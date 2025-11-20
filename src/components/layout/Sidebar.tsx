@@ -1,0 +1,299 @@
+// Sidebar.tsx - INTEGRATED WITH ROUTES
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/util';
+import { useLanguageStore } from '@/stores/useLanguageStore';
+import Image from '@/assets/images/smartlife-text-white.png'
+import {
+  LayoutDashboard,
+  Smartphone,
+  Box,
+  Bell,
+  BarChart3,
+  Users,
+  Settings,
+  ChevronDown,
+  ChevronRight,
+  X,
+  FileText,
+  Share2,
+  Activity,
+  Layers,
+  Calendar,
+   
+  CreditCard,
+  PiIcon,
+  BotIcon,
+  TvIcon,
+  FlowerIcon,
+  DamIcon,
+  PiSquare,
+  FanIcon,
+  ImageIcon,
+  SuperscriptIcon,
+  FolderKanbanIcon,
+} from 'lucide-react';
+
+interface NavItem {
+  titleKey: string;
+  href?: string;
+  icon: React.ReactNode;
+  children?: NavItem[];
+}
+
+const getNavItems = (t: (key: string) => string): NavItem[] => [
+  {
+    titleKey: 'nav.overview',
+    href: '/overview',
+    icon: <Activity className="h-5 w-5" />,
+  },
+  {
+    titleKey: 'nav.solutionTemplates',
+    href: '/solution-templates',
+    icon: <DamIcon className="h-5 w-5" />,
+  },
+   {
+    titleKey: 'nav.solutionDashboards',
+    href: '/dashboards',
+    icon: <LayoutDashboard className="h-5 w-5" />,
+  },
+  {
+    titleKey: 'nav.profiles',
+    icon: <PiSquare className="h-5 w-5" />,
+    children: [
+      { titleKey: 'nav.deviceProfiles', href: '/device-profiles', icon: <Smartphone className="h-4 w-4" /> },
+      { titleKey: 'nav.assetProfiles', href: '/asset-profiles', icon: <Box className="h-4 w-4" /> },
+    ],
+  },
+  {
+    titleKey: 'nav.objects',
+    icon: <Box className="h-5 w-5" />,
+    children: [
+      { titleKey: 'nav.devices', href: '/devices', icon: <Smartphone className="h-4 w-4" /> },
+      { titleKey: 'nav.assets', href: '/assets', icon: <Box className="h-4 w-4" /> },
+    ],
+  },
+  {
+    titleKey: 'nav.floorPlans',
+    href: '/floor-plans',
+    icon: <FlowerIcon className="h-5 w-5" />,
+  },
+  {
+    titleKey: 'nav.alerts',
+    href: '/alarms',
+    icon: <Bell className="h-5 w-5" />,
+  },
+  {
+    titleKey: 'nav.analytics',
+    href: '/analytics',
+    icon: <BarChart3 className="h-5 w-5" />,
+  },
+  {
+    titleKey: 'nav.usersAndRoles',
+    href: '/users',
+    icon: <Users className="h-5 w-5" />,
+  },
+   {
+    titleKey: 'nav.automation',
+    href: '/automation',
+    icon: <PiIcon className="h-5 w-5" />,
+  },
+   {
+    titleKey: 'nav.integrations',
+    href: '/integrations',
+    icon: <BotIcon className="h-5 w-5" />,
+  },
+   {
+    titleKey: 'nav.edgeManagementCenter',
+    href: '/edge-management',
+    icon: <TvIcon className="h-5 w-5" />,
+  },
+   { titleKey: 'nav.scheduleManagement', href: '/schedule-management', icon: <Calendar className="h-4 w-4" /> },
+   { 
+    titleKey: 'nav.resources',
+    children: [
+      { titleKey: 'nav.widgetsBundle', href: '/widgets-bundle', icon: <FolderKanbanIcon className="h-4 w-4" /> },
+      { titleKey: 'nav.widgets', href: '/widgets', icon: <FanIcon className="h-4 w-4" /> },
+      { titleKey: 'nav.imageLibrary', href: '/images', icon: <ImageIcon className="h-4 w-4" /> },
+      { titleKey: 'nav.javascriptLibrary', href: '/javascript-library', icon: <SuperscriptIcon className="h-4 w-4" /> }
+    ],
+    icon: <Layers className="h-4 w-4" /> 
+  },
+   {
+     titleKey: 'nav.notifications',
+     href: '/notifications',
+     icon: <Bell className="h-5 w-5" />,
+    },
+      {
+    titleKey: 'nav.sharingCenter',
+    href: '/sharing-center',
+    icon: <Share2 className="h-5 w-5" />,
+  },
+   {
+    titleKey: 'nav.apiMonitoring',
+    href: '/api-monitoring',
+    icon: <Activity className="h-5 w-5" />,
+  },
+  {
+    titleKey: 'nav.auditLogs',
+    href: '/audit',
+    icon: <FileText className="h-5 w-5" />,
+  },
+  {
+    titleKey: 'nav.subscriptionPlans',
+    href: '/subscription-plans',
+    icon: <CreditCard className="h-5 w-5" />,
+  },
+  {
+    titleKey: 'nav.settings',
+    href: '/settings',
+    icon: <Settings className="h-5 w-5" />,
+  },
+  
+];
+
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  className?: string;
+}
+
+export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+  const { t } = useTranslation();
+  const { direction } = useLanguageStore();
+  const location = useLocation();
+  const navItems = getNavItems(t);
+  const [expandedItems, setExpandedItems] = useState<string[] | any>(['nav.objects']);
+  const isRTL = direction === 'rtl';
+
+  const isActive = (href: string) => location.pathname === href;
+  
+  const isParentActive = (children?: NavItem[]) => {
+    if (!children) return false;
+    return children.some(child => child.href && location.pathname === child.href);
+  };
+
+  const toggleExpand = (titleKey: string) => {
+    setExpandedItems((prev: any) =>
+      prev.includes(titleKey) ? prev.filter((item: any) => item !== titleKey) : [...prev, titleKey]
+    );
+  };
+
+  return (
+    <>
+      {isOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={onClose} />
+      )}
+
+      <aside
+  className={cn(
+    'fixed top-0 z-50 h-screen w-64 bg-primary flex flex-col',
+    'transform transition-transform duration-300 ease-in-out',
+    isRTL ? 'right-0' : 'left-0',
+    'lg:translate-x-0',
+    isOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')
+  )}
+>
+  {/* Header */}
+  <div className=" p-5 flex items-center justify-between px-4   border-white/10 flex-shrink-0">
+    <img
+      src={Image}
+      alt="Smart Life"
+      className="h-16 w-auto object-contain mx-auto "
+    />
+    <button
+      onClick={onClose}
+      className="lg:hidden text-white hover:bg-white/10 p-1 rounded"
+    >
+      <X className="h-5 w-5" />
+    </button>
+  </div>
+
+  {/* Scrollable Navigation */}
+ <nav
+  className={cn(
+    "flex-1 overflow-y-auto sidebar-scroll py-4 px-3",
+    "transition-all duration-200 ease-in-out",
+    "[&::-webkit-scrollbar]:hidden",
+    "[scrollbar-width:none]"
+  )}
+>
+
+    <div className="space-y-1">
+      {navItems.map((item) => (
+        <div key={item.titleKey}>
+          {item.children ? (
+            <>
+              <button
+                onClick={() => toggleExpand(item.titleKey)}
+                className={cn(
+                  'w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all',
+                  isParentActive(item.children)
+                    ? 'bg-white/20 text-white'
+                    : 'text-white/90 hover:bg-white/10'
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  {item.icon}
+                  <span className="text-sm font-medium">{t(item.titleKey)}</span>
+                </div>
+                {expandedItems.includes(item.titleKey) ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
+              {expandedItems.includes(item.titleKey) && (
+                <div className="mt-1 ml-4 space-y-1">
+                  {item.children.map((child) => (
+                    <Link
+                      key={child.titleKey}
+                      to={child.href!}
+                      onClick={onClose}
+                      className={cn(
+                        'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all',
+                        isActive(child.href!)
+                          ? 'bg-white/20 text-white font-medium'
+                          : 'text-white/80 hover:bg-white/10'
+                      )}
+                    >
+                      {child.icon}
+                      <span>{t(child.titleKey)}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <Link
+              to={item.href!}
+              onClick={onClose}
+              className={cn(
+                'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all',
+                isActive(item.href!)
+                  ? 'bg-white/20 text-white font-medium'
+                  : 'text-white/90 hover:bg-white/10'
+              )}
+            >
+              {item.icon}
+              <span className="text-sm font-medium">{t(item.titleKey)}</span>
+            </Link>
+          )}
+        </div>
+      ))}
+    </div>
+  </nav>
+
+  {/* Footer */}
+  <div className="h-16 border-t border-white/10 flex items-center justify-center flex-shrink-0">
+    <div className="text-center">
+      <p className="text-white/80 text-xs font-medium">{t('nav.smartLifeIoTPlatform')}</p>
+      <p className="text-white/50 text-xs">{t('nav.version')}</p>
+    </div>
+  </div>
+</aside>
+
+    </>
+  );
+};

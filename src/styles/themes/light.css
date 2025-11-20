@@ -1,0 +1,49 @@
+.theme-light {
+  /* Background Colors */
+  --background: 255 255 255;
+  --foreground: 17 24 39;
+  --card: 249 250 251;
+  --card-foreground: 17 24 39;
+  --popover: 255 255 255;
+  --popover-foreground: 17 24 39;
+  
+  /* Primary Colors - #44489D */
+  --primary: 237 40% 44%;
+  --primary-foreground: 0 0% 100%;
+  
+  /* Primary Main - #1D174C */
+  --primary-main: 246 54% 19%;
+  --primary-main-foreground: 0 0% 100%;
+  
+  /* Secondary Colors - #C36BA9 */
+  --secondary: 321 47% 59%;
+  --secondary-foreground: 0 0% 100%;
+  
+  /* Secondary Main - #01C2F3 */
+  --secondary-main: 191 99% 48%;
+  --secondary-main-foreground: 0 0% 100%;
+  
+  /* Muted Colors */
+  --muted: 243 244 246;
+  --muted-foreground: 107 114 128;
+  
+  /* Accent Colors */
+  --accent: 16 185 129;
+  --accent-foreground: 255 255 255;
+  
+  /* Destructive */
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+  
+  /* Border & Input */
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 237 40% 44%; /* Primary color #44489D */
+  
+  /* Chart Colors */
+  --chart-1: 59 130 246;
+  --chart-2: 139 92 246;
+  --chart-3: 16 185 129;
+  --chart-4: 245 158 11;
+  --chart-5: 239 68 68;
+}

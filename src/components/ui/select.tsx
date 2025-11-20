@@ -1,0 +1,162 @@
+import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
+import { ChevronDown, Check } from 'lucide-react';
+
+interface SelectContextValue {
+  value: string;
+  onValueChange: (value: string) => void;
+  open: boolean;
+  setOpen: (open: boolean) => void;
+}
+
+const SelectContext = createContext<SelectContextValue | undefined>(undefined);
+
+interface SelectProps {
+  value?: string;
+  onValueChange?: (value: string) => void;
+  defaultValue?: string;
+  children: React.ReactNode;
+}
+
+export function Select({ value: controlledValue, onValueChange, defaultValue = '', children }: SelectProps) {
+  const [internalValue, setInternalValue] = useState(defaultValue);
+  const [open, setOpen] = useState(false);
+
+  const value = controlledValue !== undefined ? controlledValue : internalValue;
+  
+  const handleValueChange = (newValue: string) => {
+    if (controlledValue === undefined) {
+      setInternalValue(newValue);
+    }
+    onValueChange?.(newValue);
+    setOpen(false);
+  };
+
+  return (
+    <SelectContext.Provider value={{ value, onValueChange: handleValueChange, open, setOpen }}>
+      <div className="relative">
+        {children}
+      </div>
+    </SelectContext.Provider>
+  );
+}
+
+interface SelectTriggerProps {
+  children: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+}
+
+export function SelectTrigger({ children, className = '', disabled = false }: SelectTriggerProps) {
+  const context = useContext(SelectContext);
+  
+  if (!context) {
+    throw new Error('SelectTrigger must be used within Select');
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => context.setOpen(!context.open)}
+      className={`flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+    >
+      {children}
+      <ChevronDown className="h-4 w-4 opacity-50" />
+    </button>
+  );
+}
+
+interface SelectValueProps {
+  placeholder?: string;
+  className?: string;
+}
+
+export function SelectValue({ placeholder = 'Select...', className = '' }: SelectValueProps) {
+  const context = useContext(SelectContext);
+  
+  if (!context) {
+    throw new Error('SelectValue must be used within Select');
+  }
+
+  return (
+    <span className={className}>
+      {context.value || placeholder}
+    </span>
+  );
+}
+
+interface SelectContentProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function SelectContent({ children, className = '' }: SelectContentProps) {
+  const context = useContext(SelectContext);
+  const contentRef = useRef<HTMLDivElement>(null);
+  
+  if (!context) {
+    throw new Error('SelectContent must be used within Select');
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (contentRef.current && !contentRef.current.contains(event.target as Node)) {
+        context.setOpen(false);
+      }
+    };
+
+    if (context.open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [context.open]);
+
+  if (!context.open) {
+    return null;
+  }
+
+  return (
+    <div
+      ref={contentRef}
+      className={`absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+interface SelectItemProps {
+  value: string;
+  children: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+}
+
+export function SelectItem({ value, children, className = '', disabled = false }: SelectItemProps) {
+  const context = useContext(SelectContext);
+  
+  if (!context) {
+    throw new Error('SelectItem must be used within Select');
+  }
+
+  const isSelected = context.value === value;
+
+  return (
+    <div
+      onClick={() => !disabled && context.onValueChange(value)}
+      className={`relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none hover:bg-slate-100 focus:bg-slate-100 ${
+        isSelected ? 'bg-slate-50' : ''
+      } ${disabled ? 'pointer-events-none opacity-50' : ''} ${className}`}
+    >
+      {isSelected && (
+        <span className="absolute left-2 flex h-4 w-4 items-center justify-center">
+          <Check className="h-4 w-4" />
+        </span>
+      )}
+      {children}
+    </div>
+  );
+}
