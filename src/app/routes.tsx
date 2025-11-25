@@ -11,6 +11,8 @@ import { VerifyAccountPage } from '../pages/VerifyAccountPage.tsx';
 import { PinCodeVerificationPage } from '../pages/PinCodeVerificationPage.tsx';
 import { SelectRolePage } from '../pages/SelectRolePage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
+import MainDashboardPage from '@/pages/MainDashboardPage.tsx';
+import MainControlPanelPage from '@/pages/MainControlPanelPage.tsx';
 import { OverviewPage } from '../pages/OverviewPage.tsx';
 import DevicesPage from '@/pages/DevicesPage.tsx';
 import AssetsPage from '@/pages/AssetsPage.tsx';
@@ -37,6 +39,7 @@ import Integrations from '@/pages/IntegrationsPage.tsx';
 import EdgeManagement from '@/pages/EdgeManagementPage.tsx';
 import WidgetsBundle from '@/pages/WidgetsBundle.tsx';
 import Widgets from '@/pages/WidgetsPage.tsx';
+import WidgetConfigurationPage from '@/pages/WidgetConfigurationPage.tsx';
 import ImageLibrary from '@/pages/ImageLibraryPage.tsx';
 import ScriptLibrary from '@/pages/ScriptLibrary.tsx';
 import ScheduleManagement from '@/pages/ScheduleManagementPage.tsx';
@@ -50,10 +53,7 @@ export const router = createBrowserRouter([
   {
     element: <PublicRoute />,
     children: [
-      {
-        path: '/overview',
-        element: <OverviewPage />,
-      },
+      
       {
         path: '/login',
         element: <LoginPage />,
@@ -102,6 +102,14 @@ export const router = createBrowserRouter([
       {
         path: '/dashboard',
         element: <DashboardPage />,
+      },
+      {
+        path: '/main-dashboard',
+        element: <MainDashboardPage />,
+      },
+      {
+        path: '/main-control-panel',
+        element: <MainControlPanelPage />,
       },
       {
         path: '/devices',
@@ -236,6 +244,10 @@ export const router = createBrowserRouter([
             <Widgets />
           </AppLayout>
         ),
+      },
+      {
+        path: '/widgets/configure',
+        element: <WidgetConfigurationPage />,
       },
       {
         path: '/images',

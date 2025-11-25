@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 
 interface User {
   id: string;
@@ -36,31 +36,46 @@ interface AppState {
 
 export const useAppStore = create<AppState>()(
   devtools(
-    (set) => ({
-      // User State
-      user: null,
-      isAuthenticated: 1,
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
-      logout: () => set({ user: null, isAuthenticated: false }),
+    persist(
+      (set) => ({
+        // User State
+        user: null,
+        isAuthenticated: false,
+        setUser: (user) => set({ user, isAuthenticated: !!user }),
+        logout: () => {
+          set({ user: null, isAuthenticated: false });
+          // Clear tokens on logout
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+        },
 
-      // UI State
-      sidebarOpen: true,
-      setSidebarOpen: (open) => set({ sidebarOpen: open }),
-      toggleSidebar: () =>
-        set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+        // UI State
+        sidebarOpen: true,
+        setSidebarOpen: (open) => set({ sidebarOpen: open }),
+        toggleSidebar: () =>
+          set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 
-      // Loading
-      isLoading: false,
-      setLoading: (loading) => set({ isLoading: loading }),
+        // Loading
+        isLoading: false,
+        setLoading: (loading) => set({ isLoading: loading }),
 
-      // Modal
-      activeModal: null,
-      setActiveModal: (modal) => set({ activeModal: modal }),
+        // Modal
+        activeModal: null,
+        setActiveModal: (modal) => set({ activeModal: modal }),
 
-      // Search
-      searchQuery: '',
-      setSearchQuery: (query) => set({ searchQuery: query }),
-    }),
+        // Search
+        searchQuery: '',
+        setSearchQuery: (query) => set({ searchQuery: query }),
+      }),
+      {
+        name: 'app-storage',
+        // Only persist user authentication state, not UI preferences
+        partialize: (state) => ({
+          user: state.user,
+          isAuthenticated: state.isAuthenticated,
+        }),
+      }
+    ),
     { name: 'AppStore' }
   )
 );

@@ -68,6 +68,27 @@
     "smartLifeIoTPlatform": "Smart Life IoT Platform",
     "version": "v1.0.0"
   },
+  "mainDashboard": {
+    "title": "Main Dashboard",
+    "actions": {
+      "setting": "Setting",
+      "edit": "Edit",
+      "share": "Share"
+    },
+    "sections": {
+      "temperatureTrend": "Temperature Trend",
+      "humidityLevel": "Humidity Level",
+      "powerConsumption": "Power Consumption",
+      "systemStatus": "System Status"
+    },
+    "status": {
+      "online": "Online",
+      "offline": "Offline"
+    },
+    "tooltip": {
+      "total": "Total"
+    }
+  },
   "dashboard": {
     "title": "Dashboard",
     "overview": "Overview",
@@ -255,6 +276,94 @@
       "remaining": "Remaining"
     }
   },
+  "mainControlPanel": {
+    "title": "Main Control Panel",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "edit": "Edit",
+      "settings": "Settings",
+      "api": "API"
+    },
+    "actions": {
+      "export": "Export",
+      "share": "Share",
+      "delete": "DELETE"
+    },
+    "widgets": {
+      "temperatureTrend": "Temperature Trend",
+      "humidityLevel": "Humidity Level",
+      "deviceStatus": "Device Status",
+      "energyConsumption": "Energy Consumption Timeline",
+      "alerts": "Alerts"
+    },
+    "status": {
+      "online": "Online",
+      "uptime": "Uptime",
+      "lastPing": "Last ping",
+      "status": "Status",
+      "normal": "Normal"
+    },
+    "tooltip": {
+      "total": "Total"
+    }
+  },
+  "widgetConfiguration": {
+    "title": "Widget Configuration",
+    "subtitle": "Configure Widget: {{widgetName}}",
+    "tabs": {
+      "data": "Data",
+      "settings": "Settings",
+      "layout": "Layout",
+      "advanced": "Advanced"
+    },
+    "dataSource": {
+      "title": "Data Source",
+      "dataSource": "Data Source",
+      "entity": "Entity",
+      "timeWindow": "Time Window",
+      "options": {
+        "temperatureSensor": "Temperature Sensor",
+        "humiditySensor": "Humidity Sensor",
+        "pressureSensor": "Pressure Sensor",
+        "thermostat001": "Thermostat 001",
+        "thermostat002": "Thermostat 002",
+        "thermostat003": "Thermostat 003"
+      },
+      "timeWindows": {
+        "last1Hour": "Last 1 hour",
+        "last6Hours": "Last 6 hours",
+        "last24Hours": "Last 24 hours",
+        "last7Days": "Last 7 days"
+      }
+    },
+    "keyProperties": {
+      "title": "Key Properties",
+      "parameter": "Parameter",
+      "label": "Label"
+    },
+    "settings": {
+      "title": "Settings",
+      "comingSoon": "Settings configuration coming soon..."
+    },
+    "layout": {
+      "title": "Layout",
+      "comingSoon": "Layout configuration coming soon..."
+    },
+    "advanced": {
+      "title": "Advanced",
+      "comingSoon": "Advanced configuration coming soon..."
+    },
+    "preview": {
+      "title": "Preview",
+      "tooltip": {
+        "total": "Total"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
   "devices": {
     "title": "Devices",
     "addDevice": "Add Device",
@@ -271,6 +380,7 @@
   },
   "assets": {
     "title": "Assets",
+    "subtitle": "Manage your asset hierarchy and relationships.",
     "addAsset": "Add Asset",
     "editAsset": "Edit Asset",
     "deleteAsset": "Delete Asset",
@@ -279,7 +389,31 @@
     "parentAsset": "Parent Asset",
     "childAssets": "Child Assets",
     "assignedDevices": "Assigned Devices",
-    "noAssets": "No assets found"
+    "noAssets": "No assets found",
+    "searchPlaceholder": "Search assets...",
+    "actions": {
+      "export": "Export",
+      "import": "Import",
+      "addAsset": "+ Add Asset"
+    },
+    "filters": {
+      "assetType": "Asset Type",
+      "customer": "Customer",
+      "filter": "Filter"
+    },
+    "table": {
+      "name": "NAME",
+      "type": "TYPE",
+      "customer": "CUSTOMER",
+      "created": "CREATED",
+      "status": "STATUS",
+      "actions": "ACTIONS"
+    },
+    "status": {
+      "active": "Active",
+      "warning": "Warning",
+      "error": "Error"
+    }
   },
   "alarms": {
     "title": "Alarms",
@@ -349,7 +483,8 @@
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 6 characters",
       "loginError": "Login failed. Please check your credentials.",
-      "loginSuccess": "Login successful"
+      "loginSuccess": "Login successful",
+      "loginWithGoogle": "Sign in with Google"
     },
     "register": {
       "title": "Create Account",
@@ -363,12 +498,18 @@
       "emailPlaceholder": "Email",
       "emailInvalid": "Invalid email address",
       "mobile": "Mobile Number",
-      "mobilePlaceholder": "Mobile Number (05XXXXXXXX or +9665XXXXXXXX)",
+      "mobilePlaceholder": "Phone Number",
       "mobileRequired": "Mobile number is required",
-      "mobileInvalid": "Please enter a valid Saudi Arabia mobile number (05XXXXXXXX or +9665XXXXXXXX)",
+      "mobileInvalid": "Please enter a valid phone number",
       "password": "Password",
       "passwordPlaceholder": "Password",
-      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordRequiresLowercase": "Password must contain at least one lowercase letter",
+      "passwordRequiresUppercase": "Password must contain at least one uppercase letter",
+      "passwordRequiresNumber": "Password must contain at least one number",
+      "passwordRequiresSpecialChar": "Password must contain at least one special character",
+      "passwordInvalid": "Password does not meet the requirements",
       "confirmPassword": "Confirm Password",
       "acceptTerms": "I accept the terms & Condition",
       "acceptTermsError": "You must accept the terms & conditions",

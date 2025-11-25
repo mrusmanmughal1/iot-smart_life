@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+button{
+  cursor: pointer;
+}
+
 /* Tailwind CSS v4 Theme Configuration */
 /* 
  * Using @theme directive to customize Tailwind CSS v4 theme

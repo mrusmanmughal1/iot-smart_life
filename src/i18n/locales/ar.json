@@ -68,6 +68,27 @@
     "smartLifeIoTPlatform": "منصة Smart Life IoT",
     "version": "الإصدار 1.0.0"
   },
+  "mainDashboard": {
+    "title": "لوحة المعلومات الرئيسية",
+    "actions": {
+      "setting": "الإعدادات",
+      "edit": "تعديل",
+      "share": "مشاركة"
+    },
+    "sections": {
+      "temperatureTrend": "اتجاه درجة الحرارة",
+      "humidityLevel": "مستوى الرطوبة",
+      "powerConsumption": "استهلاك الطاقة",
+      "systemStatus": "حالة النظام"
+    },
+    "status": {
+      "online": "متصل",
+      "offline": "غير متصل"
+    },
+    "tooltip": {
+      "total": "الإجمالي"
+    }
+  },
   "dashboard": {
     "title": "لوحة التحكم",
     "overview": "نظرة عامة",
@@ -254,6 +275,94 @@
       "remaining": "متبقي"
     }
   },
+  "mainControlPanel": {
+    "title": "لوحة التحكم الرئيسية",
+    "tabs": {
+      "dashboard": "لوحة التحكم",
+      "edit": "تعديل",
+      "settings": "الإعدادات",
+      "api": "واجهة برمجة التطبيقات"
+    },
+    "actions": {
+      "export": "تصدير",
+      "share": "مشاركة",
+      "delete": "حذف"
+    },
+    "widgets": {
+      "temperatureTrend": "اتجاه درجة الحرارة",
+      "humidityLevel": "مستوى الرطوبة",
+      "deviceStatus": "حالة الجهاز",
+      "energyConsumption": "جدول استهلاك الطاقة",
+      "alerts": "التنبيهات"
+    },
+    "status": {
+      "online": "متصل",
+      "uptime": "وقت التشغيل",
+      "lastPing": "آخر ping",
+      "status": "الحالة",
+      "normal": "طبيعي"
+    },
+    "tooltip": {
+      "total": "الإجمالي"
+    }
+  },
+  "widgetConfiguration": {
+    "title": "تكوين الأداة",
+    "subtitle": "تكوين الأداة: {{widgetName}}",
+    "tabs": {
+      "data": "البيانات",
+      "settings": "الإعدادات",
+      "layout": "التخطيط",
+      "advanced": "متقدم"
+    },
+    "dataSource": {
+      "title": "مصدر البيانات",
+      "dataSource": "مصدر البيانات",
+      "entity": "الكيان",
+      "timeWindow": "النافذة الزمنية",
+      "options": {
+        "temperatureSensor": "مستشعر درجة الحرارة",
+        "humiditySensor": "مستشعر الرطوبة",
+        "pressureSensor": "مستشعر الضغط",
+        "thermostat001": "منظم الحرارة 001",
+        "thermostat002": "منظم الحرارة 002",
+        "thermostat003": "منظم الحرارة 003"
+      },
+      "timeWindows": {
+        "last1Hour": "آخر ساعة",
+        "last6Hours": "آخر 6 ساعات",
+        "last24Hours": "آخر 24 ساعة",
+        "last7Days": "آخر 7 أيام"
+      }
+    },
+    "keyProperties": {
+      "title": "الخصائص الرئيسية",
+      "parameter": "المعامل",
+      "label": "التسمية"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "comingSoon": "تكوين الإعدادات قريباً..."
+    },
+    "layout": {
+      "title": "التخطيط",
+      "comingSoon": "تكوين التخطيط قريباً..."
+    },
+    "advanced": {
+      "title": "متقدم",
+      "comingSoon": "التكوين المتقدم قريباً..."
+    },
+    "preview": {
+      "title": "معاينة",
+      "tooltip": {
+        "total": "الإجمالي"
+      }
+    },
+    "actions": {
+      "cancel": "إلغاء",
+      "save": "حفظ"
+    }
+  },
   "devices": {
     "title": "الأجهزة",
     "addDevice": "إضافة جهاز",
@@ -270,6 +379,7 @@
   },
   "assets": {
     "title": "الأصول",
+    "subtitle": "إدارة التسلسل الهرمي للأصول والعلاقات.",
     "addAsset": "إضافة أصل",
     "editAsset": "تعديل الأصل",
     "deleteAsset": "حذف الأصل",
@@ -278,7 +388,31 @@
     "parentAsset": "الأصل الرئيسي",
     "childAssets": "الأصول الفرعية",
     "assignedDevices": "الأجهزة المخصصة",
-    "noAssets": "لا توجد أصول"
+    "noAssets": "لا توجد أصول",
+    "searchPlaceholder": "البحث في الأصول...",
+    "actions": {
+      "export": "تصدير",
+      "import": "استيراد",
+      "addAsset": "+ إضافة أصل"
+    },
+    "filters": {
+      "assetType": "نوع الأصل",
+      "customer": "العميل",
+      "filter": "تصفية"
+    },
+    "table": {
+      "name": "الاسم",
+      "type": "النوع",
+      "customer": "العميل",
+      "created": "تاريخ الإنشاء",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "active": "نشط",
+      "warning": "تحذير",
+      "error": "خطأ"
+    }
   },
   "alarms": {
     "title": "التنبيهات",
@@ -348,7 +482,8 @@
       "passwordRequired": "كلمة المرور مطلوبة",
       "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
       "loginError": "فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد الخاصة بك.",
-      "loginSuccess": "تم تسجيل الدخول بنجاح"
+      "loginSuccess": "تم تسجيل الدخول بنجاح",
+      "loginWithGoogle": "تسجيل الدخول باستخدام Google"
     },
     "register": {
       "title": "إنشاء حساب",
@@ -362,12 +497,18 @@
       "emailPlaceholder": "البريد الإلكتروني",
       "emailInvalid": "عنوان بريد إلكتروني غير صحيح",
       "mobile": "رقم الجوال",
-      "mobilePlaceholder": "رقم الجوال (05XXXXXXXX أو +9665XXXXXXXX)",
+      "mobilePlaceholder": "رقم الهاتف",
       "mobileRequired": "رقم الجوال مطلوب",
-      "mobileInvalid": "يرجى إدخال رقم جوال صحيح في السعودية (05XXXXXXXX أو +9665XXXXXXXX)",
+      "mobileInvalid": "يرجى إدخال رقم هاتف صحيح",
       "password": "كلمة المرور",
       "passwordPlaceholder": "كلمة المرور",
-      "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+      "passwordRequiresLowercase": "يجب أن تحتوي كلمة المرور على حرف صغير واحد على الأقل",
+      "passwordRequiresUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير واحد على الأقل",
+      "passwordRequiresNumber": "يجب أن تحتوي كلمة المرور على رقم واحد على الأقل",
+      "passwordRequiresSpecialChar": "يجب أن تحتوي كلمة المرور على حرف خاص واحد على الأقل",
+      "passwordInvalid": "كلمة المرور لا تستوفي المتطلبات",
       "confirmPassword": "تأكيد كلمة المرور",
       "acceptTerms": "أوافق على الشروط والأحكام",
       "acceptTermsError": "يجب الموافقة على الشروط والأحكام",

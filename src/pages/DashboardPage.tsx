@@ -30,6 +30,7 @@ import {
 } from 'recharts';
 import AppLayout from '@/components/layout/AppLayout';
 import { Link } from 'react-router-dom';
+import { Progress } from '@/components/ui/progress';
 
 // Chart Data
 const activeSolutionsData = [
@@ -185,9 +186,9 @@ export const DashboardPage = () => {
 
               <div
                 ref={scrollContainerRef}
-                className="flex flex-1 items-center gap-4 overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
+                className="flex flex-1 items-center gap-4 bg-[#D9D9D92B]  rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
               >
-                <div className="flex gap-4 w-full bg-[#D9D9D92B] p-4 rounded-xl">
+                <div className="flex gap-4 w-full  p-4">
                   {solutions.map((solution) => (
                     <button
                       key={solution.key}
@@ -357,10 +358,8 @@ export const DashboardPage = () => {
                     </p>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-secondary h-2 rounded-full"
-                      style={{ width: '65%' }}
-                    ></div>
+                     
+                    <Progress value={65} max={100} />
                   </div>
                 </CardContent>
               </Card>
@@ -414,13 +413,11 @@ export const DashboardPage = () => {
                       <span className="font-semibold text-gray-900">12/30</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-secondary h-2 rounded-full"
-                        style={{ width: '40%' }}
-                      ></div>
+                    <Progress value={65} max={100} />
+
                     </div>
                   </div>
-                  <div>
+                  <div>   
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-600">
                         {t('dashboard.dashboards')}
@@ -428,10 +425,8 @@ export const DashboardPage = () => {
                       <span className="font-semibold text-gray-900">5/10</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-secondary h-2 rounded-full"
-                        style={{ width: '50%' }}
-                      ></div>
+                    <Progress value={65} max={100} />
+
                     </div>
                   </div>
                 </CardContent>

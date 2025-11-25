@@ -38,7 +38,6 @@ export const LoginForm: React.FC = () => {
   });
 
   const onSubmit = (data: LoginFormData) => {
-    alert(JSON.stringify(data));
     login(data);
   };
 

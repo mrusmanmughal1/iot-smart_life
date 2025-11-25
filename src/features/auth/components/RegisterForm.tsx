@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { isValidPhoneNumber } from 'react-phone-number-input';
 import { Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
+import { PhoneInput } from '@/components/ui/phone-input.tsx';
 import { Checkbox } from '@/components/ui/checkbox.tsx';
 import { useRegister } from '../hooks/useRegister.ts';
 import GoogleIcon from '@assets/icons/google.webp';
@@ -15,60 +17,51 @@ import GithubIcon from '@assets/icons/github.svg';
 
 type RegisterFormData = z.infer<ReturnType<typeof createRegisterSchema>>;
 
-const createRegisterSchema = (t: (key: string) => string) => z.object({
-  firstName: z.string().min(2, t('auth.register.firstNameMinLength')),
-  lastName: z.string().min(2, t('auth.register.lastNameMinLength')),
-  email: z.string().email(t('auth.register.emailInvalid')),
-  mobile: z
-    .string()
-    .min(1, t('auth.register.mobileRequired'))
-    .refine(
-      (val) => {
-        // Remove all spaces, dashes, and parentheses for validation
-        const cleaned = val.replace(/[\s\-()]/g, '');
-        
-        // Saudi Arabia phone number patterns:
-        // Local: 05XXXXXXXX (10 digits, starts with 05)
-        // International with +: +9665XXXXXXXX (13 chars, +966 + 9 digits)
-        // International with 00: 009665XXXXXXXX (14 chars, 00966 + 9 digits)
-        // Without prefix: 9665XXXXXXXX (12 digits, 966 + 9 digits)
-        
-        // Check for local format (05XXXXXXXX)
-        if (/^05\d{8}$/.test(cleaned)) {
-          return true;
+const createRegisterSchema = (t: (key: string) => string) =>
+  z.object({
+    firstName: z.string().min(2, t('auth.register.firstNameMinLength')),
+    lastName: z.string().min(2, t('auth.register.lastNameMinLength')),
+    email: z.string().email(t('auth.register.emailInvalid')),
+    phone: z
+      .string()
+      .min(1, t('auth.register.mobileRequired'))
+      .refine(
+        (val) => {
+          // Validate international phone number format
+          if (!val || val.trim() === '') {
+            return false;
+          }
+          return isValidPhoneNumber(val);
+        },
+        {
+          message: t('auth.register.mobileInvalid'),
         }
-        
-        // Check for international format with + (+9665XXXXXXXX)
-        if (/^\+9665\d{8}$/.test(cleaned)) {
-          return true;
-        }
-        
-        // Check for international format with 00 (009665XXXXXXXX)
-        if (/^009665\d{8}$/.test(cleaned)) {
-          return true;
-        }
-        
-        // Check for format without + but with country code (9665XXXXXXXX)
-        if (/^9665\d{8}$/.test(cleaned)) {
-          return true;
-        }
-        
-        return false;
-      },
-      {
-        message: t('auth.register.mobileInvalid'),
-      }
-    ),
-  password: z.string().min(6, t('auth.register.passwordMinLength')),
-  acceptTerms: z.boolean().refine((val) => val === true, {
-    message: t('auth.register.acceptTermsError'),
-  }),
-});
+      ),
+    password: z
+      .string()
+      .min(1, t('auth.register.passwordRequired'))
+      .min(8, t('auth.register.passwordMinLength'))
+      .refine((val) => /[a-z]/.test(val), {
+        message: t('auth.register.passwordRequiresLowercase'),
+      })
+      .refine((val) => /[A-Z]/.test(val), {
+        message: t('auth.register.passwordRequiresUppercase'),
+      })
+      .refine((val) => /\d/.test(val), {
+        message: t('auth.register.passwordRequiresNumber'),
+      })
+      .refine((val) => /[!@#$%^&*(),.?":{}|<>[\]\\/_+\-=~`]/.test(val), {
+        message: t('auth.register.passwordRequiresSpecialChar'),
+      }),
+    acceptTerms: z.boolean().refine((val) => val === true, {
+      message: t('auth.register.acceptTermsError'),
+    }),
+  });
 
 export const RegisterForm: React.FC = () => {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
-  const { mutate: register, isPending, error } = useRegister();
+  const { mutate: register, isPending } = useRegister();
 
   const registerSchema = createRegisterSchema(t);
 
@@ -76,12 +69,19 @@ export const RegisterForm: React.FC = () => {
     register: formRegister,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      phone: '',
+    },
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    const { firstName, lastName, ...rest } = data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { firstName, lastName, acceptTerms, ...rest } = data;
+
     register({
       name: `${firstName} ${lastName}`,
       ...rest,
@@ -100,14 +100,14 @@ export const RegisterForm: React.FC = () => {
           <img src={GoogleIcon} alt="Google" className="w-4 h-4 mr-2" />
           {t('auth.register.signUpWithGoogle')}
         </Button>
-        <Button
+        {/* <Button
           variant="social"
           className="flex-1 h-12 rounded-full text-xs"
           type="button"
         >
           <img src={AppleIcon} alt="Apple" className="w-4 h-4 mr-2" />
           {t('auth.register.signUpWithApple')}
-        </Button>
+        </Button> */}
         <Button
           variant="social"
           className="flex-1 h-12 rounded-full text-xs"
@@ -119,13 +119,13 @@ export const RegisterForm: React.FC = () => {
       </div>
 
       {/* Error Message */}
-      {error && (
+      {/* {error && (
         <div className="mb-6 p-4 bg-[#DB42900D] rounded-[40px] border border-[#DB4290]">
           <p className="text-[20px] text-[#DB4290] text-center">
             {error.message}
           </p>
         </div>
-      )}
+      )} */}
 
       {/* Register Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -159,13 +159,17 @@ export const RegisterForm: React.FC = () => {
           />
         </div>
 
-        {/* Mobile Number */}
+        {/* Phone Number */}
         <div>
-          <Input
-            type="tel"
+          <PhoneInput
             placeholder={t('auth.register.mobilePlaceholder')}
-            {...formRegister('mobile')}
-            error={errors.mobile?.message}
+            value={watch('phone') || ''}
+            onChange={(value: string | undefined) => {
+              const phoneValue = value ?? '';
+              setValue('phone', phoneValue, { shouldValidate: true });
+            }}
+            error={errors.phone?.message}
+            defaultCountry="SA"
           />
         </div>
 
@@ -195,7 +199,7 @@ export const RegisterForm: React.FC = () => {
               label={t('auth.register.acceptTerms')}
             />
             {errors.acceptTerms && (
-              <p className="text-sm  ">
+              <p className="text-xs text-red-500  ">
                 {errors.acceptTerms.message}
               </p>
             )}
@@ -209,7 +213,9 @@ export const RegisterForm: React.FC = () => {
               className="px-12"
               isLoading={isPending}
             >
-              {isPending ? t('auth.register.registering') : t('auth.register.registerButton')}
+              {isPending
+                ? t('auth.register.registering')
+                : t('auth.register.registerButton')}
             </Button>
           </div>
         </div>

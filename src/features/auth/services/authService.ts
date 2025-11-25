@@ -11,12 +11,12 @@ import type {
 export const authService = {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-    return response.data;
+    return response.data.data;
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {
     const response = await apiClient.post<AuthResponse>('/auth/register', data);
-    return response.data;
+    return response.data.data;
   },
   async logout(): Promise<void> {
     await apiClient.post('/auth/logout');
@@ -24,21 +24,28 @@ export const authService = {
 
   async getCurrentUser(): Promise<User> {
     const response = await apiClient.get<User>('/auth/me');
-    return response.data;
+    return response.data.data;
   },
 
   async forgotPassword(data: ForgotPasswordData): Promise<{ message: string }> {
     const response = await apiClient.post('/auth/forgot-password', data);
-    return response.data;
+    return response.data.data;
   },
 
   async resetPassword(data: ResetPasswordData): Promise<{ message: string }> {
     const response = await apiClient.post('/auth/reset-password', data);
-    return response.data;
+    return response.data.data;
   },
 
   async verifyToken(): Promise<{ valid: boolean }> {
     const response = await apiClient.get('/auth/verify-token');
-    return response.data;
+    return response.data.data;
+  },
+
+  async loginWithGoogle(credential: string): Promise<AuthResponse> {
+    const response = await apiClient.post<AuthResponse>('/auth/google', {
+      credential,
+    });
+    return response.data.data;
   },
 };

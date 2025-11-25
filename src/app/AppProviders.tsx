@@ -37,7 +37,7 @@ export const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
           },
         }}
       />
-      {env.enableDevtools && <ReactQueryDevtools initialIsOpen={false} />}
+      {  <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 };

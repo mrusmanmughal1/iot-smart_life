@@ -1,31 +1,17 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Plus,
   Search as SearchIcon,
   RefreshCw,
-  Eye,
-  Trash2,
-  Download,
-  Share2,
   Diamond,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { DashboardTable, DashboardTableItem } from '@/components/common/DashboardTable';
 import AppLayout from '@/components/layout/AppLayout';
 
-interface Dashboard {
-  id: string;
-  title: string;
-  tag: string;
-  tagColor: string;
-  createdTime: string;
-  status: 'active' | 'deactivate';
-  customerName: string;
-}
-
-const sampleDashboards: Dashboard[] = [
+const sampleDashboards: DashboardTableItem[] = [
   {
     id: '1',
     title: 'Smart City Overview',
@@ -58,7 +44,7 @@ const sampleDashboards: Dashboard[] = [
 export default function DashboardsPage() {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState<'all' | 'group'>('all');
-  const [dashboards] = useState<Dashboard[]>(sampleDashboards);
+  const [dashboards] = useState<DashboardTableItem[]>(sampleDashboards);
 
   const handleStatusToggle = (id: string) => {
     // TODO: Implement status toggle
@@ -144,109 +130,11 @@ export default function DashboardsPage() {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-primary">
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                      {t('solutionDashboards.table.title')}
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                      {t('solutionDashboards.table.createdTime')}
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                      {t('solutionDashboards.table.activateDeactivate')}
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                      {t('solutionDashboards.table.customerName')}
-                    </th>
-                    <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                      {t('solutionDashboards.table.actions')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dashboards.map((dashboard) => (
-                    <tr
-                      key={dashboard.id}
-                      className="border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-gray-400 mr-2">▶</span>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {dashboard.title}
-                            </div>
-                            <Badge
-                              className={`${dashboard.tagColor} text-xs mt-1 border-0`}
-                            >
-                              {t(
-                                `solutionDashboards.tags.${dashboard.tag.toLowerCase()}`
-                              )}
-                            </Badge>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-4 px-4 text-sm text-gray-600">
-                        {dashboard.createdTime}
-                      </td>
-                      <td className="py-4 px-4">
-                        <Button
-                          onClick={() => handleStatusToggle(dashboard.id)}
-                          className={`text-xs px-3 py-1 rounded-md ${
-                            dashboard.status === 'active'
-                              ? 'bg-green-500 hover:bg-green-600 text-white'
-                              : 'bg-blue-500 hover:bg-blue-600 text-white'
-                          }`}
-                        >
-                          {dashboard.status === 'active'
-                            ? t('solutionDashboards.status.active')
-                            : t('solutionDashboards.status.deactivate')}
-                        </Button>
-                      </td>
-                      <td className="py-4 px-4 text-sm text-gray-600">
-                        {dashboard.customerName}
-                      </td>
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleAction('share', dashboard.id)}
-                            className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
-                            title="Share"
-                          >
-                            <Share2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleAction('view', dashboard.id)}
-                            className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
-                            title="View"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleAction('delete', dashboard.id)}
-                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-gray-100 rounded transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleAction('download', dashboard.id)
-                            }
-                            className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
-                            title="Download"
-                          >
-                            <Download className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DashboardTable
+              data={dashboards}
+              onStatusToggle={handleStatusToggle}
+              onAction={handleAction}
+            />
           </CardContent>
         </Card>
       </div>
