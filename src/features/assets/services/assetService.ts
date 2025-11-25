@@ -62,7 +62,7 @@ export const assetService = {
       }
     }
 
-    return assetsApi.update(assetId, { parentId: newParentId });
+    return assetsApi.update(assetId, { parentId: newParentId ?? undefined });
   },
 
   /**

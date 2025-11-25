@@ -1,259 +1,259 @@
-import { auditApi } from '@/services/api/index.ts';
-import { AuditAction, AuditEntityType } from '@/services/api/audit.api.ts';
+// import { auditApi } from '@/services/api/index.ts';
+// import { AuditAction, AuditEntityType } from '@/services/api/audit.api.ts';
 
-/**
- * Audit Feature Service
- * Handles business logic for audit logs and compliance
- */
-export const auditService = {
-  /**
-   * Get audit trail for an entity
-   */
-  async getEntityAuditTrail(entityType: AuditEntityType, entityId: string) {
-    const logs = await auditApi.getByEntity(entityType, entityId);
+// /**
+//  * Audit Feature Service
+//  * Handles business logic for audit logs and compliance
+//  */
+// export const auditService = {
+//   /**
+//    * Get audit trail for an entity
+//    */
+//   async getEntityAuditTrail(entityType: AuditEntityType, entityId: string) {
+//     const logs = await auditApi.getByEntity(entityType, entityId);
     
-    // Sort by most recent first
-    const sorted = logs.data.data.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+//     // Sort by most recent first
+//     const sorted = logs.data.data.sort((a, b) => 
+//       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+//     );
 
-    // Group by action
-    const byAction = sorted.reduce((acc, log) => {
-      if (!acc[log.action]) acc[log.action] = [];
-      acc[log.action].push(log);
-      return acc;
-    }, {} as Record<AuditAction, any[]>);
+//     // Group by action
+//     const byAction = sorted.reduce((acc, log) => {
+//       if (!acc[log.action]) acc[log.action] = [];
+//       acc[log.action].push(log);
+//       return acc;
+//     }, {} as Record<AuditAction, any[]>);
 
-    return {
-      entityType,
-      entityId,
-      totalLogs: sorted.length,
-      logs: sorted,
-      byAction,
-    };
-  },
+//     return {
+//       entityType,
+//       entityId,
+//       totalLogs: sorted.length,
+//       logs: sorted,
+//       byAction,
+//     };
+//   },
 
-  /**
-   * Get user activity report
-   */
-  async getUserActivityReport(userId: string, days: number = 30) {
-    const endDate = new Date();
-    const startDate = new Date(endDate);
-    startDate.setDate(startDate.getDate() - days);
+//   /**
+//    * Get user activity report
+//    */
+//   async getUserActivityReport(userId: string, days: number = 30) {
+//     const endDate = new Date();
+//     const startDate = new Date(endDate);
+//     startDate.setDate(startDate.getDate() - days);
 
-    const activity = await auditApi.getUserActivity(
-      userId,
-      startDate.toISOString(),
-      endDate.toISOString()
-    );
+//     const activity = await auditApi.getUserActivity(
+//       userId,
+//       startDate.toISOString(),
+//       endDate.toISOString()
+//     );
 
-    const logs = activity.data.data;
+//     const logs = activity.data.data;
 
-    // Calculate statistics
-    const stats = {
-      totalActions: logs.length,
-      successfulActions: logs.filter(l => l.success).length,
-      failedActions: logs.filter(l => !l.success).length,
-      byAction: this.groupByAction(logs),
-      byEntityType: this.groupByEntityType(logs),
-      mostActiveDay: this.findMostActiveDay(logs),
-    };
+//     // Calculate statistics
+//     const stats = {
+//       totalActions: logs.length,
+//       successfulActions: logs.filter(l => l.success).length,
+//       failedActions: logs.filter(l => !l.success).length,
+//       byAction: this.groupByAction(logs),
+//       byEntityType: this.groupByEntityType(logs),
+//       mostActiveDay: this.findMostActiveDay(logs),
+//     };
 
-    return {
-      userId,
-      period: { start: startDate, end: endDate, days },
-      logs,
-      stats,
-    };
-  },
+//     return {
+//       userId,
+//       period: { start: startDate, end: endDate, days },
+//       logs,
+//       stats,
+//     };
+//   },
 
-  /**
-   * Get security audit report
-   */
-  async getSecurityAuditReport(startDate?: string, endDate?: string) {
-    const [failedActions, loginAttempts, actionCount] = await Promise.all([
-      auditApi.getFailedActions(startDate, endDate),
-      auditApi.getAll({
-        action: AuditAction.LOGIN,
-        startDate,
-        endDate,
-      }),
-      auditApi.getActionCount(startDate, endDate),
-    ]);
+//   /**
+//    * Get security audit report
+//    */
+//   async getSecurityAuditReport(startDate?: string, endDate?: string) {
+//     const [failedActions, loginAttempts, actionCount] = await Promise.all([
+//       auditApi.getFailedActions(startDate, endDate),
+//       auditApi.getAll({
+//         action: AuditAction.LOGIN,
+//         startDate,
+//         endDate,
+//       }),
+//       auditApi.getActionCount(startDate, endDate),
+//     ]);
 
-    const failed = failedActions.data.data;
-    const logins = loginAttempts.data.data;
+//     const failed = failedActions.data.data;
+//     const logins = loginAttempts.data.data;
 
-    return {
-      period: { startDate, endDate },
-      failedActions: {
-        total: failed.length,
-        byUser: this.groupByUser(failed),
-        byAction: this.groupByAction(failed),
-      },
-      loginActivity: {
-        total: logins.length,
-        successful: logins.filter(l => l.success).length,
-        failed: logins.filter(l => !l.success).length,
-        uniqueUsers: new Set(logins.map(l => l.userId)).size,
-      },
-      actionDistribution: actionCount.data.data,
-    };
-  },
+//     return {
+//       period: { startDate, endDate },
+//       failedActions: {
+//         total: failed.length,
+//         byUser: this.groupByUser(failed),
+//         byAction: this.groupByAction(failed),
+//       },
+//       loginActivity: {
+//         total: logins.length,
+//         successful: logins.filter(l => l.success).length,
+//         failed: logins.filter(l => !l.success).length,
+//         uniqueUsers: new Set(logins.map(l => l.userId)).size,
+//       },
+//       actionDistribution: actionCount.data.data,
+//     };
+//   },
 
-  /**
-   * Export audit logs
-   */
-  async exportAuditLogs(
-    filters: {
-      action?: AuditAction;
-      entityType?: AuditEntityType;
-      userId?: string;
-      startDate?: string;
-      endDate?: string;
-    },
-    format: 'CSV' | 'JSON' | 'EXCEL' = 'CSV'
-  ) {
-    return auditApi.export(filters, format);
-  },
+//   /**
+//    * Export audit logs
+//    */
+//   async exportAuditLogs(
+//     filters: {
+//       action?: AuditAction;
+//       entityType?: AuditEntityType;
+//       userId?: string;
+//       startDate?: string;
+//       endDate?: string;
+//     },
+//     format: 'CSV' | 'JSON' | 'EXCEL' = 'CSV'
+//   ) {
+//     return auditApi.export(filters, format);
+//   },
 
-  /**
-   * Get compliance report
-   */
-  async getComplianceReport(startDate: string, endDate: string) {
-    const [allLogs, stats] = await Promise.all([
-      auditApi.getAll({ startDate, endDate }),
-      auditApi.getStatistics(startDate, endDate),
-    ]);
+//   /**
+//    * Get compliance report
+//    */
+//   async getComplianceReport(startDate: string, endDate: string) {
+//     const [allLogs, stats] = await Promise.all([
+//       auditApi.getAll({ startDate, endDate }),
+//       auditApi.getStatistics(startDate, endDate),
+//     ]);
 
-    const logs = allLogs.data.data;
+//     const logs = allLogs.data.data;
 
-    // Calculate compliance metrics
-    const metrics = {
-      totalActions: logs.length,
-      criticalActions: logs.filter(l => 
-        ['DELETE', 'EXPORT'].includes(l.action)
-      ).length,
-      unauthorizedAttempts: logs.filter(l => !l.success).length,
-      dataExports: logs.filter(l => l.action === 'EXPORT').length,
-      deletions: logs.filter(l => l.action === 'DELETE').length,
-      userChanges: logs.filter(l => 
-        l.entityType === 'USER' && ['CREATE', 'UPDATE', 'DELETE'].includes(l.action)
-      ).length,
-    };
+//     // Calculate compliance metrics
+//     const metrics = {
+//       totalActions: logs.length,
+//       criticalActions: logs.filter(l => 
+//         ['DELETE', 'EXPORT'].includes(l.action)
+//       ).length,
+//       unauthorizedAttempts: logs.filter(l => !l.success).length,
+//       dataExports: logs.filter(l => l.action === 'EXPORT').length,
+//       deletions: logs.filter(l => l.action === 'DELETE').length,
+//       userChanges: logs.filter(l => 
+//         l.entityType === 'USER' && ['CREATE', 'UPDATE', 'DELETE'].includes(l.action)
+//       ).length,
+//     };
 
-    return {
-      period: { startDate, endDate },
-      metrics,
-      statistics: stats.data.data,
-      flaggedActivities: this.flagSuspiciousActivities(logs),
-    };
-  },
+//     return {
+//       period: { startDate, endDate },
+//       metrics,
+//       statistics: stats.data.data,
+//       flaggedActivities: this.flagSuspiciousActivities(logs),
+//     };
+//   },
 
-  /**
-   * Flag suspicious activities
-   */
-  flagSuspiciousActivities(logs: any[]) {
-    const suspicious = [];
+//   /**
+//    * Flag suspicious activities
+//    */
+//   flagSuspiciousActivities(logs: any[]) {
+//     const suspicious = [];
 
-    // Multiple failed login attempts from same user
-    const failedLogins = logs.filter(l => 
-      l.action === 'LOGIN' && !l.success
-    );
-    const loginsByUser = this.groupByUser(failedLogins);
+//     // Multiple failed login attempts from same user
+//     const failedLogins = logs.filter(l => 
+//       l.action === 'LOGIN' && !l.success
+//     );
+//     const loginsByUser = this.groupByUser(failedLogins);
     
-    Object.entries(loginsByUser).forEach(([userId, userLogs]) => {
-      if (userLogs.length >= 5) {
-        suspicious.push({
-          type: 'MULTIPLE_FAILED_LOGINS',
-          userId,
-          count: userLogs.length,
-          severity: 'HIGH',
-        });
-      }
-    });
+//     Object.entries(loginsByUser).forEach(([userId, userLogs]) => {
+//       if (userLogs.length >= 5) {
+//         suspicious.push({
+//           type: 'MULTIPLE_FAILED_LOGINS',
+//           userId,
+//           count: userLogs.length,
+//           severity: 'HIGH',
+//         });
+//       }
+//     });
 
-    // Unusual delete operations
-    const deletes = logs.filter(l => l.action === 'DELETE');
-    if (deletes.length > 10) {
-      suspicious.push({
-        type: 'EXCESSIVE_DELETES',
-        count: deletes.length,
-        severity: 'MEDIUM',
-      });
-    }
+//     // Unusual delete operations
+//     const deletes = logs.filter(l => l.action === 'DELETE');
+//     if (deletes.length > 10) {
+//       suspicious.push({
+//         type: 'EXCESSIVE_DELETES',
+//         count: deletes.length,
+//         severity: 'MEDIUM',
+//       });
+//     }
 
-    return suspicious;
-  },
+//     return suspicious;
+//   },
 
-  /**
-   * Group logs by action
-   */
-  groupByAction(logs: any[]) {
-    return logs.reduce((acc, log) => {
-      acc[log.action] = (acc[log.action] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-  },
+//   /**
+//    * Group logs by action
+//    */
+//   groupByAction(logs: any[]) {
+//     return logs.reduce((acc, log) => {
+//       acc[log.action] = (acc[log.action] || 0) + 1;
+//       return acc;
+//     }, {} as Record<string, number>);
+//   },
 
-  /**
-   * Group logs by entity type
-   */
-  groupByEntityType(logs: any[]) {
-    return logs.reduce((acc, log) => {
-      acc[log.entityType] = (acc[log.entityType] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-  },
+//   /**
+//    * Group logs by entity type
+//    */
+//   groupByEntityType(logs: any[]) {
+//     return logs.reduce((acc, log) => {
+//       acc[log.entityType] = (acc[log.entityType] || 0) + 1;
+//       return acc;
+//     }, {} as Record<string, number>);
+//   },
 
-  /**
-   * Group logs by user
-   */
-  groupByUser(logs: any[]) {
-    return logs.reduce((acc, log) => {
-      if (!acc[log.userId]) acc[log.userId] = [];
-      acc[log.userId].push(log);
-      return acc;
-    }, {} as Record<string, any[]>);
-  },
+//   /**
+//    * Group logs by user
+//    */
+//   groupByUser(logs: any[]) {
+//     return logs.reduce((acc, log) => {
+//       if (!acc[log.userId]) acc[log.userId] = [];
+//       acc[log.userId].push(log);
+//       return acc;
+//     }, {} as Record<string, any[]>);
+//   },
 
-  /**
-   * Find most active day
-   */
-  findMostActiveDay(logs: any[]) {
-    const byDay = logs.reduce((acc, log) => {
-      const day = new Date(log.createdAt).toISOString().split('T')[0];
-      acc[day] = (acc[day] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+//   /**
+//    * Find most active day
+//    */
+//   findMostActiveDay(logs: any[]) {
+//     const byDay = logs.reduce((acc, log) => {
+//       const day = new Date(log.createdAt).toISOString().split('T')[0];
+//       acc[day] = (acc[day] || 0) + 1;
+//       return acc;
+//     }, {} as Record<string, number>);
 
-    const entries = Object.entries(byDay);
-    if (entries.length === 0) return null;
+//     const entries = Object.entries(byDay);
+//     if (entries.length === 0) return null;
 
-    return entries.reduce((max, entry) => 
-      entry[1] > max[1] ? entry : max
-    );
-  },
+//     return entries.reduce((max, entry) => 
+//       entry[1] > max[1] ? entry : max
+//     );
+//   },
 
-  /**
-   * Get access timeline for entity
-   */
-  async getAccessTimeline(entityType: AuditEntityType, entityId: string) {
-    const logs = await auditApi.getEntityAccessLogs(entityType, entityId);
+//   /**
+//    * Get access timeline for entity
+//    */
+//   async getAccessTimeline(entityType: AuditEntityType, entityId: string) {
+//     const logs = await auditApi.getEntityAccessLogs(entityType, entityId);
     
-    // Group by date
-    const timeline = logs.data.data.reduce((acc, log) => {
-      const date = new Date(log.createdAt).toISOString().split('T')[0];
-      if (!acc[date]) {
-        acc[date] = { date, accesses: [], count: 0 };
-      }
-      acc[date].accesses.push(log);
-      acc[date].count++;
-      return acc;
-    }, {} as Record<string, any>);
+//     // Group by date
+//     const timeline = logs.data.data.reduce((acc, log) => {
+//       const date = new Date(log.createdAt).toISOString().split('T')[0];
+//       if (!acc[date]) {
+//         acc[date] = { date, accesses: [], count: 0 };
+//       }
+//       acc[date].accesses.push(log);
+//       acc[date].count++;
+//       return acc;
+//     }, {} as Record<string, any>);
 
-    return Object.values(timeline).sort((a, b) => 
-      b.date.localeCompare(a.date)
-    );
-  },
-};
+//     return Object.values(timeline).sort((a, b) => 
+//       b.date.localeCompare(a.date)
+//     );
+//   },
+// };

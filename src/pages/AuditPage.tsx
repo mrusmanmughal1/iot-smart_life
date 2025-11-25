@@ -1,29 +1,29 @@
-import { useTranslation } from 'react-i18next';
+// import { useTranslation } from 'react-i18next';
 import { FileText, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useAuditLogs } from '@/features/audit/hooks';
-import { Skeleton } from '@/components/ui/skeleton';
-import { formatDistanceToNow } from 'date-fns';
+// import { Badge } from '@/components/ui/badge';
+// import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+// import { useAuditLogs } from '@/features/audit/hooks';
+// import { Skeleton } from '@/components/ui/skeleton';
+// import { formatDistanceToNow } from 'date-fns';
 import AppLayout from '@/components/layout/AppLayout';
 
 export default function AuditPage() {
-  const { t } = useTranslation();
-  const { data: auditData, isLoading } = useAuditLogs();
+  // const { t } = useTranslation();
+  // const { data: auditData, isLoading } = useAuditLogs();
 
-  const logs = auditData?.data?.data || [];
+  // const logs = auditData?.data?.data || [];
 
-  const getActionColor = (action: string) => {
-    const colors: Record<string, string> = {
-      CREATE: 'success',
-      UPDATE: 'info',
-      DELETE: 'destructive',
-      LOGIN: 'default',
-      LOGOUT: 'secondary',
-    };
-    return colors[action] || 'default';
-  };
+  // const getActionColor = (action: string) => {
+  //   const colors: Record<string, string> = {
+  //     CREATE: 'success',
+  //     UPDATE: 'info',
+  //     DELETE: 'destructive',
+  //     LOGIN: 'default',
+  //     LOGOUT: 'secondary',
+  //   };
+    // return colors[action] || 'default';
+  // };
 
   return (
     <AppLayout>
@@ -40,7 +40,7 @@ export default function AuditPage() {
             <FileText className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{logs.length}</div>
+            {/* <div className="text-2xl font-bold">{logs.length}</div> */}
             <p className="text-xs text-slate-500">In the last 30 days</p>
           </CardContent>
         </Card>
@@ -61,7 +61,7 @@ export default function AuditPage() {
           <CardTitle>Recent Activity</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
+          {/* {isLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 10 }).map((_, i) => (
                 <Skeleton key={i} className="h-12 w-full" />
@@ -102,7 +102,7 @@ export default function AuditPage() {
                 ))}
               </TableBody>
             </Table>
-          )}
+          )} */}
         </CardContent>
       </Card>
     </div>

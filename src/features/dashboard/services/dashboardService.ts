@@ -99,7 +99,7 @@ export const dashboardService = {
 
     return {
       devices: {
-        total: systemStats.data.data.totalDevices,
+        // total: systemStats.data.data.totalDevices,
         active: systemStats.data.data.activeDevices,
         inactive: systemStats.data.data.inactiveDevices,
         ...devicesResponse.data.data,

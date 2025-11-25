@@ -25,6 +25,10 @@ const buttonVariants = cva(
         info: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-sm',
         social:
           'bg-white text-gray-700 cursor-pointer bg-gray-100 active:bg-gray-200 shadow-sm',
+        outline:
+          'border border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300',
+        destructive:
+          'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
       },
       size: {
         default: 'h-10 px-4 py-2 rounded-3xl',

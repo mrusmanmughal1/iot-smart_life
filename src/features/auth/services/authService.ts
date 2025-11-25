@@ -18,12 +18,20 @@ export const authService = {
     const response = await apiClient.post<AuthResponse>('/auth/register', data);
     return response.data.data;
   },
-  async logout(): Promise<void> {
-    await apiClient.post('/auth/logout');
+  async logout(refreshToken: string, accessToken: string): Promise<void> {
+    await apiClient.post(
+      '/auth/logout',
+      { refreshToken },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
   },
 
   async getCurrentUser(): Promise<User> {
-    const response = await apiClient.get<User>('/auth/me');
+    const response = await apiClient.get<{ data: User }>('/auth/me');
     return response.data.data;
   },
 

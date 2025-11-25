@@ -64,7 +64,7 @@ apiClient.interceptors.response.use(
 
     // Handle other errors
     if (error.response) {
-      const message = error.response.data?.message || 'An error occurred';
+      const message = (error.response.data as { message?: string })?.message || 'An error occurred';
       toast.error('Error', message);
     } else if (error.request) {
       toast.error('Network Error', 'Please check your internet connection');

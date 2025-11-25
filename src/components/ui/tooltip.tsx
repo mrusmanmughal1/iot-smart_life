@@ -13,7 +13,7 @@ interface TooltipProviderProps {
   delayDuration?: number;
 }
 
-const TooltipProvider = ({ children, delayDuration = 200 }: TooltipProviderProps) => {
+const TooltipProvider = ({ children,   }: TooltipProviderProps) => {
   return <>{children}</>;
 };
 
@@ -25,9 +25,9 @@ interface TooltipProps {
   delayDuration?: number;
 }
 
-const Tooltip = ({ open: controlledOpen, onOpenChange, defaultOpen = false, children, delayDuration = 200 }: TooltipProps) => {
+const Tooltip = ({ open: controlledOpen, onOpenChange, defaultOpen = false, children,  }: TooltipProps) => {
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
-  const timeoutRef = React.useRef<NodeJS.Timeout>();
+  const timeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
   
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const handleOpenChange = React.useCallback((newOpen: boolean) => {
@@ -59,7 +59,7 @@ interface TooltipTriggerProps extends React.HTMLAttributes<HTMLDivElement> {
 const TooltipTrigger = React.forwardRef<HTMLDivElement, TooltipTriggerProps>(
   ({ children, asChild, className, onMouseEnter, onMouseLeave, ...props }, ref) => {
     const context = React.useContext(TooltipContext);
-    const timeoutRef = React.useRef<NodeJS.Timeout>();
+    const timeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
     
     if (!context) {
       throw new Error('TooltipTrigger must be used within Tooltip');
@@ -120,7 +120,6 @@ interface TooltipContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
   ({ className, sideOffset = 4, side = 'top', align = 'center', children, ...props }, ref) => {
     const context = React.useContext(TooltipContext);
-    const contentRef = React.useRef<HTMLDivElement>(null);
 
     if (!context || !context.open) return null;
 

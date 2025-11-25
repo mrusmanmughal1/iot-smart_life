@@ -1,10 +1,10 @@
-import { useAuthStore } from '../stores/authStore.ts';
+import { useAppStore } from '@/stores/useAppStore';
 import { useQuery } from '@tanstack/react-query';
 import { authService } from '../services/authService.ts';
 import { useEffect } from 'react';
 
 export const useAuth = () => {
-  const { user, isAuthenticated, setUser, logout } = useAuthStore();
+  const { user, isAuthenticated, setUser, logout } = useAppStore();
 
   // Only fetch current user if authenticated but no user data
   const { data: currentUser, isLoading } = useQuery({
@@ -17,7 +17,18 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (currentUser && !user) {
-      setUser(currentUser);
+      // Transform API User to store User format
+      // const nameParts = currentUser.name?.split(' ') || [];
+      const firstName = currentUser.firstName ||   '';
+      const lastName = currentUser.lastName ||   '';
+      
+      setUser({
+        id: currentUser.id || '',
+        email: currentUser.email || '',
+        firstName,
+        lastName,
+        role: currentUser.role || '',
+      });
     }
   }, [currentUser, user, setUser]);
 

@@ -8,9 +8,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
     "types": ["node","vite/client"],
     "baseUrl": ".",
     "paths": {

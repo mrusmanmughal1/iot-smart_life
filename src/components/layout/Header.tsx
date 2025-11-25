@@ -1,11 +1,12 @@
 // src/components/layout/Header.tsx - COMPLETE WITH EVERYTHING
-import React, { useState, useRef, useEffect } from "react";
-import { Bell, Search, User, Menu, Settings, LogOut, Sun, Moon, Monitor, Globe, Languages } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Bell, User, Menu, Settings, LogOut, Sun, Moon, Monitor } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useLanguageStore } from '@/stores/useLanguageStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useNotificationStore } from '@/stores/useNotificationStore';
+import { useLogout } from '@/features/auth/hooks/useLogout';
 import { cn } from '@/lib/util';
 import { LanguageSwitcher } from "../ui/LanguageSwitcher";
 
@@ -13,18 +14,16 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isThemeOpen, setIsThemeOpen] = useState(false);
-  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   
   const profileRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const themeRef = useRef<HTMLDivElement>(null);
-  const languageRef = useRef<HTMLDivElement>(null);
   
-  const navigate = useNavigate();
   const { theme, setTheme, effectiveTheme } = useThemeStore();
-  const { language, setLanguage, direction } = useLanguageStore();
-  const { user, logout } = useAppStore();
+  const { direction } = useLanguageStore();
+  const { user } = useAppStore();
   const { notifications } = useNotificationStore();
+  const { mutate: logout } = useLogout();
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -38,9 +37,6 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
       if (themeRef.current && !themeRef.current.contains(event.target as Node)) {
         setIsThemeOpen(false);
       }
-      if (languageRef.current && !languageRef.current.contains(event.target as Node)) {
-        setIsLanguageOpen(false);
-      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -48,16 +44,12 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
   const handleLogout = () => {
     logout();
-    localStorage.clear();
-    sessionStorage.clear();
-    navigate("/login");
   };
 
   const closeAllDropdowns = () => {
     setIsProfileOpen(false);
     setIsNotifOpen(false);
     setIsThemeOpen(false);
-    setIsLanguageOpen(false);
   };
  
 

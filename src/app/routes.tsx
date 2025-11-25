@@ -13,8 +13,8 @@ import { SelectRolePage } from '../pages/SelectRolePage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
 import MainDashboardPage from '@/pages/MainDashboardPage.tsx';
 import MainControlPanelPage from '@/pages/MainControlPanelPage.tsx';
-import { OverviewPage } from '../pages/OverviewPage.tsx';
-import DevicesPage from '@/pages/DevicesPage.tsx';
+// import { OverviewPage } from '../pages/OverviewPage.tsx';
+// import DevicesPage from '@/pages/DevicesPage.tsx';
 import AssetsPage from '@/pages/AssetsPage.tsx';
 import AlarmsPage from '@/pages/AlarmsPage.tsx';
 import UsersPage from '@/pages/UsersPage.tsx';
@@ -111,10 +111,10 @@ export const router = createBrowserRouter([
         path: '/main-control-panel',
         element: <MainControlPanelPage />,
       },
-      {
-        path: '/devices',
-        element: <DevicesPage />,
-      },
+      // {
+      //   path: '/devices',
+      //   element: <DevicesPage />,
+      // },
       {
         path: '/assets',
         element: <AssetsPage />,

@@ -5,7 +5,7 @@ import { AccountBlockedForm } from '../features/auth/components/AccountBlockedFo
 export const AccountBlockedPage: React.FC = () => {
 
   return (
-    <AuthLayout>
+    <AuthLayout title="Account Blocked">
       <div className="w-full  flex justify-center items-center">
         <AccountBlockedForm />
       </div>

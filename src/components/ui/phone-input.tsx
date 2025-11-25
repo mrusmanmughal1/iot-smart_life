@@ -1,15 +1,15 @@
 import * as React from 'react';
 import PhoneInputWithCountry, {
-  type PhoneInputWithCountryProps,
   type Country,
 } from 'react-phone-number-input';
+import type { DefaultInputComponentProps } from 'react-phone-number-input';
 import { cn } from '@/lib/util';
 // Import base styles
 import 'react-phone-number-input/style.css';
 
 export interface PhoneInputProps
   extends Omit<
-    PhoneInputWithCountryProps,
+    DefaultInputComponentProps,
     'value' | 'onChange' | 'defaultCountry'
   > {
   error?: string;

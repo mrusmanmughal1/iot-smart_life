@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { widgetTypesApi, widgetBundlesApi } from '@/services/api';
-import { widgetService } from '../services/widgetService';
+import { widgetService } from '../services/widgetsService';
 
 export const useWidgets = (params?: any) => {
   return useQuery({

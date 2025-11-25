@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { analyticsApi } from '@/services/api';
-import { analyticsService } from '../services/analyticsService';
 
 export const useSystemAnalytics = () => {
   return useQuery({
