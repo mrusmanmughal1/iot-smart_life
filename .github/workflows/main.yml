@@ -1,0 +1,46 @@
+name: iot-platform-frontend-deploy
+
+on:
+  push:
+    branches:
+      - master  # or your deployment branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22  
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Build React app
+      - name: Build React app
+        run: npm run build
+
+      # Step 5: Deploy to VPS via SSH
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v0.1.9
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ${{ secrets.VPS_PATH }}
+            git reset --hard
+            git pull
+            npm install
+            npm run build
+            # Restart React app via PM2
+            pm2 restart react-frontend || pm2 start npm --name "react-frontend" -- run preview
