@@ -152,7 +152,6 @@ export const router = createBrowserRouter([
         path: '/audit',
         element: <AuditPage />,
       },
-
       // Add more protected routes here
       {
         path: '/solution-dashboards',

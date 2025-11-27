@@ -34,3 +34,5 @@ export const useCreateDashboard = () => {
     },
   });
 };
+
+export { useDashboardsPage } from './useDashboardsPage';

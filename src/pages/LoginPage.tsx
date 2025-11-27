@@ -42,6 +42,7 @@ export const LoginPage: React.FC = () => {
           className="flex-1 h-12 rounded-full text-xs"
           type="button"
           onClick={handleGithubLogin}
+          
         >
           <img src={GithubIcon} alt="GitHub" className="w-5 h-5 mr-2" />
           {t('auth.login.loginWithGithub')}
