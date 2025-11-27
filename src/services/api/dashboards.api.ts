@@ -80,6 +80,7 @@ export const dashboardsApi = {
   // Get all dashboards
   getAll: (params?: DashboardQuery) => {
     const accessToken = localStorage.getItem('accessToken');
+    console.log(accessToken , 'accessToken')
     return apiClient.get<PaginatedResponse<Dashboard>>('/dashboards', {
       params,
       headers: accessToken

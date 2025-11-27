@@ -1,4 +1,4 @@
-const STORAGE_PREFIX = 'iot_platform_';
+const STORAGE_PREFIX = '';
 
 class LocalStorageService {
   private getKey(key: string): string {
