@@ -5,6 +5,7 @@ import { LoginForm } from '../features/auth/components/LoginForm.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { Link } from 'react-router-dom';
 import { useGoogleLogin } from '../features/auth/hooks/useGoogleLogin.ts';
+import { useGithubLogin } from '../features/auth/hooks/useGithubLogin.ts';
 import GoogleIcon from '../assets/icons/google.webp';
 import AppleIcon from '../assets/icons/apple.svg';
 import GithubIcon from '../assets/icons/github.svg';
@@ -13,6 +14,7 @@ import GithubIcon from '../assets/icons/github.svg';
 export const LoginPage: React.FC = () => {
   const { t } = useTranslation();
   const { handleGoogleLogin } = useGoogleLogin();
+  const { handleGithubLogin } = useGithubLogin();
 
   return (
     <AuthLayout title='Login' >
@@ -39,9 +41,10 @@ export const LoginPage: React.FC = () => {
           variant="social"
           className="flex-1 h-12 rounded-full text-xs"
           type="button"
+          onClick={handleGithubLogin}
         >
           <img src={GithubIcon} alt="GitHub" className="w-5 h-5 mr-2" />
-          Sign up with Github
+          {t('auth.login.loginWithGithub')}
         </Button>
       </div>
      

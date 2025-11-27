@@ -10,6 +10,7 @@ import { AccountBlockedPage } from '../pages/AccountBlockedPage.tsx';
 import { VerifyAccountPage } from '../pages/VerifyAccountPage.tsx';
 import { PinCodeVerificationPage } from '../pages/PinCodeVerificationPage.tsx';
 import { SelectRolePage } from '../pages/SelectRolePage.tsx';
+import { OAuthCallbackPage } from '../pages/OAuthCallbackPage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
 import MainDashboardPage from '@/pages/MainDashboardPage.tsx';
 import MainControlPanelPage from '@/pages/MainControlPanelPage.tsx';
@@ -89,6 +90,10 @@ export const router = createBrowserRouter([
       {
         path: '/select-role',
         element: <SelectRolePage />,
+      },
+      {
+        path: '/auth/callback',
+        element: <OAuthCallbackPage />,
       },
       {
         path: '*',

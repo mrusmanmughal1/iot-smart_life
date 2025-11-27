@@ -483,7 +483,8 @@
       "passwordMinLength": "يجب أن تكون كلمة المرور 6 أحرف على الأقل",
       "loginError": "فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد الخاصة بك.",
       "loginSuccess": "تم تسجيل الدخول بنجاح",
-      "loginWithGoogle": "تسجيل الدخول باستخدام Google"
+      "loginWithGoogle": "تسجيل الدخول باستخدام Google",
+      "loginWithGithub": "تسجيل الدخول باستخدام GitHub"
     },
     "register": {
       "title": "إنشاء حساب",

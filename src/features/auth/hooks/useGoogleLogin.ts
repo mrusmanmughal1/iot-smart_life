@@ -11,7 +11,7 @@ export const useGoogleLogin = () => {
     try {
       const backendUrl =
         import.meta.env.VITE_API_BASE_URL || 'http://192.168.1.125:5000/api';
-      const redirectUri = `${window.location.origin}/auth/google/callback`;
+      const redirectUri = `${window.location.origin}/auth/callback`;
       const googleAuthUrl = `${backendUrl}/auth/google?redirect_uri=${encodeURIComponent(
         redirectUri
       )}`;

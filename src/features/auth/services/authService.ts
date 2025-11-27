@@ -56,4 +56,11 @@ export const authService = {
     });
     return response.data.data;
   },
+
+  async handleOAuthCallback(code: string): Promise<AuthResponse> {
+    const response = await apiClient.post<AuthResponse>('/auth/callback', {
+      code,
+    });
+    return response.data.data;
+  },
 };

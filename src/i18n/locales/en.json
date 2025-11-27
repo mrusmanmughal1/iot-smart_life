@@ -484,7 +484,8 @@
       "passwordMinLength": "Password must be at least 6 characters",
       "loginError": "Login failed. Please check your credentials.",
       "loginSuccess": "Login successful",
-      "loginWithGoogle": "Sign in with Google"
+      "loginWithGoogle": "Sign in with Google",
+      "loginWithGithub": "Sign in with GitHub"
     },
     "register": {
       "title": "Create Account",
