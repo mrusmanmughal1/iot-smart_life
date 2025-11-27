@@ -29,7 +29,7 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
   const queryParams = useMemo((): DashboardQuery => {
     const params: DashboardQuery = {
       page: 1,
-      limit: 100,
+      limit: 10,
     };
 
     if (search) {

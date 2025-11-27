@@ -78,8 +78,17 @@ export interface ApiResponse<T> {
 
 export const dashboardsApi = {
   // Get all dashboards
-  getAll: (params?: DashboardQuery) =>
-    apiClient.get<PaginatedResponse<Dashboard>>('/dashboards', { params }),
+  getAll: (params?: DashboardQuery) => {
+    const accessToken = localStorage.getItem('accessToken');
+    return apiClient.get<PaginatedResponse<Dashboard>>('/dashboards', {
+      params,
+      headers: accessToken
+        ? {
+            Authorization: `Bearer ${accessToken}`,
+          }
+        : undefined,
+    });
+  },
 
   // Get dashboard by ID
   getById: (id: string) =>
