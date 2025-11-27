@@ -38,9 +38,6 @@ jobs:
           port: 22
           script: |
             cd ${{ secrets.VPS_PATH }}
-            git reset --hard
-            git pull
-            npm install
-            npm run build
+            
             # Restart React app via PM2
             pm2 restart react-frontend || pm2 start npm --name "react-frontend" -- run preview
