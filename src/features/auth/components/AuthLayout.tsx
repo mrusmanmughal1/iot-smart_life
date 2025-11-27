@@ -16,14 +16,14 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
 }) => {
   return (
     <div className="max-h-screen w-full">
-      <div className="flex  usman">
+      <div className="flex">
         {/* Left Side - Background Image */}
         <div className="flex-1 hidden md:block h-screen  object-cover overflow-hidden  ">
-          {/* <img
+          <img
             src={AuthBg}
             alt="Auth Background"
             className="  w-full h-full object-cover   "
-          /> */}
+          />
         </div>
 
         {/* Right Side - Form Content Area (50%) */}
