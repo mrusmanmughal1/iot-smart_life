@@ -58,7 +58,7 @@ export const authService = {
   },
 
   async handleOAuthCallback(code: string): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>('/auth/callback', {
+    const response = await apiClient.post<AuthResponse>('/auth/exchange-code', {
       code,
     });
     return response.data.data;
