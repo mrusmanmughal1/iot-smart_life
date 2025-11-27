@@ -12,11 +12,12 @@ export const OAuthCallbackPage: React.FC = () => {
   const setAuth = useAppStore((state) => state.setUser);
 
   const code = searchParams.get('code');
-
+  console.log(code , 'code')
   const { mutate: handleCallback, isPending, isError } = useMutation({
     mutationFn: (code: string) => authService.handleOAuthCallback(code),
     onSuccess: (data) => {
       console.log('=== OAUTH CALLBACK SUCCESS ===');
+      console.log(data , 'data')
       console.log('1. Data received:', {
         hasUser: !!data.data?.user || !!data.user,
         hasAccessToken: !!data.data?.accessToken || !!data.accessToken,
@@ -41,6 +42,7 @@ export const OAuthCallbackPage: React.FC = () => {
         accessToken: localStorage.getItem('accessToken')?.substring(0, 20) + '...',
         refreshToken: localStorage.getItem('refreshToken')?.substring(0, 20) + '...',
       });
+      console.log(userData , 'userData'	)
 
       // Update store SECOND
       if (userData) {
