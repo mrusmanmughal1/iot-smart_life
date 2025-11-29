@@ -4,8 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useDashboards } from './index';
 import { dashboardsApi } from '@/services/api';
-import type { Dashboard, DashboardQuery } from '@/services/api/dashboards.api';
+import type { Dashboard, DashboardQuery, PaginatedResponse } from '@/services/api/dashboards.api';
 import type { DashboardTableItem } from '@/components/common/DashboardTable';
+
+// API response wrapper structure: { data: PaginatedResponse<T> }
+interface ApiResponseWrapper<T> {
+  data: PaginatedResponse<T>;
+}
 
 export type DashboardTab = 'all' | 'group';
 
@@ -54,12 +59,15 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
   } = useDashboards(queryParams);
 
   // Transform API Dashboard data to DashboardTableItem format
+  // API response structure: { data: { data: [...], meta: {...} } }
   const dashboards: DashboardTableItem[] = useMemo(() => {
-    if (!dashboardsResponse?.data?.data?.data) {
+    // Type assertion for nested response structure
+    const responseData = dashboardsResponse?.data as ApiResponseWrapper<Dashboard> | undefined;
+    if (!responseData?.data?.data || !Array.isArray(responseData.data.data)) {
       return [];
     }
 
-    return dashboardsResponse.data.data.data.map((dashboard: Dashboard) => {
+    return responseData.data.data.map((dashboard: Dashboard) => {
       // Determine tag and color based on additionalInfo or default
       const tag = dashboard.additionalInfo?.tag || 'General';
       const tagColorMap: Record<string, string> = {

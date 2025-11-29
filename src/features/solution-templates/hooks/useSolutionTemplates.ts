@@ -3,8 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import {
   solutionTemplatesApi,
   TemplateCategory,
+  PaginatedResponse,
 } from '@/features/solution-templates/services/solution-templates.api';
 import type { SolutionTemplate } from '@/features/solution-templates/services/solution-templates.api';
+
+// API response wrapper structure: { data: PaginatedResponse<T> }
+interface ApiResponseWrapper<T> {
+  data: PaginatedResponse<T>;
+}
 
 // Template interface matching component expectations
 export interface Template {
@@ -150,12 +156,15 @@ export const useSolutionTemplates = (
     retry: 2,
   });
   // Transform API SolutionTemplate to component Template format
+  // API response structure: { data: { data: [...], meta: {...} } }
   const templates: Template[] = useMemo(() => {
-    if (!templatesResponse?.data?.data) {
+    // Type assertion for nested response structure
+    const responseData = templatesResponse?.data as ApiResponseWrapper<SolutionTemplate> | undefined;
+    if (!responseData?.data?.data || !Array.isArray(responseData.data.data)) {
       return [];
     }
 
-    return templatesResponse.data.data.data.map((template: SolutionTemplate) => {
+    return responseData.data.data.map((template: SolutionTemplate) => {
 
       // Extract images from thumbnail or configuration
       const images: string[] = [];
@@ -192,12 +201,15 @@ export const useSolutionTemplates = (
   }, [templatesResponse]);
 
   // Get total count and pages from API response
+  // API response structure: { data: { data: [...], meta: {...} } }
   const totalPages = useMemo(() => {
-    return templatesResponse?.data?.meta?.totalPages || 1;
+    const responseData = templatesResponse?.data as ApiResponseWrapper<SolutionTemplate> | undefined;
+    return responseData?.data?.meta?.totalPages || 1;
   }, [templatesResponse]);
 
   const totalTemplates = useMemo(() => {
-    return templatesResponse?.data?.meta?.total || 0;
+    const responseData = templatesResponse?.data as ApiResponseWrapper<SolutionTemplate> | undefined;
+    return responseData?.data?.meta?.total || 0;
   }, [templatesResponse]);
 
   // Filter templates client-side if needed (for additional filtering beyond API)
@@ -250,11 +262,7 @@ export const useSolutionTemplates = (
           category: TemplateCategory.AGRICULTURE,
           translationKey: 'solutionTemplates.categories.smartAgriculture',
         },
-        {
-          key: 'smartBuilding',
-          category: TemplateCategory.INDUSTRIAL,
-          translationKey: 'solutionTemplates.categories.smartBuilding',
-        },
+        
         {
           key: 'smartTransportation',
           category: TemplateCategory.TRANSPORTATION,
@@ -265,11 +273,7 @@ export const useSolutionTemplates = (
           category: TemplateCategory.SMART_HOME,
           translationKey: 'solutionTemplates.categories.smartHome',
         },
-        {
-          key: 'smartFactory',
-          category: TemplateCategory.INDUSTRIAL,
-          translationKey: 'solutionTemplates.categories.smartFactory',
-        },
+        
       ];
     }
 
