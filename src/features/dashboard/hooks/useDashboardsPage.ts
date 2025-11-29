@@ -55,11 +55,11 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
 
   // Transform API Dashboard data to DashboardTableItem format
   const dashboards: DashboardTableItem[] = useMemo(() => {
-    if (!dashboardsResponse?.data?.data) {
+    if (!dashboardsResponse?.data?.data?.data) {
       return [];
     }
 
-    return dashboardsResponse.data.data.map((dashboard: Dashboard) => {
+    return dashboardsResponse.data.data.data.map((dashboard: Dashboard) => {
       // Determine tag and color based on additionalInfo or default
       const tag = dashboard.additionalInfo?.tag || 'General';
       const tagColorMap: Record<string, string> = {

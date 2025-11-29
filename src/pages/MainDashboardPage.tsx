@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings, Edit, Share2, MoreVertical } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,39 +16,24 @@ import {
   ReferenceLine,
 } from 'recharts';
 import AppLayout from '@/components/layout/AppLayout';
-
-// Temperature Trend Data
-const temperatureData = [
-  { date: '20/8', value: 25 },
-  { date: '21/8', value: 28 },
-  { date: '22/8', value: 24 },
-  { date: '23/8', value: 27 },
-  { date: '24/8', value: 26 },
-  { date: '25/8', value: 30 },
-  { date: '26/8', value: 29 },
-];
-
-// Humidity Level Data
-const humidityData = [
-  { name: 'Used', value: 50 },
-  { name: 'Remaining', value: 50 },
-];
-
-const COLORS = {
-  primary: '#C36BA9', // Purple/pink
-  gray: '#E5E7EB',
-  orange: '#F97316',
-  green: '#22C55E',
-};
+import { useMainDashboard } from '@/features/dashboard/hooks/useMainDashboard';
 
 export default function MainDashboardPage() {
   const { t } = useTranslation();
-  const [isOnline, setIsOnline] = useState(true);
+  const {
+    isOnline,
+    temperatureData,
+    humidityData,
+    powerConsumption,
+    temperatureTotal,
+    humidityPercentage,
+    colors: COLORS,
+    handleSetting,
+    toggleSystemStatus,
+  } = useMainDashboard();
 
-  const handleSetting = () => {
-    console.log('Settings clicked');
-  };
-
+  console.log(temperatureTotal , 'temperatureTotal')
+ 
   const handleEdit = () => {
     console.log('Edit clicked');
   };
@@ -164,7 +148,7 @@ export default function MainDashboardPage() {
                     </LineChart>
                   </ResponsiveContainer>
                   <div className="mt-2 text-xs text-gray-500">
-                    {t('mainDashboard.tooltip.total')}: 2000 kW/h
+                    {t('mainDashboard.tooltip.total')}: {temperatureTotal.value} {temperatureTotal.unit}
                   </div>
                 </CardContent>
               </Card>
@@ -210,7 +194,7 @@ export default function MainDashboardPage() {
                     </ResponsiveContainer>
                     <div className="absolute text-center">
                       <div className="text-4xl font-bold text-gray-900">
-                        50%
+                        {humidityPercentage}%
                       </div>
                     </div>
                   </div>
@@ -236,7 +220,7 @@ export default function MainDashboardPage() {
                 <CardContent>
                   <div className="flex items-center justify-center h-[200px]">
                     <div className="text-5xl font-bold text-orange-500">
-                      2.4 kW
+                      {powerConsumption.value} {powerConsumption.unit}
                     </div>
                   </div>
                 </CardContent>
@@ -264,7 +248,7 @@ export default function MainDashboardPage() {
                       {t('mainDashboard.status.online')}
                     </span>
                     <button
-                      onClick={() => setIsOnline(!isOnline)}
+                      onClick={toggleSystemStatus}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                         isOnline ? 'bg-green-500' : 'bg-gray-300'
                       }`}

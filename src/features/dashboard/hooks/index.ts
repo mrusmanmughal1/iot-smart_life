@@ -36,3 +36,9 @@ export const useCreateDashboard = () => {
 };
 
 export { useDashboardsPage } from './useDashboardsPage';
+export { useMainDashboard, DASHBOARD_COLORS } from './useMainDashboard';
+export type {
+  TemperatureDataPoint,
+  HumidityDataPoint,
+  DashboardStatistics,
+} from './useMainDashboard';

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService.ts';
 import type { LoginCredentials } from '../types/auth.types.ts';
 import { toast } from 'react-hot-toast';
+import localStorageService from '@/services/storage/localStorage.ts';
 
 export const useLogin = () => {
   const navigate = useNavigate();
@@ -28,10 +29,10 @@ export const useLogin = () => {
       // Store tokens FIRST
       console.log('2. Storing tokens in localStorage...');
       if (accessToken) {
-        localStorage.setItem('accessToken', accessToken);
+        localStorageService.setToken(accessToken); 
       }
       if (refreshToken) {
-        localStorage.setItem('refreshToken', refreshToken);
+        localStorageService.setRefreshToken(refreshToken);
       }
       
       console.log('3. Tokens stored:', {

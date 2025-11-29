@@ -2,13 +2,18 @@ import apiClient from '@/lib/axios';
 
 export enum TemplateCategory {
   SMART_HOME = 'smart_home',
-  INDUSTRIAL = 'industrial',
   AGRICULTURE = 'agriculture',
   SMART_CITY = 'smart_city',
   HEALTHCARE = 'healthcare',
   ENERGY = 'energy',
   TRANSPORTATION = 'transportation',
   RETAIL = 'retail',
+  SMART_FACTORY = 'smart_factory',
+  SMART_BUILDING = 'smart_building',
+  LOGISTICS = 'logistics',
+  WATER = 'water',
+  CLIMATE = 'climate',
+  EDUCATION = 'education',
 }
 
 export interface TemplateConfiguration {

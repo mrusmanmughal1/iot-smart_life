@@ -148,6 +148,7 @@
   "solutionDashboards": {
     "title": "Solution Dashboards",
     "createNewDashboard": "Create New Dashboard",
+    "importDashboard": "Import Dashboard",
     "search": "Search",
     "showCustomerDashboards": "Show Customer Dashboards",
     "tabs": {
@@ -191,7 +192,14 @@
       "smartBuilding": "Smart Building",
       "smartTransportation": "Smart Transportation",
       "smartHome": "Smart Home",
-      "smartFactory": "Smart Factory"
+      "smartFactory": "Smart Factory",
+      "healthcare": "Healthcare",
+      "energy": "Energy",
+      "retail": "Retail",
+      "logistics": "Logistics",
+      "water": "Water",
+      "climate": "Climate",
+      "education": "Education"
     },
     "templatePreview": {
       "title": "Smart City Template Preview",

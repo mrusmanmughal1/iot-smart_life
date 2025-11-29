@@ -1,5 +1,5 @@
 import apiClient from '@/lib/axios.ts';
-import { TemplateQuery } from './solution-templates.api';
+import { TemplateQuery } from '../../features/solution-templates/services/solution-templates.api';
 
 export enum NotificationType {
   ALARM = 'ALARM',

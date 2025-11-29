@@ -14,16 +14,17 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorageService.getToken();
-    
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;``
+
+    // 🔥 FIX: ensure headers object exists
+    config.headers = config.headers || {};
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     return config;
   },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
+  (error: AxiosError) => Promise.reject(error)
 );
 
 // Response interceptor

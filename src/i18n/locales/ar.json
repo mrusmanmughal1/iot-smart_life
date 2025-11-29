@@ -150,6 +150,7 @@
     "createNewDashboard": "إنشاء لوحة معلومات جديدة",
     "search": "بحث",
     "showCustomerDashboards": "عرض لوحات معلومات العملاء",
+    "importDashboard": "استيراد لوحة معلومات",
     "tabs": {
       "all": "الكل",
       "group": "مجموعة"
@@ -191,7 +192,14 @@
       "smartBuilding": "المبنى الذكي",
       "smartTransportation": "النقل الذكي",
       "smartHome": "المنزل الذكي",
-      "smartFactory": "المصنع الذكي"
+      "smartFactory": "المصنع الذكي",
+      "healthcare": "الرعاية الصحية",
+      "energy": "الطاقة",
+      "retail": "التجارة",
+      "logistics": "اللوجستيات",
+      "water": "المياه",
+      "climate": "المناخ",
+      "education": "التعليم"
     },
     "templatePreview": {
       "title": "معاينة قالب المدينة الذكية",

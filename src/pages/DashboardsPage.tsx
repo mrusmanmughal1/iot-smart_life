@@ -32,7 +32,7 @@ export default function DashboardsPage() {
     handleImportDashboard,
     handleShowCustomerDashboards,
   } = useDashboardsPage();
-
+  console.log(dashboards);
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -70,18 +70,22 @@ export default function DashboardsPage() {
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-            <Button className="bg-secondary hover:bg-secondary/90 text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              {t('solutionDashboards.createNewDashboard')}
+                <Button className="bg-secondary hover:bg-secondary/90 text-white">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('solutionDashboards.createNewDashboard')}
                   <ChevronDown className="h-4 w-4 ml-2" />
-            </Button>
+                </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56">
+              <DropdownMenuContent
+                align="start"
+                className="w-56 absolute border border-secondary/50 shadow-md rounded-md  "
+              >
                 <DropdownMenuItem onClick={handleCreateDashboard}>
                   {t('solutionDashboards.createNewDashboard')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleImportDashboard}>
-                  {t('solutionDashboards.importDashboard') || 'Import Dashboard'}
+                  {t('solutionDashboards.importDashboard') ||
+                    'Import Dashboard'}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -99,7 +103,9 @@ export default function DashboardsPage() {
               onClick={handleRefresh}
               disabled={isLoading}
             >
-              <RefreshCw className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-5 w-5 ${isLoading ? 'animate-spin' : ''}`}
+              />
             </Button>
           </div>
         </div>
@@ -124,11 +130,11 @@ export default function DashboardsPage() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
               </div>
             ) : (
-            <DashboardTable
-              data={dashboards}
-              onStatusToggle={handleStatusToggle}
-              onAction={handleAction}
-            />
+              <DashboardTable
+                data={dashboards}
+                onStatusToggle={handleStatusToggle}
+                onAction={handleAction}
+              />
             )}
           </CardContent>
         </Card>
