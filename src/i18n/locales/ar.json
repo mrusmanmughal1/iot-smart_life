@@ -151,6 +151,14 @@
     "search": "بحث",
     "showCustomerDashboards": "عرض لوحات معلومات العملاء",
     "importDashboard": "استيراد لوحة معلومات",
+    "dashboardFile": "ملف لوحة المعلومات",
+    "dropFilesHere": "اسحب الملفات هنا أو انقر للتصفح",
+    "supportedFormats": "الصيغ المدعومة: JSON (الحد الأقصى 5 ميجابايت)",
+    "browse": "تصفح",
+    "selectedFile": "المحدد",
+    "noFileSelected": "لم يتم تحديد ملف",
+    "cancel": "إلغاء",
+    "import": "استيراد",
     "tabs": {
       "all": "الكل",
       "group": "مجموعة"
@@ -171,6 +179,27 @@
       "energy": "طاقة",
       "transport": "نقل"
     }
+  },
+  "createDashboard": {
+    "title": "إنشاء لوحة معلومات جديدة",
+    "dashboardTitle": "عنوان لوحة المعلومات",
+    "dashboardTitlePlaceholder": "أدخل عنوان لوحة المعلومات",
+    "description": "الوصف",
+    "descriptionPlaceholder": "أدخل وصف لوحة المعلومات",
+    "ownerAndGroups": "المالك والمجموعات",
+    "owner": "المالك",
+    "ownerPlaceholder": "اكتب اسم المالك واضغط Enter",
+    "groups": "المجموعات",
+    "groupsPlaceholder": "اكتب اسم المجموعة واضغط Enter",
+    "dashboardImage": "صورة لوحة المعلومات",
+    "dropImageOrClick": "اسحب الصورة هنا أو انقر للتحميل",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "titleRequired": "عنوان لوحة المعلومات مطلوب",
+    "ownerRequired": "المالك مطلوب",
+    "invalidImageType": "يرجى اختيار ملف صورة",
+    "success": "تم إنشاء لوحة المعلومات بنجاح",
+    "error": "فشل إنشاء لوحة المعلومات"
   },
   "solutionTemplates": {
     "title": "قوالب الحلول",

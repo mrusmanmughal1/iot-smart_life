@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AuthBg from '../../../assets/images/auth-bg.png';
 import SmartLifeImg from '../../../assets/images/smartlife-text-black.png';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
@@ -14,6 +14,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   title,
   description,
 }) => {
+  // Preload the background image
+  useEffect(() => {
+    const img = new Image();
+    img.src = AuthBg;
+  }, []);
+
   return (
     <div className="max-h-screen w-full">
       <div className="flex">

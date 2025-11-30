@@ -151,6 +151,14 @@
     "importDashboard": "Import Dashboard",
     "search": "Search",
     "showCustomerDashboards": "Show Customer Dashboards",
+    "dashboardFile": "Dashboard File",
+    "dropFilesHere": "Drop Files Here Or Click To Browse",
+    "supportedFormats": "Supported Formats: JSON (Max 5MB)",
+    "browse": "Browse",
+    "selectedFile": "Selected",
+    "noFileSelected": "No File Selected",
+    "cancel": "Cancel",
+    "import": "Import",
     "tabs": {
       "all": "All",
       "group": "Group"
@@ -171,6 +179,27 @@
       "energy": "Energy",
       "transport": "Transport"
     }
+  },
+  "createDashboard": {
+    "title": "Create New Dashboard",
+    "dashboardTitle": "Dashboard Title",
+    "dashboardTitlePlaceholder": "Enter dashboard title",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter dashboard description",
+    "ownerAndGroups": "Owner and Groups",
+    "owner": "Owner",
+    "ownerPlaceholder": "Type owner name and press Enter",
+    "groups": "Groups",
+    "groupsPlaceholder": "Type group name and press Enter",
+    "dashboardImage": "Dashboard Image",
+    "dropImageOrClick": "Drop Image Here Or Click To Upload",
+    "cancel": "Cancel",
+    "save": "Save",
+    "titleRequired": "Dashboard title is required",
+    "ownerRequired": "Owner is required",
+    "invalidImageType": "Please select an image file",
+    "success": "Dashboard created successfully",
+    "error": "Failed to create dashboard"
   },
   "solutionTemplates": {
     "title": "Solution Templates",

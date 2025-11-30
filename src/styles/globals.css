@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 button{
-  cursor: pointer;
+  cursor: pointer !important;
 }
 
 /* Tailwind CSS v4 Theme Configuration */

@@ -23,6 +23,7 @@ import NotificationsPage from '@/pages/NotificationsPage.tsx';
 import AnalyticsPage from '@/pages/AnalyticsPage.tsx';
 import SettingsPage from '@/pages/SettingsPage.tsx';
 import DashboardsPage from '@/pages/DashboardsPage.tsx';
+import CreateDashboardPage from '@/pages/CreateDashboardPage.tsx';
 import AuditPage from '@/pages/AuditPage.tsx';
 import PublicNotFoundPage from '@/pages/PublicNotFoundPage.tsx';
 import PrivateNotFoundPage from '@/pages/PrivateNotFoundPage.tsx';
@@ -147,6 +148,12 @@ export const router = createBrowserRouter([
       {
         path: '/dashboards',
         element: <DashboardsPage />,
+      },
+      {
+        path: '/dashboards/create',
+        element: (
+            <CreateDashboardPage />
+        ),
       },
       {
         path: '/audit',

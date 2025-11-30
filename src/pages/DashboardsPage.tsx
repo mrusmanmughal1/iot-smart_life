@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Plus,
@@ -17,9 +18,17 @@ import {
 import { DashboardTable } from '@/components/common/DashboardTable';
 import AppLayout from '@/components/layout/AppLayout';
 import { useDashboardsPage } from '@/features/dashboard/hooks/useDashboardsPage';
+import { ImportDashboardModal } from '@/components/common/ImportDashboardModal';
+import { dashboardsApi } from '@/services/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-hot-toast';
 
 export default function DashboardsPage() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+
   const {
     selectedTab,
     dashboards,
@@ -29,10 +38,41 @@ export default function DashboardsPage() {
     handleRefresh,
     handleTabChange,
     handleCreateDashboard,
-    handleImportDashboard,
     handleShowCustomerDashboards,
   } = useDashboardsPage();
-  console.log(dashboards);
+
+  // Handle opening import modal
+  const handleOpenImportModal = () => {
+    setIsImportModalOpen(true);
+  };
+
+  // Handle importing dashboard from modal
+  const handleImportFromModal = async (file: File) => {
+    setIsImporting(true);
+    try {
+      const text = await file.text();
+      const dashboardData = JSON.parse(text) as Record<string, unknown>;
+      
+      // Import the dashboard via API
+      await dashboardsApi.import(dashboardData);
+      
+      // Invalidate queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: ['dashboards'] });
+      
+      toast.success('Dashboard imported successfully');
+      
+      // Close modal after successful import
+      setIsImportModalOpen(false);
+    } catch (error: unknown) {
+      console.error('Failed to import dashboard:', error);
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Failed to import dashboard';
+      toast.error(errorMessage);
+    } finally {
+      setIsImporting(false);
+    }
+  };
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -83,7 +123,7 @@ export default function DashboardsPage() {
                 <DropdownMenuItem onClick={handleCreateDashboard}>
                   {t('solutionDashboards.createNewDashboard')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleImportDashboard}>
+                <DropdownMenuItem onClick={handleOpenImportModal}>
                   {t('solutionDashboards.importDashboard') ||
                     'Import Dashboard'}
                 </DropdownMenuItem>
@@ -139,6 +179,14 @@ export default function DashboardsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Import Dashboard Modal */}
+      <ImportDashboardModal
+        open={isImportModalOpen}
+        onOpenChange={setIsImportModalOpen}
+        onImport={handleImportFromModal}
+        isLoading={isImporting}
+      />
     </AppLayout>
   );
 }
