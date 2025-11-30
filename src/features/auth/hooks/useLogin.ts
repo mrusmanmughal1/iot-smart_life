@@ -25,6 +25,7 @@ export const useLogin = () => {
       const accessToken = data.data?.accessToken || data.accessToken;
       const refreshToken = data.data?.refreshToken || data.refreshToken;
       const userData = data.data?.user || data.user;
+      const expiresIn = data.data?.expiresIn || data.expiresIn;
 
       // Store tokens FIRST
       console.log('2. Storing tokens in localStorage...');
@@ -34,11 +35,11 @@ export const useLogin = () => {
       if (refreshToken) {
         localStorageService.setRefreshToken(refreshToken);
       }
+      if (expiresIn) {
+        localStorageService.setExpiresIn(expiresIn);
+      }
       
-      console.log('3. Tokens stored:', {
-        accessToken: localStorage.getItem('accessToken')?.substring(0, 20) + '...',
-        refreshToken: localStorage.getItem('refreshToken')?.substring(0, 20) + '...',
-      });
+    
 
       // Update store SECOND
       if (userData) {

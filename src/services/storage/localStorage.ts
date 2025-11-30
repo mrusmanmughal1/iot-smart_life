@@ -61,18 +61,48 @@ class LocalStorageService {
     return this.get('refresh_token');
   }
 
+  // Token expiration methods
+  setExpiresIn(expiresIn: number | string): void {
+    // expiresIn can be seconds (number) or ISO timestamp (string)
+    let expirationTime: number;
+    
+    if (typeof expiresIn === 'string') {
+      // If it's a timestamp string, parse it
+      expirationTime = new Date(expiresIn).getTime();
+    } else {
+      // If it's a number (seconds), calculate expiration time
+      expirationTime = Date.now() + (expiresIn * 1000);
+    }
+    
+    this.set('token_expires_at', expirationTime);
+  }
+
+  getExpiresAt(): number | null {
+    return this.get<number>('token_expires_at');
+  }
+
+  isTokenExpired(): boolean {
+    const expiresAt = this.getExpiresAt();
+    if (!expiresAt) {
+      return false; // If no expiration set, assume not expired
+    }
+    // Add 5 minute buffer to refresh before actual expiration
+    return Date.now() >= (expiresAt - 5 * 60 * 1000);
+  }
+
   removeToken(): void {
     this.remove('access_token');
     this.remove('refresh_token');
+    this.remove('token_expires_at');
   }
 
   // User-specific methods
-  setUser(user: any): void {
+  setUser(user: Record<string, unknown>): void {
     this.set('user', user);
   }
 
-  getUser(): any | null {
-    return this.get('user');
+  getUser(): Record<string, unknown> | null {
+    return this.get<Record<string, unknown>>('user');
   }
 
   removeUser(): void {
@@ -87,6 +117,7 @@ class LocalStorageService {
   getTheme(): 'light' | 'dark' | null {
     return this.get('theme');
   }
+    
 }
 
 export const localStorageService = new LocalStorageService();

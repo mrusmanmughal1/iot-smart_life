@@ -1,3 +1,4 @@
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -25,6 +26,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useSolutionTemplates } from '@/features/solution-templates/hooks';
+import { debounce } from '@/lib/util';
 
 export default function SolutionTemplates() {
   const { t } = useTranslation();
@@ -47,6 +49,31 @@ export default function SolutionTemplates() {
     itemsPerPage: 10,
     initialCategory: 'smartCity',
   });
+
+  // Local state for input value (for immediate UI update)
+  const [inputValue, setInputValue] = useState(searchQuery);
+
+  // Create debounced search handler (900ms delay)
+  const debouncedSearch = useMemo(
+    () => debounce((value: string) => {
+      handleSearch(value);
+    }, 300),
+    []
+  );
+
+  // Handle input change with immediate UI update and debounced search
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Update input value immediately for responsive UI (doesn't trigger API)
+    setInputValue(value);
+    // Debounce the actual search API call
+    debouncedSearch(value);
+  }, [debouncedSearch]);
+
+  // Sync input value when searchQuery changes externally (e.g., clear filters)
+  useEffect(() => {
+    setInputValue(searchQuery);
+  }, [searchQuery]);
 
   // Map API categories to component format with icons
   const iconMap: Record<string, typeof Building2> = {
@@ -82,8 +109,8 @@ export default function SolutionTemplates() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
               placeholder={t('solutionTemplates.searchPlaceholder')}
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
+              value={inputValue}
+              onChange={handleInputChange}
               className="pl-10 w-96 rounded-md"
             />
           </div>

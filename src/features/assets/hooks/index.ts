@@ -107,3 +107,6 @@ export const useAssignDevices = () => {
     },
   });
 };
+
+export { useAssetsPage } from './useAssetsPage';
+export type { Asset } from './useAssetsPage';

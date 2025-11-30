@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Eye, Trash2, Download, Share2 } from 'lucide-react';
+import { Eye, Trash2, Download, Share2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
@@ -38,6 +38,15 @@ export interface DashboardTableProps {
     tagPrefix?: string;
   };
   emptyMessage?: string;
+  // Pagination props
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalItems?: number;
+    itemsPerPage?: number;
+    onPageChange: (page: number) => void;
+    showItemsPerPage?: boolean;
+  };
 }
 
 export function DashboardTable({
@@ -53,6 +62,7 @@ export function DashboardTable({
   },
   translationKeys = {},
   emptyMessage,
+  pagination,
 }: DashboardTableProps) {
   const { t } = useTranslation();
 
@@ -86,9 +96,16 @@ export function DashboardTable({
     }
   };
 
+  const handlePageChange = (page: number) => {
+    if (pagination && page >= 1 && page <= pagination.totalPages) {
+      pagination.onPageChange(page);
+    }
+  };
+
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
+    <div className="space-y-4">
+      <div className="overflow-x-auto">
+        <table className="w-full">
         <thead className="bg-primary">
           <tr className="border-b border-gray-200">
             {columns.title && (
@@ -228,6 +245,69 @@ export function DashboardTable({
           )}
         </tbody>
       </table>
+      </div>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            {pagination.totalItems !== undefined && (
+              <span>
+                Showing {((pagination.currentPage - 1) * (pagination.itemsPerPage || 10) + 1)} to{' '}
+                {Math.min(pagination.currentPage * (pagination.itemsPerPage || 10), pagination.totalItems)} of{' '}
+                {pagination.totalItems} results
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handlePageChange(1)}
+              disabled={pagination.currentPage === 1}
+              className="h-8 w-8"
+              aria-label="First page"
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handlePageChange(pagination.currentPage - 1)}
+              disabled={pagination.currentPage === 1}
+              className="h-8 w-8"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="flex items-center gap-1 px-2">
+              <span className="text-sm text-gray-600">
+                Page {pagination.currentPage} of {pagination.totalPages}
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handlePageChange(pagination.currentPage + 1)}
+              disabled={pagination.currentPage === pagination.totalPages}
+              className="h-8 w-8"
+              aria-label="Next page"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handlePageChange(pagination.totalPages)}
+              disabled={pagination.currentPage === pagination.totalPages}
+              className="h-8 w-8"
+              aria-label="Last page"
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

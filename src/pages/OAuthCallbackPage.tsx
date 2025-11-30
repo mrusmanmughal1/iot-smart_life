@@ -5,6 +5,7 @@ import { useAppStore } from '@/stores/useAppStore.ts';
 import { authService } from '@/features/auth/services/authService.ts';
 import { toast } from 'react-hot-toast';
 import { AuthLayout } from '@/features/auth/components/AuthLayout.tsx';
+import localStorageService from '@/services/storage/localStorage.ts';
 
 export const OAuthCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -27,20 +28,25 @@ export const OAuthCallbackPage: React.FC = () => {
       // Handle different response structures
       const accessToken = data.data?.accessToken || data.accessToken;
       const refreshToken = data.data?.refreshToken || data.refreshToken;
+      const expiresIn = data.data?.expiresIn || data.expiresIn;
       const userData = data.data?.user || data.user;
 
       // Store tokens FIRST
       console.log('2. Storing tokens in localStorage...');
       if (accessToken) {
-        localStorage.setItem('accessToken', accessToken);
+        localStorageService.setToken(accessToken);
       }
       if (refreshToken) {
-        localStorage.setItem('refreshToken', refreshToken);
+        localStorageService.setRefreshToken(refreshToken);
+      }
+      if (expiresIn) {
+        localStorageService.setExpiresIn(expiresIn);
       }
 
       console.log('3. Tokens stored:', {
-        accessToken: localStorage.getItem('accessToken')?.substring(0, 20) + '...',
-        refreshToken: localStorage.getItem('refreshToken')?.substring(0, 20) + '...',
+        accessToken: localStorageService.getToken()?.substring(0, 20) + '...',
+        refreshToken: localStorageService.getRefreshToken()?.substring(0, 20) + '...',
+        expiresAt: localStorageService.getExpiresAt(),
       });
       console.log(userData , 'userData'	)
 

@@ -9,6 +9,7 @@ export enum UserRole {
 
 // Role Permissions
 export const ROLE_PERMISSIONS = {
+  
   [UserRole.ADMIN]: {
     devices: ['create', 'read', 'update', 'delete', 'command'],
     users: ['create', 'read', 'update', 'delete'],
