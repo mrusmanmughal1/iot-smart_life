@@ -21,8 +21,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   }, []);
 
   return (
-    <div className="max-h-screen w-full">
-      <div className="flex">
+    <div className="max-h-screen flex w-full">
         {/* Left Side - Background Image */}
         <div className="flex-1 hidden md:block h-screen  object-cover overflow-hidden  ">
           <img
@@ -54,7 +53,6 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
             <div className="mb-4">{children}</div>
           </div>
         </div>
-      </div>
     </div>
   );
 };

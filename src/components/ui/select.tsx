@@ -58,7 +58,7 @@ export function SelectTrigger({ children, className = '', disabled = false }: Se
       type="button"
       disabled={disabled}
       onClick={() => context.setOpen(!context.open)}
-      className={`flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-100 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     >
       {children}
       <ChevronDown className="h-4 w-4 opacity-50" />

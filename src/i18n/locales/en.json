@@ -201,6 +201,30 @@
     "success": "Dashboard created successfully",
     "error": "Failed to create dashboard"
   },
+  "createGroup": {
+    "title": "Create New Group",
+    "groupTitle": "Group Title",
+    "groupTitlePlaceholder": "Enter group title",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter description",
+    "shareGroup": "Share Group",
+    "shareGroupPlaceholder": "Enter share group details",
+    "customer": "Customer",
+    "allUser": "All User",
+    "selectUserGroup": "Select User Group",
+    "userGroupPlaceholder": "Enter user group",
+    "userGroupRequired": "Target user group is required*",
+    "permissions": "Permissions",
+    "read": "Read",
+    "write": "Write",
+    "other": "Other",
+    "roles": "Roles",
+    "rolesPlaceholder": "Enter roles",
+    "cancel": "Cancel",
+    "save": "Save",
+    "success": "Group created successfully",
+    "error": "Failed to create group"
+  },
   "solutionTemplates": {
     "title": "Solution Templates",
     "searchPlaceholder": "Search",
@@ -413,7 +437,18 @@
     "telemetry": "Telemetry",
     "attributes": "Attributes",
     "noDevices": "No devices found",
-    "searchDevices": "Search devices..."
+    "searchDevices": "Search devices...",
+    "table": {
+      "name": "Name",
+      "createdTime": "Created time",
+      "status": "State",
+      "customer": "Customer name",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
   },
   "assets": {
     "title": "Assets",
@@ -446,6 +481,32 @@
       "status": "STATUS",
       "actions": "ACTIONS"
     },
+    "status": {
+      "active": "Active",
+      "error": "Error"
+    }
+  },
+  "addAsset": {
+    "title": "Add New Asset",
+    "assetName": "Asset Name",
+    "assetNamePlaceholder": "Asset Name *",
+    "assetType": "Asset Type",
+    "assetTypePlaceholder": "Select asset type...",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter description",
+    "assetProfile": "Asset Profile",
+    "assetProfilePlaceholder": "Select profile...",
+    "parentAsset": "Parent Asset",
+    "parentAssetPlaceholder": "Select parent...",
+    "additionalAttributes": "Additional Attributes",
+    "value": "Value",
+    "add": "Add",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "save": "Save",
+    "nameRequired": "Asset name is required",
+    "typeRequired": "Asset type is required",
+  
     "status": {
       "active": "Active",
       "warning": "Warning",

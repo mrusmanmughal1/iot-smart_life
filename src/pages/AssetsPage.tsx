@@ -14,11 +14,14 @@ import { useAssetsPage } from '@/features/assets/hooks';
 import { debounce } from '@/lib/util';
 import { DashboardTable } from '@/components/common/DashboardTable/DashboardTable';
 import type { DashboardTableItem } from '@/components/common/DashboardTable/DashboardTable';
+import { AddAssetModal } from '@/components/common/AddAssetModal';
 
 
 export default function AssetsPage() {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
+  const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
+  const [isSavingAsset, setIsSavingAsset] = useState(false);
 
   const {
     searchQuery,
@@ -33,8 +36,42 @@ export default function AssetsPage() {
     handleAction,
     handleExport,
     handleImport,
-    handleAddAsset,
   } = useAssetsPage();
+
+  // Handle opening add asset modal
+  const handleOpenAddAssetModal = () => {
+    setIsAddAssetModalOpen(true);
+  };
+
+  // Handle saving asset from modal
+  const handleSaveAsset = async (assetData: {
+    name: string;
+    type: string;
+    description: string;
+    assetProfile: string;
+    parentAsset: string;
+    additionalAttributes: Array<{ key: string; value: string }>;
+  }) => {
+    setIsSavingAsset(true);
+    try {
+      // TODO: Replace with actual API call
+      // await assetsApi.create(assetData);
+      console.log('Creating asset:', assetData);
+      
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Close modal and show success
+      setIsAddAssetModalOpen(false);
+      
+      // Refresh assets list
+      // queryClient.invalidateQueries({ queryKey: ['assets'] });
+    } catch (error: unknown) {
+      console.error('Failed to create asset:', error);
+    } finally {
+      setIsSavingAsset(false);
+    }
+  };
 
   // Transform Asset data to DashboardTableItem format
   const tableData: DashboardTableItem[] = useMemo(() => {
@@ -107,7 +144,7 @@ export default function AssetsPage() {
             <Button
               variant="primary"
               size="sm"
-              onClick={handleAddAsset}
+              onClick={handleOpenAddAssetModal}
               className="flex items-center gap-2 bg-secondary hover:bg-secondary/90 text-white"
             >
               <Plus className="h-4 w-4" />
@@ -191,6 +228,14 @@ export default function AssetsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Add Asset Modal */}
+      <AddAssetModal
+        open={isAddAssetModalOpen}
+        onOpenChange={setIsAddAssetModalOpen}
+        onSave={handleSaveAsset}
+        isLoading={isSavingAsset}
+      />
     </AppLayout>
   );
 }

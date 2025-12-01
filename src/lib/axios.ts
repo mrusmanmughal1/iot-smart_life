@@ -1,126 +1,121 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { localStorageService } from '@/services/storage/localStorage';
 import { toast } from '@/stores/useNotificationStore';
+import { useAppStore } from '@/stores/useAppStore';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Request interceptor
+// ====================================
+// GLOBAL REFRESH TOKEN HANDLING
+// ====================================
+let isRefreshing = false;
+let subscribers: Array<(token: string) => void> = [];
+
+function subscribeTokenRefresh(cb: (token: string) => void) {
+  subscribers.push(cb);
+}
+
+function onRefreshed(token: string) {
+  subscribers.forEach((cb) => cb(token));
+  subscribers = [];
+}
+
+async function refreshAccessToken() {
+  const refreshToken = localStorageService.getRefreshToken();
+  if (!refreshToken) throw new Error('No refresh token');
+
+  const baseURL =
+    import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+  const refreshUrl = `${baseURL}/auth/refresh`;
+
+  const response = await axios.post(refreshUrl, {
+    refreshToken: refreshToken,
+  });
+  const { accessToken, expiresIn } = response.data.data || response.data;
+  console.log(accessToken);
+  if (!accessToken) {
+    // Clear store and logout if no access token
+    useAppStore.getState().logout();
+    localStorageService.removeToken();
+    localStorageService.removeUser();
+    throw new Error('Refresh failed - no access token');
+  }
+
+  localStorageService.setToken(accessToken);
+  if (expiresIn) localStorageService.setExpiresIn(expiresIn);
+
+  return accessToken;
+}
+
+// ====================================
+// REQUEST INTERCEPTOR
+// ====================================
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const token = localStorageService.getToken();
-
-    // 🔥 FIX: ensure headers object exists
     config.headers = config.headers || {};
 
-    if (token) {
-      // Check if token is expired and try to refresh if needed
-      if (localStorageService.isTokenExpired()) {
-        const refreshToken = localStorageService.getRefreshToken();
-        
-        if (refreshToken) {
-          try {
-            // Refresh token before making the request
-            // Use direct axios to avoid interceptor loop
-            const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-            const refreshUrl = `${baseURL}/auth/refresh`;
-            
-            const response = await axios.post(
-              refreshUrl,
-              { refresh_token: refreshToken }
-            );
+    const token = localStorageService.getToken();
 
-            const { access_token, expires_in } = response.data.data || response.data;
-            
-            if (access_token) {
-              localStorageService.setToken(access_token);
-              if (expires_in) {
-                localStorageService.setExpiresIn(expires_in);
-              }
-              config.headers.Authorization = `Bearer ${access_token}`;
-            } else {
-              // No token in refresh response, remove tokens
-              localStorageService.removeToken();
-              localStorageService.removeUser();
-              window.location.href = '/login';
-              return Promise.reject(new Error('Token refresh failed'));
-            }
-          } catch (refreshError) {
-            // Refresh failed, logout user
-            localStorageService.removeToken();
-            localStorageService.removeUser();
-            window.location.href = '/login';
-            return Promise.reject(refreshError);
-          }
-        } else {
-          // No refresh token, redirect to login
-          localStorageService.removeToken();
-          localStorageService.removeUser();
-          window.location.href = '/login';
-          return Promise.reject(new Error('No refresh token available'));
-        }
-      } else {
-        // Token is still valid
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
-  },
-  (error: AxiosError) => Promise.reject(error)
+  }
 );
 
-// Response interceptor
+// ====================================
+// RESPONSE INTERCEPTOR
+// ====================================
 apiClient.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    // Handle 401 Unauthorized
+  async (error: AxiosError) => {
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      try {
-        const refreshToken = localStorageService.getRefreshToken();
-        
-        if (refreshToken) {
-          const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-          const refreshUrl = `${baseURL}/auth/refresh`;
-          
-          const response = await axios.post(
-            refreshUrl,
-            { refresh_token: refreshToken }
-          );
+      // avoid multiple refresh requests
+      if (!isRefreshing) {
+        isRefreshing = true;
 
-          const { access_token, expires_in } = response.data.data || response.data;
-          localStorageService.setToken(access_token);
-          
-          if (expires_in) {
-            localStorageService.setExpiresIn(expires_in);
-          }
-
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${access_token}`;
-          }
-
-          return apiClient(originalRequest);
+        try {
+          const newToken = await refreshAccessToken();
+          isRefreshing = false;
+          onRefreshed(newToken);
+        } catch (err) {
+          isRefreshing = false;
+          // Clear store and logout
+          useAppStore.getState().logout();
+          localStorageService.removeToken();
+          localStorageService.removeUser();
+          // window.location.href = '/login';
+          return Promise.reject(err);
         }
-      } catch (refreshError) {
-        // Refresh failed, logout user
-        localStorageService.removeToken();
-        localStorageService.removeUser();
-        window.location.href = '/login';
       }
+
+      // wait until token is refreshed
+      return new Promise((resolve) => {
+        subscribeTokenRefresh((newToken) => {
+          originalRequest.headers!.Authorization = `Bearer ${newToken}`;
+          resolve(apiClient(originalRequest));
+        });
+      });
     }
 
-    // Handle other errors
+    // OTHER ERRORS
     if (error.response) {
-      const message = (error.response.data as { message?: string })?.message || 'An error occurred';
+      const message =
+        (error.response.data as { message?: string })?.message ||
+        'An error occurred';
+
       toast.error('Error', message);
     } else if (error.request) {
       toast.error('Network Error', 'Please check your internet connection');

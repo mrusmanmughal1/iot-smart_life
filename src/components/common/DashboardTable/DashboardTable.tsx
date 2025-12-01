@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Eye, Trash2, Download, Share2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +21,8 @@ export interface DashboardTableProps {
     action: 'share' | 'view' | 'delete' | 'download',
     id: string
   ) => void;
+  onTitleClick?: (id: string) => void;
+  getNavigationPath?: (id: string) => string;
   columns?: {
     title?: boolean;
     createdTime?: boolean;
@@ -53,6 +56,8 @@ export function DashboardTable({
   data,
   onStatusToggle,
   onAction,
+  onTitleClick,
+  getNavigationPath,
   columns = {
     title: true,
     createdTime: true,
@@ -65,6 +70,7 @@ export function DashboardTable({
   pagination,
 }: DashboardTableProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   // Default translation keys
   const defaultTranslationKeys = {
@@ -101,6 +107,17 @@ export function DashboardTable({
       pagination.onPageChange(page);
     }
   };
+
+  const handleTitleClick = (id: string) => {
+    if (onTitleClick) {
+      onTitleClick(id);
+    } else if (getNavigationPath) {
+      const path = getNavigationPath(id);
+      navigate(path);
+    }
+  };
+
+  const isTitleClickable = !!(onTitleClick || getNavigationPath);
 
   return (
     <div className="space-y-4">
@@ -152,7 +169,10 @@ export function DashboardTable({
                 className="border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors"
               >
                 {columns.title && (
-                  <td className="py-4 px-4">
+                  <td
+                    className={`py-4 px-4 ${isTitleClickable ? 'cursor-pointer hover:bg-gray-100 transition-colors' : ''}`}
+                    onClick={isTitleClickable ? () => handleTitleClick(item.id) : undefined}
+                  >
                     <div className="flex items-center gap-2">
                       <span className="text-gray-400 mr-2">▶</span>
                       <div>

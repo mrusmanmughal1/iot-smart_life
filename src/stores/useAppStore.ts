@@ -1,3 +1,4 @@
+import localStorageService from '@/services/storage/localStorage';
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 
@@ -43,10 +44,12 @@ export const useAppStore = create<AppState>()(
         isAuthenticated: false,
         setUser: (user) => set({ user, isAuthenticated: !!user }),
         logout: () => {
-          set({ user: null, isAuthenticated: false });
-          // Clear tokens on logout
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+          localStorageService.removeToken();
+
+          set({
+            user: null,
+            isAuthenticated: false,
+          });
         },
 
         // UI State

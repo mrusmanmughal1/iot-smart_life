@@ -201,6 +201,30 @@
     "success": "تم إنشاء لوحة المعلومات بنجاح",
     "error": "فشل إنشاء لوحة المعلومات"
   },
+  "createGroup": {
+    "title": "إنشاء مجموعة جديدة",
+    "groupTitle": "عنوان المجموعة",
+    "groupTitlePlaceholder": "أدخل عنوان المجموعة",
+    "description": "الوصف",
+    "descriptionPlaceholder": "أدخل الوصف",
+    "shareGroup": "مشاركة المجموعة",
+    "shareGroupPlaceholder": "أدخل تفاصيل مشاركة المجموعة",
+    "customer": "العميل",
+    "allUser": "جميع المستخدمين",
+    "selectUserGroup": "اختر مجموعة المستخدمين",
+    "userGroupPlaceholder": "أدخل مجموعة المستخدمين",
+    "userGroupRequired": "مجموعة المستخدمين المستهدفة مطلوبة*",
+    "permissions": "الأذونات",
+    "read": "قراءة",
+    "write": "كتابة",
+    "other": "أخرى",
+    "roles": "الأدوار",
+    "rolesPlaceholder": "أدخل الأدوار",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "success": "تم إنشاء المجموعة بنجاح",
+    "error": "فشل إنشاء المجموعة"
+  },
   "solutionTemplates": {
     "title": "قوالب الحلول",
     "searchPlaceholder": "بحث",
@@ -412,7 +436,18 @@
     "telemetry": "القياسات عن بعد",
     "attributes": "الخصائص",
     "noDevices": "لا توجد أجهزة",
-    "searchDevices": "البحث عن الأجهزة..."
+    "searchDevices": "البحث عن الأجهزة...",
+    "table": {
+      "name": "الاسم",
+      "createdTime": "وقت الإنشاء",
+      "status": "الحالة",
+      "customer": "اسم العميل",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    }
   },
   "assets": {
     "title": "الأصول",
@@ -450,6 +485,27 @@
       "warning": "تحذير",
       "error": "خطأ"
     }
+  },
+  "addAsset": {
+    "title": "إضافة أصل جديد",
+    "assetName": "اسم الأصل",
+    "assetNamePlaceholder": "اسم الأصل *",
+    "assetType": "نوع الأصل",
+    "assetTypePlaceholder": "اختر نوع الأصل...",
+    "description": "الوصف",
+    "descriptionPlaceholder": "أدخل الوصف",
+    "assetProfile": "ملف تعريف الأصل",
+    "assetProfilePlaceholder": "اختر الملف الشخصي...",
+    "parentAsset": "الأصل الأب",
+    "parentAssetPlaceholder": "اختر الأصل الأب...",
+    "additionalAttributes": "السمات الإضافية",
+    "value": "القيمة",
+    "add": "إضافة",
+    "remove": "إزالة",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "nameRequired": "اسم الأصل مطلوب",
+    "typeRequired": "نوع الأصل مطلوب"
   },
   "alarms": {
     "title": "التنبيهات",

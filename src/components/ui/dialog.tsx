@@ -133,7 +133,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
         <div
           ref={ref}
           className={cn(
-            'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-[#fff] p-6 shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%] sm:rounded-lg',
+            'fixed left-[50%] top-[50%] z-50 grid w-full max-w-2xl  translate-x-[-50%] translate-y-[-50%] gap-4 border bg-[#fff]   shadow-lg duration-200 animate-in fade-in-0 zoom-in-95 slide-in-from-left-1/2 slide-in-from-top-[48%] sm:rounded-lg',
             className
           )}
           onClick={(e) => e.stopPropagation()}
@@ -160,7 +160,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'flex flex-col space-y-1.5 text-center sm:text-left',
+      'flex flex-col space-y-1.5 p-4  text-center bg-primary text-white sm:text-left',
       className
     )}
     {...props}

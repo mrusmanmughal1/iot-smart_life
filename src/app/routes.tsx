@@ -15,7 +15,8 @@ import { DashboardPage } from '../pages/DashboardPage.tsx';
 import MainDashboardPage from '@/pages/MainDashboardPage.tsx';
 import MainControlPanelPage from '@/pages/MainControlPanelPage.tsx';
 // import { OverviewPage } from '../pages/OverviewPage.tsx';
-// import DevicesPage from '@/pages/DevicesPage.tsx';
+import DevicesPage from '@/pages/DevicesPage.tsx';
+import DeviceDetailsPage from '@/pages/DeviceDetailsPage.tsx';
 import AssetsPage from '@/pages/AssetsPage.tsx';
 import AlarmsPage from '@/pages/AlarmsPage.tsx';
 import UsersPage from '@/pages/UsersPage.tsx';
@@ -24,6 +25,7 @@ import AnalyticsPage from '@/pages/AnalyticsPage.tsx';
 import SettingsPage from '@/pages/SettingsPage.tsx';
 import DashboardsPage from '@/pages/DashboardsPage.tsx';
 import CreateDashboardPage from '@/pages/CreateDashboardPage.tsx';
+import CreateGroupPage from '@/pages/CreateGroupPage.tsx';
 import AuditPage from '@/pages/AuditPage.tsx';
 import PublicNotFoundPage from '@/pages/PublicNotFoundPage.tsx';
 import PrivateNotFoundPage from '@/pages/PrivateNotFoundPage.tsx';
@@ -55,7 +57,6 @@ export const router = createBrowserRouter([
   {
     element: <PublicRoute />,
     children: [
-      
       {
         path: '/login',
         element: <LoginPage />,
@@ -117,13 +118,18 @@ export const router = createBrowserRouter([
         path: '/main-control-panel',
         element: <MainControlPanelPage />,
       },
-      // {
-      //   path: '/devices',
-      //   element: <DevicesPage />,
-      // },
+
       {
         path: '/assets',
         element: <AssetsPage />,
+      },
+      {
+        path: '/devices',
+        element: <DevicesPage />,
+      },
+      {
+        path: '/devices/:id',
+        element: <DeviceDetailsPage />,
       },
       {
         path: '/alarms',
@@ -151,9 +157,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/dashboards/create',
-        element: (
-            <CreateDashboardPage />
-        ),
+        element: <CreateDashboardPage />,
+      },
+      {
+        path: '/groups/create',
+        element: <CreateGroupPage />,
       },
       {
         path: '/audit',
