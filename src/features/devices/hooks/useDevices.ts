@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { devicesApi } from '@/services/api/index.ts';
 import { deviceService } from '../services/deviceService.ts';
-import type { DeviceQuery } from '@/services/api/devices.api.ts';
+import type { DeviceQuery, DeviceType, Device } from '@/services/api/devices.api.ts';
 import type { DeviceFormData } from '../types/index.ts';
 
 export const useDevices = (params?: DeviceQuery) => {
@@ -58,8 +58,14 @@ export const useUpdateDevice = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<DeviceFormData> }) =>
-      devicesApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<DeviceFormData> }) => {
+      // Convert DeviceFormData to Device format
+      const deviceData: Partial<Device> = {
+        ...data,
+        type: data.type as DeviceType | undefined,
+      };
+      return devicesApi.update(id, deviceData);
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
       queryClient.invalidateQueries({ queryKey: ['devices', variables.id] });

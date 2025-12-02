@@ -1,5 +1,6 @@
 import { devicesApi } from '@/services/api/index.ts';
-import type { Device, DeviceQuery } from '@/services/api/devices.api.ts';
+import type { Device, DeviceQuery, DeviceType } from '@/services/api/devices.api.ts';
+import type { DeviceFormData } from '../types/device.types.ts';
 
 /**
  * Devices Feature Service
@@ -9,14 +10,22 @@ export const deviceService = {
   /**
    * Provision a new device with validation and setup
    */
-  async provisionDevice(data: Partial<Device>) {
+  async provisionDevice(data: DeviceFormData | Partial<Device>) {
     // 1. Validate required fields
     if (!data.name || !data.type) {
       throw new Error('Device name and type are required');
     }
 
-    // 2. Create device
-    const response = await devicesApi.create(data);
+    // 2. Convert DeviceFormData to Device format if needed
+    const deviceData: Partial<Device> = {
+      name: data.name,
+      type: data.type as DeviceType, // Convert string to DeviceType enum
+      description: data.description,
+      // Map other fields as needed
+    };
+
+    // 3. Create device
+    const response = await devicesApi.create(deviceData);
     const device = response.data.data;
 
     // 3. Set default attributes if not provided
@@ -34,7 +43,7 @@ export const deviceService = {
   /**
    * Bulk provision multiple devices
    */
-  async bulkProvision(devices: Partial<Device>[]) {
+  async bulkProvision(devices: DeviceFormData[]) {
     const results = [];
     const errors = [];
 

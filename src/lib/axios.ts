@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { localStorageService } from '@/services/storage/localStorage';
-import { toast } from '@/stores/useNotificationStore';
 import { useAppStore } from '@/stores/useAppStore';
+import toast from 'react-hot-toast';
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
@@ -33,7 +33,7 @@ async function refreshAccessToken() {
   const refreshUrl = `${baseURL}/auth/refresh`;
 
   const response = await axios.post(refreshUrl, {
-    refreshToken: refreshToken,
+    refreshToken,
   });
   const { accessToken, expiresIn } = response.data.data || response.data;
   console.log(accessToken);
@@ -50,7 +50,6 @@ async function refreshAccessToken() {
 
   return accessToken;
 }
-
 // ====================================
 // REQUEST INTERCEPTOR
 // ====================================
@@ -104,7 +103,8 @@ apiClient.interceptors.response.use(
       // wait until token is refreshed
       return new Promise((resolve) => {
         subscribeTokenRefresh((newToken) => {
-          originalRequest.headers!.Authorization = `Bearer ${newToken}`;
+          originalRequest.headers = originalRequest.headers || {};
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
           resolve(apiClient(originalRequest));
         });
       });
@@ -116,7 +116,7 @@ apiClient.interceptors.response.use(
         (error.response.data as { message?: string })?.message ||
         'An error occurred';
 
-      toast.error('Error', message);
+      toast.error(message);
     } else if (error.request) {
       toast.error('Network Error', 'Please check your internet connection');
     }
