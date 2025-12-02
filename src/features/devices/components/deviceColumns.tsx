@@ -9,7 +9,7 @@ import type { Device } from '@/services/api/devices.api';
 // Extended device type to include additional fields from API response
 export interface DeviceTableRow extends Device {
   deviceProfile?: string;
-  label?: string;
+  label: string;
   customerName?: string;
   groups?: string[];
   isGateway?: boolean;

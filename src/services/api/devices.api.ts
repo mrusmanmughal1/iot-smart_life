@@ -16,6 +16,11 @@ export enum DeviceStatus {
 }
 
 export interface Device {
+  additionalInfo: any;
+  attributes: any;
+  deviceProfileId: any;
+  label: any;
+  lastActivityTime: any;
   id: string;
   name: string;
   type: DeviceType;

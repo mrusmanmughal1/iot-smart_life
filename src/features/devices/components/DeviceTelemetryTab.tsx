@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { attributesApi } from '@/services/api';
 import { EntityType, AttributeScope as ApiAttributeScope } from '@/services/api/attributes.api';
+import { TelemetryDetails } from './TelemetryDetails';
 
 type AttributeScope = 'server' | 'client' | 'shared';
 
@@ -283,6 +284,7 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
           )}
         </CardContent>
       </Card>
+      <TelemetryDetails deviceId={deviceId} />
     </div>
   );
 };

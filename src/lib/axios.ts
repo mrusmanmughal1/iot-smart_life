@@ -35,8 +35,8 @@ async function refreshAccessToken() {
   const response = await axios.post(refreshUrl, {
     refreshToken,
   });
-  const { accessToken, expiresIn } = response.data.data || response.data;
-  console.log(accessToken);
+  const { accessToken, expiresIn, accesstoken } =
+    response.data.data || response.data;
   if (!accessToken) {
     // Clear store and logout if no access token
     useAppStore.getState().logout();
@@ -46,6 +46,7 @@ async function refreshAccessToken() {
   }
 
   localStorageService.setToken(accessToken);
+  localStorageService.setRefreshToken(accesstoken);
   if (expiresIn) localStorageService.setExpiresIn(expiresIn);
 
   return accessToken;
@@ -118,7 +119,7 @@ apiClient.interceptors.response.use(
 
       toast.error(message);
     } else if (error.request) {
-      toast.error('Network Error', 'Please check your internet connection');
+      toast.error('Network Error' );
     }
 
     return Promise.reject(error);

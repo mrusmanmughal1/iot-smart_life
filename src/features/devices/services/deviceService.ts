@@ -71,27 +71,27 @@ export const deviceService = {
   /**
    * Activate device
    */
-  async activateDevice(deviceId: string) {
-    await devicesApi.updateAttributes(deviceId, {
-      active: true,
-      activatedAt: new Date().toISOString(),
-    });
+  // async activateDevice(deviceId: string) {
+  //   await devicesApi.update(deviceId, {
+  //     active: true,
+  //     activatedAt: new Date().toISOString(),
+  //   });
 
-    return devicesApi.getById(deviceId);
-  },
+  //   return devicesApi.getById(deviceId);
+  // },
 
   /**
    * Deactivate device
    */
-  async deactivateDevice(deviceId: string, reason?: string) {
-    await devicesApi.updateAttributes(deviceId, {
-      active: false,
-      deactivatedAt: new Date().toISOString(),
-      deactivationReason: reason,
-    });
+  // async deactivateDevice(deviceId: string, reason?: string) {
+  //   await devicesApi.updateAttributes(deviceId, {
+  //     active: false,
+  //     deactivatedAt: new Date().toISOString(),
+  //     deactivationReason: reason,
+  //   });
 
-    return devicesApi.getById(deviceId);
-  },
+  //   return devicesApi.getById(deviceId);
+  // },
 
   /**
    * Get device with telemetry data
@@ -172,9 +172,9 @@ export const deviceService = {
     const response = await devicesApi.getById(deviceId);
     const device = response.data.data;
 
-    // const lastSeen = device.lastActivityTime 
-    //   ? new Date(device.lastActivityTime) 
-    //   : null;
+    const lastSeen = device.lastActivityTime 
+      ? new Date(device.lastActivityTime) 
+      : null;
 
     const now = new Date();
       const minutesSinceLastSeen = lastSeen 
@@ -192,7 +192,6 @@ export const deviceService = {
       deviceId: device.id,
       deviceName: device.name,
       status,
-      lastSeen,
       minutesSinceLastSeen,
       // active: device.active,
     };

@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/select';
 import { useDevice } from '@/features/devices/hooks';
 import { devicesApi } from '@/services/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { DeviceType } from '@/services/api/devices.api';
 import toast from 'react-hot-toast';
 
 interface DeviceGeneralTabProps {
@@ -23,6 +25,7 @@ interface DeviceGeneralTabProps {
 export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
   deviceId,
 }) => {
+  const queryClient = useQueryClient();
   const { data: deviceData } = useDevice(deviceId);
   const device = deviceData?.data?.data;
 
@@ -60,14 +63,19 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
   }, [device]);
 
   // Fetch device profiles
-  const { data: deviceProfiles } = useQuery({
+  const { data: deviceProfilesResponse } = useQuery({
     queryKey: ['device-profiles'],
     queryFn: async () => {
       const { deviceProfilesApi } = await import('@/services/api/profiles.api');
       const response = await deviceProfilesApi.getAll();
+      // PaginatedResponse structure: { message: string, data: T[], meta: {...} }
+      // response.data is PaginatedResponse, response.data.data is the array
       return response.data;
     },
   });
+
+  // Extract profiles array from paginated response
+  const deviceProfiles = (deviceProfilesResponse?.data as Array<{ id: string; name: string }>) || [];
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -86,7 +94,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
       const updateData = {
         name: formData.deviceName,
         label: formData.deviceLabel,
-        type: formData.deviceType,
+        type: formData.deviceType as DeviceType,
         deviceProfileId: formData.deviceProfile,
         description: formData.description,
         metadata: {
@@ -104,6 +112,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
 
       await devicesApi.update(deviceId, updateData);
       toast.success('Device settings saved successfully');
+      queryClient.invalidateQueries({ queryKey: ['devices', deviceId] });
     } catch (error) {
       console.error('Failed to save device settings:', error);
       toast.error('Failed to save device settings');
@@ -239,13 +248,13 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                     <SelectValue placeholder="Select device profile" />
                   </SelectTrigger>
                   <SelectContent>
-                    {deviceProfiles?.data?.data?.map(
+                    {deviceProfiles.map(
                       (profile: { id: string; name: string }) => (
                         <SelectItem key={profile.id} value={profile.id}>
                           {profile.name}
                         </SelectItem>
                       )
-                    ) || []}
+                    )}
                   </SelectContent>
                 </Select>
               </div>

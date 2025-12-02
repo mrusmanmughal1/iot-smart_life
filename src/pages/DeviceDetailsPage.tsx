@@ -9,7 +9,7 @@ import { DeviceTelemetryTab } from '@/features/devices/components/DeviceTelemetr
 import { DeviceAlarmsTab } from '@/features/devices/components/DeviceAlarmsTab';
 import { DeviceGeneralTab } from '@/features/devices/components/DeviceGeneralTab';
 
-type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms';
+type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms' | 'relations';
 
 export default function DeviceDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,6 +24,7 @@ export default function DeviceDetailsPage() {
     { id: 'attributes', label: 'Attributes' },
     { id: 'telemetry', label: 'Telemetry' },
     { id: 'alarms', label: 'Alarms' },
+    { id: 'relations', label: 'Relations' },
   ];
 
   return (

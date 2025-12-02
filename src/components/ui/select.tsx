@@ -15,9 +15,10 @@ interface SelectProps {
   onValueChange?: (value: string) => void;
   defaultValue?: string;
   children: React.ReactNode;
+  className?: string;
 }
 
-export function Select({ value: controlledValue, onValueChange, defaultValue = '', children }: SelectProps) {
+export function Select({ value: controlledValue, onValueChange, defaultValue = '', children, className = '' }: SelectProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [open, setOpen] = useState(false);
 
@@ -33,7 +34,7 @@ export function Select({ value: controlledValue, onValueChange, defaultValue = '
 
   return (
     <SelectContext.Provider value={{ value, onValueChange: handleValueChange, open, setOpen }}>
-      <div className="relative">
+      <div className={`relative ${className}`}>
         {children}
       </div>
     </SelectContext.Provider>

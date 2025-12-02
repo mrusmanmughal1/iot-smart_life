@@ -85,28 +85,28 @@ export const useDeleteDevice = () => {
 };
 
 export const useActivateDevice = () => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: (deviceId: string) => deviceService.activateDevice(deviceId),
-    onSuccess: (_, deviceId) => {
-      queryClient.invalidateQueries({ queryKey: ['devices'] });
-      queryClient.invalidateQueries({ queryKey: ['devices', deviceId] });
-    },
-  });
+  // return useMutation({
+  //   mutationFn: (deviceId: string) => deviceService.activateDevice(deviceId),
+  //   onSuccess: (_, deviceId) => {
+  //     queryClient.invalidateQueries({ queryKey: ['devices'] });
+  //     queryClient.invalidateQueries({ queryKey: ['devices', deviceId] });
+  //   },
+  // });
 };
 
 export const useDeactivateDevice = () => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: ({ deviceId, reason }: { deviceId: string; reason?: string }) =>
-      deviceService.deactivateDevice(deviceId, reason),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['devices'] });
-      queryClient.invalidateQueries({ queryKey: ['devices', variables.deviceId] });
-    },
-  });
+  // return useMutation({
+  //   mutationFn: ({ deviceId, reason }: { deviceId: string; reason?: string }) =>
+  //     deviceService.deactivateDevice(deviceId, reason),
+  //   onSuccess: (_, variables) => {
+  //     queryClient.invalidateQueries({ queryKey: ['devices'] });
+  //     queryClient.invalidateQueries({ queryKey: ['devices', variables.deviceId] });
+  //   },
+  // });
 };
 
 export const useCloneDevice = () => {

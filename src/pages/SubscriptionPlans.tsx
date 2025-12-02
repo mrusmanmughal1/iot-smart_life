@@ -194,8 +194,11 @@ export default function SubscriptionPlans() {
       </Card>
 
       {/* Billing Toggle */}
-      <div className="flex items-center justify-center gap-4">
-        <Label htmlFor="billing" className={billingPeriod === 'monthly' ? 'font-semibold' : ''}>
+      <div className="flex items-center justify-center gap-4 py-4">
+        <Label
+          htmlFor="billing"
+          className={`cursor-pointer ${billingPeriod === 'monthly' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}
+        >
           Monthly
         </Label>
         <Switch
@@ -203,10 +206,19 @@ export default function SubscriptionPlans() {
           checked={billingPeriod === 'yearly'}
           onCheckedChange={(checked) => setBillingPeriod(checked ? 'yearly' : 'monthly')}
         />
-        <Label htmlFor="billing" className={billingPeriod === 'yearly' ? 'font-semibold' : ''}>
-          Yearly
-          <Badge variant="secondary" className="ml-2">Save 17%</Badge>
-        </Label>
+        <div className="flex items-center gap-2">
+          <Label
+            htmlFor="billing"
+            className={`cursor-pointer ${billingPeriod === 'yearly' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}
+          >
+            Yearly
+          </Label>
+          {billingPeriod === 'yearly' && (
+            <Badge className="bg-green-100 text-green-700 border-green-300">
+              Save 17%
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Plans Grid */}
@@ -214,92 +226,120 @@ export default function SubscriptionPlans() {
         {plans.map((plan) => (
           <Card
             key={plan.id}
-            className={`flex flex-col ${plan.isPopular ? 'border-primary shadow-lg scale-105' : ''}`}
+            className={`relative flex flex-col transition-all hover:shadow-xl ${
+              plan.isPopular
+                ? 'border-2 border-primary shadow-lg scale-105 z-10'
+                : 'border border-gray-200'
+            }`}
           >
             {plan.isPopular && (
-              <div className="bg-primary text-primary-foreground text-center py-2 text-sm font-semibold rounded-t-lg">
-                Most Popular
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20">
+                <Badge className="bg-primary text-white px-4 py-1 text-sm font-semibold shadow-md">
+                  Most Popular
+                </Badge>
               </div>
             )}
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="p-2 bg-primary/10 rounded-lg text-primary">
+            <CardHeader className="text-center pb-4">
+              <div className="flex items-center justify-center mb-4">
+                <div className="p-3 bg-primary/10 rounded-xl text-primary">
                   {plan.icon}
                 </div>
-                {plan.isEnterprise && (
-                  <Badge variant="secondary">Custom</Badge>
-                )}
               </div>
-              <CardTitle className="text-2xl mt-4">{plan.name}</CardTitle>
-              <CardDescription>{plan.description}</CardDescription>
+              {plan.isEnterprise && (
+                <Badge variant="secondary" className="mb-2">Custom Pricing</Badge>
+              )}
+              <CardTitle className="text-2xl font-bold mt-2">{plan.name}</CardTitle>
+              <CardDescription className="mt-2">{plan.description}</CardDescription>
             </CardHeader>
 
-            <CardContent className="flex-1">
-              <div className="mb-6">
+            <CardContent className="flex-1 space-y-6">
+              <div className="text-center">
                 {plan.isEnterprise ? (
-                  <div className="text-3xl font-bold">Custom</div>
+                  <div className="space-y-2">
+                    <div className="text-3xl font-bold">Custom</div>
+                    <p className="text-sm text-muted-foreground">Contact us for pricing</p>
+                  </div>
                 ) : (
                   <>
-                    <div className="text-4xl font-bold">
-                      ${billingPeriod === 'monthly' ? plan.price.monthly : Math.round(plan.price.yearly / 12)}
-                      <span className="text-base font-normal text-muted-foreground">/month</span>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-5xl font-bold">
+                        ${billingPeriod === 'monthly' ? plan.price.monthly : Math.round(plan.price.yearly / 12)}
+                      </span>
+                      <span className="text-lg text-muted-foreground">/month</span>
                     </div>
                     {billingPeriod === 'yearly' && plan.price.yearly > 0 && (
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-muted-foreground mt-2">
                         ${plan.price.yearly}/year billed annually
                       </p>
+                    )}
+                    {plan.price.monthly === 0 && (
+                      <p className="text-sm text-muted-foreground mt-2">Forever free</p>
                     )}
                   </>
                 )}
               </div>
 
-              <div className="space-y-3 mb-6">
+              <div className="space-y-3">
                 {plan.features.map((feature, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                    <span className="text-sm">{feature}</span>
+                  <div key={index} className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">{feature}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="pt-4 border-t space-y-2">
-                <p className="text-xs font-semibold text-muted-foreground mb-3">LIMITS</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
+              <div className="pt-4 border-t space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                  Plan Limits
+                </p>
+                <div className="space-y-2.5 text-sm">
+                  <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Devices:</span>
-                    <span className="font-medium">{plan.limits.devices}</span>
+                    <span className="font-semibold text-gray-900">{plan.limits.devices}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Assets:</span>
+                    <span className="font-semibold text-gray-900">{plan.limits.assets}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Users:</span>
-                    <span className="font-medium">{plan.limits.users}</span>
+                    <span className="font-semibold text-gray-900">{plan.limits.users}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">API Calls:</span>
-                    <span className="font-medium">{plan.limits.apiCalls}</span>
+                    <span className="font-semibold text-gray-900">{plan.limits.apiCalls}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-muted-foreground">Data Retention:</span>
-                    <span className="font-medium">{plan.limits.dataRetention}</span>
+                    <span className="font-semibold text-gray-900">{plan.limits.dataRetention}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground">Rule Chains:</span>
+                    <span className="font-semibold text-gray-900">{plan.limits.ruleChains}</span>
                   </div>
                 </div>
               </div>
             </CardContent>
 
-            <CardFooter>
+            <CardFooter className="pt-0">
               {plan.id === 'professional' ? (
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full" disabled>
                   Current Plan
                 </Button>
               ) : plan.isEnterprise ? (
-                <Button className="w-full">
+                <Button className="w-full bg-secondary hover:bg-secondary/90 text-white">
                   Contact Sales
                 </Button>
               ) : (
                 <Button
                   variant={plan.isPopular ? 'default' : 'outline'}
-                  className="w-full"
+                  className={`w-full ${
+                    plan.isPopular
+                      ? 'bg-primary hover:bg-primary/90 text-white'
+                      : ''
+                  }`}
                 >
-                  {plan.id === 'free' ? 'Downgrade' : 'Upgrade'}
+                  {plan.id === 'free' ? 'Current Plan' : 'Upgrade Now'}
                 </Button>
               )}
             </CardFooter>
@@ -308,19 +348,24 @@ export default function SubscriptionPlans() {
       </div>
 
       {/* Feature Comparison */}
-      <Card>
+      <Card className="border-gray-200 shadow-sm">
         <CardHeader>
-          <CardTitle>Feature Comparison</CardTitle>
-          <CardDescription>Compare features across all plans</CardDescription>
+          <CardTitle className="text-2xl font-bold">Feature Comparison</CardTitle>
+          <CardDescription>Compare features across all plans side by side</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-4 pr-4">Feature</th>
+                <tr className="border-b-2 border-gray-200">
+                  <th className="text-left py-4 pr-8 font-semibold text-gray-900">Feature</th>
                   {plans.map((plan) => (
-                    <th key={plan.id} className="text-center py-4 px-4">
+                    <th
+                      key={plan.id}
+                      className={`text-center py-4 px-4 font-semibold ${
+                        plan.isPopular ? 'text-primary' : 'text-gray-900'
+                      }`}
+                    >
                       {plan.name}
                     </th>
                   ))}
@@ -335,11 +380,18 @@ export default function SubscriptionPlans() {
                   { feature: 'Data Retention', key: 'dataRetention' },
                   { feature: 'Rule Chains', key: 'ruleChains' },
                 ].map((row) => (
-                  <tr key={row.key} className="border-b">
-                    <td className="py-4 pr-4 font-medium">{row.feature}</td>
+                  <tr key={row.key} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="py-4 pr-8 font-medium text-gray-900">{row.feature}</td>
                     {plans.map((plan) => (
-                      <td key={plan.id} className="text-center py-4 px-4">
-                        {plan.limits[row.key as keyof typeof plan.limits]}
+                      <td
+                        key={plan.id}
+                        className={`text-center py-4 px-4 ${
+                          plan.isPopular ? 'bg-primary/5' : ''
+                        }`}
+                      >
+                        <span className="font-semibold text-gray-900">
+                          {plan.limits[row.key as keyof typeof plan.limits]}
+                        </span>
                       </td>
                     ))}
                   </tr>
