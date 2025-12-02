@@ -229,7 +229,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                 >
                   Device Profile
                 </Label>
-                <Select
+                {/* <Select
                   value={formData.deviceProfile}
                   onValueChange={(value) =>
                     handleSelectChange('deviceProfile', value)
@@ -247,7 +247,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                       )
                     ) || []}
                   </SelectContent>
-                </Select>
+                </Select> */}
               </div>
             </div>
 
