@@ -69,6 +69,7 @@ export function DashboardTable({
   emptyMessage,
   pagination,
 }: DashboardTableProps) {
+  console.log(data , 'dashboard data')
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -118,7 +119,7 @@ export function DashboardTable({
   };
 
   const isTitleClickable = !!(onTitleClick || getNavigationPath);
-
+console.log(data , 'dashboard datass')
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto">
@@ -177,7 +178,7 @@ export function DashboardTable({
                       <span className="text-gray-400 mr-2">▶</span>
                       <div>
                         <div className="text-sm font-medium text-gray-900">
-                          {item.title}
+                          {item.title}   
                         </div>
                         {item.tag && item.tagColor && (
                           <Badge

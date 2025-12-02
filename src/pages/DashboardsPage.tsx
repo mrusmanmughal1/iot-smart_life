@@ -73,6 +73,7 @@ export default function DashboardsPage() {
       setIsImporting(false);
     }
   };
+  console.log(dashboards , 'dashboards')
   return (
     <AppLayout>
       <div className="space-y-6">
