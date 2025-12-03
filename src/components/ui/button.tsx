@@ -28,7 +28,7 @@ const buttonVariants = cva(
         outline:
           'border border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300',
         destructive:
-          'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
+          'bg-red-800 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
       },
       size: {
         default: 'h-10 px-4 py-2 rounded-3xl',

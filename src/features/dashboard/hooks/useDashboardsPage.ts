@@ -69,7 +69,7 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
 
     return responseData.data.data.map((dashboard: Dashboard) => {
       // Determine tag and color based on additionalInfo or default
-      const tag = dashboard.additionalInfo?.tag || 'General';
+      const tag = dashboard.additionalInfo?.tag ;
       const tagColorMap: Record<string, string> = {
         City: 'bg-blue-100 text-blue-700',
         Energy: 'bg-green-100 text-green-700',
@@ -102,7 +102,7 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
 
       return {
         id: dashboard.id,
-        title: dashboard.title,
+        title: dashboard.title ||dashboard.name,
         tag,
         tagColor,
         createdTime,

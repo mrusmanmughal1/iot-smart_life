@@ -48,6 +48,7 @@ import ImageLibrary from '@/pages/ImageLibraryPage.tsx';
 import ScriptLibrary from '@/pages/ScriptLibrary.tsx';
 import ScheduleManagement from '@/pages/ScheduleManagementPage.tsx';
 import FloorPlans from '@/pages/FloorPlanPage.tsx';
+import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -209,6 +210,10 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: '/subscription-plans',
+        element: <SubscriptionPlans />,
+      },
+      {
         path: '/device-profiles',
         element: (
           <AppLayout>
@@ -307,6 +312,10 @@ export const router = createBrowserRouter([
             <SubscriptionPlans />
           </AppLayout>
         ),
+      },
+      {
+        path: '/dashboards/:id',
+        element: <WidgetEditorPage />,
       },
       {
         path: '*',

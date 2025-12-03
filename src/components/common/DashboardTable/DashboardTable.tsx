@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Eye, Trash2, Download, Share2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export interface DashboardTableItem {
   id: string;
@@ -21,6 +23,7 @@ export interface DashboardTableProps {
     action: 'share' | 'view' | 'delete' | 'download',
     id: string
   ) => void;
+  onBulkDelete?: (ids: string[]) => void;
   onTitleClick?: (id: string) => void;
   getNavigationPath?: (id: string) => string;
   columns?: {
@@ -56,6 +59,7 @@ export function DashboardTable({
   data,
   onStatusToggle,
   onAction,
+  onBulkDelete,
   onTitleClick,
   getNavigationPath,
   columns = {
@@ -72,6 +76,7 @@ export function DashboardTable({
   console.log(data , 'dashboard data')
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   // Default translation keys
   const defaultTranslationKeys = {
@@ -118,14 +123,62 @@ export function DashboardTable({
     }
   };
 
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(data.map(item => item.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectOne = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds([...selectedIds, id]);
+    } else {
+      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (onBulkDelete && selectedIds.length > 0) {
+      onBulkDelete(selectedIds);
+      setSelectedIds([]);
+    }
+  };
+
+  const isAllSelected = data.length > 0 && selectedIds.length === data.length;
   const isTitleClickable = !!(onTitleClick || getNavigationPath);
-console.log(data , 'dashboard datass')
   return (
     <div className="space-y-4">
+      {/* Bulk Delete Button */}
+      {selectedIds.length > 0 && (
+        <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
+          <span className="text-sm text-gray-600">
+            {selectedIds.length} item{selectedIds.length > 1 ? 's' : ''} selected
+          </span>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={handleBulkDelete}
+            className="ml-auto"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete Selected
+          </Button>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full">
         <thead className="bg-primary">
           <tr className="border-b border-gray-200">
+            <th className="text-left py-3 px-4 text-sm font-semibold text-white w-12">
+              <Checkbox
+                checked={isAllSelected}
+                onChange={handleSelectAll}
+                aria-label="Select all"
+              />
+            </th>
             {columns.title && (
               <th className="text-left py-3 px-4 text-sm font-semibold text-white">
                 {t(defaultTranslationKeys.title)}
@@ -157,7 +210,7 @@ console.log(data , 'dashboard datass')
           {data.length === 0 ? (
             <tr>
               <td
-                colSpan={Object.values(columns).filter(Boolean).length}
+                colSpan={Object.values(columns).filter(Boolean).length + 1}
                 className="py-8 px-4 text-center text-gray-500"
               >
                 {defaultEmptyMessage}
@@ -167,20 +220,30 @@ console.log(data , 'dashboard datass')
             data.map((item) => (
               <tr
                 key={item.id}
-                className="border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors"
+                className={`border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors ${
+                  selectedIds.includes(item.id) ? 'bg-blue-50' : ''
+                }`}
               >
+                <td className="py-4 px-4 w-12">
+                  <Checkbox
+                    checked={selectedIds.includes(item.id)}
+                    onChange={(e) => handleSelectOne(item.id, e)}
+                    aria-label={`Select ${item.title}`}
+                  />
+                </td>
                 {columns.title && (
                   <td
                     className={`py-4 px-4 ${isTitleClickable ? 'cursor-pointer hover:bg-gray-100 transition-colors' : ''}`}
                     onClick={isTitleClickable ? () => handleTitleClick(item.id) : undefined}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-400 mr-2">▶</span>
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="">
+                        <NavLink to={`/dashboards/${item.id}`} className="text-sm font-medium text-gray-900">
                           {item.title}   
+                        </NavLink>
                         </div>
-                        {item.tag && item.tagColor && (
+                        {/* {item.tag && item.tagColor && (
                           <Badge
                             className={`${item.tagColor} text-xs mt-1 border-0`}
                           >
@@ -192,7 +255,7 @@ console.log(data , 'dashboard datass')
                                 )
                               : item.tag}
                           </Badge>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </td>

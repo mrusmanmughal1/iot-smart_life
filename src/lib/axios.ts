@@ -119,7 +119,7 @@ apiClient.interceptors.response.use(
 
       toast.error(message);
     } else if (error.request) {
-      toast.error('Network Error' );
+      toast.error('Network Error');
     }
 
     return Promise.reject(error);

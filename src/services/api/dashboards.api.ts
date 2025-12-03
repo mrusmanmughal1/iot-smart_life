@@ -1,6 +1,7 @@
 import apiClient from '@/lib/axios.ts';
 
 export interface Dashboard {
+  name: string;
   id: string;
   title: string;
   description?: string;

@@ -484,7 +484,14 @@
     "status": {
       "active": "Active",
       "error": "Error"
+    },
+    "tags":{
+      "sensor": "Sensor",
+      "gateway": "Gateway",
+      "controller": "Controller",
+      "actuator": "Actuator"
     }
+     
   },
   "addAsset": {
     "title": "Add New Asset",
