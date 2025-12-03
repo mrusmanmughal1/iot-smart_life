@@ -92,6 +92,7 @@ apiClient.interceptors.response.use(
           onRefreshed(newToken);
         } catch (err) {
           isRefreshing = false;
+          toast.error('You may have loggedin from another device, please login again');
           // Clear store and logout
           useAppStore.getState().logout();
           localStorageService.removeToken();
