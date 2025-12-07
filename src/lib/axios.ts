@@ -79,7 +79,20 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't refresh token for auth endpoints (login, register, etc.)
+    const isAuthEndpoint = originalRequest.url?.includes('/auth/login') || 
+                           originalRequest.url?.includes('/auth/register') ||
+                           originalRequest.url?.includes('/auth/refresh');
+    
+    // Only attempt token refresh if:
+    // 1. Status is 401
+    // 2. Request hasn't been retried
+    // 3. It's not an auth endpoint (login/register)
+    // 4. We have a refresh token available
+    if (error.response?.status === 401 && 
+        !originalRequest._retry && 
+        !isAuthEndpoint &&
+        localStorageService.getRefreshToken()) {
       originalRequest._retry = true;
 
       // avoid multiple refresh requests
@@ -87,12 +100,13 @@ apiClient.interceptors.response.use(
         isRefreshing = true;
 
         try {
+          
           const newToken = await refreshAccessToken();
           isRefreshing = false;
           onRefreshed(newToken);
         } catch (err) {
           isRefreshing = false;
-          toast.error('You may have loggedin from another device, please login again');
+          // toast.error('You may have loggedin from another device, please login again');
           // Clear store and logout
           useAppStore.getState().logout();
           localStorageService.removeToken();
@@ -118,7 +132,7 @@ apiClient.interceptors.response.use(
         (error.response.data as { message?: string })?.message ||
         'An error occurred';
 
-      toast.error(message);
+      console.log(message);
     } else if (error.request) {
       toast.error('Network Error');
     }

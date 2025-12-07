@@ -87,7 +87,7 @@ export const subscriptionsApi = {
 
   // Create subscription
   create: (plan: SubscriptionPlan, billingPeriod: BillingPeriod) =>
-    apiClient.post<ApiResponse<Subscription>>('/subscriptions', {
+    apiClient.post<ApiResponse<Subscription>>('/payments/create', {
       plan,
       billingPeriod,
     }),

@@ -49,6 +49,7 @@ import ScriptLibrary from '@/pages/ScriptLibrary.tsx';
 import ScheduleManagement from '@/pages/ScheduleManagementPage.tsx';
 import FloorPlans from '@/pages/FloorPlanPage.tsx';
 import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
+import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -57,6 +58,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <PublicRoute />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         path: '/login',
@@ -106,6 +108,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <ProtectedRoute />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         path: '/dashboard',

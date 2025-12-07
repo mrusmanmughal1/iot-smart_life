@@ -12,7 +12,18 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => authService.login(credentials),
-    onSuccess: (data) => {
+    onSuccess: (data,variables) => {
+      if (data.requires2FA === true) {
+
+    navigate("/verify-pin", {
+      state: {
+        email: variables.email,
+        password: variables.password,
+      },
+    });
+
+    return; // ❗ stop here, do not run normal login flow
+  }
       console.log('=== LOGIN SUCCESS ===');
       console.log('1. Data received:', {
         hasUser: !!data.data?.user || !!data.user,
@@ -73,11 +84,11 @@ export const useLogin = () => {
       console.log('=== LOGIN FLOW COMPLETE ===');
     },
     onError: (error: unknown) => {
-      console.error('Login error:', error);
-      const message = 
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 
+      console.log('Login error:', error);
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
         'Login failed';
-      toast.error(message);
+      toast.error(message, { id: "error-toast" });
     },
   });
 };

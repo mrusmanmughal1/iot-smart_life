@@ -14,7 +14,7 @@ import { toast } from 'react-hot-toast';
 type ResetPasswordFormData = z.infer<ReturnType<typeof createResetPasswordSchema>>;
 
 const createResetPasswordSchema = (t: (key: string) => string) => z.object({
-  password: z.string().min(6, t('auth.resetPassword.passwordMinLength')),
+  password: z.string().min(8, t('auth.resetPassword.passwordMinLength')),
   confirmPassword: z.string().min(1, t('auth.resetPassword.confirmPasswordRequired')),
 }).refine((data) => data.password === data.confirmPassword, {
   message: t('auth.resetPassword.passwordsDoNotMatch'),

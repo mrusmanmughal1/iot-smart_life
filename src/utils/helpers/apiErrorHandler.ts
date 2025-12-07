@@ -11,6 +11,7 @@ export const handleApiError = (error: unknown): ApiError => {
     const statusCode = error.response?.status;
     const message = error.response?.data?.message || error.message;
     const errors = error.response?.data?.errors;
+    
 
     return {
       message,

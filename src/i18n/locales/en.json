@@ -689,8 +689,8 @@
       "failedToSendCode": "Failed to send verification code"
     },
     "pinCodeVerification": {
-      "title": "Enter 4 Digit Code",
-      "description": "Enter the 4 digit code that you received on your phone",
+      "title": "Enter 6 Digit Code",
+      "description": "Enter the 6 digit code that you received on your phone",
       "verifyCode": "Sent Code",
       "verifying": "Verifying...",
       "backToLogin": "Back to Login",

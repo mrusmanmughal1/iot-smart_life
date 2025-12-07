@@ -14,11 +14,11 @@ import {
   Zap,
   Rocket,
   Users,
-  Database,
-  Cloud,
 } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
-
+import { subscriptionsApi, SubscriptionPlan, BillingPeriod } from '@/services/api/subscriptions.api';
+import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 interface Plan {
   id: string;
   name: string;
@@ -156,9 +156,53 @@ const plans: Plan[] = [
 ];
 
 export default function SubscriptionPlans() {
+  const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>(
     'monthly'
   );
+  const [isSubscribing, setIsSubscribing] = useState<string | null>(null);
+
+  // Map plan IDs to SubscriptionPlan enum
+  const mapPlanIdToSubscriptionPlan = (planId: string): SubscriptionPlan => {
+    switch (planId) {
+      case 'free':
+        return SubscriptionPlan.FREE;
+      case 'starter':
+        return "starter"; // Assuming starter maps to BASIC
+      case 'professional':
+        return SubscriptionPlan.PROFESSIONAL;
+      default:
+        return SubscriptionPlan.FREE;
+    }
+  };
+
+  const handlePlanSelection = async (planId: string) => {
+    // Don't allow subscribing to the current plan
+    if (planId === 'professional') {
+      toast.error('This is your current plan');
+      return;
+    }
+
+    setIsSubscribing(planId);
+    
+    try {
+      const plan = mapPlanIdToSubscriptionPlan(planId);
+      const billing = billingPeriod === 'monthly' ? BillingPeriod.MONTHLY : BillingPeriod.YEARLY;
+      
+      const result =  await subscriptionsApi.create(plan, billing);
+      console.log(result);
+      if (result.status === 201) {
+        window.open(result.data.data.paymentUrl);
+      }
+      
+      toast.success(`Successfully subscribed to ${plans.find(p => p.id === planId)?.name} plan!`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to subscribe to plan';
+      toast.error(errorMessage);
+    } finally {
+      setIsSubscribing(null);
+    }
+  };
 
   return (
     <AppLayout>
@@ -302,6 +346,7 @@ export default function SubscriptionPlans() {
                 {plan.id === 'professional' ? (
                   <Button
                     className="w-full bg-gray-100  border border-gray-300 text-black hover:bg-gray-800 font-medium"
+                    disabled
                   >
                     Current Plan
                   </Button>
@@ -309,6 +354,9 @@ export default function SubscriptionPlans() {
                   <Button
                     variant="outline"
                     className="w-full border-gray-300   bg-black text-white hover:bg-black/80 font-medium"
+                    onClick={() => handlePlanSelection(plan.id)}
+                    disabled={isSubscribing !== null}
+                    isLoading={isSubscribing === plan.id}
                   >
                     Upgrade Plan
                   </Button>
