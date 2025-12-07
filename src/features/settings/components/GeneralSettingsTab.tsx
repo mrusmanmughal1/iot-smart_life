@@ -15,7 +15,6 @@ export function GeneralSettingsTab() {
     settings,
     isLoading,
     handleLanguageChange,
-    handleThemeChange,
     handleAutoRefreshToggle,
     handleCompactModeToggle,
     handleSaveAll,
@@ -78,7 +77,7 @@ export function GeneralSettingsTab() {
 
         <div className="space-y-2">
           <Label htmlFor="theme">{t('settings.theme')}</Label>
-          <Select value={currentTheme} onValueChange={handleThemeChange}>
+          <Select value={currentTheme}  >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>

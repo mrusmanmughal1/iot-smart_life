@@ -22,6 +22,7 @@ export interface RegisterData {
 }
 
 export interface AuthResponse {
+  requires2FA: boolean;
   data?: any;
   accessToken: string;
   refreshToken: string;

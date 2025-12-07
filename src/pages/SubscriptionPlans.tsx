@@ -10,15 +10,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import {
-  Zap,
-  Rocket,
-  Users,
-} from 'lucide-react';
+import { Zap, Rocket, Users } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
-import { subscriptionsApi, SubscriptionPlan, BillingPeriod } from '@/services/api/subscriptions.api';
+import {
+  subscriptionsApi,
+  SubscriptionPlan,
+  BillingPeriod,
+} from '@/services/api/subscriptions.api';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 interface Plan {
   id: string;
   name: string;
@@ -122,7 +121,7 @@ const plans: Plan[] = [
       ruleChains: '10',
     },
   },
-  
+
   // {
   //   id: 'enterprise',
   //   name: 'Enterprise',
@@ -156,7 +155,6 @@ const plans: Plan[] = [
 ];
 
 export default function SubscriptionPlans() {
-  const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>(
     'monthly'
   );
@@ -168,7 +166,7 @@ export default function SubscriptionPlans() {
       case 'free':
         return SubscriptionPlan.FREE;
       case 'starter':
-        return "starter"; // Assuming starter maps to BASIC
+        return SubscriptionPlan.BASIC; // Assuming starter maps to BASIC
       case 'professional':
         return SubscriptionPlan.PROFESSIONAL;
       default:
@@ -184,20 +182,27 @@ export default function SubscriptionPlans() {
     }
 
     setIsSubscribing(planId);
-    
+
     try {
       const plan = mapPlanIdToSubscriptionPlan(planId);
-      const billing = billingPeriod === 'monthly' ? BillingPeriod.MONTHLY : BillingPeriod.YEARLY;
-      
-      const result =  await subscriptionsApi.create(plan, billing);
-      console.log(result);
+      const billing =
+        billingPeriod === 'monthly'
+          ? BillingPeriod.MONTHLY
+          : BillingPeriod.YEARLY;
+
+      const result = await subscriptionsApi.create(plan, billing);
       if (result.status === 201) {
         window.open(result.data.data.paymentUrl);
       }
-      
-      toast.success(`Successfully subscribed to ${plans.find(p => p.id === planId)?.name} plan!`);
+
+      toast.success(
+        `Successfully subscribed to ${
+          plans.find((p) => p.id === planId)?.name
+        } plan!`
+      );
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to subscribe to plan';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to subscribe to plan';
       toast.error(errorMessage);
     } finally {
       setIsSubscribing(null);
@@ -209,10 +214,10 @@ export default function SubscriptionPlans() {
       <div className="space-y-6 border bg-[#fff6fb]/50 p-6 rounded-lg border-secondary ">
         <div className="">
           <Badge className="text-base  mb-4 font-normal px-4 py-2 bg-secondary text-white">
-            Subscription 
+            Subscription
           </Badge>
           <div className="text-2xl font-semibold">
-          Manage Your Subscription Plans
+            Manage Your Subscription Plans
           </div>
           <div className="text-sm text-muted-foreground">
             Choose the perfect plan to support your business growth. Manage your
@@ -314,9 +319,17 @@ export default function SubscriptionPlans() {
               }`}
             >
               {/* Header Section with Plan Name and Badge */}
-              <div className={`px-6 pt-6 pb-4 ${plan.isPopular ? 'bg-gray-900' : 'bg-white'}`}>
+              <div
+                className={`px-6 pt-6 pb-4 ${
+                  plan.isPopular ? 'bg-gray-900' : 'bg-white'
+                }`}
+              >
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className={`text-xl font-semibold ${plan.isPopular ? 'text-white' : 'text-gray-900'}`}>
+                  <h3
+                    className={`text-xl font-semibold ${
+                      plan.isPopular ? 'text-white' : 'text-gray-900'
+                    }`}
+                  >
                     {plan.name} Plan
                   </h3>
                   <Badge
@@ -328,21 +341,41 @@ export default function SubscriptionPlans() {
                         : 'bg-blue-600 text-white'
                     } px-6 py-1 text-md font-semibold uppercase`}
                   >
-                    {plan.id === 'free' ? 'FREE' : plan.isPopular ? 'PRO' : 'ADVANCE'}
+                    {plan.id === 'free'
+                      ? 'FREE'
+                      : plan.isPopular
+                      ? 'PRO'
+                      : 'ADVANCE'}
                   </Badge>
                 </div>
                 <div className="flex items-baseline gap-1">
-                  <span className={`text-4xl font-bold ${plan.isPopular ? 'text-white' : 'text-gray-900'}`}>
-                    ${billingPeriod === 'monthly' ? plan.price.monthly : Math.round(plan.price.yearly / 12)}.00
+                  <span
+                    className={`text-4xl font-bold ${
+                      plan.isPopular ? 'text-white' : 'text-gray-900'
+                    }`}
+                  >
+                    $
+                    {billingPeriod === 'monthly'
+                      ? plan.price.monthly
+                      : Math.round(plan.price.yearly / 12)}
+                    .00
                   </span>
-                  <span className={`text-sm ${plan.isPopular ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <span
+                    className={`text-sm ${
+                      plan.isPopular ? 'text-gray-300' : 'text-gray-500'
+                    }`}
+                  >
                     /month
                   </span>
                 </div>
               </div>
 
               {/* Current Plan / Upgrade Button */}
-              <div className={`px-6 py-3 ${plan.isPopular ? 'bg-gray-900' : 'bg-white'}`}>
+              <div
+                className={`px-6 py-3 ${
+                  plan.isPopular ? 'bg-gray-900' : 'bg-white'
+                }`}
+              >
                 {plan.id === 'professional' ? (
                   <Button
                     className="w-full bg-gray-100  border border-gray-300 text-black hover:bg-gray-800 font-medium"
@@ -373,15 +406,24 @@ export default function SubscriptionPlans() {
               )}
 
               {/* Features List */}
-              <CardContent className={`flex-1 px-6 pb-6 ${plan.isPopular ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`}>
+              <CardContent
+                className={`flex-1 px-6 pb-6 ${
+                  plan.isPopular
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-white text-gray-900'
+                }`}
+              >
                 <ol className="space-y-3 list-decimal list-inside">
                   {plan.features.map((feature, index) => (
-                    <li key={index} className={`text-sm ${plan.isPopular ? 'text-gray-300' : 'text-gray-900'}`}>
+                    <li
+                      key={index}
+                      className={`text-sm ${
+                        plan.isPopular ? 'text-gray-300' : 'text-gray-900'
+                      }`}
+                    >
                       {feature}
                     </li>
                   ))}
-                 
-                  
                 </ol>
               </CardContent>
             </Card>

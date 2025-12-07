@@ -74,7 +74,7 @@ export const PinCodeVerificationForm: React.FC = () => {
       email,
       password,
       twoFactorCode: finalCode,
-    } as { email: string; password: string; pinCode: string });
+    } as { email: string; password: string; pinCode: string , twoFactorCode: string });
   };
 
    

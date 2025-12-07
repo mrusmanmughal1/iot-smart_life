@@ -57,6 +57,7 @@ export interface Subscription {
   tenantId?: string;
   createdAt: string;
   updatedAt: string;
+  paymentUrl?: string;
 }
 
 export interface Usage {
