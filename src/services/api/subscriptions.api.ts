@@ -2,7 +2,7 @@ import apiClient from '@/lib/axios';
 
 export enum SubscriptionPlan {
   FREE = 'free',
-  BASIC = 'basic',
+  BASIC = 'starter',
   PROFESSIONAL = 'professional',
   ENTERPRISE = 'enterprise',
 }
@@ -83,8 +83,7 @@ export const subscriptionsApi = {
     apiClient.get<ApiResponse<Plan>>(`/subscriptions/plans/${plan}`),
 
   // Get current subscription
-  getCurrent: () =>
-    apiClient.get<ApiResponse<Subscription>>('/subscriptions'),
+  getCurrent: () => apiClient.get<ApiResponse<Subscription>>('/subscriptions'),
 
   // Create subscription
   create: (plan: SubscriptionPlan, billingPeriod: BillingPeriod) =>
@@ -112,8 +111,7 @@ export const subscriptionsApi = {
     }),
 
   // Cancel subscription
-  cancel: () =>
-    apiClient.post<ApiResponse<any>>('/subscriptions/cancel'),
+  cancel: () => apiClient.post<ApiResponse<any>>('/subscriptions/cancel'),
 
   // Renew subscription
   renew: () =>

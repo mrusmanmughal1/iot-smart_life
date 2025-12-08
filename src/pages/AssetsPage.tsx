@@ -194,7 +194,7 @@ export default function AssetsPage() {
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
-              </div>
+                      </div>
             ) : (
               <DashboardTable
                 data={tableData}

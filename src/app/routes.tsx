@@ -155,35 +155,19 @@ export const router = createBrowserRouter([
         path: '/settings',
         element: <SettingsPage />,
       },
-      {
-        path: '/dashboards',
-        element: <DashboardsPage />,
-      },
-      {
-        path: '/dashboards/create',
-        element: <CreateDashboardPage />,
-      },
-      {
-        path: '/groups/create',
-        element: <CreateGroupPage />,
-      },
-      {
-        path: '/audit',
-        element: <AuditPage />,
-      },
-      // Add more protected routes here
+      // --------------------Solutions dashboards Routes --------------------
       {
         path: '/solution-dashboards',
         element: <DashboardsPage />,
       },
       {
-        path: '/solution-templates',
-        element: (
-          <AppLayout>
-            <SolutionTemplates />
-          </AppLayout>
-        ),
+        path: '/solution-dashboards/create',
+        element: <CreateDashboardPage />,
       },
+
+
+      // --------------------Solutions templates Routes --------------------
+
       {
         path: '/solution-templates/create',
         element: (
@@ -196,6 +180,25 @@ export const router = createBrowserRouter([
         path: '/solution-templates/preview/:id',
         element: <TemplatePreviewPage />,
       },
+      {
+        path: '/groups/create',
+        element: <CreateGroupPage />,
+      },
+      {
+        path: '/audit',
+        element: <AuditPage />,
+      },
+      // Add more protected routes here
+       
+      {
+        path: '/solution-templates',
+        element: (
+          <AppLayout>
+            <SolutionTemplates />
+          </AppLayout>
+        ),
+      },
+   
       {
         path: '/floor-plans',
         element: (

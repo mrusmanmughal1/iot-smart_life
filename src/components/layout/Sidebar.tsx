@@ -54,7 +54,7 @@ const getNavItems = (t: (key: string) => string): NavItem[] => [
   },
   {
     titleKey: 'nav.solutionDashboards',
-    href: '/dashboards',
+    href: '/solution-dashboards',
     icon: <LayoutDashboard className="h-5 w-5" />,
   },
   {

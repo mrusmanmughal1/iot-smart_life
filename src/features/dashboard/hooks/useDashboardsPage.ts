@@ -215,7 +215,7 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
 
   // Handle create new dashboard
   const handleCreateDashboard = () => {
-    navigate('/dashboards/create');
+    navigate('/solution-dashboards/create');
   };
 
   // Handle import dashboard
