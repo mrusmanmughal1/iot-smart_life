@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Eye, Trash2, Download, Share2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 
 export interface DashboardTableItem {
@@ -17,6 +16,7 @@ export interface DashboardTableItem {
 }
 
 export interface DashboardTableProps {
+  linkto: string;
   data: DashboardTableItem[];
   onStatusToggle?: (id: string) => void;
   onAction?: (
@@ -56,6 +56,7 @@ export interface DashboardTableProps {
 }
 
 export function DashboardTable({
+  linkto,
   data,
   onStatusToggle,
   onAction,
@@ -73,7 +74,7 @@ export function DashboardTable({
   emptyMessage,
   pagination,
 }: DashboardTableProps) {
-  console.log(data , 'dashboard data')
+ 
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -239,7 +240,7 @@ export function DashboardTable({
                     <div className="flex items-center gap-2">
                       <div>
                         <div className="">
-                        <NavLink to={`/dashboards/${item.id}`} className="text-sm font-medium text-gray-900">
+                        <NavLink to={`/${linkto}/${item.id}`} className="text-sm font-medium text-gray-900">
                           {item.title}   
                         </NavLink>
                         </div>

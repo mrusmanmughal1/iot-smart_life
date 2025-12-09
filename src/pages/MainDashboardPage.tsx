@@ -15,7 +15,6 @@ import {
   Tooltip,
   ReferenceLine,
 } from 'recharts';
-import AppLayout from '@/components/layout/AppLayout';
 import { useMainDashboard } from '@/features/dashboard/hooks/useMainDashboard';
 
 export default function MainDashboardPage() {
@@ -43,7 +42,6 @@ export default function MainDashboardPage() {
   };
 
   return (
-    <AppLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -267,6 +265,5 @@ export default function MainDashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
   );
 }

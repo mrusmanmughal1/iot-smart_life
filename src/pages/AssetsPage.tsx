@@ -110,7 +110,7 @@ export default function AssetsPage() {
 
 
   return (
-    <AppLayout>
+    < >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -147,7 +147,6 @@ export default function AssetsPage() {
               onClick={handleOpenAddAssetModal}
               className="flex items-center gap-2 bg-secondary hover:bg-secondary/90 text-white"
             >
-              <Plus className="h-4 w-4" />
               {t('assets.actions.addAsset')}
             </Button>
           </div>
@@ -198,6 +197,7 @@ export default function AssetsPage() {
             ) : (
               <DashboardTable
                 data={tableData}
+                linkto="assets"
                 onAction={handleAction}
                 translationKeys={{
                   title: 'assets.table.name',
@@ -236,6 +236,6 @@ export default function AssetsPage() {
         onSave={handleSaveAsset}
         isLoading={isSavingAsset}
       />
-    </AppLayout>
+    </>
   );
 }

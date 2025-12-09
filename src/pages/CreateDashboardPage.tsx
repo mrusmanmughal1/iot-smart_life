@@ -7,7 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import AppLayout from '@/components/layout/AppLayout';
 import { TagInput } from '@/components/common/TagInput';
 import { dashboardsApi } from '@/services/api';
 import { useQueryClient } from '@tanstack/react-query';
@@ -87,7 +86,6 @@ export default function CreateDashboardPage() {
   };
 
   return (
-    <AppLayout>
       <div className="space-y-6">
         {/* Header */}
         <h1 className="text-2xl font-semibold text-gray-900">
@@ -210,7 +208,6 @@ export default function CreateDashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
   );
 }
 

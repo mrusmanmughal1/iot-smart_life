@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { ProtectedRoute } from '@/routes/ProtectedRoute.tsx';
 import { PublicRoute } from '@/routes/PublicRoute.tsx';
 import { LoginPage } from '../pages/LoginPage.tsx';
@@ -50,6 +50,7 @@ import ScheduleManagement from '@/pages/ScheduleManagementPage.tsx';
 import FloorPlans from '@/pages/FloorPlanPage.tsx';
 import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
 import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
+import { Children } from 'react';
 
 export const router = createBrowserRouter([
   {
@@ -115,19 +116,6 @@ export const router = createBrowserRouter([
         element: <DashboardPage />,
       },
       {
-        path: '/main-dashboard',
-        element: <MainDashboardPage />,
-      },
-      {
-        path: '/main-control-panel',
-        element: <MainControlPanelPage />,
-      },
-
-      {
-        path: '/assets',
-        element: <AssetsPage />,
-      },
-      {
         path: '/devices',
         element: <DevicesPage />,
       },
@@ -155,16 +143,62 @@ export const router = createBrowserRouter([
         path: '/settings',
         element: <SettingsPage />,
       },
+      //  ------------------ routes for assets --------------------
+
+      {
+        path: '/assets',
+        element: (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <AssetsPage />,
+          },
+        ],
+      },
       // --------------------Solutions dashboards Routes --------------------
+
       {
         path: '/solution-dashboards',
-        element: <DashboardsPage />,
+        element: (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <DashboardsPage />,
+          },
+          {
+            path: 'create',
+            element: <CreateDashboardPage />,
+          },
+          {
+            path: 'groups/create',
+            element: <CreateGroupPage />,
+          },
+          {
+            path: 'widgets/configure',
+            element: <WidgetConfigurationPage />,
+          },
+          {
+            path: ':id',
+            element: <WidgetEditorPage />,
+          },
+          {
+            path: 'main-dashboard',
+            element: <MainDashboardPage />,
+          },
+          {
+            path: 'main-control-panel',
+            element: <MainControlPanelPage />,
+          },
+        ],
       },
-      {
-        path: '/solution-dashboards/create',
-        element: <CreateDashboardPage />,
-      },
-
 
       // --------------------Solutions templates Routes --------------------
 
@@ -180,16 +214,13 @@ export const router = createBrowserRouter([
         path: '/solution-templates/preview/:id',
         element: <TemplatePreviewPage />,
       },
-      {
-        path: '/groups/create',
-        element: <CreateGroupPage />,
-      },
+
       {
         path: '/audit',
         element: <AuditPage />,
       },
       // Add more protected routes here
-       
+
       {
         path: '/solution-templates',
         element: (
@@ -198,7 +229,7 @@ export const router = createBrowserRouter([
           </AppLayout>
         ),
       },
-   
+
       {
         path: '/floor-plans',
         element: (
@@ -275,10 +306,7 @@ export const router = createBrowserRouter([
           </AppLayout>
         ),
       },
-      {
-        path: '/widgets/configure',
-        element: <WidgetConfigurationPage />,
-      },
+
       {
         path: '/images',
         element: (

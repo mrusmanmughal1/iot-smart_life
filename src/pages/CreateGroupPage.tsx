@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Radio } from '@/components/ui/radio';
-import AppLayout from '@/components/layout/AppLayout';
 import { toast } from 'react-hot-toast';
 import { cn } from '@/lib/util';
 
@@ -113,7 +112,6 @@ export default function CreateGroupPage() {
   };
 
   return (
-    <AppLayout>
       <div className="space-y-6">
         {/* Header */}
         <h1 className="text-2xl font-semibold text-gray-900">
@@ -303,7 +301,6 @@ export default function CreateGroupPage() {
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
   );
 }
 

@@ -16,7 +16,6 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import { DashboardTable } from '@/components/common/DashboardTable';
-import AppLayout from '@/components/layout/AppLayout';
 import { useDashboardsPage } from '@/features/dashboard/hooks/useDashboardsPage';
 import { ImportDashboardModal } from '@/components/common/ImportDashboardModal';
 import { dashboardsApi } from '@/services/api';
@@ -73,9 +72,8 @@ export default function DashboardsPage() {
       setIsImporting(false);
     }
   };
-  console.log(dashboards , 'dashboards')
   return (
-    <AppLayout>
+    < >
       <div className="space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
@@ -188,6 +186,6 @@ export default function DashboardsPage() {
         onImport={handleImportFromModal}
         isLoading={isImporting}
       />
-    </AppLayout>
+    </>
   );
 }
