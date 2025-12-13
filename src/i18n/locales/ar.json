@@ -484,7 +484,45 @@
       "active": "نشط",
       "warning": "تحذير",
       "error": "خطأ"
+    },
+    "details": {
+      "overview": "نظرة عامة",
+      "attributes": "الخصائص",
+      "relations": "العلاقات",
+      "telemetry": "البيانات الفورية",
+
+      "assetInformation": "معلومات الأصل",
+      "name": "الاسم",
+      "type": "النوع",
+      "customer": "العميل",
+      "created": "تاريخ الإنشاء",
+      "lastActivity": "آخر نشاط",
+
+      "connectedDevices": "الأجهزة المتصلة",
+      "activeDevices": "الأجهزة النشطة",
+      "offline": "غير متصل",
+      "warning": "تحذير",
+
+      "recentActivity": "آخر الأنشطة",
+      "deviceAdded": "تمت إضافة جهاز",
+      "alarmTriggered": "تم تشغيل إنذار",
+      "configUpdated": "تم تحديث الإعدادات",
+      "ago": "منذ",
+
+      "assetHierarchy": "تسلسل الأصل",
+
+      "floors": {
+        "floor1": "الطابق 1",
+        "floor2": "الطابق 2",
+        "basement": "الطابق السفلي"
+      },
+
+      "devices": {
+        "temperatureSensor": "حساس درجة الحرارة",
+        "hvacController": "وحدة تحكم التكييف"
+      }
     }
+
   },
   "addAsset": {
     "title": "إضافة أصل جديد",

@@ -110,3 +110,10 @@ export const useAssignDevices = () => {
 
 export { useAssetsPage } from './useAssetsPage';
 export type { Asset } from './useAssetsPage';
+export { useAssetDetails } from './useAssetDetails';
+export type {
+  AssetDetails,
+  ConnectedDevice,
+  RecentActivity,
+  AssetHierarchy,
+} from './useAssetDetails';

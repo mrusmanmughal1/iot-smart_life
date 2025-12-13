@@ -46,6 +46,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
     label: '',
     description: '',
     gatewayId: '',
+    connectionType: '',
     ...initialData,
   });
   const [enableGatewayAssignment, setEnableGatewayAssignment] = useState(false);
@@ -78,6 +79,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
       label: '',
       description: '',
       gatewayId: '',
+      connectionType: '',
     });
     setEnableGatewayAssignment(false);
   };
@@ -123,10 +125,36 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   <SelectValue className="placeholder:text-slate-100" placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="wifi">wifi</SelectItem>
-                  <SelectItem value="gateway">Gateway</SelectItem>
+                  <SelectItem value="sensor">Sensor</SelectItem>
                   <SelectItem value="actuator">Actuator</SelectItem>
+                  <SelectItem value="gateway">Gateway</SelectItem>
                   <SelectItem value="controller">Controller</SelectItem>
+                  <SelectItem value="camera">Camera</SelectItem>
+                  <SelectItem value="tracker">tracker</SelectItem>
+
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="device-type">{t('devices.connectionType')} *</Label>
+              <Select
+                value={formData.connectionType}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, connectionType: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue className="placeholder:text-slate-100" placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wifi">Wifi</SelectItem>
+                  <SelectItem value="ethenet">Ethenet</SelectItem>
+                  <SelectItem value="bluetooth">Bluetooth</SelectItem>
+                  <SelectItem value="cellular">Cellular</SelectItem>
+                  <SelectItem value="zigbee">Zigbee</SelectItem>
+                  <SelectItem value="zwave">Zwave</SelectItem>
+                  <SelectItem value="lora">Lora</SelectItem>
+
                 </SelectContent>
               </Select>
             </div>

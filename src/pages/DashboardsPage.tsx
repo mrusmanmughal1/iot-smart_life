@@ -170,6 +170,7 @@ export default function DashboardsPage() {
               </div>
             ) : (
             <DashboardTable
+              linkto="dashboards"
               data={dashboards}
               onStatusToggle={handleStatusToggle}
               onAction={handleAction}

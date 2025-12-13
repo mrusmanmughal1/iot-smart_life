@@ -16,6 +16,7 @@ export enum DeviceStatus {
 }
 
 export interface Device {
+  connectionType: string;
   additionalInfo: any;
   attributes: any;
   deviceProfileId: any;

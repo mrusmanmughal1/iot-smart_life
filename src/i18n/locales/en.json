@@ -490,6 +490,45 @@
       "gateway": "Gateway",
       "controller": "Controller",
       "actuator": "Actuator"
+    },
+    "details": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "overview": "Overview",
+      "attributes": "Attributes",
+      "relations": "Relations",
+      "telemetry": "Telemetry",
+
+      "assetInformation": "Asset Information",
+      "name": "Name",
+      "type": "Type",
+      "customer": "Customer",
+      "created": "Created",
+      "lastActivity": "Last activity",
+
+      "connectedDevices": "Connected Devices",
+      "activeDevices": "Active Devices",
+      "offline": "offline",
+      "warning": "warning",
+
+      "recentActivity": "Recent Activity",
+      "deviceAdded": "Device added",
+      "alarmTriggered": "Alarm triggered",
+      "configUpdated": "Configuration updated",
+      "ago": "ago",
+
+      "assetHierarchy": "Asset Hierarchy",
+
+      "floors": {
+        "floor1": "Floor 1",
+        "floor2": "Floor 2",
+        "basement": "Basement"
+      },
+
+      "devices": {
+        "temperatureSensor": "Temperature Sensor",
+        "hvacController": "HVAC Controller"
+      }
     }
      
   },

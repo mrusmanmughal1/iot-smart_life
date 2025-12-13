@@ -39,7 +39,6 @@ export default function DevicesPage() {
   // Handle status toggle
   const handleStatusToggle = useCallback(async (deviceId: string) => {
     // TODO: Implement status toggle functionality
-    console.log('Toggle status for device:', deviceId);
     toast('Status toggle functionality coming soon', { icon: 'ℹ️' });
   }, []);
 
@@ -197,6 +196,7 @@ export default function DevicesPage() {
             </div>
           ) : (
             <DashboardTable
+              linkto="devices"
               data={tableData}
               onStatusToggle={handleStatusToggle}
               onAction={handleTableAction}

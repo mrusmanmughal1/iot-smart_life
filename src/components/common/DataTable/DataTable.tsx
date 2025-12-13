@@ -60,19 +60,19 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 p-5">
       <DataTableToolbar
         table={table}
         searchKey={searchKey}
         searchPlaceholder={searchPlaceholder}
       />
-      <div className="rounded-md border">
+      <div className="rounded-md overflow-visible">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-primary">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-none hover:bg-transparent">
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="text-white font-medium [&_button]:text-white [&_button]:bg-primary  [&_button]:hover:bg-primary/80 [&_svg]:text-white">
                     {header.isPlaceholder
                       ? null
                       : flexRender(

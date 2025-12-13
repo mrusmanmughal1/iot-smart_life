@@ -21,6 +21,7 @@ export const deviceService = {
       name: data.name,
       type: data.type as DeviceType, // Convert string to DeviceType enum
       description: data.description,
+      connectionType: data.connectionType,
       // Map other fields as needed
     };
 

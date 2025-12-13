@@ -9,7 +9,6 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import AppLayout from '@/components/layout/AppLayout';
 import { useAssetsPage } from '@/features/assets/hooks';
 import { debounce } from '@/lib/util';
 import { DashboardTable } from '@/components/common/DashboardTable/DashboardTable';
