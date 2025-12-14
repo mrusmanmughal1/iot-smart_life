@@ -50,6 +50,7 @@ import FloorPlans from '@/pages/FloorPlanPage.tsx';
 import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
 import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 import AssetDetailsPage from '@/pages/AssetDetailsPage.tsx';
+import AssetProfileDetails from '@/pages/AssetProfileDetails.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -166,6 +167,24 @@ export const router = createBrowserRouter([
         ],
       },
 
+    // ------------------ assets-profiles routes ------------------
+    {
+      path: '/asset-profiles',
+      element: (
+        <AppLayout>
+          <AssetProfiles />
+        </AppLayout>
+      ),
+    },
+    {
+      path: '/asset-profiles/:id',
+      element: (
+        <AppLayout>
+          <AssetProfileDetails />
+        </AppLayout>
+      ),
+    },
+
       // --------------------Solutions dashboards Routes --------------------
       {
         path: '/solution-dashboards',
@@ -263,14 +282,7 @@ export const router = createBrowserRouter([
           </AppLayout>
         ),
       },
-      {
-        path: '/asset-profiles',
-        element: (
-          <AppLayout>
-            <AssetProfiles />
-          </AppLayout>
-        ),
-      },
+      
       {
         path: '/integrations',
         element: (

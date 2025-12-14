@@ -21,13 +21,15 @@ interface Step4DeviceProvisioningProps {
   form: UseFormReturn<DeviceProfileMultiStepFormData>;
 }
 
-export const Step4DeviceProvisioning: React.FC<Step4DeviceProvisioningProps> = ({
-  form,
-}) => {
+export const Step4DeviceProvisioning: React.FC<
+  Step4DeviceProvisioningProps
+> = ({ form }) => {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Device Provisioning</h3>
+        <h3 className="text-lg font-semibold  text-primary  mb-1">
+          Device Provisioning
+        </h3>
         <p className="text-sm text-gray-500">
           Configure device provisioning settings (Optional)
         </p>
@@ -40,10 +42,7 @@ export const Step4DeviceProvisioning: React.FC<Step4DeviceProvisioningProps> = (
           render={({ field }) => (
             <FormItem>
               <FormLabel>Provision Strategy</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select provision strategy" />
@@ -73,10 +72,7 @@ export const Step4DeviceProvisioning: React.FC<Step4DeviceProvisioningProps> = (
           render={({ field }) => (
             <FormItem>
               <FormLabel>Default Rule Chain</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select rule chain" />
@@ -108,4 +104,3 @@ export const Step4DeviceProvisioning: React.FC<Step4DeviceProvisioningProps> = (
     </div>
   );
 };
-

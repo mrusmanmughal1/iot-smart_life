@@ -40,7 +40,7 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Alarm Rules</h3>
+        <h3 className="text-lg font-semibold  text-primary  mb-1">Alarm Rules</h3>
         <p className="text-sm text-gray-500">
           Define alarm rules for device monitoring (Optional)
         </p>

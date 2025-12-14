@@ -121,7 +121,7 @@ const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenuContent
       <div
         ref={ref}
         className={cn(
-          'z-50 min-w-[8rem] overflow-hidden rounded-md border bg-white p-1 text-gray-950 shadow-md animate-in fade-in-0 zoom-in-95',
+          'z-50 min-w-[8rem] absolute overflow-hidden rounded-md   bg-white p-1 text-gray-950 shadow-md animate-in fade-in-0 zoom-in-95',
           alignClasses[align],
           sideClasses[side],
           className

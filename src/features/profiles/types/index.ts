@@ -8,3 +8,4 @@ export interface ProfileFilters {
 export type ProfileType = 'device' | 'asset';
 
 export * from './device-profile-form.types';
+export * from './asset-profile-form.types';

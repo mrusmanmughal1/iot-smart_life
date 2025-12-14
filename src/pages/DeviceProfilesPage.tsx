@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import { PageHeader } from '@/components/common/PageHeader';
 import {
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { DataTable } from '@/components/common/DataTable/DataTable';
 import {
   createSortableColumn,
+  createSortableDateColumn,
   createActionsColumn,
 } from '@/components/common/DataTable/columns';
 import {
@@ -27,71 +28,49 @@ import {
 import type { DeviceProfile } from '@/features/device-profiles/types';
 import { DeviceProfileMultiStepForm } from '@/features/profiles/components';
 import type { DeviceProfileMultiStepFormData } from '@/features/profiles/types';
+import {
+  useDeviceProfiles,
+  useCreateDeviceProfile,
+} from '@/features/profiles/hooks';
+import toast from 'react-hot-toast';
 
-const deviceProfiles: DeviceProfile[] = [
-  {
-    id: '1',
-    name: 'Temperature Sensor',
-    description: 'Profile for temperature monitoring devices',
-    type: 'Sensor',
-    transportType: 'MQTT',
-    provisionType: 'Allow creating new devices',
-    defaultRuleChain: 'Root Rule Chain',
-    createdTime: new Date('2024-01-15'),
-    devices: 45,
-    isDefault: false,
-  },
-  {
-    id: '2',
-    name: 'Smart Gateway',
-    description: 'Gateway device for LoRaWAN network',
-    type: 'Gateway',
-    transportType: 'MQTT',
-    provisionType: 'Check pre-provisioned devices',
-    defaultRuleChain: 'Gateway Processing',
-    createdTime: new Date('2024-01-10'),
-    devices: 12,
-    isDefault: false,
-  },
-  {
-    id: '3',
-    name: 'Energy Meter',
-    description: 'Smart energy metering and monitoring',
-    type: 'Meter',
-    transportType: 'Modbus',
-    provisionType: 'Allow creating new devices',
-    defaultRuleChain: 'Energy Processing',
-    createdTime: new Date('2024-02-01'),
-    devices: 78,
-    isDefault: true,
-  },
-  {
-    id: '4',
-    name: 'Water Flow Sensor',
-    description: 'Profile for water flow monitoring',
-    type: 'Sensor',
-    transportType: 'MQTT',
-    provisionType: 'Allow creating new devices',
-    defaultRuleChain: 'Root Rule Chain',
-    createdTime: new Date('2024-01-20'),
-    devices: 34,
-    isDefault: false,
-  },
-  {
-    id: '5',
-    name: 'Air Quality Monitor',
-    description: 'Indoor/outdoor air quality measurement device',
-    type: 'Sensor',
-    transportType: 'HTTP',
-    provisionType: 'Disabled',
-    defaultRuleChain: 'Air Quality Processing',
-    createdTime: new Date('2024-02-10'),
-    devices: 56,
-    isDefault: false,
-  },
-];
+// API Response type for device profile
+interface DeviceProfileApiResponse {
+  id: string;
+  name: string;
+  description?: string;
+  type?: string;
+  transportType?: string;
+  provisionType?: string;
+  default?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 
 export default function DeviceProfiles() {
+  const { data: deviceProfiles } = useDeviceProfiles();
+  const createDeviceProfileMutation = useCreateDeviceProfile();
+  
+  // Transform API response to table format
+  // API structure: response.data.data.data (nested response)
+  const deviceProfilesData: DeviceProfile[] = useMemo(() => {
+    const apiResponse = deviceProfiles?.data as { data?: { data?: DeviceProfileApiResponse[] } } | undefined;
+    const profiles = apiResponse?.data?.data ?? [];
+    return profiles.map((profile: DeviceProfileApiResponse) => ({
+      id: profile.id,
+      name: profile.name,
+      description: profile.description || '',
+      type: profile.type || 'Unknown',
+      transportType: profile.transportType || 'Unknown',
+      provisionType: profile.provisionType || '',
+      default: profile.default || false,
+      createdAt: profile.createdAt,
+      updatedAt: profile.updatedAt,
+      devices: 0, // TODO: Fetch device count separately if needed
+    }));
+  }, [deviceProfiles]);
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const columns: ColumnDef<DeviceProfile>[] = [
@@ -101,15 +80,26 @@ export default function DeviceProfiles() {
       header: 'Type',
       cell: ({ row }: CellContext<DeviceProfile, unknown>) => {
         const type = row.getValue('type') as string;
-        const icons: Record<string, React.ReactNode> = {
-          Sensor: <Thermometer className="h-4 w-4" />,
-          Gateway: <Activity className="h-4 w-4" />,
-          Meter: <Zap className="h-4 w-4" />,
+        // Format API type (e.g., "air_quality_monitor" -> "Air Quality Monitor")
+        const formatType = (t: string) => {
+          return t
+            .split('_')
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
         };
+        const displayType = formatType(type);
+        const icons: Record<string, React.ReactNode> = {
+          sensor: <Thermometer className="h-4 w-4" />,
+          gateway: <Activity className="h-4 w-4" />,
+          meter: <Zap className="h-4 w-4" />,
+        };
+        const typeLower = type.toLowerCase();
         return (
           <div className="flex items-center gap-2">
-            <div className="text-primary">{icons[type]}</div>
-            <span>{type}</span>
+            <div className="text-primary">
+              {icons[typeLower] || <Cpu className="h-4 w-4" />}
+            </div>
+            <span>{displayType}</span>
           </div>
         );
       },
@@ -117,22 +107,26 @@ export default function DeviceProfiles() {
     {
       accessorKey: 'transportType',
       header: 'Transport',
-      cell: ({ row }: CellContext<DeviceProfile, unknown>) => (
-        <Badge variant="outline">{row.getValue('transportType')}</Badge>
-      ),
+      cell: ({ row }: CellContext<DeviceProfile, unknown>) => {
+        const transport = row.getValue('transportType') as string;
+        // Format transport type (e.g., "mqtt" -> "MQTT")
+        const displayTransport = transport.toUpperCase();
+        return <Badge variant="outline">{displayTransport}</Badge>;
+      },
     },
     createSortableColumn('devices', 'Devices'),
     {
-      accessorKey: 'isDefault',
+      accessorKey: 'default',
       header: 'Default',
       cell: ({ row }: CellContext<DeviceProfile, unknown>) =>
-        row.getValue('isDefault') ? (
+        row.getValue('default') ? (
           <Badge variant="default">Default</Badge>
         ) : (
           <Badge variant="secondary">-</Badge>
         ),
     },
-    createSortableColumn('createdTime', 'Created'),
+    
+    createSortableDateColumn('createdAt', 'Created'),
     createActionsColumn((row: DeviceProfile) => [
       {
         label: 'Edit',
@@ -153,10 +147,18 @@ export default function DeviceProfiles() {
     ]),
   ];
 
-  const handleCreateProfile = (data: DeviceProfileMultiStepFormData) => {
-    console.log('Creating profile:', data);
-    // TODO: Transform multi-step form data to API format and submit
-    setIsCreateOpen(false);
+  const handleCreateProfile = async (data: DeviceProfileMultiStepFormData) => {
+    try {
+      await createDeviceProfileMutation.mutateAsync(data);
+      toast.success('Device profile created successfully');
+      setIsCreateOpen(false);
+    } catch (error) {
+      console.error('Error creating device profile:', error);
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || 'Failed to create device profile. Please try again.';
+      toast.error(errorMessage);
+    }
   };
 
   return (
@@ -183,7 +185,7 @@ export default function DeviceProfiles() {
             <Settings className="h-4 w-4 text-white text-muted-foreground" />
           </CardHeader>
           <CardContent className="text-white">
-            <div className="text-2xl font-bold">{deviceProfiles.length}</div>
+            <div className="text-2xl font-bold">{deviceProfilesData.length}</div>
             <p className="text-xs text-muted-foreground">
               Device configurations
             </p>
@@ -199,7 +201,7 @@ export default function DeviceProfiles() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {deviceProfiles.reduce((sum, p) => sum + p.devices, 0)}
+              {deviceProfilesData.reduce((sum, p) => sum + (p.devices || 0), 0)}
             </div>
             <p className="text-xs text-muted-foreground">
               Using these profiles
@@ -216,7 +218,7 @@ export default function DeviceProfiles() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {deviceProfiles.filter((p) => p.type === 'Gateway').length}
+              {deviceProfilesData.filter((p) => p.type === 'Gateway').length}
             </div>
             <p className="text-xs text-muted-foreground">Gateway profiles</p>
           </CardContent>
@@ -229,7 +231,7 @@ export default function DeviceProfiles() {
           <div className="overflow-visible">
             <DataTable
               columns={columns}
-              data={deviceProfiles}
+              data={deviceProfilesData}
               searchKey="name"
             />
           </div>

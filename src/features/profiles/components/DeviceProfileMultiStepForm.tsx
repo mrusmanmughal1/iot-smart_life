@@ -70,7 +70,14 @@ export const DeviceProfileMultiStepForm: React.FC<
     switch (currentStep) {
       case 1: {
         // Step 1 is required - validate all fields
-        fieldsToValidate = ['name', 'description', 'type', 'defaultRuleChain', 'queue', 'defaultEdgeRuleChain'];
+        fieldsToValidate = [
+          'name',
+          'description', 
+          'type',
+          'defaultRuleChain',
+          'queue',
+          'defaultEdgeRuleChain',
+        ];
         break;
       }
       case 2: {
@@ -91,17 +98,25 @@ export const DeviceProfileMultiStepForm: React.FC<
           if (alarmRules && alarmRules.length > 0) {
             // Filter out incomplete alarm rules (empty name or condition)
             const completeAlarmRules = alarmRules.filter(
-              (rule) => rule.name && rule.name.trim() !== '' && rule.condition && rule.condition.trim() !== ''
+              (rule) =>
+                rule.name &&
+                rule.name.trim() !== '' &&
+                rule.condition &&
+                rule.condition.trim() !== ''
             );
-            
+
             // If there are incomplete rules, remove them and update the form
             if (completeAlarmRules.length !== alarmRules.length) {
-              form.setValue('alarmRules', completeAlarmRules.length > 0 ? completeAlarmRules : [], {
-                shouldValidate: false,
-                shouldDirty: false,
-              });
+              form.setValue(
+                'alarmRules',
+                completeAlarmRules.length > 0 ? completeAlarmRules : [],
+                {
+                  shouldValidate: false,
+                  shouldDirty: false,
+                }
+              );
             }
-            
+
             // Only validate if there are complete alarm rules
             if (completeAlarmRules.length > 0) {
               fieldsToValidate = ['alarmRules'];
@@ -144,7 +159,7 @@ export const DeviceProfileMultiStepForm: React.FC<
     // Prevent form submission
     e?.preventDefault();
     e?.stopPropagation();
-    
+
     try {
       const isValid = await validateCurrentStep();
       if (isValid) {
@@ -218,8 +233,8 @@ export const DeviceProfileMultiStepForm: React.FC<
   });
 
   return (
-    <Dialog 
-      open={open} 
+    <Dialog
+      open={open}
       onOpenChange={(isOpen) => {
         // Only close if explicitly set to false (not from internal state changes)
         if (!isOpen) {
@@ -250,9 +265,11 @@ export const DeviceProfileMultiStepForm: React.FC<
               }}
               className="space-y-6"
             >
-              <div className="min-h-[400px] shadow  border border-gray-200 rounded-lg  mt-4 p-4">{renderStepContent()}</div>
+              <div className="min-h-[400px] shadow  border border-gray-200 rounded-lg  mt-4 mb-32 p-4">
+                {renderStepContent()}
+              </div>
 
-              <DialogFooter className="flex pb-4 justify-between">
+              <DialogFooter className="flex p-4 justify-between absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
                 <div>
                   {currentStep > 1 && (
                     <Button
@@ -269,8 +286,8 @@ export const DeviceProfileMultiStepForm: React.FC<
                     Cancel
                   </Button>
                   {currentStep < STEPS.length ? (
-                    <Button 
-                      type="button" 
+                    <Button
+                      type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();

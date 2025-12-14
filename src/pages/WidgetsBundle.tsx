@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DataTable } from '@/components/common/DataTable/DataTable';
-import { createSortableColumn, createActionsColumn } from '@/components/common/DataTable/columns';
+import { createSortableColumn, createSortableDateColumn, createActionsColumn } from '@/components/common/DataTable/columns';
 import { Package, Plus, Search, Copy, Trash2, Edit, Download, BarChart3, Gauge, LineChart, PieChart } from 'lucide-react';
 
 interface WidgetBundle {
@@ -36,7 +36,7 @@ export default function WidgetsBundle() {
     { accessorKey: 'widgets', header: 'Widgets', cell: ({ row }: any) => <Badge variant="outline">{row.getValue('widgets')} widgets</Badge> },
     { accessorKey: 'isSystem', header: 'Type', cell: ({ row }: any) => row.getValue('isSystem') ? <Badge>System</Badge> : <Badge variant="secondary">Custom</Badge> },
     createSortableColumn('author', 'Author'),
-    createSortableColumn('createdAt', 'Created'),
+    createSortableDateColumn('createdAt', 'Created'),
     createActionsColumn((row) => [
       { label: 'View Widgets', onClick: () => {}, icon: <Package className="h-4 w-4" /> },
       { label: 'Export', onClick: () => {}, icon: <Download className="h-4 w-4" /> },

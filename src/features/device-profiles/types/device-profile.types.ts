@@ -10,14 +10,14 @@ export type ProvisionType =
 export interface DeviceProfile {
   id: string;
   name: string;
-  description: string;
-  type: DeviceType;
-  transportType: TransportType;
-  provisionType: ProvisionType;
-  defaultRuleChain: string;
-  createdTime: Date;
-  devices: number;
-  isDefault: boolean;
+  description?: string;
+  type: string; // API returns strings like "air_quality_monitor", "sensor", etc.
+  transportType: string; // API returns strings like "mqtt", "http", etc.
+  provisionType?: string; // API returns strings like "allow_create_new", etc.
+  default: boolean; // API uses "default" not "isDefault"
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  devices?: number; // Count of devices using this profile (may need separate API call)
 }
 
 export interface DeviceProfileFormData {

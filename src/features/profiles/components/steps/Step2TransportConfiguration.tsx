@@ -30,7 +30,7 @@ export const Step2TransportConfiguration: React.FC<Step2TransportConfigurationPr
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold mb-1">Transport Configuration</h3>
+        <h3 className="text-lg font-semibold  text-primary  mb-1">Transport Configuration</h3>
         <p className="text-sm text-gray-500">
           Configure the transport protocol settings (Optional)
         </p>

@@ -34,6 +34,7 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   searchPlaceholder,
+  
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -60,7 +61,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4 p-5">
+    <div className="space-y-4 py-5 px-3">
       <DataTableToolbar
         table={table}
         searchKey={searchKey}
@@ -92,7 +93,7 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && 'selected'}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id}  >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
