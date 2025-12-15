@@ -10,9 +10,10 @@ export const useRegister = () => {
 
   return useMutation({
     mutationFn: (data: RegisterData) => authService.register(data),
-    onSuccess: () => {
+    onSuccess: (data: any) => {
+      console.log(data , 'data')
       // setAuth(data.data.user, data.data.accessToken, data.data.refreshToken);
-      toast.success('Registration successful!');
+      toast.success( data.message || 'Registration successful!');
       navigate('/login');
     },
     onError: (error: any) => {
