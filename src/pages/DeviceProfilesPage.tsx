@@ -1,12 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import { PageHeader } from '@/components/common/PageHeader';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DataTable } from '@/components/common/DataTable/DataTable';
 import {
@@ -47,15 +42,16 @@ interface DeviceProfileApiResponse {
   updatedAt: string;
 }
 
-
 export default function DeviceProfiles() {
   const { data: deviceProfiles } = useDeviceProfiles();
   const createDeviceProfileMutation = useCreateDeviceProfile();
-  
+
   // Transform API response to table format
   // API structure: response.data.data.data (nested response)
   const deviceProfilesData: DeviceProfile[] = useMemo(() => {
-    const apiResponse = deviceProfiles?.data as { data?: { data?: DeviceProfileApiResponse[] } } | undefined;
+    const apiResponse = deviceProfiles?.data as
+      | { data?: { data?: DeviceProfileApiResponse[] } }
+      | undefined;
     const profiles = apiResponse?.data?.data ?? [];
     return profiles.map((profile: DeviceProfileApiResponse) => ({
       id: profile.id,
@@ -125,7 +121,7 @@ export default function DeviceProfiles() {
           <Badge variant="secondary">-</Badge>
         ),
     },
-    
+
     createSortableDateColumn('createdAt', 'Created'),
     createActionsColumn((row: DeviceProfile) => [
       {
@@ -156,7 +152,8 @@ export default function DeviceProfiles() {
       console.error('Error creating device profile:', error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message || 'Failed to create device profile. Please try again.';
+          ?.data?.message ||
+        'Failed to create device profile. Please try again.';
       toast.error(errorMessage);
     }
   };
@@ -185,7 +182,9 @@ export default function DeviceProfiles() {
             <Settings className="h-4 w-4 text-white text-muted-foreground" />
           </CardHeader>
           <CardContent className="text-white">
-            <div className="text-2xl font-bold">{deviceProfilesData.length}</div>
+            <div className="text-2xl font-bold">
+              {deviceProfilesData.length}
+            </div>
             <p className="text-xs text-muted-foreground">
               Device configurations
             </p>
@@ -226,13 +225,14 @@ export default function DeviceProfiles() {
       </div>
 
       {/* Table */}
-      <Card className="pt-6">
+      <Card className="">
         <CardContent className="p-2">
           <div className="overflow-visible">
             <DataTable
               columns={columns}
               data={deviceProfilesData}
               searchKey="name"
+              detailRoute="/device-profiles"
             />
           </div>
         </CardContent>

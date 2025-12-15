@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { Eye, Trash2, Download, Share2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 
 export interface DashboardTableItem {
   id: string;
@@ -78,6 +79,9 @@ export function DashboardTable({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Default translation keys
   const defaultTranslationKeys = {
@@ -104,8 +108,30 @@ export function DashboardTable({
     action: 'share' | 'view' | 'delete' | 'download',
     id: string
   ) => {
-    if (onAction) {
+    if (action === 'delete') {
+      const item = data.find(d => d.id === id);
+      if (item) {
+        setItemToDelete({ id: item.id, title: item.title });
+        setDeleteDialogOpen(true);
+      }
+    } else if (onAction) {
       onAction(action, id);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete || !onAction) return;
+    
+    setIsDeleting(true);
+    try {
+      await onAction('delete', itemToDelete.id);
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+    } catch (error) {
+      console.error('Delete error:', error);
+      // Error handling is done by the caller
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -290,14 +316,7 @@ export function DashboardTable({
                 {columns.actions && (
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleAction('share', item.id)}
-                        className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
-                        title="Share"
-                        aria-label="Share"
-                      >
-                        <Share2 className="h-4 w-4" />
-                      </button>
+                       
                       <button
                         onClick={() => handleAction('view', item.id)}
                         className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
@@ -393,6 +412,21 @@ export function DashboardTable({
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Item"
+        itemName={itemToDelete?.title}
+        description={itemToDelete?.title 
+          ? `Are you sure you want to delete "${itemToDelete.title}"? This action cannot be undone.`
+          : 'Are you sure you want to delete this item? This action cannot be undone.'}
+        isLoading={isDeleting}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 }

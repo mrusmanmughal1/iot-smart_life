@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   flexRender,
   getCoreRowModel,
@@ -27,6 +28,9 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   searchKey?: string;
   searchPlaceholder?: string;
+  onRowClick?: (row: TData) => void;
+  detailRoute?: string; // Route path for detail page (e.g., "/asset-profiles" or "/device-profiles")
+  idKey?: string; // Key to access the ID field (default: "id")
 }
 
 export function DataTable<TData, TValue>({
@@ -34,8 +38,11 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   searchPlaceholder,
-  
+  onRowClick,
+  detailRoute,
+  idKey = 'id',
 }: DataTableProps<TData, TValue>) {
+  const navigate = useNavigate();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -92,11 +99,29 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}  >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isNameColumn = cell.column.id === 'name' || cell.column.id === searchKey;
+                    const rowData = row.original as Record<string, unknown>;
+                    const rowId = rowData[idKey] as string | undefined;
+                    
+                    const handleCellClick = () => {
+                      if (isNameColumn && detailRoute && rowId) {
+                        navigate(`${detailRoute}/${rowId}`);
+                      } else if (onRowClick) {
+                        onRowClick(row.original);
+                      }
+                    };
+
+                    return (
+                      <TableCell
+                        key={cell.id}
+                        className={isNameColumn && detailRoute && rowId ? 'cursor-pointer hover:text-primary' : ''}
+                        onClick={isNameColumn && (detailRoute || onRowClick) ? handleCellClick : undefined}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (

@@ -31,18 +31,28 @@ import {
 import type { AssetProfileFormData } from '../types/asset-profile-form.types';
 import { DEFAULT_ASSET_PROFILE_FORM_DATA } from '../types/asset-profile-form.types';
 import { assetProfileFormSchema } from '../types/asset-profile-form.schema';
+import { useEdgeRuleChain, useQueues, useRuleChains } from '@/features/rules/hooks';
 
 interface AssetProfileFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: AssetProfileFormData) => void;
+  isLoading?: boolean;
 }
 
 export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
   open,
   onOpenChange,
   onSubmit,
+  isLoading
 }) => {
+
+  const { data: ruleChains } = useRuleChains();
+  console.log('ruleChains', ruleChains);
+  const { data: queues } = useQueues();
+  console.log('queues', queues);
+  const { data: edgeRuleChains } = useEdgeRuleChain();
+  console.log('edgeRuleChains', edgeRuleChains);
   const form = useForm<AssetProfileFormData>({
     resolver: zodResolver(assetProfileFormSchema),
     defaultValues: DEFAULT_ASSET_PROFILE_FORM_DATA,
@@ -151,38 +161,26 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
 
               <FormField
                 control={form.control}
-                name="mobileDashboard"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mobile Dashboard</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="border-2 rounded-md"
-                        placeholder="Enter mobile dashboard name"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription className="text-xs text-gray-600">
-                      Used by mobile application as a asset details dashboard
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="queue"
+                name="defaultQueueName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Queue</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter queue name"
-                        className="border-2 rounded-md"
-                        {...field}
-                      />
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ''}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select queue" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Root Rule Chain">
+                          Root queue Chain
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -227,44 +225,14 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
                 )}
               />
 
-              {/* <FormField
-                control={form.control}
-                name="assetProfileImage"
-                render={({ field: { value, onChange, ...field } }) => (
-                  <FormItem>
-                    <FormLabel>Asset Profile Image</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-4">
-                        <Input
-                          type="file"
-                          accept="image/*"
-                          className="cursor-pointer"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            onChange(file);
-                          }}
-                          {...field}
-                        />
-                        {value && (
-                          <div className="text-sm text-muted-foreground">
-                            {value instanceof File
-                              ? value.name
-                              : 'Image selected'}
-                          </div>
-                        )}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
+               
             </div>
 
             <DialogFooter className="p-4 absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
               <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button type="submit">Create Profile</Button>
+              <Button type="submit" isLoading={isLoading}>{isLoading ? 'Creating...' : 'Create Profile'}</Button>
             </DialogFooter>
           </form>
         </Form>

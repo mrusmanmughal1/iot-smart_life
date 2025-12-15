@@ -51,6 +51,7 @@ import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
 import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 import AssetDetailsPage from '@/pages/AssetDetailsPage.tsx';
 import AssetProfileDetails from '@/pages/AssetProfileDetails.tsx';
+import DeviceProfileDetails from '@/pages/DeviceProfileDetails.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -184,6 +185,23 @@ export const router = createBrowserRouter([
         </AppLayout>
       ),
     },
+    // ------------------ Device-profiles routes ------------------
+    {
+      path: '/device-profiles',
+      element: (
+        <AppLayout>
+          <DeviceProfiles />
+        </AppLayout>
+      ),
+    },
+    {
+      path: '/device-profiles/:id',
+      element: (
+        <AppLayout>
+          <DeviceProfileDetails />
+        </AppLayout>
+      ),
+    },
 
       // --------------------Solutions dashboards Routes --------------------
       {
@@ -274,14 +292,7 @@ export const router = createBrowserRouter([
         path: '/subscription-plans',
         element: <SubscriptionPlans />,
       },
-      {
-        path: '/device-profiles',
-        element: (
-          <AppLayout>
-            <DeviceProfiles />
-          </AppLayout>
-        ),
-      },
+     
       
       {
         path: '/integrations',

@@ -30,6 +30,7 @@ import toast from 'react-hot-toast';
 interface AssetsProfileDetailsTabProps {
   profileId: string;
   profileData?: {
+    defaultQueueName?: string;
     name?: string;
     description?: string;
     defaultRuleChain?: string;
@@ -60,8 +61,7 @@ const AssetsProfileDetailsTab: React.FC<AssetsProfileDetailsTabProps> = ({
         name: profileData.name || '',
         description: profileData.description || '',
         defaultRuleChain: profileData.defaultRuleChain || '',
-        mobileDashboard: profileData.mobileDashboard || '',
-        queue: profileData.queue || '',
+        defaultQueueName: profileData.defaultQueueName || '',
         defaultEdgeRuleChain: profileData.defaultEdgeRuleChain || '',
         assetProfileImage: undefined,
       });
@@ -93,8 +93,7 @@ const AssetsProfileDetailsTab: React.FC<AssetsProfileDetailsTabProps> = ({
         name: profileData.name || '',
         description: profileData.description || '',
         defaultRuleChain: profileData.defaultRuleChain || '',
-        mobileDashboard: profileData.mobileDashboard || '',
-        queue: profileData.queue || '',
+        defaultQueueName: profileData.defaultQueueName || '',
         defaultEdgeRuleChain: profileData.defaultEdgeRuleChain || '',
         assetProfileImage: undefined,
       });
@@ -187,38 +186,26 @@ const AssetsProfileDetailsTab: React.FC<AssetsProfileDetailsTabProps> = ({
 
                 <FormField
                   control={form.control}
-                  name="mobileDashboard"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Mobile Dashboard</FormLabel>
-                      <FormControl>
-                        <Input
-                          className="border-2 rounded-md"
-                          placeholder="Enter mobile dashboard name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription className="text-xs text-gray-600">
-                        Used by mobile application as a asset details dashboard
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="queue"
+                  name="defaultQueueName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Queue</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter queue name"
-                          className="border-2 rounded-md"
-                          {...field}
-                        />
-                      </FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value || ''}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select queue" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Root Rule Chain">
+                            Root queue Chain
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+
                       <FormMessage />
                     </FormItem>
                   )}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { X, Plus, Trash2 } from 'lucide-react';
+import { X, Plus, Trash2, MapPin } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { LocationMap } from '@/components/common/LocationMap';
 
 export interface AdditionalAttribute {
   key: string;
@@ -33,6 +34,8 @@ export interface AddAssetModalProps {
     description: string;
     assetProfile: string;
     parentAsset: string;
+    latitude?: number | null;
+    longitude?: number | null;
     additionalAttributes: AdditionalAttribute[];
   }) => void;
   isLoading?: boolean;
@@ -51,11 +54,13 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     description: '',
     assetProfile: '',
     parentAsset: '',
+    latitude: '',
+    longitude: '',
   });
 
-  const [additionalAttributes, setAdditionalAttributes] = useState<AdditionalAttribute[]>([
-    { key: '', value: '' },
-  ]);
+  const [additionalAttributes, setAdditionalAttributes] = useState<
+    AdditionalAttribute[]
+  >([{ key: '', value: '' }]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -79,6 +84,24 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     }
   };
 
+  const handleCoordinateChange = (
+    name: 'latitude' | 'longitude',
+    value: string
+  ) => {
+    // Allow empty, numbers, decimals, and negative sign
+    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      // Clear error when user starts typing
+      if (errors[name]) {
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[name];
+          return newErrors;
+        });
+      }
+    }
+  };
+
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error when user selects
@@ -91,7 +114,11 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     }
   };
 
-  const handleAttributeChange = (index: number, field: 'key' | 'value', value: string) => {
+  const handleAttributeChange = (
+    index: number,
+    field: 'key' | 'value',
+    value: string
+  ) => {
     const updated = [...additionalAttributes];
     updated[index] = { ...updated[index], [field]: value };
     setAdditionalAttributes(updated);
@@ -103,7 +130,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
 
   const handleRemoveAttribute = (index: number) => {
     if (additionalAttributes.length > 1) {
-      setAdditionalAttributes(additionalAttributes.filter((_, i) => i !== index));
+      setAdditionalAttributes(
+        additionalAttributes.filter((_, i) => i !== index)
+      );
     }
   };
 
@@ -116,6 +145,39 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
 
     if (!formData.type) {
       newErrors.type = t('addAsset.typeRequired') || 'Asset type is required';
+    }
+
+    // Validate latitude if provided
+    if (formData.latitude.trim()) {
+      const lat = parseFloat(formData.latitude);
+      if (isNaN(lat) || lat < -90 || lat > 90) {
+        newErrors.latitude =
+          t('addAsset.invalidLatitude') ||
+          'Latitude must be between -90 and 90';
+      }
+    }
+
+    // Validate longitude if provided
+    if (formData.longitude.trim()) {
+      const lng = parseFloat(formData.longitude);
+      if (isNaN(lng) || lng < -180 || lng > 180) {
+        newErrors.longitude =
+          t('addAsset.invalidLongitude') ||
+          'Longitude must be between -180 and 180';
+      }
+    }
+
+    // If one coordinate is provided, the other should also be provided
+    if (
+      (formData.latitude.trim() && !formData.longitude.trim()) ||
+      (!formData.latitude.trim() && formData.longitude.trim())
+    ) {
+      newErrors.latitude =
+        t('addAsset.bothCoordinatesRequired') ||
+        'Both latitude and longitude are required';
+      newErrors.longitude =
+        t('addAsset.bothCoordinatesRequired') ||
+        'Both latitude and longitude are required';
     }
 
     setErrors(newErrors);
@@ -134,6 +196,10 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
 
     onSave({
       ...formData,
+      latitude: formData.latitude.trim() ? parseFloat(formData.latitude) : null,
+      longitude: formData.longitude.trim()
+        ? parseFloat(formData.longitude)
+        : null,
       additionalAttributes: validAttributes,
     });
   };
@@ -146,11 +212,30 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
       description: '',
       assetProfile: '',
       parentAsset: '',
+      latitude: '',
+      longitude: '',
     });
     setAdditionalAttributes([{ key: '', value: '' }]);
     setErrors({});
     onOpenChange(false);
   };
+
+  // Parse coordinates for map display
+  const latitudeNum = formData.latitude.trim()
+    ? parseFloat(formData.latitude)
+    : null;
+  const longitudeNum = formData.longitude.trim()
+    ? parseFloat(formData.longitude)
+    : null;
+  const hasValidCoordinates =
+    latitudeNum !== null &&
+    longitudeNum !== null &&
+    !isNaN(latitudeNum) &&
+    !isNaN(longitudeNum) &&
+    latitudeNum >= -90 &&
+    latitudeNum <= 90 &&
+    longitudeNum >= -180 &&
+    longitudeNum <= 180;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -183,8 +268,12 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder={t('addAsset.assetNamePlaceholder') || 'Asset Name *'}
-                className={errors.name ? 'border-red-500' : ''}
+                placeholder={
+                  t('addAsset.assetNamePlaceholder') || 'Asset Name *'
+                }
+                className={
+                  errors.name ? '  border-2 rounded-md' : ' border-2 rounded-md'
+                }
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -202,7 +291,10 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
               >
                 <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
                   <SelectValue
-                    placeholder={t('addAsset.assetTypePlaceholder') || 'Select asset type...'}
+                    placeholder={
+                      t('addAsset.assetTypePlaceholder') ||
+                      'Select asset type...'
+                    }
                   />
                 </SelectTrigger>
                 <SelectContent>
@@ -227,7 +319,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder={t('addAsset.descriptionPlaceholder') || 'Enter description'}
+                placeholder={
+                  t('addAsset.descriptionPlaceholder') || 'Enter description'
+                }
                 className="min-h-[80px] w-full"
               />
             </div>
@@ -241,11 +335,16 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 </label>
                 <Select
                   value={formData.assetProfile}
-                  onValueChange={(value) => handleSelectChange('assetProfile', value)}
+                  onValueChange={(value) =>
+                    handleSelectChange('assetProfile', value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue
-                      placeholder={t('addAsset.assetProfilePlaceholder') || 'Select profile...'}
+                      placeholder={
+                        t('addAsset.assetProfilePlaceholder') ||
+                        'Select profile...'
+                      }
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -265,11 +364,16 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 </label>
                 <Select
                   value={formData.parentAsset}
-                  onValueChange={(value) => handleSelectChange('parentAsset', value)}
+                  onValueChange={(value) =>
+                    handleSelectChange('parentAsset', value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue
-                      placeholder={t('addAsset.parentAssetPlaceholder') || 'Select parent...'}
+                      placeholder={
+                        t('addAsset.parentAssetPlaceholder') ||
+                        'Select parent...'
+                      }
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -283,6 +387,92 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
               </div>
             </div>
 
+            {/* Location Coordinates */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <MapPin className="inline h-4 w-4 mr-1" />
+                {t('addAsset.location') || 'Location'}
+              </label>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {/* Latitude */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    {t('addAsset.latitude') || 'Latitude'}
+                  </label>
+                  <Input
+                    name="latitude"
+                    type="text"
+                    value={formData.latitude}
+                    onChange={(e) =>
+                      handleCoordinateChange('latitude', e.target.value)
+                    }
+                    placeholder={
+                      t('addAsset.latitudePlaceholder') || 'e.g., 40.7128'
+                    }
+                    className={
+                      errors.latitude
+                        ? 'border-red-500'
+                        : '' + ' border-2 rounded-md'
+                    }
+                  />
+                  {errors.latitude && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.latitude}
+                    </p>
+                  )}
+                </div>
+
+                {/* Longitude */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
+                    {t('addAsset.longitude') || 'Longitude'}
+                  </label>
+                  <Input
+                    name="longitude"
+                    type="text"
+                    value={formData.longitude}
+                    onChange={(e) =>
+                      handleCoordinateChange('longitude', e.target.value)
+                    }
+                    placeholder={
+                      t('addAsset.longitudePlaceholder') || 'e.g., -74.0060'
+                    }
+                    className={
+                      errors.longitude
+                        ? 'border-red-500'
+                        : '' + ' border-2 rounded-md'
+                    }
+                  />
+                  {errors.longitude && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.longitude}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Map Display */}
+              {hasValidCoordinates ? (
+                <div className="mt-2">
+                  <LocationMap
+                    latitude={latitudeNum}
+                    longitude={longitudeNum}
+                    height="250px"
+                  />
+                </div>
+              ) : (
+                <div className="mt-2 h-[250px] rounded-lg border border-gray-300 bg-gray-50 flex items-center justify-center">
+                  <div className="text-center text-gray-400">
+                    <MapPin className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">
+                      {t('addAsset.enterCoordinates') ||
+                        'Enter latitude and longitude to view map'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Additional Attributes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -292,15 +482,22 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 {additionalAttributes.map((attr, index) => (
                   <div key={index} className="flex gap-2 items-center">
                     <Input
-                      placeholder={t('addAsset.additionalAttributes') || 'Additional Attributes'}
+                      placeholder={
+                        t('addAsset.additionalAttributes') ||
+                        'Additional Attributes'
+                      }
                       value={attr.key}
-                      onChange={(e) => handleAttributeChange(index, 'key', e.target.value)}
+                      onChange={(e) =>
+                        handleAttributeChange(index, 'key', e.target.value)
+                      }
                       className="flex-1"
                     />
                     <Input
                       placeholder={t('addAsset.value') || 'Value'}
                       value={attr.value}
-                      onChange={(e) => handleAttributeChange(index, 'value', e.target.value)}
+                      onChange={(e) =>
+                        handleAttributeChange(index, 'value', e.target.value)
+                      }
                       className="flex-1"
                     />
                     <div className="flex gap-2">
@@ -358,4 +555,3 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     </Dialog>
   );
 };
-
