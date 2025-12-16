@@ -38,7 +38,9 @@ export interface ApiResponse<T> {
 export const defaultRuleChainsApi = {
   // Get all default rule chains
   getAll: (params?: DefaultRuleChainQuery) =>
-    apiClient.get<PaginatedResponse<DefaultRuleChain>>('/default-rule-chains', { params }),
+    apiClient.get<PaginatedResponse<DefaultRuleChain>>('/default-rule-chains', {
+      params,
+    }),
 
   // Get default rule chain by ID
   getById: (id: string) =>
@@ -50,18 +52,24 @@ export const defaultRuleChainsApi = {
 
   // Update default rule chain
   update: (id: string, data: Partial<DefaultRuleChain>) =>
-    apiClient.patch<ApiResponse<DefaultRuleChain>>(`/default-rule-chains/${id}`, data),
+    apiClient.patch<ApiResponse<DefaultRuleChain>>(
+      `/default-rule-chains/${id}`,
+      data
+    ),
 
   // Delete default rule chain
-  delete: (id: string) =>
-    apiClient.delete(`/default-rule-chains/${id}`),
+  delete: (id: string) => apiClient.delete(`/default-rule-chains/${id}`),
 
   // Get default rule chain by type
   getByType: (type: 'DEVICE' | 'ASSET' | 'EDGE') =>
-    apiClient.get<ApiResponse<DefaultRuleChain>>(`/default-rule-chains/type/${type}`),
+    apiClient.get<ApiResponse<DefaultRuleChain>>(
+      `/default-rule-chains/type/${type}`
+    ),
 
   // Set default rule chain for type
   setDefault: (type: 'DEVICE' | 'ASSET' | 'EDGE', ruleChainId: string) =>
-    apiClient.post<ApiResponse<DefaultRuleChain>>(`/default-rule-chains/type/${type}`, { ruleChainId }),
+    apiClient.post<ApiResponse<DefaultRuleChain>>(
+      `/default-rule-chains/type/${type}`,
+      { ruleChainId }
+    ),
 };
-

@@ -3,6 +3,7 @@ import { assetsApi } from '@/services/api';
 import { assetService } from '../services/assetService';
 import type { AssetQuery } from '@/services/api/assets.api';
 import type { AssetFormData } from '../types';
+import toast from 'react-hot-toast';
 
 export const useAssets = (params?: AssetQuery) => {
   return useQuery({
@@ -55,7 +56,11 @@ export const useCreateAsset = () => {
   return useMutation({
     mutationFn: (data: AssetFormData) => assetService.createAsset(data),
     onSuccess: () => {
+      toast.success('Asset created successfully');
       queryClient.invalidateQueries({ queryKey: ['assets'] });
+    },
+    onError: (error) => {
+      toast.error('Failed to create asset');
     },
   });
 };

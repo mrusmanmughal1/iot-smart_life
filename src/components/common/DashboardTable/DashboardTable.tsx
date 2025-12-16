@@ -1,7 +1,16 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Eye, Trash2, Download, Share2, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+  Eye,
+  Trash2,
+  Download,
+  Share2,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
@@ -75,12 +84,14 @@ export function DashboardTable({
   emptyMessage,
   pagination,
 }: DashboardTableProps) {
- 
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Default translation keys
@@ -109,7 +120,7 @@ export function DashboardTable({
     id: string
   ) => {
     if (action === 'delete') {
-      const item = data.find(d => d.id === id);
+      const item = data.find((d) => d.id === id);
       if (item) {
         setItemToDelete({ id: item.id, title: item.title });
         setDeleteDialogOpen(true);
@@ -121,7 +132,7 @@ export function DashboardTable({
 
   const handleDeleteConfirm = async () => {
     if (!itemToDelete || !onAction) return;
-    
+
     setIsDeleting(true);
     try {
       await onAction('delete', itemToDelete.id);
@@ -152,17 +163,20 @@ export function DashboardTable({
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedIds(data.map(item => item.id));
+      setSelectedIds(data.map((item) => item.id));
     } else {
       setSelectedIds([]);
     }
   };
 
-  const handleSelectOne = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectOne = (
+    id: string,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (e.target.checked) {
       setSelectedIds([...selectedIds, id]);
     } else {
-      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
     }
   };
 
@@ -181,7 +195,8 @@ export function DashboardTable({
       {selectedIds.length > 0 && (
         <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
           <span className="text-sm text-gray-600">
-            {selectedIds.length} item{selectedIds.length > 1 ? 's' : ''} selected
+            {selectedIds.length} item{selectedIds.length > 1 ? 's' : ''}{' '}
+            selected
           </span>
           <Button
             size="sm"
@@ -197,80 +212,91 @@ export function DashboardTable({
 
       <div className="overflow-x-auto">
         <table className="w-full">
-        <thead className="bg-primary">
-          <tr className="border-b border-gray-200">
-            <th className="text-left py-3 px-4 text-sm font-semibold text-white w-12">
-              <Checkbox
-                checked={isAllSelected}
-                onChange={handleSelectAll}
-                aria-label="Select all"
-              />
-            </th>
-            {columns.title && (
-              <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                {t(defaultTranslationKeys.title)}
+          <thead className="bg-primary">
+            <tr className="border-b border-gray-200">
+              <th className="text-left py-3 px-4 text-sm font-semibold text-white w-12">
+                <Checkbox
+                  checked={isAllSelected}
+                  onChange={handleSelectAll}
+                  aria-label="Select all"
+                />
               </th>
-            )}
-            {columns.createdTime && (
-              <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                {t(defaultTranslationKeys.createdTime)}
-              </th>
-            )}
-            {columns.status && (
-              <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                {t(defaultTranslationKeys.activateDeactivate)}
-              </th>
-            )}
-            {columns.customerName && (
-              <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                {t(defaultTranslationKeys.customerName)}
-              </th>
-            )}
-            {columns.actions && (
-              <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                {t(defaultTranslationKeys.actions)}
-              </th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {data.length === 0 ? (
-            <tr>
-              <td
-                colSpan={Object.values(columns).filter(Boolean).length + 1}
-                className="py-8 px-4 text-center text-gray-500"
-              >
-                {defaultEmptyMessage}
-              </td>
+              {columns.title && (
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                  {t(defaultTranslationKeys.title)}
+                </th>
+              )}
+              {columns.createdTime && (
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                  {t(defaultTranslationKeys.createdTime)}
+                </th>
+              )}
+              {columns.status && (
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                  {t(defaultTranslationKeys.activateDeactivate)}
+                </th>
+              )}
+              {columns.customerName && (
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                  {t(defaultTranslationKeys.customerName)}
+                </th>
+              )}
+              {columns.actions && (
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                  {t(defaultTranslationKeys.actions)}
+                </th>
+              )}
             </tr>
-          ) : (
-            data.map((item) => (
-              <tr
-                key={item.id}
-                className={`border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors ${
-                  selectedIds.includes(item.id) ? 'bg-blue-50' : ''
-                }`}
-              >
-                <td className="py-4 px-4 w-12">
-                  <Checkbox
-                    checked={selectedIds.includes(item.id)}
-                    onChange={(e) => handleSelectOne(item.id, e)}
-                    aria-label={`Select ${item.title}`}
-                  />
+          </thead>
+          <tbody>
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={Object.values(columns).filter(Boolean).length + 1}
+                  className="py-8 px-4 text-center text-gray-500"
+                >
+                  {defaultEmptyMessage}
                 </td>
-                {columns.title && (
-                  <td
-                    className={`py-4 px-4 ${isTitleClickable ? 'cursor-pointer hover:bg-gray-100 transition-colors' : ''}`}
-                    onClick={isTitleClickable ? () => handleTitleClick(item.id) : undefined}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div>
-                        <div className="">
-                        <NavLink to={`/${linkto}/${item.id}`} className="text-sm font-medium text-gray-900">
-                          {item.title}   
-                        </NavLink>
-                        </div>
-                        {/* {item.tag && item.tagColor && (
+              </tr>
+            ) : (
+              data.map((item) => (
+                <tr
+                  key={item.id}
+                  className={`border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors ${
+                    selectedIds.includes(item.id) ? 'bg-blue-50' : ''
+                  }`}
+                >
+                  <td className="py-4 px-4 w-12">
+                    <Checkbox
+                      checked={selectedIds.includes(item.id)}
+                      onChange={(e) => handleSelectOne(item.id, e)}
+                      aria-label={`Select ${item.title}`}
+                    />
+                  </td>
+                  {columns.title && (
+                    <td
+                      className={`py-4 px-4 ${
+                        isTitleClickable
+                          ? 'cursor-pointer hover:bg-gray-100 transition-colors'
+                          : ''
+                      }`}
+                      onClick={
+                        isTitleClickable
+                          ? () => handleTitleClick(item.id)
+                          : undefined
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <div className="">
+                            <NavLink
+                              to={`/${linkto}/${item.id}`}
+                              className="text-sm font-medium text-gray-900"
+                            >
+                              {item.title}
+                            </NavLink>
+                          </div>
+                          {/* {item.tag && item.tagColor && (
                           <Badge
                             className={`${item.tagColor} text-xs mt-1 border-0`}
                           >
@@ -283,72 +309,71 @@ export function DashboardTable({
                               : item.tag}
                           </Badge>
                         )} */}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                )}
-                {columns.createdTime && (
-                  <td className="py-4 px-4 text-sm text-gray-600">
-                    {item.createdTime}
-                  </td>
-                )}
-                {columns.status && (
-                  <td className="py-4 px-4 flex items-center justify-center">
-                    <Button
-                      onClick={() => handleStatusToggle(item.id)}
-                      className={`text-xs px-5 h-8  rounded-full ${
-                        item.status === 'active'
-                          ? 'bg-green-500 hover:bg-green-600 text-white'
-                          : 'bg-blue-500 hover:bg-blue-600 text-white'
-                      }`}
-                    >
-                      {item.status === 'active'
-                        ? t(defaultTranslationKeys.active)
-                        : t(defaultTranslationKeys.deactivate)}
-                    </Button>
-                  </td>
-                )}
-                {columns.customerName && (
-                  <td className="py-4 px-4 text-sm text-gray-600">
-                    {item.customerName}
-                  </td>
-                )}
-                {columns.actions && (
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-2">
-                       
-                      <button
-                        onClick={() => handleAction('view', item.id)}
-                        className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
-                        title="View"
-                        aria-label="View"
+                    </td>
+                  )}
+                  {columns.createdTime && (
+                    <td className="py-4 px-4 text-sm text-gray-600">
+                      {item.createdTime}
+                    </td>
+                  )}
+                  {columns.status && (
+                    <td className="py-4 px-4 flex items-center justify-center">
+                      <Button
+                        onClick={() => handleStatusToggle(item.id)}
+                        className={`text-xs px-5 h-8  rounded-full ${
+                          item.status === 'active'
+                            ? 'bg-green-500 hover:bg-green-600 text-white'
+                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                        }`}
                       >
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleAction('delete', item.id)}
-                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-gray-100 rounded transition-colors"
-                        title="Delete"
-                        aria-label="Delete"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleAction('download', item.id)}
-                        className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
-                        title="Download"
-                        aria-label="Download"
-                      >
-                        <Download className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                )}
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+                        {item.status === 'active'
+                          ? t(defaultTranslationKeys.active)
+                          : t(defaultTranslationKeys.deactivate)}
+                      </Button>
+                    </td>
+                  )}
+                  {columns.customerName && (
+                    <td className="py-4 px-4 text-sm text-gray-600">
+                      {item.customerName}
+                    </td>
+                  )}
+                  {columns.actions && (
+                    <td className="py-4 px-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleAction('view', item.id)}
+                          className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
+                          title="View"
+                          aria-label="View"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleAction('delete', item.id)}
+                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-gray-100 rounded transition-colors"
+                          title="Delete"
+                          aria-label="Delete"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleAction('download', item.id)}
+                          className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
+                          title="Download"
+                          aria-label="Download"
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Pagination */}
@@ -357,9 +382,16 @@ export function DashboardTable({
           <div className="flex items-center gap-2 text-sm text-gray-600">
             {pagination.totalItems !== undefined && (
               <span>
-                Showing {((pagination.currentPage - 1) * (pagination.itemsPerPage || 10) + 1)} to{' '}
-                {Math.min(pagination.currentPage * (pagination.itemsPerPage || 10), pagination.totalItems)} of{' '}
-                {pagination.totalItems} results
+                Showing{' '}
+                {(pagination.currentPage - 1) *
+                  (pagination.itemsPerPage || 10) +
+                  1}{' '}
+                to{' '}
+                {Math.min(
+                  pagination.currentPage * (pagination.itemsPerPage || 10),
+                  pagination.totalItems
+                )}{' '}
+                of {pagination.totalItems} results
               </span>
             )}
           </div>
@@ -420,9 +452,11 @@ export function DashboardTable({
         onConfirm={handleDeleteConfirm}
         title="Delete Item"
         itemName={itemToDelete?.title}
-        description={itemToDelete?.title 
-          ? `Are you sure you want to delete "${itemToDelete.title}"? This action cannot be undone.`
-          : 'Are you sure you want to delete this item? This action cannot be undone.'}
+        description={
+          itemToDelete?.title
+            ? `Are you sure you want to delete "${itemToDelete.title}"? This action cannot be undone.`
+            : 'Are you sure you want to delete this item? This action cannot be undone.'
+        }
         isLoading={isDeleting}
         confirmText="Delete"
         cancelText="Cancel"

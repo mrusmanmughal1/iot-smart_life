@@ -99,7 +99,10 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
               : 'Update device information'}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="max-h-[90vh] p-6 overflow-y-auto">
+        <form
+          onSubmit={handleSubmit}
+          className="max-h-[90vh] p-6 overflow-y-auto"
+        >
           <div className="space-y-4">
             <div>
               <Label htmlFor="device-name">{t('devices.deviceName')} *</Label>
@@ -111,6 +114,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 }
                 placeholder="Enter device name"
                 required
+                className='border-2 rounded-md'
               />
             </div>
             <div>
@@ -122,7 +126,10 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue className="placeholder:text-slate-100" placeholder="Select type" />
+                  <SelectValue
+                    className="placeholder:text-slate-100"
+                    placeholder="Select type"
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="sensor">Sensor</SelectItem>
@@ -131,12 +138,13 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   <SelectItem value="controller">Controller</SelectItem>
                   <SelectItem value="camera">Camera</SelectItem>
                   <SelectItem value="tracker">tracker</SelectItem>
-
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="device-type">{t('devices.connectionType')} *</Label>
+              <Label htmlFor="device-type">
+                {t('devices.connectionType')} *
+              </Label>
               <Select
                 value={formData.connectionType}
                 onValueChange={(value) =>
@@ -144,17 +152,18 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue className="placeholder:text-slate-100" placeholder="Select type" />
+                  <SelectValue
+                    className="placeholder:text-slate-100"
+                    placeholder="Select type"
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="wifi">Wifi</SelectItem>
-                  <SelectItem value="ethenet">Ethenet</SelectItem>
+                  <SelectItem value="ethernet">Ethernet</SelectItem>
                   <SelectItem value="bluetooth">Bluetooth</SelectItem>
                   <SelectItem value="cellular">Cellular</SelectItem>
                   <SelectItem value="zigbee">Zigbee</SelectItem>
-                  <SelectItem value="zwave">Zwave</SelectItem>
                   <SelectItem value="lora">Lora</SelectItem>
-
                 </SelectContent>
               </Select>
             </div>
@@ -167,6 +176,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   setFormData({ ...formData, label: e.target.value })
                 }
                 placeholder="Optional label"
+                className='border-2 rounded-md'
               />
             </div>
             <div>
@@ -221,7 +231,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
               </Select>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className=' pt-4'>
             <Button
               type="button"
               variant="outline"

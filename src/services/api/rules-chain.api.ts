@@ -59,46 +59,46 @@ export interface ApiResponse<T> {
 export const rulesChainApi = {
   // Get all rule chains
   getAll: (params?: RuleChainQuery) =>
-    apiClient.get<PaginatedResponse<RuleChain>>('/rules-chain', { params }),
+    apiClient.get<PaginatedResponse<RuleChain>>('/rules-chains', { params }),
 
   // Get rule chain by ID
   getById: (id: string) =>
-    apiClient.get<ApiResponse<RuleChain>>(`/rules-chain/${id}`),
+    apiClient.get<ApiResponse<RuleChain>>(`/rules-chains/${id}`),
 
   // Create rule chain
   create: (data: Partial<RuleChain>) =>
-    apiClient.post<ApiResponse<RuleChain>>('/rules-chain', data),
+    apiClient.post<ApiResponse<RuleChain>>('/rules-chains', data),
 
   // Update rule chain
   update: (id: string, data: Partial<RuleChain>) =>
-    apiClient.patch<ApiResponse<RuleChain>>(`/rules-chain/${id}`, data),
+    apiClient.patch<ApiResponse<RuleChain>>(`/rules-chains/${id}`, data),
 
   // Delete rule chain
   delete: (id: string) =>
-    apiClient.delete(`/rules-chain/${id}`),
+    apiClient.delete(`/rules-chains/${id}`),
 
   // Get root rule chains
   getRoots: () =>
-    apiClient.get<ApiResponse<RuleChain[]>>('/rules-chain/roots'),
+    apiClient.get<ApiResponse<RuleChain[]>>('/rules-chains/roots'),
 
   // Set root rule chain
   setRoot: (id: string) =>
-    apiClient.post<ApiResponse<RuleChain>>(`/rules-chain/${id}/root`),
+    apiClient.post<ApiResponse<RuleChain>>(`/rules-chains/${id}/root`),
 
   // Get rule chain metadata
   getMetadata: (id: string) =>
-    apiClient.get<ApiResponse<RuleChain['metadata']>>(`/rules-chain/${id}/metadata`),
+    apiClient.get<ApiResponse<RuleChain['metadata']>>(`/rules-chains/${id}/metadata`),
 
   // Save rule chain metadata
   saveMetadata: (id: string, metadata: RuleChain['metadata']) =>
-    apiClient.post<ApiResponse<RuleChain>>(`/rules-chain/${id}/metadata`, { metadata }),
+    apiClient.post<ApiResponse<RuleChain>>(`/rules-chains/${id}/metadata`, { metadata }),
 
   // Activate rule chain
   activate: (id: string) =>
-    apiClient.post<ApiResponse<RuleChain>>(`/rules-chain/${id}/activate`),
+    apiClient.post<ApiResponse<RuleChain>>(`/rules-chains/${id}/activate`),
 
   // Deactivate rule chain
   deactivate: (id: string) =>
-    apiClient.post<ApiResponse<RuleChain>>(`/rules-chain/${id}/deactivate`),
+    apiClient.post<ApiResponse<RuleChain>>(`/rules-chains/${id}/deactivate`),
 };
 

@@ -9,11 +9,11 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAssetsPage } from '@/features/assets/hooks';
+import { useAssetsPage, useCreateAsset } from '@/features/assets/hooks';
 import { debounce } from '@/lib/util';
 import { DashboardTable } from '@/components/common/DashboardTable/DashboardTable';
 import type { DashboardTableItem } from '@/components/common/DashboardTable/DashboardTable';
-import { AddAssetModal } from '@/components/common/AddAssetModal';
+import { AddAssetModal } from '@/features/assets/components/AddAssetModal';
 
 
 export default function AssetsPage() {
@@ -21,7 +21,7 @@ export default function AssetsPage() {
   const [inputValue, setInputValue] = useState('');
   const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
   const [isSavingAsset, setIsSavingAsset] = useState(false);
-
+  const createAssetMutation = useCreateAsset();
   const {
     searchQuery,
     isLoading,
@@ -47,18 +47,23 @@ export default function AssetsPage() {
     name: string;
     type: string;
     description: string;
-    assetProfile: string;
-    parentAsset: string;
-    additionalAttributes: Array<{ key: string; value: string }>;
+    assetProfileId?: string;
+    parentAssetId?: string;
+    location?: {
+      latitude: number;
+      longitude: number;
+    };
+    attributes: Array<{ key: string; value: string }>;
   }) => {
     setIsSavingAsset(true);
     try {
+      const response = await createAssetMutation.mutateAsync(assetData);
       // TODO: Replace with actual API call
       // await assetsApi.create(assetData);
       console.log('Creating asset:', assetData);
       
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
 
       // Close modal and show success
       setIsAddAssetModalOpen(false);

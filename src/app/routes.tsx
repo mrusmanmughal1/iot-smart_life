@@ -60,6 +60,7 @@ export const router = createBrowserRouter([
   },
 
   //  --------------------public routes--------------------
+  
   {
     element: <PublicRoute />,
     errorElement: <RouteErrorPage />,

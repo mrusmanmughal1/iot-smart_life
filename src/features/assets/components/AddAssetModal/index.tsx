@@ -19,6 +19,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { LocationMap } from '@/components/common/LocationMap';
+import { useAssetProfiles } from '@/features/profiles/hooks';
+import { useAssets } from '@/features/assets/hooks';
+import type { AssetProfile as ApiAssetProfile } from '@/services/api/profiles.api';
+import type { Asset as ApiAsset } from '@/services/api/assets.api';
 
 export interface AdditionalAttribute {
   key: string;
@@ -32,11 +36,13 @@ export interface AddAssetModalProps {
     name: string;
     type: string;
     description: string;
-    assetProfile: string;
-    parentAsset: string;
-    latitude?: number | null;
-    longitude?: number | null;
-    additionalAttributes: AdditionalAttribute[];
+    assetProfileId: string;
+    parentAssetId: string;
+    location: {
+      latitude: number;
+      longitude: number;
+    };
+    attributes: AdditionalAttribute[];
   }) => void;
   isLoading?: boolean;
 }
@@ -48,26 +54,43 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   isLoading = false,
 }) => {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
+
+  const getInitialFormData = () => ({
     name: '',
     type: '',
     description: '',
-    assetProfile: '',
-    parentAsset: '',
-    latitude: '',
-    longitude: '',
+    assetProfileId: '',
+    parentAssetId: '',
+    location: {
+      latitude: '0',
+      longitude: '0',
+    },
   });
 
+  const [formData, setFormData] = useState(getInitialFormData());
+  const { data: assetProfilesData } = useAssetProfiles();
+  const { data: assetsData } = useAssets({ limit: 200 });
+
+  // assetProfilesData comes from axios response -> response.data (PaginatedResponse)
+  // normalize nested structure safely
+  const assetProfilesResponse = assetProfilesData?.data as
+    | { data?: { data?: ApiAssetProfile[] } }
+    | undefined;
+  const assetProfilesList = assetProfilesResponse?.data?.data ?? [];
+
+  // assetsData similarly contains paginated assets list
+  const assetsResponse = assetsData?.data as
+    | { data?: { data?: ApiAsset[] } }
+    | undefined;
+  const parentAssetsList = assetsResponse?.data?.data ?? [];
   const [additionalAttributes, setAdditionalAttributes] = useState<
     AdditionalAttribute[]
   >([{ key: '', value: '' }]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Mock data for selects - replace with actual API calls
-  const assetTypes = ['Device', 'Sensor', 'Gateway', 'Controller'];
-  const assetProfiles = ['Profile A', 'Profile B', 'Profile C'];
-  const parentAssets = ['Parent Asset 1', 'Parent Asset 2', 'Parent Asset 3'];
+  // Mock data for selects - keep assetTypes mocked
+  const assetTypes = ['building', 'floor', 'room', 'vehicle', 'equipment','infrastructure','zone'	];
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -90,7 +113,13 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   ) => {
     // Allow empty, numbers, decimals, and negative sign
     if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({
+        ...prev,
+        location: {
+          ...prev.location,
+          [name]: value,
+        },
+      }));
       // Clear error when user starts typing
       if (errors[name]) {
         setErrors((prev) => {
@@ -103,6 +132,7 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   };
 
   const handleSelectChange = (name: string, value: string) => {
+    // store select values on top-level keys (e.g. assetProfileId, parentAssetId, type)
     setFormData((prev) => ({ ...prev, [name]: value }));
     // Clear error when user selects
     if (errors[name]) {
@@ -147,9 +177,12 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
       newErrors.type = t('addAsset.typeRequired') || 'Asset type is required';
     }
 
-    // Validate latitude if provided
-    if (formData.latitude.trim()) {
-      const lat = parseFloat(formData.latitude);
+    // Validate latitude/longitude strings safely
+    const latStr = String(formData.location.latitude || '').trim();
+    const lngStr = String(formData.location.longitude || '').trim();
+
+    if (latStr) {
+      const lat = parseFloat(latStr);
       if (isNaN(lat) || lat < -90 || lat > 90) {
         newErrors.latitude =
           t('addAsset.invalidLatitude') ||
@@ -157,9 +190,8 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
       }
     }
 
-    // Validate longitude if provided
-    if (formData.longitude.trim()) {
-      const lng = parseFloat(formData.longitude);
+    if (lngStr) {
+      const lng = parseFloat(lngStr);
       if (isNaN(lng) || lng < -180 || lng > 180) {
         newErrors.longitude =
           t('addAsset.invalidLongitude') ||
@@ -168,10 +200,7 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     }
 
     // If one coordinate is provided, the other should also be provided
-    if (
-      (formData.latitude.trim() && !formData.longitude.trim()) ||
-      (!formData.latitude.trim() && formData.longitude.trim())
-    ) {
+    if ((latStr && !lngStr) || (!latStr && lngStr)) {
       newErrors.latitude =
         t('addAsset.bothCoordinatesRequired') ||
         'Both latitude and longitude are required';
@@ -184,7 +213,13 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSave = () => {
+  const resetForm = () => {
+    setFormData(getInitialFormData());
+    setAdditionalAttributes([{ key: '', value: '' }]);
+    setErrors({});
+  };
+
+  const handleSave = async () => {
     if (!validateForm()) {
       return;
     }
@@ -194,38 +229,29 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
       (attr) => attr.key.trim() && attr.value.trim()
     );
 
-    onSave({
+    await onSave({
       ...formData,
-      latitude: formData.latitude.trim() ? parseFloat(formData.latitude) : null,
-      longitude: formData.longitude.trim()
-        ? parseFloat(formData.longitude)
-        : null,
-      additionalAttributes: validAttributes,
+      location: {
+        latitude: parseFloat(formData.location.latitude),
+        longitude: parseFloat(formData.location.longitude),
+      },
+      attributes: validAttributes,
     });
+
+    resetForm();
   };
 
   const handleCancel = () => {
-    // Reset form
-    setFormData({
-      name: '',
-      type: '',
-      description: '',
-      assetProfile: '',
-      parentAsset: '',
-      latitude: '',
-      longitude: '',
-    });
-    setAdditionalAttributes([{ key: '', value: '' }]);
-    setErrors({});
+    resetForm();
     onOpenChange(false);
   };
 
   // Parse coordinates for map display
-  const latitudeNum = formData.latitude.trim()
-    ? parseFloat(formData.latitude)
+  const latitudeNum = String(formData.location.latitude || '').trim()
+    ? parseFloat(String(formData.location.latitude))
     : null;
-  const longitudeNum = formData.longitude.trim()
-    ? parseFloat(formData.longitude)
+  const longitudeNum = String(formData.location.longitude || '').trim()
+    ? parseFloat(String(formData.location.longitude))
     : null;
   const hasValidCoordinates =
     latitudeNum !== null &&
@@ -333,28 +359,33 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('addAsset.assetProfile') || 'Asset Profile'}
                 </label>
+               
                 <Select
-                  value={formData.assetProfile}
+                  value={formData.assetProfileId}
                   onValueChange={(value) =>
-                    handleSelectChange('assetProfile', value)
+                    handleSelectChange('assetProfileId', value)
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        t('addAsset.assetProfilePlaceholder') ||
-                        'Select profile...'
-                      }
-                    />
+                    <span className="text-sm">
+                      {formData.assetProfileId
+                        ? (assetProfilesList.find((p: any) => p.id === formData.assetProfileId)?.name || formData.assetProfileId)
+                        : (t('addAsset.assetProfilePlaceholder') || 'Select profile...')}
+                    </span>
                   </SelectTrigger>
                   <SelectContent>
-                    {assetProfiles.map((profile) => (
-                      <SelectItem key={profile} value={profile}>
-                        {profile}
-                      </SelectItem>
-                    ))}
+                    {assetProfilesList.length === 0 ? (
+                      <SelectItem value="">{t('addAsset.noProfiles') || 'No profiles'}</SelectItem>
+                    ) : (
+                      assetProfilesList.map((profile: any) => (
+                        <SelectItem key={profile.id} value={profile.id}>
+                          {profile.name}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
+                
               </div>
 
               {/* Parent Asset */}
@@ -363,27 +394,31 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                   {t('addAsset.parentAsset') || 'Parent Asset'}
                 </label>
                 <Select
-                  value={formData.parentAsset}
+                  value={formData.parentAssetId}
                   onValueChange={(value) =>
-                    handleSelectChange('parentAsset', value)
+                    handleSelectChange('parentAssetId', value)
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        t('addAsset.parentAssetPlaceholder') ||
-                        'Select parent...'
-                      }
-                    />
+                    <span className="text-sm">
+                      {formData.parentAssetId
+                        ? (parentAssetsList.find((a: any) => a.id === formData.parentAssetId)?.name || formData.parentAssetId)
+                        : (t('addAsset.parentAssetPlaceholder') || 'Select parent...')}
+                    </span>
                   </SelectTrigger>
                   <SelectContent>
-                    {parentAssets.map((parent) => (
-                      <SelectItem key={parent} value={parent}>
-                        {parent}
-                      </SelectItem>
-                    ))}
+                    {parentAssetsList.length === 0 ? (
+                      <SelectItem value="">{t('addAsset.noParents') || 'No parent assets'}</SelectItem>
+                    ) : (
+                      parentAssetsList.map((parent: any) => (
+                        <SelectItem key={parent.id} value={parent.id}>
+                          {parent.name}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
+              
               </div>
             </div>
 
@@ -402,7 +437,7 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                   <Input
                     name="latitude"
                     type="text"
-                    value={formData.latitude}
+                    value={formData.location.latitude}
                     onChange={(e) =>
                       handleCoordinateChange('latitude', e.target.value)
                     }
@@ -430,7 +465,7 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                   <Input
                     name="longitude"
                     type="text"
-                    value={formData.longitude}
+                    value={formData.location.longitude}
                     onChange={(e) =>
                       handleCoordinateChange('longitude', e.target.value)
                     }
