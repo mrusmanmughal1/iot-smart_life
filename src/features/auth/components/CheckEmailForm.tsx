@@ -12,6 +12,7 @@ export const CheckEmailForm: React.FC = () => {
   const email = searchParams.get('email') || '';
   
   // Mask email for display (e.g., xxxxxxxxx@gmail.com)
+  
   const maskEmail = (email: string) => {
     if (!email) return '';
     const [localPart, domain] = email.split('@');

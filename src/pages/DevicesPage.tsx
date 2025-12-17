@@ -139,7 +139,7 @@ export default function DevicesPage() {
 
   const handleCreate = async (data: DeviceFormData) => {
     try {
-      await createDevice.mutateAsync(data);
+      await  createDevice.mutateAsync(data);
       toast.success(t('success.created') || 'Device created successfully');
       setIsCreateDialogOpen(false);
     } catch {
@@ -158,6 +158,7 @@ export default function DevicesPage() {
       setIsEditDialogOpen(false);
       setSelectedDevice(null);
     } catch {
+      console.log()
       toast.error(t('errors.generic') || 'Failed to update device');
     }
   };

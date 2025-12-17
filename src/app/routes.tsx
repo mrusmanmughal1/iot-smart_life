@@ -47,12 +47,13 @@ import ImageLibrary from '@/pages/ImageLibraryPage.tsx';
 import ScriptLibrary from '@/pages/ScriptLibrary.tsx';
 import ScheduleManagement from '@/pages/ScheduleManagementPage.tsx';
 import FloorPlans from '@/pages/FloorPlanPage.tsx';
+import FloorMapCreatePage from '@/pages/FloorMapCreatePage.tsx';
 import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
 import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 import AssetDetailsPage from '@/pages/AssetDetailsPage.tsx';
 import AssetProfileDetails from '@/pages/AssetProfileDetails.tsx';
 import DeviceProfileDetails from '@/pages/DeviceProfileDetails.tsx';
-
+import EmailVerification from '@/pages/EmailVerification.tsx';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -60,7 +61,7 @@ export const router = createBrowserRouter([
   },
 
   //  --------------------public routes--------------------
-  
+
   {
     element: <PublicRoute />,
     errorElement: <RouteErrorPage />,
@@ -78,8 +79,12 @@ export const router = createBrowserRouter([
         element: <ForgotPasswordPage />,
       },
       {
-        path: '/verify-email',
+        path: '/check-email',
         element: <CheckEmailPage />,
+      },
+      {
+        path: '/verify-email',
+        element: <EmailVerification />,
       },
       {
         path: '/reset-password',
@@ -169,40 +174,40 @@ export const router = createBrowserRouter([
         ],
       },
 
-    // ------------------ assets-profiles routes ------------------
-    {
-      path: '/asset-profiles',
-      element: (
-        <AppLayout>
-          <AssetProfiles />
-        </AppLayout>
-      ),
-    },
-    {
-      path: '/asset-profiles/:id',
-      element: (
-        <AppLayout>
-          <AssetProfileDetails />
-        </AppLayout>
-      ),
-    },
-    // ------------------ Device-profiles routes ------------------
-    {
-      path: '/device-profiles',
-      element: (
-        <AppLayout>
-          <DeviceProfiles />
-        </AppLayout>
-      ),
-    },
-    {
-      path: '/device-profiles/:id',
-      element: (
-        <AppLayout>
-          <DeviceProfileDetails />
-        </AppLayout>
-      ),
-    },
+      // ------------------ assets-profiles routes ------------------
+      {
+        path: '/asset-profiles',
+        element: (
+          <AppLayout>
+            <AssetProfiles />
+          </AppLayout>
+        ),
+      },
+      {
+        path: '/asset-profiles/:id',
+        element: (
+          <AppLayout>
+            <AssetProfileDetails />
+          </AppLayout>
+        ),
+      },
+      // ------------------ Device-profiles routes ------------------
+      {
+        path: '/device-profiles',
+        element: (
+          <AppLayout>
+            <DeviceProfiles />
+          </AppLayout>
+        ),
+      },
+      {
+        path: '/device-profiles/:id',
+        element: (
+          <AppLayout>
+            <DeviceProfileDetails />
+          </AppLayout>
+        ),
+      },
 
       // --------------------Solutions dashboards Routes --------------------
       {
@@ -273,14 +278,26 @@ export const router = createBrowserRouter([
       },
       // --------------------- protected routes ---------------------
 
+      // ----------------------- floor plans ------------------------
       {
         path: '/floor-plans',
         element: (
           <AppLayout>
-            <FloorPlans />
+            <Outlet />
           </AppLayout>
         ),
+        children: [
+          {
+            index: true,
+            element: <FloorPlans />,
+          },
+          {
+            path: 'create',
+            element: <FloorMapCreatePage />,
+          },
+        ],
       },
+
       {
         path: '/automation',
         element: (
@@ -293,8 +310,7 @@ export const router = createBrowserRouter([
         path: '/subscription-plans',
         element: <SubscriptionPlans />,
       },
-     
-      
+
       {
         path: '/integrations',
         element: (

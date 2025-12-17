@@ -45,6 +45,13 @@ export const authService = {
     return response.data.data;
   },
 
+  async verifyEmail(token: string): Promise<{ message: string }> {
+    const response = await apiClient.get('/auth/verify-email', {
+      params: { token },
+    });
+    return response.data.data;
+  },
+
   async verifyToken(): Promise<{ valid: boolean }> {
     const response = await apiClient.get('/auth/verify-token');
     return response.data.data;

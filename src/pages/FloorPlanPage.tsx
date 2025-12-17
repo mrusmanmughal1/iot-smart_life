@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/common/PageHeader';
+import { ColumnDef, Row } from '@tanstack/react-table';
 import {
   Card,
   CardContent,
@@ -11,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +39,6 @@ import {
 } from '@/components/common/DataTable/columns';
 import {
   Map,
-  Search,
   Building2,
   Layers,
   MapPin,
@@ -57,6 +58,10 @@ import {
   Factory,
   Warehouse,
   Hospital,
+  PlusSquare,
+  FileInput,
+  Plug,
+  BarChart3,
 } from 'lucide-react';
 
 interface FloorPlan {
@@ -91,6 +96,8 @@ interface DeviceMarker {
   value?: string;
   icon: React.ReactNode;
 }
+
+type FloorPlanRow = Row<FloorPlan>;
 
 const floorPlans: FloorPlan[] = [
   {
@@ -208,7 +215,8 @@ const deviceMarkers: DeviceMarker[] = [
 ];
 
 export default function FloorPlans() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+  const [searchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<FloorPlan | null>(null);
@@ -217,13 +225,44 @@ export default function FloorPlans() {
   const [showZones, setShowZones] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
 
-  const columns = [
+  const quickActions = [
+    {
+      label: 'Create New',
+      title: 'Floor Map',
+      description: 'Start with asset selection',
+      icon: <PlusSquare className="h-5 w-5 text-primary" />,
+      onClick: () => navigate('/floor-plans/create'),
+    },
+    {
+      label: 'Import DWG',
+      title: 'Files',
+      description: 'Upload building plans',
+      icon: <FileInput className="h-5 w-5 text-primary" />,
+      onClick: () => setIsCreateOpen(true),
+    },
+    {
+      label: 'Device',
+      title: 'Management',
+      description: 'Manage device associations',
+      icon: <Plug className="h-5 w-5 text-primary" />,
+      onClick: () => setActiveTab('plans'),
+    },
+    {
+      label: 'Analytics',
+      title: 'Dashboard',
+      description: 'View floor map insights',
+      icon: <BarChart3 className="h-5 w-5 text-primary" />,
+      onClick: () => setActiveTab('plans'),
+    },
+  ];
+
+  const columns: ColumnDef<FloorPlan>[] = [
     {
       accessorKey: 'name',
       header: 'Name',
-      cell: ({ row }: any) => (
+      cell: ({ row }: { row: FloorPlanRow }) => (
         <div>
-          <div className="font-medium">{row.getValue('name')}</div>
+          <div className="font-medium">{row.getValue('name') as string}</div>
           <div className="text-sm text-muted-foreground">
             {row.original.building} - {row.original.floor}
           </div>
@@ -233,7 +272,7 @@ export default function FloorPlans() {
     {
       accessorKey: 'category',
       header: 'Category',
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: FloorPlanRow }) => {
         const category = row.getValue('category') as string;
         const icons: Record<string, React.ReactNode> = {
           Industrial: <Factory className="h-4 w-4" />,
@@ -252,21 +291,23 @@ export default function FloorPlans() {
     {
       accessorKey: 'devices',
       header: 'Devices',
-      cell: ({ row }: any) => (
-        <Badge variant="outline">{row.getValue('devices')} devices</Badge>
+      cell: ({ row }: { row: FloorPlanRow }) => (
+        <Badge variant="outline">
+          {row.getValue('devices') as number} devices
+        </Badge>
       ),
     },
     {
       accessorKey: 'zones',
       header: 'Zones',
-      cell: ({ row }: any) => (
-        <Badge variant="outline">{row.getValue('zones')} zones</Badge>
+      cell: ({ row }: { row: FloorPlanRow }) => (
+        <Badge variant="outline">{row.getValue('zones') as number} zones</Badge>
       ),
     },
     {
       accessorKey: 'status',
       header: 'Status',
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: FloorPlanRow }) => {
         const status = row.getValue('status') as string;
         const colors = {
           active: 'bg-green-500',
@@ -282,8 +323,11 @@ export default function FloorPlans() {
         );
       },
     },
-    createSortableColumn('lastModified', 'Last Modified'),
-    createActionsColumn((row: any) => [
+    // createSortableColumn(
+    //   'lastModified',
+    //   'Last Modified'
+    // ) as ColumnDef<FloorPlan>,
+    createActionsColumn((row: FloorPlanRow) => [
       {
         label: 'View',
         onClick: () => {
@@ -305,7 +349,7 @@ export default function FloorPlans() {
         icon: <Trash2 className="h-4 w-4" />,
         variant: 'destructive' as const,
       },
-    ]),
+    ]) as ColumnDef<FloorPlan>,
   ];
 
   const filteredPlans = floorPlans.filter(
@@ -392,9 +436,6 @@ export default function FloorPlans() {
         <TabsContent value="plans" className="space-y-6">
           {/* Table */}
           <Card>
-            <CardHeader>
-              <CardTitle>Floor Plans</CardTitle>
-            </CardHeader>
             <CardContent>
               <DataTable
                 columns={columns}
@@ -509,6 +550,32 @@ export default function FloorPlans() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Quick Actions */}
+      <div className="space-y-3">
+        <h3 className="text-xl font-semibold text-gray-900">Quick Actions</h3>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {quickActions.map((action) => (
+            <button
+              key={action.label}
+              type="button"
+              onClick={action.onClick}
+              className="group text-left  shadow rounded-xl p-4 bg-white hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-2 text-primary font-semibold">
+                {action.icon}
+                <span>{action.label}</span>
+              </div>
+              <div className="mt-2 text-sm text-gray-900 font-medium">
+                {action.title}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {action.description}
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Create/Upload Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
