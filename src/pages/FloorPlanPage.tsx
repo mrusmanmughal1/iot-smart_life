@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -15,13 +22,21 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { DataTable } from '@/components/common/DataTable/DataTable';
-import { createSortableColumn, createActionsColumn } from '@/components/common/DataTable/columns';
+import {
+  createSortableColumn,
+  createActionsColumn,
+} from '@/components/common/DataTable/columns';
 import {
   Map,
-  Plus,
   Search,
   Building2,
   Layers,
@@ -30,7 +45,6 @@ import {
   Droplets,
   Zap,
   Wind,
-  AlertCircle,
   CheckCircle2,
   Edit,
   Copy,
@@ -40,10 +54,8 @@ import {
   Eye,
   Maximize2,
   Grid3x3,
-  Home,
   Factory,
   Warehouse,
-  School,
   Hospital,
 } from 'lucide-react';
 
@@ -262,7 +274,9 @@ export default function FloorPlans() {
           archived: 'bg-gray-500',
         };
         return (
-          <Badge className={`${colors[status as keyof typeof colors]} text-white`}>
+          <Badge
+            className={`${colors[status as keyof typeof colors]} text-white`}
+          >
             {status}
           </Badge>
         );
@@ -280,14 +294,24 @@ export default function FloorPlans() {
       },
       { label: 'Edit', onClick: () => {}, icon: <Edit className="h-4 w-4" /> },
       { label: 'Copy', onClick: () => {}, icon: <Copy className="h-4 w-4" /> },
-      { label: 'Export', onClick: () => {}, icon: <Download className="h-4 w-4" /> },
-      { label: 'Delete', onClick: () => {}, icon: <Trash2 className="h-4 w-4" />, variant: 'destructive' as const },
+      {
+        label: 'Export',
+        onClick: () => {},
+        icon: <Download className="h-4 w-4" />,
+      },
+      {
+        label: 'Delete',
+        onClick: () => {},
+        icon: <Trash2 className="h-4 w-4" />,
+        variant: 'destructive' as const,
+      },
     ]),
   ];
 
-  const filteredPlans = floorPlans.filter((plan) =>
-    plan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    plan.building.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredPlans = floorPlans.filter(
+    (plan) =>
+      plan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      plan.building.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -306,9 +330,11 @@ export default function FloorPlans() {
 
       {/* Stats */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card>
+        <Card className="bg-primary text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Floor Plans</CardTitle>
+            <CardTitle className="text-sm font-medium   text-white">
+              Total Floor Plans
+            </CardTitle>
             <Map className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -317,22 +343,26 @@ export default function FloorPlans() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Plans</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
+        <Card className="bg-secondary text-white">
+          <CardHeader className="flex flex-row  items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium   text-white">
+              Active Plans
+            </CardTitle>
+            <CheckCircle2 className="h-4 w-4  " />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-500">
-              {floorPlans.filter(p => p.status === 'active').length}
+            <div className="text-2xl font-bold  ">
+              {floorPlans.filter((p) => p.status === 'active').length}
             </div>
             <p className="text-xs text-muted-foreground">In use</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-success text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Devices</CardTitle>
+            <CardTitle className="text-sm font-medium text-white">
+              Total Devices
+            </CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -358,37 +388,19 @@ export default function FloorPlans() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue='plans' value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="plans">Floor Plans</TabsTrigger>
-          <TabsTrigger value="gallery">Gallery View</TabsTrigger>
-          <TabsTrigger value="categories">By Category</TabsTrigger>
-        </TabsList>
-
+      <Tabs defaultValue="plans" value={activeTab} onValueChange={setActiveTab}>
         <TabsContent value="plans" className="space-y-6">
-          {/* Search */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search floor plans..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Table */}
           <Card>
             <CardHeader>
               <CardTitle>Floor Plans</CardTitle>
-              <CardDescription>Manage your facility layouts and device placement</CardDescription>
             </CardHeader>
             <CardContent>
-              <DataTable columns={columns} data={filteredPlans} searchKey="name" />
+              <DataTable
+                columns={columns}
+                data={filteredPlans}
+                searchKey="name"
+              />
             </CardContent>
           </Card>
         </TabsContent>
@@ -396,7 +408,10 @@ export default function FloorPlans() {
         <TabsContent value="gallery" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {floorPlans.map((plan) => (
-              <Card key={plan.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <Card
+                key={plan.id}
+                className="overflow-hidden hover:shadow-lg transition-shadow"
+              >
                 <div className="aspect-video bg-muted flex items-center justify-center relative">
                   <Map className="h-16 w-16 text-muted-foreground" />
                   <Badge className="absolute top-2 right-2">
@@ -448,46 +463,50 @@ export default function FloorPlans() {
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-6">
-          {['Industrial', 'Commercial', 'Logistics', 'Healthcare'].map((category) => {
-            const plans = floorPlans.filter(p => p.category === category);
-            if (plans.length === 0) return null;
+          {['Industrial', 'Commercial', 'Logistics', 'Healthcare'].map(
+            (category) => {
+              const plans = floorPlans.filter((p) => p.category === category);
+              if (plans.length === 0) return null;
 
-            return (
-              <Card key={category}>
-                <CardHeader>
-                  <CardTitle>{category}</CardTitle>
-                  <CardDescription>{plans.length} floor plans</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {plans.map((plan) => (
-                      <div
-                        key={plan.id}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                        onClick={() => {
-                          setSelectedPlan(plan);
-                          setIsViewerOpen(true);
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-primary/10 rounded-lg">
-                            <Map className="h-5 w-5 text-primary" />
+              return (
+                <Card key={category}>
+                  <CardHeader>
+                    <CardTitle>{category}</CardTitle>
+                    <CardDescription>
+                      {plans.length} floor plans
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {plans.map((plan) => (
+                        <div
+                          key={plan.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                          onClick={() => {
+                            setSelectedPlan(plan);
+                            setIsViewerOpen(true);
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-lg">
+                              <Map className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{plan.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {plan.devices} devices • {plan.zones} zones
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">{plan.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {plan.devices} devices • {plan.zones} zones
-                            </p>
-                          </div>
+                          <Eye className="h-5 w-5 text-muted-foreground" />
                         </div>
-                        <Eye className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            }
+          )}
         </TabsContent>
       </Tabs>
 
@@ -496,19 +515,27 @@ export default function FloorPlans() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Upload Floor Plan</DialogTitle>
-            <DialogDescription>Upload a floor plan image and configure settings</DialogDescription>
+            <DialogDescription>
+              Upload a floor plan image and configure settings
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="plan-name">Floor Plan Name *</Label>
-              <Input id="plan-name" placeholder="e.g., Factory Floor - Production Area" />
+              <Input
+                id="plan-name"
+                placeholder="e.g., Factory Floor - Production Area"
+              />
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="building">Building *</Label>
-                <Input id="building" placeholder="e.g., Manufacturing Plant A" />
+                <Input
+                  id="building"
+                  placeholder="e.g., Manufacturing Plant A"
+                />
               </div>
 
               <div className="space-y-2">
@@ -538,8 +565,12 @@ export default function FloorPlans() {
               <Label htmlFor="image">Floor Plan Image *</Label>
               <div className="border-2 border-dashed rounded-lg p-8 text-center hover:bg-muted/50 cursor-pointer transition-colors">
                 <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-sm font-medium mb-1">Click to upload or drag and drop</p>
-                <p className="text-xs text-muted-foreground">PNG, JPG, SVG up to 10MB</p>
+                <p className="text-sm font-medium mb-1">
+                  Click to upload or drag and drop
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  PNG, JPG, SVG up to 10MB
+                </p>
               </div>
             </div>
 
@@ -562,7 +593,11 @@ export default function FloorPlans() {
 
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" placeholder="Floor plan description..." rows={3} />
+              <Textarea
+                id="description"
+                placeholder="Floor plan description..."
+                rows={3}
+              />
             </div>
           </div>
 
@@ -603,7 +638,9 @@ export default function FloorPlans() {
                     checked={showDevices}
                     onCheckedChange={setShowDevices}
                   />
-                  <Label htmlFor="show-devices" className="cursor-pointer">Show Devices</Label>
+                  <Label htmlFor="show-devices" className="cursor-pointer">
+                    Show Devices
+                  </Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
@@ -611,7 +648,9 @@ export default function FloorPlans() {
                     checked={showZones}
                     onCheckedChange={setShowZones}
                   />
-                  <Label htmlFor="show-zones" className="cursor-pointer">Show Zones</Label>
+                  <Label htmlFor="show-zones" className="cursor-pointer">
+                    Show Zones
+                  </Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
@@ -619,7 +658,9 @@ export default function FloorPlans() {
                     checked={showHeatmap}
                     onCheckedChange={setShowHeatmap}
                   />
-                  <Label htmlFor="show-heatmap" className="cursor-pointer">Heat Map</Label>
+                  <Label htmlFor="show-heatmap" className="cursor-pointer">
+                    Heat Map
+                  </Label>
                 </div>
               </div>
 
@@ -636,12 +677,17 @@ export default function FloorPlans() {
             </div>
 
             {/* Floor Plan Canvas */}
-            <div className="relative border rounded-lg overflow-hidden bg-muted/20" style={{ height: '500px' }}>
+            <div
+              className="relative border rounded-lg overflow-hidden bg-muted/20"
+              style={{ height: '500px' }}
+            >
               {/* Background Grid */}
-              <div className="absolute inset-0 opacity-20"
+              <div
+                className="absolute inset-0 opacity-20"
                 style={{
-                  backgroundImage: 'linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px)',
-                  backgroundSize: '20px 20px'
+                  backgroundImage:
+                    'linear-gradient(#ccc 1px, transparent 1px), linear-gradient(90deg, #ccc 1px, transparent 1px)',
+                  backgroundSize: '20px 20px',
                 }}
               />
 
@@ -651,46 +697,58 @@ export default function FloorPlans() {
               </div>
 
               {/* Device Markers */}
-              {showDevices && deviceMarkers.map((device) => (
-                <div
-                  key={device.id}
-                  className="absolute group cursor-pointer"
-                  style={{
-                    left: `${device.position.x}%`,
-                    top: `${device.position.y}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                >
-                  {/* Device Pin */}
-                  <div className={`
+              {showDevices &&
+                deviceMarkers.map((device) => (
+                  <div
+                    key={device.id}
+                    className="absolute group cursor-pointer"
+                    style={{
+                      left: `${device.position.x}%`,
+                      top: `${device.position.y}%`,
+                      transform: 'translate(-50%, -50%)',
+                    }}
+                  >
+                    {/* Device Pin */}
+                    <div
+                      className={`
                     p-2 rounded-full shadow-lg transition-all
                     ${device.status === 'online' ? 'bg-green-500' : ''}
                     ${device.status === 'offline' ? 'bg-gray-500' : ''}
                     ${device.status === 'warning' ? 'bg-yellow-500' : ''}
                     text-white hover:scale-110
-                  `}>
-                    {device.icon}
-                  </div>
+                  `}
+                    >
+                      {device.icon}
+                    </div>
 
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                    <div className="bg-popover text-popover-foreground border rounded-lg shadow-lg p-3 whitespace-nowrap">
-                      <p className="font-semibold text-sm">{device.name}</p>
-                      <p className="text-xs text-muted-foreground">{device.type}</p>
-                      {device.value && (
-                        <p className="text-sm font-medium mt-1">{device.value}</p>
-                      )}
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      <div className="bg-popover text-popover-foreground border rounded-lg shadow-lg p-3 whitespace-nowrap">
+                        <p className="font-semibold text-sm">{device.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {device.type}
+                        </p>
+                        {device.value && (
+                          <p className="text-sm font-medium mt-1">
+                            {device.value}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
               {/* Zones */}
               {showZones && (
                 <>
                   <div
                     className="absolute border-2 border-blue-500 border-dashed bg-blue-500/10 rounded-lg"
-                    style={{ left: '10%', top: '15%', width: '35%', height: '40%' }}
+                    style={{
+                      left: '10%',
+                      top: '15%',
+                      width: '35%',
+                      height: '40%',
+                    }}
                   >
                     <div className="absolute -top-6 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
                       Zone A - Production
@@ -698,7 +756,12 @@ export default function FloorPlans() {
                   </div>
                   <div
                     className="absolute border-2 border-purple-500 border-dashed bg-purple-500/10 rounded-lg"
-                    style={{ left: '55%', top: '20%', width: '30%', height: '35%' }}
+                    style={{
+                      left: '55%',
+                      top: '20%',
+                      width: '30%',
+                      height: '35%',
+                    }}
                   >
                     <div className="absolute -top-6 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
                       Zone B - Storage
@@ -737,7 +800,8 @@ export default function FloorPlans() {
               <div>
                 <p className="text-sm text-muted-foreground">Dimensions</p>
                 <p className="font-semibold">
-                  {selectedPlan?.dimensions.width}m × {selectedPlan?.dimensions.height}m
+                  {selectedPlan?.dimensions.width}m ×{' '}
+                  {selectedPlan?.dimensions.height}m
                 </p>
               </div>
               <div>

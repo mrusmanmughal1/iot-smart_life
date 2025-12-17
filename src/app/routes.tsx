@@ -78,7 +78,7 @@ export const router = createBrowserRouter([
         element: <ForgotPasswordPage />,
       },
       {
-        path: '/check-email',
+        path: '/verify-email',
         element: <CheckEmailPage />,
       },
       {

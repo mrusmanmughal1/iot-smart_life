@@ -90,7 +90,15 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Mock data for selects - keep assetTypes mocked
-  const assetTypes = ['building', 'floor', 'room', 'vehicle', 'equipment','infrastructure','zone'	];
+  const assetTypes = [
+    'building',
+    'floor',
+    'room',
+    'vehicle',
+    'equipment',
+    'infrastructure',
+    'zone',
+  ];
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -359,7 +367,7 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('addAsset.assetProfile') || 'Asset Profile'}
                 </label>
-               
+
                 <Select
                   value={formData.assetProfileId}
                   onValueChange={(value) =>
@@ -369,13 +377,18 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                   <SelectTrigger>
                     <span className="text-sm">
                       {formData.assetProfileId
-                        ? (assetProfilesList.find((p: any) => p.id === formData.assetProfileId)?.name || formData.assetProfileId)
-                        : (t('addAsset.assetProfilePlaceholder') || 'Select profile...')}
+                        ? assetProfilesList.find(
+                            (p: any) => p.id === formData.assetProfileId
+                          )?.name || formData.assetProfileId
+                        : t('addAsset.assetProfilePlaceholder') ||
+                          'Select profile...'}
                     </span>
                   </SelectTrigger>
                   <SelectContent>
                     {assetProfilesList.length === 0 ? (
-                      <SelectItem value="">{t('addAsset.noProfiles') || 'No profiles'}</SelectItem>
+                      <SelectItem value="">
+                        {t('addAsset.noProfiles') || 'No profiles'}
+                      </SelectItem>
                     ) : (
                       assetProfilesList.map((profile: any) => (
                         <SelectItem key={profile.id} value={profile.id}>
@@ -385,7 +398,6 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                     )}
                   </SelectContent>
                 </Select>
-                
               </div>
 
               {/* Parent Asset */}
@@ -402,13 +414,18 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                   <SelectTrigger>
                     <span className="text-sm">
                       {formData.parentAssetId
-                        ? (parentAssetsList.find((a: any) => a.id === formData.parentAssetId)?.name || formData.parentAssetId)
-                        : (t('addAsset.parentAssetPlaceholder') || 'Select parent...')}
+                        ? parentAssetsList.find(
+                            (a: any) => a.id === formData.parentAssetId
+                          )?.name || formData.parentAssetId
+                        : t('addAsset.parentAssetPlaceholder') ||
+                          'Select parent...'}
                     </span>
                   </SelectTrigger>
                   <SelectContent>
                     {parentAssetsList.length === 0 ? (
-                      <SelectItem value="">{t('addAsset.noParents') || 'No parent assets'}</SelectItem>
+                      <SelectItem value="">
+                        {t('addAsset.noParents') || 'No parent assets'}
+                      </SelectItem>
                     ) : (
                       parentAssetsList.map((parent: any) => (
                         <SelectItem key={parent.id} value={parent.id}>
@@ -418,7 +435,6 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                     )}
                   </SelectContent>
                 </Select>
-              
               </div>
             </div>
 
