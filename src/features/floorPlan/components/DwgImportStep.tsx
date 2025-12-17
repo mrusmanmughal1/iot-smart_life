@@ -174,7 +174,6 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
                   <div className="flex justify-end gap-2">
                     <Button
                       variant="outline"
-                      size="xs"
                       className="h-7 px-2 text-[10px]"
                     >
                       <Edit className="mr-1 h-3 w-3" />
@@ -182,7 +181,6 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
                     </Button>
                     <Button
                       variant="outline"
-                      size="xs"
                       className="h-7 px-2 text-[10px]"
                     >
                       <Eye className="mr-1 h-3 w-3" />
@@ -190,7 +188,6 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
                     </Button>
                     <Button
                       variant="destructive"
-                      size="xs"
                       className="h-7 px-2 text-[10px]"
                     >
                       <Trash2 className="mr-1 h-3 w-3" />
