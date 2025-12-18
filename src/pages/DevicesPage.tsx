@@ -10,6 +10,7 @@ import { DeviceDialog } from '@/features/devices/components/DeviceDialog';
 import AppLayout from '@/components/layout/AppLayout';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
+import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
 import type { DeviceFormData } from '@/features/devices/types';
 
 export default function DevicesPage() {
@@ -28,10 +29,16 @@ export default function DevicesPage() {
   const handleDelete = useCallback(async (deviceId: string) => {
     if (window.confirm('Are you sure you want to delete this device?')) {
       try {
-        await deleteDevice.mutateAsync(deviceId);
-        toast.success(t('success.deleted') || 'Device deleted successfully');
-      } catch {
-        toast.error(t('errors.generic') || 'Failed to delete device');
+        const response = await deleteDevice.mutateAsync(deviceId);
+        const successMessage = 
+          (response as { data?: { message?: string } })?.data?.message ||
+          (response as { message?: string })?.message ||
+          t('success.deleted') || 
+          'Device deleted successfully';
+        toast.success(successMessage);
+      } catch (error) {
+        const errorMessage = getErrorMessage(error) || t('errors.generic') || 'Failed to delete device';
+        toast.error(errorMessage);
       }
     }
   }, [deleteDevice, t]);
@@ -39,6 +46,7 @@ export default function DevicesPage() {
   // Handle status toggle
   const handleStatusToggle = useCallback(async (deviceId: string) => {
     // TODO: Implement status toggle functionality
+    console.log('Toggle status for device:', deviceId);
     toast('Status toggle functionality coming soon', { icon: 'ℹ️' });
   }, []);
 
@@ -139,27 +147,38 @@ export default function DevicesPage() {
 
   const handleCreate = async (data: DeviceFormData) => {
     try {
-      await  createDevice.mutateAsync(data);
-      toast.success(t('success.created') || 'Device created successfully');
+      const response = await createDevice.mutateAsync(data);
+      const successMessage = 
+        (response as { data?: { message?: string } })?.data?.message ||
+        (response as { message?: string })?.message ||
+        t('success.created') || 
+        'Device created successfully';
+      toast.success(successMessage);
       setIsCreateDialogOpen(false);
-    } catch {
-      toast.error(t('errors.generic') || 'Failed to create device');
+    } catch (error) {
+      const errorMessage = getErrorMessage(error) || t('errors.generic') || 'Failed to create device';
+      toast.error(errorMessage);
     }
   };
 
   const handleEdit = async (data: DeviceFormData) => {
     if (!selectedDevice) return;
     try {
-      await updateDevice.mutateAsync({
+      const response = await updateDevice.mutateAsync({
         id: selectedDevice.id,
         data,
       });
-      toast.success(t('success.updated') || 'Device updated successfully');
+      const successMessage = 
+        (response as { data?: { message?: string } })?.data?.message ||
+        (response as { message?: string })?.message ||
+        t('success.updated') || 
+        'Device updated successfully';
+      toast.success(successMessage);
       setIsEditDialogOpen(false);
       setSelectedDevice(null);
-    } catch {
-      console.log()
-      toast.error(t('errors.generic') || 'Failed to update device');
+    } catch (error) {
+      const errorMessage = getErrorMessage(error) || t('errors.generic') || 'Failed to update device';
+      toast.error(errorMessage);
     }
   };
 

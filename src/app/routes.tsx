@@ -54,6 +54,7 @@ import AssetDetailsPage from '@/pages/AssetDetailsPage.tsx';
 import AssetProfileDetails from '@/pages/AssetProfileDetails.tsx';
 import DeviceProfileDetails from '@/pages/DeviceProfileDetails.tsx';
 import EmailVerification from '@/pages/EmailVerification.tsx';
+import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -395,6 +396,10 @@ export const router = createBrowserRouter([
       {
         path: '/dashboards/:id',
         element: <WidgetEditorPage />,
+      },
+      {
+        path: '/payment-success',
+        element: <PaymentSuccess />,
       },
       {
         path: '*',

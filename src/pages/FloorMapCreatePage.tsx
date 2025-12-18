@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { FilterFormValues, AssetOption } from '@/features/floorPlan/types';
 import { AssetSelectionStep } from '@/features/floorPlan/components/AssetSelectionStep';
 import { DwgImportStep } from '@/features/floorPlan/components/DwgImportStep';
+import { ZoneSetupStep } from '@/features/floorPlan/components/ZoneSetupStep';
+import { DeviceLinkStep } from '@/features/floorPlan/components/DeviceLinkStep';
 
 type StepId = 1 | 2 | 3 | 4 | 5;
 
@@ -204,7 +206,25 @@ const progressPercent = steps.length <= 1
             />
           )}
 
-          {currentStep > 2 && (
+          {currentStep === 3 && (
+            <ZoneSetupStep
+              register={register}
+              control={control}
+              onPrevious={() => setCurrentStep(2)}
+              onNext={handleNext}
+            />
+          )}
+
+          {currentStep === 4 && (
+            <DeviceLinkStep
+              register={register}
+              control={control}
+              onPrevious={() => setCurrentStep(3)}
+              onNext={handleNext}
+            />
+          )}
+
+          {currentStep > 4 && (
             <div className="rounded-lg border bg-muted/40 p-6 text-sm text-muted-foreground">
               Content for step {currentStep} will be implemented in the next
               iterations. You can navigate back to change the selected asset.

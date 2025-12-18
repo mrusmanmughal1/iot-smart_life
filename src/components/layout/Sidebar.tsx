@@ -93,6 +93,18 @@ const getNavItems = (t: (key: string) => string): NavItem[] => [
     titleKey: 'nav.floorPlans',
     href: '/floor-plans',
     icon: <FlowerIcon className="h-5 w-5" />,
+    children: [
+      {
+        titleKey: 'nav.viewFloorPlans',
+        href: '/floor-plans',
+        icon: <Box className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.analytics',
+        href: '/floor-plans/analytics',
+        icon: <BarChart3 className="h-4 w-4" />,
+      },
+    ],
   },
   {
     titleKey: 'nav.alerts',

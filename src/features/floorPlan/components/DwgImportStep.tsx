@@ -11,6 +11,12 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   UploadCloud,
   FileText,
   Eye,
@@ -18,6 +24,7 @@ import {
   Trash2,
   CheckCircle2,
   AlertTriangle,
+  MoreVertical,
 } from 'lucide-react';
 import type { FilterFormValues } from '@/features/floorPlan/types';
 
@@ -171,28 +178,50 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     {file.status}
                   </span>
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      className="h-7 px-2 text-[10px]"
-                    >
-                      <Edit className="mr-1 h-3 w-3" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="h-7 px-2 text-[10px]"
-                    >
-                      <Eye className="mr-1 h-3 w-3" />
-                      Preview
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      className="h-7 px-2 text-[10px]"
-                    >
-                      <Trash2 className="mr-1 h-3 w-3" />
-                      Delete
-                    </Button>
+                  <div className="flex justify-end">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="h-7 w-7 p-0 hover:bg-gray-100"
+                        >
+                          <span className="sr-only">Open menu</span>
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-32">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            // Handle edit action
+                            console.log('Edit file:', file.id);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Edit className="mr-2 h-3.5 w-3.5" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            // Handle preview action
+                            console.log('Preview file:', file.id);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Eye className="mr-2 h-3.5 w-3.5" />
+                          Preview
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            // Handle delete action
+                            console.log('Delete file:', file.id);
+                          }}
+                          className="cursor-pointer text-red-600 focus:text-red-600"
+                        >
+                          <Trash2 className="mr-2 h-3.5 w-3.5" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               ))}
@@ -231,7 +260,7 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
       </div>
 
       {/* Footer actions */}
-      <div className="flex flex-wrap justify-end gap-3 pt-2 text-xs">
+      <div className="flex flex-wrap  gap-3 pt-2 text-xs">
         <Button variant="outline" type="button">
           Save Draft
         </Button>
