@@ -46,6 +46,7 @@ export interface Plan {
 }
 
 export interface Subscription {
+  requiresPayment: any;
   id: string;
   plan: SubscriptionPlan;
   status: SubscriptionStatus;
