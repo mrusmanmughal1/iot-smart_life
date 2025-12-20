@@ -56,6 +56,7 @@ import DeviceProfileDetails from '@/pages/DeviceProfileDetails.tsx';
 import EmailVerification from '@/pages/EmailVerification.tsx';
 import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
 export const router = createBrowserRouter([
+
   {
     path: '/',
     element: <Navigate to="/login" replace />,
@@ -119,6 +120,7 @@ export const router = createBrowserRouter([
   },
 
   //  --------------------protected routes--------------------
+
   {
     element: <ProtectedRoute />,
     errorElement: <RouteErrorPage />,

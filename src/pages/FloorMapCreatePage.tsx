@@ -8,6 +8,7 @@ import { AssetSelectionStep } from '@/features/floorPlan/components/AssetSelecti
 import { DwgImportStep } from '@/features/floorPlan/components/DwgImportStep';
 import { ZoneSetupStep } from '@/features/floorPlan/components/ZoneSetupStep';
 import { DeviceLinkStep } from '@/features/floorPlan/components/DeviceLinkStep';
+import { ReviewStep } from '@/features/floorPlan/components/ReviewStep';
 
 type StepId = 1 | 2 | 3 | 4 | 5;
 
@@ -121,6 +122,13 @@ export default function FloorMapCreatePage() {
     }
   };
 
+  const handleSave = () => {
+    // TODO: Implement save functionality
+    console.log('Saving floor map...');
+    // After saving, navigate back to floor plans list
+    navigate('/floor-plans');
+  };
+
   const handleBack = () => {
     if (currentStep === 1) {
       navigate('/floor-plans');
@@ -130,11 +138,12 @@ export default function FloorMapCreatePage() {
   };
 
   const currentIndex = steps.findIndex((s) => s.id === currentStep);
-const validIndex = currentIndex >= 0 ? currentIndex : 0;
+  const validIndex = currentIndex >= 0 ? currentIndex : 0;
 
-const progressPercent = steps.length <= 1
-  ? 10 // or 90 if you consider a single step completed
-  : 10 + (validIndex / (steps.length - 1)) * 80;
+  const progressPercent =
+    steps.length <= 1
+      ? 10 // or 90 if you consider a single step completed
+      : 10 + (validIndex / (steps.length - 1)) * 80;
   return (
     <div className="space-y-6">
       <PageHeader
@@ -224,11 +233,13 @@ const progressPercent = steps.length <= 1
             />
           )}
 
-          {currentStep > 4 && (
-            <div className="rounded-lg border bg-muted/40 p-6 text-sm text-muted-foreground">
-              Content for step {currentStep} will be implemented in the next
-              iterations. You can navigate back to change the selected asset.
-            </div>
+          {currentStep === 5 && (
+            <ReviewStep
+              register={register}
+              control={control}
+              onPrevious={() => setCurrentStep(4)}
+              onSave={handleSave}
+            />
           )}
         </CardContent>
       </Card>

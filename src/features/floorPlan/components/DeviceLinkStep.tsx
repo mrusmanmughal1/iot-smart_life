@@ -12,7 +12,11 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Search, Filter } from 'lucide-react';
-import type { FilterFormValues, Device, Room } from '@/features/floorPlan/types';
+import type {
+  FilterFormValues,
+  Device,
+  Room,
+} from '@/features/floorPlan/types';
 
 interface DeviceLinkStepProps {
   register: UseFormRegister<FilterFormValues>;
@@ -111,7 +115,11 @@ const getDeviceTypeColor = (type: string): string => {
   if (typeLower.includes('gateway') || typeLower.includes('lora')) {
     return 'bg-yellow-500';
   }
-  if (typeLower.includes('sensor') || typeLower.includes('temperature') || typeLower.includes('humidity')) {
+  if (
+    typeLower.includes('sensor') ||
+    typeLower.includes('temperature') ||
+    typeLower.includes('humidity')
+  ) {
     return 'bg-green-500';
   }
   return 'bg-red-500';
@@ -137,7 +145,8 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
   onNext,
 }) => {
   const [rooms, setRooms] = useState<Room[]>(mockRooms);
-  const [availableDevices, setAvailableDevices] = useState<Device[]>(mockAvailableDevices);
+  const [availableDevices, setAvailableDevices] =
+    useState<Device[]>(mockAvailableDevices);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [draggedDevice, setDraggedDevice] = useState<Device | null>(null);
@@ -151,7 +160,8 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
         device.type.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesType =
-        filterType === 'all' || device.type.toLowerCase().includes(filterType.toLowerCase());
+        filterType === 'all' ||
+        device.type.toLowerCase().includes(filterType.toLowerCase());
 
       return matchesSearch && matchesType;
     });
@@ -190,7 +200,9 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
 
     // Update available devices
     const updatedDevices = availableDevices.map((device) =>
-      device.id === draggedDevice.id ? { ...device, assignedTo: roomId } : device
+      device.id === draggedDevice.id
+        ? { ...device, assignedTo: roomId }
+        : device
     );
 
     setRooms(updatedRoomsWithDevice);
@@ -255,7 +267,9 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-900">{room.name}</span>
+                          <span className="font-semibold text-gray-900">
+                            {room.name}
+                          </span>
                           {room.devices.map((device) => (
                             <span
                               key={device.id}
@@ -271,7 +285,8 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
                         </div>
                         {room.devices.length > 0 && (
                           <Badge variant="outline" className="text-xs">
-                            {room.devices.length} device{room.devices.length !== 1 ? 's' : ''}
+                            {room.devices.length} device
+                            {room.devices.length !== 1 ? 's' : ''}
                           </Badge>
                         )}
                       </div>
@@ -384,14 +399,20 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
                           title={device.status}
                         />
                         <div className="flex-1">
-                          <p className="font-semibold text-sm text-gray-900">{device.name}</p>
+                          <p className="font-semibold text-sm text-gray-900">
+                            {device.name}
+                          </p>
                           <p className="text-xs text-gray-600">
-                            Status: {device.status.charAt(0).toUpperCase() + device.status.slice(1)} | Type: {device.type}
+                            Status:{' '}
+                            {device.status.charAt(0).toUpperCase() +
+                              device.status.slice(1)}{' '}
+                            | Type: {device.type}
                             {device.assignedTo && (
                               <>
                                 {' '}
                                 | Assigned to:{' '}
-                                {rooms.find((r) => r.id === device.assignedTo)?.name || 'Unknown'}
+                                {rooms.find((r) => r.id === device.assignedTo)
+                                  ?.name || 'Unknown'}
                               </>
                             )}
                           </p>
@@ -413,14 +434,21 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
 
       {/* Footer Actions */}
       <div className="flex items-center justify-between border-t pt-4">
-        <Button variant="outline" type="button" onClick={onPrevious}>
-          Previous
-        </Button>
-        <Button type="button" onClick={onNext}>
-          Save
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" type="button" onClick={onPrevious}>
+            Previous
+          </Button>
+          <Button variant="outline" type="button">
+            Cancel
+          </Button>
+          <Button variant="outline" type="button">
+            Save
+          </Button>
+          <Button type="button" onClick={onNext}>
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
 };
-

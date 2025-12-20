@@ -118,11 +118,13 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({
               type="button"
               onClick={() => onSelectAsset(asset.id)}
               className={`relative flex h-full flex-col overflow-hidden border-gray-300 justify-between rounded-e-xl border bg-white p-6 text-left transition-shadow ${
-                isSelected ? '  shadow-md' : 'border-border  hover:shadow-sm'
+                isSelected
+                  ? '  shadow-md border-primary border-2'
+                  : 'border-border  hover:shadow-sm'
               }`}
             >
               {isSelected && (
-                <div className="absolute left-0 top-0 h-full w-5   bg-primary" />
+                <div className="absolute left-0 top-0 h-full w-5 bg-primary" />
               )}
 
               <div className="space-y-1">
@@ -134,26 +136,12 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({
                   Status: {asset.status}
                 </p>
               </div>
-
-              {/* {asset.notes && (
-                <div className="mt-3 space-y-1 border-t pt-2">
-                  <p className="text-[11px] font-semibold text-primary">Selected Asset</p>
-                  {asset.notes.map((note) => (
-                    <p
-                      key={note}
-                      className="text-[11px] text-muted-foreground leading-snug"
-                    >
-                      {note}
-                    </p>
-                  ))}
-                </div>
-              )} */}
             </button>
           );
         })}
       </div>
 
-      <div className="mt-4 flex items-center  ">
+      <div className="mt-4 flex items-center gap-2  ">
         <Button variant="outline" type="button" onClick={onCancel}>
           Cancel
         </Button>
