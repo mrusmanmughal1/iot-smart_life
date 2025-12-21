@@ -104,6 +104,16 @@ const getNavItems = (t: (key: string) => string): NavItem[] => [
         href: '/floor-plans/analytics',
         icon: <BarChart3 className="h-4 w-4" />,
       },
+      {
+        titleKey: 'nav.multiFloorBuildingView',
+        href: '/floor-plans/multifloor',
+        icon: <Box className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.settings',
+        href: '/floor-plans/settings',
+        icon: <Settings className="h-4 w-4" />,
+      },
     ],
   },
   {

@@ -279,7 +279,7 @@ export default function SubscriptionPlans() {
       const requiresPayment = result.data.data.requiresPayment;
       if (requiresPayment) {
         const paymentUrl = await handlePayment(plan, billing);
-        window.open(paymentUrl);
+        window.location.href = paymentUrl;
       } else {
         toast.error('Successfully subscribed to plan');
       }
@@ -487,7 +487,7 @@ export default function SubscriptionPlans() {
                     {currentPlanId &&
                     plans.findIndex((p) => p.id === plan.id) >
                       plans.findIndex((p) => p.id === currentPlanId)
-                      ? 'Upgrade Plan'
+                      ? 'Upgrade sPlan'
                       : 'Subscribe'}
                   </Button>
                 )}

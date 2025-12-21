@@ -48,6 +48,8 @@ import ScriptLibrary from '@/pages/ScriptLibrary.tsx';
 import ScheduleManagement from '@/pages/ScheduleManagementPage.tsx';
 import FloorPlans from '@/pages/FloorPlanPage.tsx';
 import FloorMapCreatePage from '@/pages/FloorMapCreatePage.tsx';
+import MultiFloorBuildingViewPage from '@/pages/MultiFloorBuildingViewPage.tsx';
+import FloorMapSettingsPage from '@/pages/FloorMapSettingsPage.tsx';
 import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
 import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 import AssetDetailsPage from '@/pages/AssetDetailsPage.tsx';
@@ -297,6 +299,14 @@ export const router = createBrowserRouter([
           {
             path: 'create',
             element: <FloorMapCreatePage />,
+          },
+          {
+            path: 'multifloor',
+            element: <MultiFloorBuildingViewPage />,
+          },
+          {
+            path: 'settings',
+            element: <FloorMapSettingsPage />,
           },
         ],
       },
