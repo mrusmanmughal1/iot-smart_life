@@ -7,9 +7,7 @@ export const PaymentSuccess: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const paymentStatus = searchParams.get('status') || '';
-  console.log(paymentStatus)
   const isSuccess = paymentStatus.toLowerCase() === 'paid';
-  console.log(isSuccess)
   return (
     <div className="w-full flex justify-center items-center min-h-screen bg-[url('@assets/images/bg-auth-2.png')] bg-cover bg-center">
       <div className="w-full max-w-lg bg-white rounded-2xl p-8 shadow-lg text-center animate-fadeIn">

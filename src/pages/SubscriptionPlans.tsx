@@ -23,7 +23,6 @@ import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { format } from 'date-fns';
-import { get } from 'http';
 import apiClient from '@/lib/axios';
 
 interface ApiPlan {
@@ -194,6 +193,7 @@ export default function SubscriptionPlans() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>(
     'monthly'
   );
+
   const [isSubscribing, setIsSubscribing] = useState<string | null>(null);
 
   const {
@@ -212,6 +212,7 @@ export default function SubscriptionPlans() {
       return apiResponse?.data || [];
     },
   });
+
   const { data: currentSubscriptionResponse } = useQuery({
     queryKey: ['current-subscription'],
     queryFn: async () => {
@@ -281,7 +282,6 @@ export default function SubscriptionPlans() {
       } else {
         toast.error('Successfully subscribed to plan');
       }
-
     } catch (error: unknown) {
       const errorMessage =
         getErrorMessage(error) || 'Failed to subscribe to plan';
@@ -403,7 +403,7 @@ export default function SubscriptionPlans() {
           {plans.map((plan) => (
             <Card
               key={plan.id}
-              className={`relative flex flex-col overflow-hidden rounded-3xl transition-all hover:shadow-xl ${
+              className={`relative flex flex-col overflow-hidden rounded-3xl transition-all hover:shadow-md  hover:translate-y-[-5px] duration-500 ${
                 plan.isPopular
                   ? 'border-2 border-primary shadow-lg'
                   : 'border border-gray-400'
@@ -467,28 +467,46 @@ export default function SubscriptionPlans() {
                   plan.isPopular ? 'bg-gray-900' : 'bg-white'
                 }`}
               >
-                {plan.id === currentPlanId ? (
-                  <Button
-                    className="w-full bg-gray-100 border border-gray-300 text-black hover:bg-gray-800 font-medium"
-                    disabled
-                  >
-                    Current Plan
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    className="w-full border-gray-300 bg-black text-white hover:bg-black/80 font-medium"
-                    onClick={() => handlePlanSelection(plan.id)}
-                    disabled={isSubscribing !== null}
-                    isLoading={isSubscribing === plan.id}
-                  >
-                    {currentPlanId &&
-                    plans.findIndex((p) => p.id === plan.id) >
-                      plans.findIndex((p) => p.id === currentPlanId)
-                      ? 'Upgrade sPlan'
-                      : 'Subscribe'}
-                  </Button>
-                )}
+                {(() => {
+                  const isCurrentPlan = plan.id === currentPlanId;
+                  const currentBillingPeriod =
+                    currentSubscriptionResponse?.billingPeriod?.toLowerCase();
+                  const isBillingPeriodMatch =
+                    (billingPeriod === 'monthly' &&
+                      currentBillingPeriod === 'monthly') ||
+                    (billingPeriod === 'yearly' &&
+                      currentBillingPeriod === 'yearly');
+                  const showCurrentPlan = isCurrentPlan && isBillingPeriodMatch;
+
+                  if (showCurrentPlan) {
+                    return (
+                      <Button
+                        className="w-full bg-gray-100 border border-gray-300 text-black hover:bg-gray-800 font-medium"
+                        disabled
+                      >
+                        Current Plan
+                      </Button>
+                    );
+                  }
+
+                  return (
+                    <Button
+                      variant="outline"
+                      className="w-full border-gray-300 bg-black text-white hover:bg-black/80 font-medium"
+                      onClick={() => handlePlanSelection(plan.id)}
+                      disabled={isSubscribing !== null}
+                      isLoading={isSubscribing === plan.id}
+                    >
+                      {currentPlanId &&
+                      plans.findIndex((p) => p.id === plan.id) >
+                        plans.findIndex((p) => p.id === currentPlanId)
+                        ? 'Upgrade Plan'
+                        : isCurrentPlan && !isBillingPeriodMatch
+                        ? 'Upgrade Plan'
+                        : 'Subscribe'}
+                    </Button>
+                  );
+                })()}
               </div>
 
               {/* Features List */}
