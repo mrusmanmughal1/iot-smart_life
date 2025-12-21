@@ -308,6 +308,10 @@ export const router = createBrowserRouter([
             path: 'settings',
             element: <FloorMapSettingsPage />,
           },
+          {
+            path: 'analytics',
+            element: <AnalyticsPage />,
+          },
         ],
       },
 

@@ -290,7 +290,7 @@ export default function MultiFloorBuildingViewPage() {
             <CardTitle>{currentFloor.name} Plan</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-2  gap-4">
               {currentRooms.map((room) => (
                 <Card
                   key={room.id}
@@ -314,6 +314,7 @@ export default function MultiFloorBuildingViewPage() {
             </div>
 
             {/* Action Buttons */}
+            
             <div className="flex gap-3 mt-6">
               <Button variant="outline" onClick={() => navigate('/floor-plans')}>
                 Back

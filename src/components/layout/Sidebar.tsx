@@ -1,5 +1,5 @@
 // Sidebar.tsx - INTEGRATED WITH ROUTES
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/util';
@@ -41,7 +41,7 @@ interface NavItem {
   children?: NavItem[];
 }
 
-const getNavItems = (t: (key: string) => string): NavItem[] => [
+const getNavItems = (): NavItem[] => [
   {
     titleKey: 'nav.overview',
     href: '/dashboard',
@@ -91,7 +91,6 @@ const getNavItems = (t: (key: string) => string): NavItem[] => [
   },
   {
     titleKey: 'nav.floorPlans',
-    href: '/floor-plans',
     icon: <FlowerIcon className="h-5 w-5" />,
     children: [
       {
@@ -99,11 +98,7 @@ const getNavItems = (t: (key: string) => string): NavItem[] => [
         href: '/floor-plans',
         icon: <Box className="h-4 w-4" />,
       },
-      {
-        titleKey: 'nav.analytics',
-        href: '/floor-plans/analytics',
-        icon: <BarChart3 className="h-4 w-4" />,
-      },
+
       {
         titleKey: 'nav.multiFloorBuildingView',
         href: '/floor-plans/multifloor',
@@ -125,6 +120,13 @@ const getNavItems = (t: (key: string) => string): NavItem[] => [
     titleKey: 'nav.analytics',
     href: '/analytics',
     icon: <BarChart3 className="h-5 w-5" />,
+    children: [
+      {
+        titleKey: 'nav.deviceAnalytics',
+        href: '/floor-plans/analytics',
+        icon: <BarChart3 className="h-4 w-4" />,
+      },
+    ],
   },
   {
     titleKey: 'nav.usersAndRoles',
@@ -219,10 +221,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const { t } = useTranslation();
   const { direction } = useLanguageStore();
   const location = useLocation();
-  const navItems = getNavItems(t);
-  const [expandedItems, setExpandedItems] = useState<string[] | any>([
-    'nav.objects',
-  ]);
+  const navItems = getNavItems();
   const isRTL = direction === 'rtl';
 
   const isActive = (href: string) => location.pathname === href;
@@ -234,10 +233,33 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     );
   };
 
+  // Initialize expanded items based on active children
+  const getActiveParents = () => {
+    return navItems
+      .filter((item) => {
+        if (!item.children) return false;
+        return item.children.some(
+          (child) => child.href && location.pathname === child.href
+        );
+      })
+      .map((item) => item.titleKey);
+  };
+
+  const [expandedItems, setExpandedItems] = useState<string[]>(() =>
+    getActiveParents()
+  );
+
+  // Update expanded items when location changes
+  useEffect(() => {
+    const activeParents = getActiveParents();
+    setExpandedItems(activeParents);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
   const toggleExpand = (titleKey: string) => {
-    setExpandedItems((prev: any) =>
+    setExpandedItems((prev: string[]) =>
       prev.includes(titleKey)
-        ? prev.filter((item: any) => item !== titleKey)
+        ? prev.filter((item: string) => item !== titleKey)
         : [...prev, titleKey]
     );
   };

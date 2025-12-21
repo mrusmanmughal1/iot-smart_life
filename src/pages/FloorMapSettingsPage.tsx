@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -53,7 +53,6 @@ export default function FloorMapSettingsPage() {
   const onSubmit = async (data: FloorMapSettingsForm) => {
     try {
       // TODO: Implement API call to save settings
-      console.log('Saving settings:', data);
       toast.success('Settings applied successfully');
     } catch (error) {
       toast.error('Failed to apply settings');
@@ -212,87 +211,6 @@ export default function FloorMapSettingsPage() {
                       min: 0.1,
                     })}
                     className="w-32"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Default Colors */}
-            <div className="space-y-6 border-t border-gray-200 pt-6">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Default Colors
-              </h3>
-
-              <div className="space-y-4">
-                {/* Gateways */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-6 h-6 rounded border-2 border-gray-300"
-                      style={{ backgroundColor: watch('gatewayColor') }}
-                    />
-                    <Label className="text-sm font-medium text-gray-700">
-                      Gateways
-                    </Label>
-                  </div>
-                  <Input
-                    type="color"
-                    {...register('gatewayColor')}
-                    className="w-16 h-8 cursor-pointer"
-                  />
-                </div>
-
-                {/* Sensors */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-6 h-6 rounded border-2 border-gray-300"
-                      style={{ backgroundColor: watch('sensorColor') }}
-                    />
-                    <Label className="text-sm font-medium text-gray-700">
-                      Sensors
-                    </Label>
-                  </div>
-                  <Input
-                    type="color"
-                    {...register('sensorColor')}
-                    className="w-16 h-8 cursor-pointer"
-                  />
-                </div>
-
-                {/* Zones */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-6 h-6 rounded border-2 border-gray-300"
-                      style={{ backgroundColor: watch('zoneColor') }}
-                    />
-                    <Label className="text-sm font-medium text-gray-700">
-                      Zones
-                    </Label>
-                  </div>
-                  <Input
-                    type="color"
-                    {...register('zoneColor')}
-                    className="w-16 h-8 cursor-pointer"
-                  />
-                </div>
-
-                {/* Connections */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-6 h-6 rounded border-2 border-gray-300"
-                      style={{ backgroundColor: watch('connectionColor') }}
-                    />
-                    <Label className="text-sm font-medium text-gray-700">
-                      Connections
-                    </Label>
-                  </div>
-                  <Input
-                    type="color"
-                    {...register('connectionColor')}
-                    className="w-16 h-8 cursor-pointer"
                   />
                 </div>
               </div>
