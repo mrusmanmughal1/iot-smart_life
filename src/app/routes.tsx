@@ -410,7 +410,7 @@ export const router = createBrowserRouter([
         element: <WidgetEditorPage />,
       },
       {
-        path: '/payment-success',
+        path: '/payment-status',
         element: <PaymentSuccess />,
       },
       {

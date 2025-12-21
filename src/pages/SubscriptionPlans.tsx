@@ -265,9 +265,7 @@ export default function SubscriptionPlans() {
       toast.error('This is your current plan');
       return;
     }
-
     setIsSubscribing(planId);
-
     try {
       const plan = mapPlanIdToSubscriptionPlan(planId);
       const billing =
