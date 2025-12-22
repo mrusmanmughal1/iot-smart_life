@@ -4,7 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useDashboards } from './index';
 import { dashboardsApi } from '@/services/api';
-import type { Dashboard, DashboardQuery, PaginatedResponse } from '@/services/api/dashboards.api';
+import type {
+  Dashboard,
+  DashboardQuery,
+  PaginatedResponse,
+} from '@/services/api/dashboards.api';
 import type { DashboardTableItem } from '@/components/common/DashboardTable';
 
 // API response wrapper structure: { data: PaginatedResponse<T> }
@@ -62,21 +66,26 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
   // API response structure: { data: { data: [...], meta: {...} } }
   const dashboards: DashboardTableItem[] = useMemo(() => {
     // Type assertion for nested response structure
-    const responseData = dashboardsResponse?.data as ApiResponseWrapper<Dashboard> | undefined;
+    const responseData = dashboardsResponse?.data as
+      | ApiResponseWrapper<Dashboard>
+      | undefined;
     if (!responseData?.data?.data || !Array.isArray(responseData.data.data)) {
       return [];
     }
 
     return responseData.data.data.map((dashboard: Dashboard) => {
       // Determine tag and color based on additionalInfo or default
-      const tag = dashboard.additionalInfo?.tag ;
+      const tag = dashboard.additionalInfo?.tag;
       const tagColorMap: Record<string, string> = {
         City: 'bg-blue-100 text-blue-700',
         Energy: 'bg-green-100 text-green-700',
         Transport: 'bg-yellow-100 text-yellow-700',
         General: 'bg-gray-100 text-gray-700',
       };
-      const tagColor = dashboard.additionalInfo?.tagColor || tagColorMap[tag] || tagColorMap.General;
+      const tagColor =
+        dashboard.additionalInfo?.tagColor ||
+        tagColorMap[tag] ||
+        tagColorMap.General;
 
       // Format created time
       const createdTime = dashboard.createdAt
@@ -92,7 +101,8 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
 
       // Determine status - use public field or additionalInfo.status
       const status: 'active' | 'deactivate' =
-        dashboard.public !== false && dashboard.additionalInfo?.status !== 'deactivate'
+        dashboard.public !== false &&
+        dashboard.additionalInfo?.status !== 'deactivate'
           ? 'active'
           : 'deactivate';
 
@@ -102,7 +112,7 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
 
       return {
         id: dashboard.id,
-        title: dashboard.title ||dashboard.name,
+        title: dashboard.title || dashboard.name,
         tag,
         tagColor,
         createdTime,
@@ -133,18 +143,25 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
 
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['dashboards'] });
-      toast.success(`Dashboard ${newStatus === 'active' ? 'activated' : 'deactivated'} successfully`);
+      toast.success(
+        `Dashboard ${
+          newStatus === 'active' ? 'activated' : 'deactivated'
+        } successfully`
+      );
     } catch (error: unknown) {
       console.error('Failed to toggle dashboard status:', error);
       const errorMessage =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Failed to update dashboard status';
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || 'Failed to update dashboard status';
       toast.error(errorMessage);
     }
   };
 
   // Handle actions (share, view, delete, download)
-  const handleAction = async (action: 'share' | 'view' | 'delete' | 'download', id: string) => {
+  const handleAction = async (
+    action: 'share' | 'view' | 'delete' | 'download',
+    id: string
+  ) => {
     try {
       switch (action) {
         case 'view':
@@ -152,7 +169,9 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
           break;
 
         case 'delete':
-          if (window.confirm('Are you sure you want to delete this dashboard?')) {
+          if (
+            window.confirm('Are you sure you want to delete this dashboard?')
+          ) {
             await dashboardsApi.delete(id);
             queryClient.invalidateQueries({ queryKey: ['dashboards'] });
             toast.success('Dashboard deleted successfully');
@@ -162,9 +181,12 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
         case 'download': {
           const exportData = await dashboardsApi.export(id);
           // Create a blob and download
-          const blob = new Blob([JSON.stringify(exportData.data.data, null, 2)], {
-            type: 'application/json',
-          });
+          const blob = new Blob(
+            [JSON.stringify(exportData.data.data, null, 2)],
+            {
+              type: 'application/json',
+            }
+          );
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
@@ -191,16 +213,17 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
     } catch (error: unknown) {
       console.error(`Failed to ${action} dashboard:`, error);
       const errorMessage =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        `Failed to ${action} dashboard`;
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || `Failed to ${action} dashboard`;
       toast.error(errorMessage);
     }
   };
 
   // Handle refresh
   const handleRefresh = () => {
-    refetch();
-    toast.success('Dashboards refreshed');
+    refetch().then(() => {
+      toast.success('Dashboards refreshed', { id: 'dashboards-refreshed' });
+    });
   };
 
   // Handle search
@@ -232,7 +255,7 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
         try {
           const text = await file.text();
           const dashboardData = JSON.parse(text) as Record<string, unknown>;
-          
+
           // Import the dashboard
           await dashboardsApi.import(dashboardData);
           queryClient.invalidateQueries({ queryKey: ['dashboards'] });
@@ -240,8 +263,8 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
         } catch (error: unknown) {
           console.error('Failed to import dashboard:', error);
           const errorMessage =
-            (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-            'Failed to import dashboard';
+            (error as { response?: { data?: { message?: string } } })?.response
+              ?.data?.message || 'Failed to import dashboard';
           toast.error(errorMessage);
         }
       };
@@ -284,4 +307,3 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
     refetch,
   };
 };
-

@@ -68,9 +68,10 @@ const getStatusColor = (status: string): string => {
 
 export default function AlertConfigurationPage() {
   const navigate = useNavigate();
-  const { register, handleSubmit, control, watch } = useForm<AlertConfigurationForm>({
-    defaultValues,
-  });
+  const { register, handleSubmit, control, watch } =
+    useForm<AlertConfigurationForm>({
+      defaultValues,
+    });
 
   const onSubmit = async (data: AlertConfigurationForm) => {
     try {
@@ -111,7 +112,9 @@ export default function AlertConfigurationPage() {
                 <Label htmlFor="alertName">Alert Name</Label>
                 <Input
                   id="alertName"
-                  {...register('alertName', { required: 'Alert name is required' })}
+                  {...register('alertName', {
+                    required: 'Alert name is required',
+                  })}
                 />
               </div>
               <div className="space-y-2">
@@ -119,7 +122,9 @@ export default function AlertConfigurationPage() {
                 <Textarea
                   id="description"
                   rows={4}
-                  {...register('description', { required: 'Description is required' })}
+                  {...register('description', {
+                    required: 'Description is required',
+                  })}
                 />
               </div>
             </CardContent>
@@ -149,7 +154,9 @@ export default function AlertConfigurationPage() {
                 ))}
               </div>
               <div className="pt-4 border-t border-gray-200">
-                <h4 className="text-sm font-semibold text-gray-700 mb-2">Legend</h4>
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                  Legend
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
@@ -281,10 +288,14 @@ export default function AlertConfigurationPage() {
                         <SelectValue placeholder="Select condition" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="greater-than">Greater than</SelectItem>
+                        <SelectItem value="greater-than">
+                          Greater than
+                        </SelectItem>
                         <SelectItem value="less-than">Less than</SelectItem>
                         <SelectItem value="equal-to">Equal to</SelectItem>
-                        <SelectItem value="not-equal-to">Not equal to</SelectItem>
+                        <SelectItem value="not-equal-to">
+                          Not equal to
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   )}
@@ -306,7 +317,9 @@ export default function AlertConfigurationPage() {
                 <Input
                   id="duration"
                   placeholder="e.g., 5 minutes"
-                  {...register('duration', { required: 'Duration is required' })}
+                  {...register('duration', {
+                    required: 'Duration is required',
+                  })}
                 />
               </div>
             </div>
@@ -364,7 +377,11 @@ export default function AlertConfigurationPage() {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-3">
-          <Button type="submit" variant="outline" className="bg-gray-100 text-gray-700">
+          <Button
+            type="submit"
+            variant="outline"
+            className="bg-gray-100 text-gray-700"
+          >
             Save
           </Button>
           <Button
@@ -379,4 +396,3 @@ export default function AlertConfigurationPage() {
     </div>
   );
 }
-
