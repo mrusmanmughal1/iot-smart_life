@@ -45,9 +45,10 @@ interface SelectTriggerProps {
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
+  id?: string;
 }
 
-export function SelectTrigger({ children, className = '', disabled = false }: SelectTriggerProps) {
+export function SelectTrigger({ children, className = '', disabled = false, id }: SelectTriggerProps) {
   const context = useContext(SelectContext);
   
   if (!context) {
@@ -57,6 +58,7 @@ export function SelectTrigger({ children, className = '', disabled = false }: Se
   return (
     <button
       type="button"
+      id={id}
       disabled={disabled}
       onClick={() => context.setOpen(!context.open)}
       className={`flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-100 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
