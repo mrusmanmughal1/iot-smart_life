@@ -208,7 +208,6 @@ export default function MultiFloorBuildingViewPage() {
   const [selectedFloor, setSelectedFloor] = useState<string>('ground');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [floorToDelete, setFloorToDelete] = useState<string | null>(null);
-
   const currentFloor = mockFloors.find((f) => f.id === selectedFloor) || mockFloors[0];
   const currentRooms = mockRooms[selectedFloor] || [];
   const currentDeviceSummary = mockDeviceSummaries[selectedFloor] || [];

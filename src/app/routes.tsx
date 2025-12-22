@@ -19,8 +19,11 @@ import DeviceDetailsPage from '@/pages/DeviceDetailsPage.tsx';
 import AssetsPage from '@/pages/AssetsPage.tsx';
 import AlarmsPage from '@/pages/AlarmsPage.tsx';
 import UsersPage from '@/pages/UsersPage.tsx';
+import UserDetailsPermissionsPage from '@/pages/UserDetailsPermissionsPage.tsx';
 import NotificationsPage from '@/pages/NotificationsPage.tsx';
 import AnalyticsPage from '@/pages/AnalyticsPage.tsx';
+import AlertConfigurationPage from '@/pages/AlertConfigurationPage.tsx';
+import BuildingHierarchyChartPage from '@/pages/BuildingHierarchyChartPage.tsx';
 import SettingsPage from '@/pages/SettingsPage.tsx';
 import DashboardsPage from '@/pages/DashboardsPage.tsx';
 import CreateDashboardPage from '@/pages/CreateDashboardPage.tsx';
@@ -50,6 +53,7 @@ import FloorPlans from '@/pages/FloorPlanPage.tsx';
 import FloorMapCreatePage from '@/pages/FloorMapCreatePage.tsx';
 import MultiFloorBuildingViewPage from '@/pages/MultiFloorBuildingViewPage.tsx';
 import FloorMapSettingsPage from '@/pages/FloorMapSettingsPage.tsx';
+import FloorMapHistoryPage from '@/pages/FloorMapHistoryPage.tsx';
 import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
 import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 import AssetDetailsPage from '@/pages/AssetDetailsPage.tsx';
@@ -58,7 +62,7 @@ import DeviceProfileDetails from '@/pages/DeviceProfileDetails.tsx';
 import EmailVerification from '@/pages/EmailVerification.tsx';
 import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
 export const router = createBrowserRouter([
-
+  
   {
     path: '/',
     element: <Navigate to="/login" replace />,
@@ -145,7 +149,21 @@ export const router = createBrowserRouter([
       },
       {
         path: '/users',
-        element: <UsersPage />,
+        element: (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <UsersPage />,
+          },
+          {
+            path: ':id/permissions',
+            element: <UserDetailsPermissionsPage />,
+          },
+        ],
       },
       {
         path: '/notifications',
@@ -311,6 +329,18 @@ export const router = createBrowserRouter([
           {
             path: 'analytics',
             element: <AnalyticsPage />,
+          },
+          // {
+          //   path: 'hierarchy',
+          //   element: <BuildingHierarchyChartPage />,
+          // },
+          {
+            path: 'alert-configuration',
+            element: <AlertConfigurationPage />,
+          },
+          {
+            path: 'history',
+            element: <FloorMapHistoryPage />,
           },
         ],
       },

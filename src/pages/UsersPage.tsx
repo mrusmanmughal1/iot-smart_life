@@ -8,7 +8,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useUsers } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import AppLayout from '@/components/layout/AppLayout';
 
 export default function UsersPage() {
   const { t } = useTranslation();
@@ -17,7 +16,6 @@ export default function UsersPage() {
   const users = usersData?.data?.data || [];
 
   return (
-    <AppLayout>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -106,6 +104,5 @@ export default function UsersPage() {
         </CardContent>
       </Card>
     </div>
-    </AppLayout>
   );
 }

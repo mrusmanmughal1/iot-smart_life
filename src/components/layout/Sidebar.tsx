@@ -32,6 +32,7 @@ import {
   ImageIcon,
   SuperscriptIcon,
   FolderKanbanIcon,
+  History,
 } from 'lucide-react';
 
 interface NavItem {
@@ -98,11 +99,31 @@ const getNavItems = (): NavItem[] => [
         href: '/floor-plans',
         icon: <Box className="h-4 w-4" />,
       },
-
       {
-        titleKey: 'nav.multiFloorBuildingView',
-        href: '/floor-plans/multifloor',
-        icon: <Box className="h-4 w-4" />,
+        titleKey: 'nav.analytics',
+        icon: <BarChart3 className="h-4 w-4" />,
+        children: [
+          {
+            titleKey: 'nav.deviceAnalytics',
+            href: '/floor-plans/analytics',
+            icon: <BarChart3 className="h-4 w-4" />,
+          },
+          {
+            titleKey: 'nav.hierarchyChart',
+            href: '/floor-plans/hierarchy',
+            icon: <Layers className="h-4 w-4" />,
+          },
+          {
+            titleKey: 'nav.alertConfiguration',
+            href: '/floor-plans/alert-configuration',
+            icon: <Bell className="h-4 w-4" />,
+          },
+          {
+            titleKey: 'nav.history',
+            href: '/floor-plans/history',
+            icon: <History className="h-4 w-4" />,
+          },
+        ],
       },
       {
         titleKey: 'nav.settings',
@@ -120,13 +141,7 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.analytics',
     href: '/analytics',
     icon: <BarChart3 className="h-5 w-5" />,
-    children: [
-      {
-        titleKey: 'nav.deviceAnalytics',
-        href: '/floor-plans/analytics',
-        icon: <BarChart3 className="h-4 w-4" />,
-      },
-    ],
+    
   },
   {
     titleKey: 'nav.usersAndRoles',
@@ -226,23 +241,51 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
   const isActive = (href: string) => location.pathname === href;
 
-  const isParentActive = (children?: NavItem[]) => {
+  const isParentActive = (children?: NavItem[]): boolean => {
     if (!children) return false;
-    return children.some(
-      (child) => child.href && location.pathname === child.href
-    );
+    return children.some((child) => {
+      if (child.href && location.pathname === child.href) return true;
+      if (child.children) return isParentActive(child.children);
+      return false;
+    });
+  };
+
+  // Recursive function to find all active parent keys
+  const findActiveParents = (items: NavItem[], parentKey?: string): string[] => {
+    const activeKeys: string[] = [];
+    
+    items.forEach((item) => {
+      const currentKey = parentKey ? `${parentKey}.${item.titleKey}` : item.titleKey;
+      
+      if (item.children) {
+        const hasActiveChild = item.children.some((child) => {
+          if (child.href && location.pathname === child.href) return true;
+          if (child.children) {
+            const nestedActive = findActiveParents([child], currentKey);
+            return nestedActive.length > 0;
+          }
+          return false;
+        });
+        
+        if (hasActiveChild) {
+          activeKeys.push(item.titleKey);
+          if (parentKey) {
+            activeKeys.push(parentKey);
+          }
+        }
+        
+        // Recursively check nested children
+        const nestedKeys = findActiveParents(item.children, item.titleKey);
+        activeKeys.push(...nestedKeys);
+      }
+    });
+    
+    return [...new Set(activeKeys)]; // Remove duplicates
   };
 
   // Initialize expanded items based on active children
   const getActiveParents = () => {
-    return navItems
-      .filter((item) => {
-        if (!item.children) return false;
-        return item.children.some(
-          (child) => child.href && location.pathname === child.href
-        );
-      })
-      .map((item) => item.titleKey);
+    return findActiveParents(navItems);
   };
 
   const [expandedItems, setExpandedItems] = useState<string[]>(() =>
@@ -339,20 +382,65 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     {expandedItems.includes(item.titleKey) && (
                       <div className="mt-1 ml-4 space-y-1">
                         {item.children.map((child) => (
-                          <Link
-                            key={child.titleKey}
-                            to={child.href!}
-                            onClick={onClose}
-                            className={cn(
-                              'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all',
-                              isActive(child.href!)
-                                ? 'bg-white/20 text-white font-medium'
-                                : 'text-white/80 hover:bg-white/10'
+                          <div key={child.titleKey}>
+                            {child.children ? (
+                              <>
+                                <button
+                                  onClick={() => toggleExpand(child.titleKey)}
+                                  className={cn(
+                                    'w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all',
+                                    isParentActive(child.children)
+                                      ? 'bg-white/20 text-white'
+                                      : 'text-white/80 hover:bg-white/10'
+                                  )}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    {child.icon}
+                                    <span>{t(child.titleKey)}</span>
+                                  </div>
+                                  {expandedItems.includes(child.titleKey) ? (
+                                    <ChevronDown className="h-3 w-3" />
+                                  ) : (
+                                    <ChevronRight className="h-3 w-3" />
+                                  )}
+                                </button>
+                                {expandedItems.includes(child.titleKey) && (
+                                  <div className="mt-1 ml-4 space-y-1">
+                                    {child.children.map((subChild) => (
+                                      <Link
+                                        key={subChild.titleKey}
+                                        to={subChild.href!}
+                                        onClick={onClose}
+                                        className={cn(
+                                          'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs transition-all',
+                                          isActive(subChild.href!)
+                                            ? 'bg-white/20 text-white font-medium'
+                                            : 'text-white/70 hover:bg-white/10'
+                                        )}
+                                      >
+                                        {subChild.icon}
+                                        <span>{t(subChild.titleKey)}</span>
+                                      </Link>
+                                    ))}
+                                  </div>
+                                )}
+                              </>
+                            ) : (
+                              <Link
+                                to={child.href!}
+                                onClick={onClose}
+                                className={cn(
+                                  'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all',
+                                  isActive(child.href!)
+                                    ? 'bg-white/20 text-white font-medium'
+                                    : 'text-white/80 hover:bg-white/10'
+                                )}
+                              >
+                                {child.icon}
+                                <span>{t(child.titleKey)}</span>
+                              </Link>
                             )}
-                          >
-                            {child.icon}
-                            <span>{t(child.titleKey)}</span>
-                          </Link>
+                          </div>
                         ))}
                       </div>
                     )}
