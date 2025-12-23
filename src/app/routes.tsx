@@ -22,6 +22,7 @@ import UsersPage from '@/pages/UsersPage.tsx';
 import UserDetailsPermissionsPage from '@/pages/UserDetailsPermissionsPage.tsx';
 import NotificationsPage from '@/pages/NotificationsPage.tsx';
 import AnalyticsPage from '@/pages/AnalyticsPage.tsx';
+import ReportTemplatesPage from '@/pages/ReportTemplatesPage.tsx';
 import AlertConfigurationPage from '@/pages/AlertConfigurationPage.tsx';
 import BuildingHierarchyChartPage from '@/pages/BuildingHierarchyChartPage.tsx';
 import SettingsPage from '@/pages/SettingsPage.tsx';
@@ -173,6 +174,7 @@ export const router = createBrowserRouter([
         path: '/analytics',
         element: <AnalyticsPage />,
       },
+     
       {
         path: '/settings',
         element: <SettingsPage />,
@@ -341,6 +343,10 @@ export const router = createBrowserRouter([
           {
             path: 'history',
             element: <FloorMapHistoryPage />,
+          },
+          {
+            path: 'report-templates',
+            element: <ReportTemplatesPage />,
           },
         ],
       },

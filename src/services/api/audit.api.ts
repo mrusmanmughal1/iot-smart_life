@@ -78,7 +78,7 @@ export interface ApiResponse<T> {
 export const auditApi = {
   // Get all audit logs
   getAll: (params?: AuditQuery) =>
-    apiClient.get<PaginatedResponse<AuditLog>>('/audit/logs', { params }),
+    apiClient.get<PaginatedResponse<AuditLog>>('/audit', { params }),
 
   // Get audit log by ID
   getById: (id: string) =>

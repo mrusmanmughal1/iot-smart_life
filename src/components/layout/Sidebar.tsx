@@ -130,6 +130,11 @@ const getNavItems = (): NavItem[] => [
         href: '/floor-plans/settings',
         icon: <Settings className="h-4 w-4" />,
       },
+      {
+        titleKey: 'nav.reportTemplates',
+        href: '/floor-plans/report-templates',
+        icon: <FileText className="h-4 w-4" />,
+      },
     ],
   },
   {

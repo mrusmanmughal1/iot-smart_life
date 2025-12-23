@@ -121,6 +121,10 @@ export default function AnalyticsPage() {
         title="Device Analytics and Monitoring - Building AGW-01"
         actions={[
           {
+            label: 'Report Templates',
+            onClick: () => navigate('/report-templates'),
+          },
+          {
             label: 'Back',
             onClick: () => navigate('/floor-plans'),
           },
