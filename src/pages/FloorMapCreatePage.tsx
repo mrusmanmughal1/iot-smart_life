@@ -1,16 +1,20 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, useWatch } from 'react-hook-form';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { FilterFormValues, AssetOption } from '@/features/floorPlan/types';
+import type { Asset } from '@/services/api/assets.api';
 import { AssetSelectionStep } from '@/features/floorPlan/components/AssetSelectionStep';
 import { DwgImportStep } from '@/features/floorPlan/components/DwgImportStep';
 import { ZoneSetupStep } from '@/features/floorPlan/components/ZoneSetupStep';
 import { DeviceLinkStep } from '@/features/floorPlan/components/DeviceLinkStep';
 import { ReviewStep } from '@/features/floorPlan/components/ReviewStep';
-
-type StepId = 1 | 2 | 3 | 4 | 5;
+import { assetsApi } from '@/services/api';
+import { useQuery } from '@tanstack/react-query';
+import { LoadingOverlay } from '@/components/common/LoadingSpinner';
+import { useFloorMapStore } from '@/features/floorPlan/store';
+import type { StepId } from '@/features/floorPlan/store';
 
 const steps: { id: StepId; label: string }[] = [
   { id: 1, label: 'Asset' },
@@ -20,74 +24,43 @@ const steps: { id: StepId; label: string }[] = [
   { id: 5, label: 'Review' },
 ];
 
-const mockAssets: AssetOption[] = [
-  {
-    id: 'asset-1',
-    name: 'Building A - Main Office',
-    type: 'Commercial Building',
-    location: 'Downtown Campus',
-    status: 'Active',
-  },
-  {
-    id: 'asset-2',
-    name: 'Warehouse B',
-    type: 'Commercial Building',
-    location: 'Downtown Campus',
-    status: 'Active',
-  },
-  {
-    id: 'asset-3',
-    name: 'Retail Store C',
-    type: 'Retail Store Location',
-    location: 'Shopping District',
-    status: 'Active',
-  },
-  {
-    id: 'asset-4',
-    name: 'Medical Center D',
-    type: 'Healthcare Facility',
-    location: 'Medical District',
-    status: 'Active',
-  },
-  {
-    id: 'asset-5',
-    name: 'School Building E',
-    type: 'Educational Facility',
-    location: 'Education Campus',
-    status: 'Active',
-  },
-  {
-    id: 'asset-6',
-    name: 'Building A - Main Office',
-    type: 'Commercial Building',
-    location: 'Downtown Campus',
-    status: 'Active',
-    notes: [
-      'Ready for floor map creation',
-      '45 devices available for linking',
-      'No existing floor map',
-    ],
-    isReady: true,
-    devicesAvailable: 45,
-    hasExistingFloorMap: false,
-  },
-];
-
 export default function FloorMapCreatePage() {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<StepId>(1);
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(
-    'asset-6'
-  );
 
+  // Zustand store
+  const {
+    currentStep,
+    setCurrentStep,
+    nextStep,
+    previousStep,
+    selectedAssetId,
+    setSelectedAssetId,
+    filteredAssets,
+    setFilteredAssets,
+    formValues,
+    setFormValues,
+    reset,
+  } = useFloorMapStore();
+
+  // Fetch assets
+  const {
+    data: assetsResponse,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ['assets'],
+    queryFn: () => assetsApi.getAll(),
+  });
+
+  // Handle nested API response structure: response.data.data (PaginatedResponse.data)
+  const assetsdataa = (
+    assetsResponse?.data as unknown as { data?: { data?: Asset[] } } | undefined
+  )?.data?.data;
+
+  // Initialize form with store values
   const form = useForm<FilterFormValues>({
-    defaultValues: {
-      search: '',
-      type: 'all',
-      status: 'all',
-      drawingScale: '1:100',
-      drawingUnit: 'meters',
-    },
+    defaultValues: formValues,
   });
 
   const { register, control, setValue } = form;
@@ -99,33 +72,66 @@ export default function FloorMapCreatePage() {
     control,
   });
 
-  const filteredAssets = useMemo(() => {
-    return mockAssets.filter((asset) => {
-      const matchesSearch =
-        !search ||
-        asset.name.toLowerCase().includes(search.toLowerCase()) ||
-        asset.location.toLowerCase().includes(search.toLowerCase());
-
-      const matchesType =
-        type === 'all' || asset.type.toLowerCase().includes(type);
-
-      const matchesStatus =
-        status === 'all' || asset.status.toLowerCase() === status.toLowerCase();
-
-      return matchesSearch && matchesType && matchesStatus;
+  // Sync form values with store
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      setFormValues(values as FilterFormValues);
     });
-  }, [search, type, status]);
+    return () => subscription.unsubscribe();
+  }, [form, setFormValues]);
+
+  // Filter and transform assets
+  const computedFilteredAssets = useMemo((): AssetOption[] => {
+    if (!assetsdataa || !Array.isArray(assetsdataa)) return [];
+
+    // Transform Asset[] to AssetOption[] and filter
+    const transformedAssets: AssetOption[] = assetsdataa
+      .map((asset: Asset) => ({
+        id: asset.id,
+        name: asset.name || 'Unnamed Asset',
+        type: asset.type || 'Unknown',
+        location: asset.location?.address || 'No location',
+        status: 'active', // Default status since Asset doesn't have status field
+        active: 'active', // Default to active (string as per AssetOption interface)
+      }))
+      .filter((assetOption: AssetOption) => {
+        const assetName = assetOption.name?.toLowerCase() || '';
+        const assetLocation = assetOption.location?.toLowerCase() || '';
+        const searchLower = search?.toLowerCase() || '';
+
+        const matchesSearch =
+          !search ||
+          assetName.includes(searchLower) ||
+          assetLocation.includes(searchLower);
+
+        const assetType = assetOption.type?.toLowerCase() || '';
+        const matchesType =
+          type === 'all' || assetType.includes(type.toLowerCase());
+
+        const matchesStatus =
+          status === 'all' ||
+          assetOption.status.toLowerCase() === status.toLowerCase();
+
+        return matchesSearch && matchesType && matchesStatus;
+      });
+
+    return transformedAssets;
+  }, [assetsdataa, search, type, status]);
+
+  // Update store with filtered assets
+  useEffect(() => {
+    setFilteredAssets(computedFilteredAssets);
+  }, [computedFilteredAssets, setFilteredAssets]);
 
   const handleNext = () => {
-    if (currentStep < 5) {
-      setCurrentStep((prev) => (prev + 1) as StepId);
-    }
+    nextStep();
   };
 
   const handleSave = () => {
     // TODO: Implement save functionality
-    console.log('Saving floor map...');
-    // After saving, navigate back to floor plans list
+    console.log('Saving floor map...', useFloorMapStore.getState());
+    // After saving, reset store and navigate back
+    reset();
     navigate('/floor-plans');
   };
 
@@ -133,7 +139,7 @@ export default function FloorMapCreatePage() {
     if (currentStep === 1) {
       navigate('/floor-plans');
     } else {
-      setCurrentStep((prev) => (prev - 1) as StepId);
+      previousStep();
     }
   };
 
@@ -144,6 +150,18 @@ export default function FloorMapCreatePage() {
     steps.length <= 1
       ? 10 // or 90 if you consider a single step completed
       : 10 + (validIndex / (steps.length - 1)) * 80;
+
+  if (isLoading) {
+    return (
+      <div>
+        <LoadingOverlay />
+      </div>
+    );
+  }
+  if (isError) {
+    return <div>Error: {error?.message}</div>;
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -201,7 +219,10 @@ export default function FloorMapCreatePage() {
               filteredAssets={filteredAssets}
               selectedAssetId={selectedAssetId}
               onSelectAsset={setSelectedAssetId}
-              onCancel={() => navigate('/floor-plans')}
+              onCancel={() => {
+                reset();
+                navigate('/floor-plans');
+              }}
               onNext={handleNext}
             />
           )}

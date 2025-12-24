@@ -64,7 +64,6 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { notifications } = useNotificationStore();
   const { mutate: logout } = useLogout();
 
-
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -111,6 +110,12 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         | undefined;
       return apiResponse?.data;
     },
+    staleTime: Infinity, // Data never becomes stale - only refetch when explicitly invalidated
+    gcTime: 1000 * 60 * 60 * 24, // 24 hours - keep in cache for 24 hours
+    refetchOnMount: false, // Don't refetch on component mount
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnReconnect: false, // Don't refetch on network reconnect
+    refetchInterval: false, // Don't refetch on interval
   });
 
   // Format plan name for display
@@ -136,7 +141,6 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
       return 'N/A';
     }
   };
-
 
   return (
     <header

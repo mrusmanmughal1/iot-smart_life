@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { AssetOption, FilterFormValues } from '@/features/floorPlan/types';
+import { Badge } from '@/components/ui/badge';
 
 interface AssetSelectionStepProps {
   register: UseFormRegister<FilterFormValues>;
@@ -109,7 +110,7 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({
 
       {/* Asset cards */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {filteredAssets.map((asset) => {
+        {filteredAssets?.map((asset) => {
           const isSelected = asset.id === selectedAssetId;
 
           return (
@@ -117,23 +118,24 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({
               key={asset.id}
               type="button"
               onClick={() => onSelectAsset(asset.id)}
-              className={`relative flex h-full flex-col overflow-hidden border-gray-300 justify-between rounded-e-xl border bg-white p-6 text-left transition-shadow ${
+              className={`relative flex h-full flex-col overflow-hidden border-gray-300 justify-between rounded-e-xl border bg-white p-6 ps-10 text-left transition-shadow ${
                 isSelected
                   ? '  shadow-md border-primary border-2'
                   : 'border-border  hover:shadow-sm'
               }`}
             >
-              {isSelected && (
-                <div className="absolute left-0 top-0 h-full w-5 bg-primary" />
-              )}
+              <div className="absolute left-0 top-0 h-full w-6 bg-primary" />
 
               <div className="space-y-1">
                 <p className="text-sm font-semibold">{asset.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  Type: {asset.type} Location: {asset.location}
+                  Type : {asset.type} <br /> Location: {asset.location}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Status: {asset.status}
+                  Status:{' '}
+                  <Badge variant={asset.active === 'active' ? 'success' : 'destructive'}>
+                    {asset.active === 'active' ? 'Active' : 'Inactive'}
+                  </Badge>
                 </p>
               </div>
             </button>

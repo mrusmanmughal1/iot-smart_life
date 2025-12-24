@@ -10,6 +10,7 @@ export interface FilterFormValues {
 }
 
 export interface AssetOption {
+  active: string;
   id: string;
   name: string;
   type: string;
