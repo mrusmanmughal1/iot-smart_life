@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
-import { useLanguageStore } from '@/stores/useLanguageStore';
+import { useRTL } from '@/hooks/useRTL';
 import { cn } from '@/lib/util';
 
 interface AppLayoutProps {
@@ -11,8 +11,7 @@ interface AppLayoutProps {
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { direction } = useLanguageStore();
-  const isRTL = direction === 'rtl';
+  const { isRTL } = useRTL();
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">

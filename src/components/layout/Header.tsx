@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useThemeStore } from '@/stores/useThemeStore';
-import { useLanguageStore } from '@/stores/useLanguageStore';
+import { useRTL } from '@/hooks/useRTL';
 import { useAppStore } from '@/stores/useAppStore';
 import { useNotificationStore } from '@/stores/useNotificationStore';
 import { useLogout } from '@/features/auth/hooks/useLogout';
@@ -59,7 +59,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const notifRef = useRef<HTMLDivElement>(null);
   const themeRef = useRef<HTMLDivElement>(null);
   const { theme, setTheme, effectiveTheme } = useThemeStore();
-  const { direction } = useLanguageStore();
+  const { direction } = useRTL();
   const { user } = useAppStore();
   const { notifications } = useNotificationStore();
   const { mutate: logout } = useLogout();

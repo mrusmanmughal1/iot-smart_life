@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/util';
-import { useLanguageStore } from '@/stores/useLanguageStore';
+import { useRTL } from '@/hooks/useRTL';
 import Image from '@/assets/images/smartlife-text-white.png';
 import {
   LayoutDashboard,
@@ -239,7 +239,7 @@ interface SidebarProps {
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const { t } = useTranslation();
-  const { direction } = useLanguageStore();
+  const { direction } = useRTL();
   const location = useLocation();
   const navItems = getNavItems();
   const isRTL = direction === 'rtl';

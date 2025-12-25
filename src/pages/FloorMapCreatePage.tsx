@@ -64,6 +64,7 @@ export default function FloorMapCreatePage() {
   });
 
   const { register, control, setValue } = form;
+  
   const {
     search,
     type = 'all',

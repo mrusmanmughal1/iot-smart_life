@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Languages } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/util';
-import { useLanguageStore } from '@/stores/useLanguageStore';
 import { languages } from '@/i18n/languages';
-import i18n from '@/i18n/i18n';
+import { getDirection } from '@/i18n/i18n';
 
 interface LanguageSwitcherProps {
   variant?: 'dropdown' | 'button';
@@ -18,7 +18,9 @@ export function LanguageSwitcher({
 }: LanguageSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { language, setLanguage, direction } = useLanguageStore();
+  const { i18n } = useTranslation();
+  const language = i18n.language;
+  const direction = getDirection(language);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -47,11 +49,11 @@ export function LanguageSwitcher({
   }, [isOpen]);
 
   const handleLanguageChange = (langCode: string) => {
-    // Update both i18n and language store for consistency
-    i18n.changeLanguage(langCode).then(() => {
-      setLanguage(langCode as any);
-      setIsOpen(false);
-    });
+    if (langCode === 'en' || langCode === 'ar') {
+      i18n.changeLanguage(langCode).then(() => {
+        setIsOpen(false);
+      });
+    }
   };
 
   const currentLanguage = languages.find((lang) => lang.code === language);
