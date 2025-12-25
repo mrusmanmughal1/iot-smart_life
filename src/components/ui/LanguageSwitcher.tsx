@@ -11,10 +11,10 @@ interface LanguageSwitcherProps {
   className?: string;
 }
 
-export function LanguageSwitcher({ 
-  variant = 'dropdown', 
+export function LanguageSwitcher({
+  variant = 'dropdown',
   showLabel = false,
-  className 
+  className,
 }: LanguageSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,14 +25,18 @@ export function LanguageSwitcher({
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
 
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      return () =>
+        document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [isOpen]);
 
@@ -68,12 +72,17 @@ export function LanguageSwitcher({
             className={cn(
               'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
               'hover:bg-gray-100 dark:hover:bg-gray-800',
-              language === lang.code && 'bg-primary text-primary-foreground hover:bg-primary/90'
+              language === lang.code &&
+                'bg-primary text-primary-foreground hover:bg-primary/90'
             )}
             title={lang.name}
           >
             <span className="text-lg">{lang.flag}</span>
-            {showLabel && <span className="text-sm font-medium">{lang.code.toUpperCase()}</span>}
+            {showLabel && (
+              <span className="text-sm font-medium">
+                {lang.code.toUpperCase()}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -118,7 +127,6 @@ export function LanguageSwitcher({
           role="menu"
           aria-orientation="vertical"
         >
-         
           {languages.map((lang) => (
             <button
               key={lang.code}
@@ -146,4 +154,3 @@ export function LanguageSwitcher({
     </div>
   );
 }
-

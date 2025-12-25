@@ -1,6 +1,4 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { DndProvider, useDrop, useDrag } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Control, Controller, UseFormRegister } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -21,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ZoomIn,
@@ -31,11 +28,9 @@ import {
   Plus,
   Layers,
   Eye,
-  Package,
-  X,
   AlertTriangle,
 } from 'lucide-react';
-import type { FilterFormValues, Zone, Device } from '@/features/floorPlan/types';
+import type { FilterFormValues, Zone } from '@/features/floorPlan/types';
 import { Stage, Layer, Rect, Text, Group, Line, Image as KonvaImage } from 'react-konva';
 import type { Stage as KonvaStage } from 'konva/lib/Stage';
 import { useFloorMapStore } from '@/features/floorPlan/store';
@@ -59,44 +54,6 @@ const getZoneColor = (type: string): string => {
   return colors[type] || '#E5E7EB';
 };
 
-// Mock device library
-const deviceLibrary: Device[] = [
-  { id: 'device-1', name: 'Temperature Sensor', type: 'sensor', status: 'online' },
-  { id: 'device-2', name: 'Motion Detector', type: 'sensor', status: 'online' },
-  { id: 'device-3', name: 'Smart Light', type: 'actuator', status: 'online' },
-  { id: 'device-4', name: 'Door Lock', type: 'actuator', status: 'online' },
-  { id: 'device-5', name: 'Gateway', type: 'gateway', status: 'online' },
-];
-
-// Device Draggable Component
-const DraggableDevice: React.FC<{ device: Device }> = ({ device }) => {
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: 'device',
-    item: { device },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  }));
-
-  return (
-    <div
-      ref={drag as unknown as React.RefObject<HTMLDivElement>}
-      className={`flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-lg cursor-move hover:border-primary hover:shadow-sm transition-all ${
-        isDragging ? 'opacity-50' : ''
-      }`}
-      style={{ cursor: 'grab' }}
-    >
-      <Package className="h-4 w-4 text-primary" />
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium truncate">{device.name}</p>
-        <p className="text-xs text-muted-foreground">{device.type}</p>
-      </div>
-      <Badge variant={device.status === 'online' ? 'default' : 'secondary'} className="text-[10px]">
-        {device.status}
-      </Badge>
-    </div>
-  );
-};
 
 // Floor Plan Canvas with Drop Zone
 const FloorPlanCanvas: React.FC<{
@@ -107,7 +64,6 @@ const FloorPlanCanvas: React.FC<{
   dwgFile?: File;
   onZoneClick: (zoneId: string) => void;
   onStageClick: () => void;
-  onDeviceDrop: (device: Device, x: number, y: number) => void;
   stageRef: React.RefObject<KonvaStage>;
   isDrawing: boolean;
   selectionPoints: Array<{ x: number; y: number }>;
@@ -120,7 +76,6 @@ const FloorPlanCanvas: React.FC<{
   dwgFile,
   onZoneClick,
   onStageClick,
-  onDeviceDrop,
   stageRef,
   isDrawing,
   selectionPoints,
@@ -182,7 +137,7 @@ const FloorPlanCanvas: React.FC<{
               canvas.style.height = scaledHeight + 'px';
               
               // Force a reflow to ensure dimensions are set
-              canvas.offsetHeight;
+              void canvas.offsetHeight;
               
               // Render the DXF to canvas (this will use getBoundingClientRect)
               try {
@@ -256,27 +211,8 @@ const FloorPlanCanvas: React.FC<{
     parseAndRenderDWG();
   }, [dwgFile, dwgImageUrl, onDwgError, scaledWidth, scaledHeight]);
 
-  const [{ isOver }, dropRef] = useDrop(() => ({
-    accept: 'device',
-    drop: (item: { device: Device }) => {
-      if (stageRef.current) {
-        const stage = stageRef.current;
-        const point = stage.getPointerPosition();
-        if (point) {
-          const scale = zoomLevel / 100;
-          const x = point.x / scale;
-          const y = point.y / scale;
-          onDeviceDrop(item.device, x, y);
-        }
-      }
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  }));
-
   return (
-    <div ref={dropRef as unknown as React.RefObject<HTMLDivElement>} className="relative">
+    <div className="relative">
       {/* Hidden canvas for DWG rendering */}
       <canvas
         ref={canvasRef}
@@ -287,7 +223,7 @@ const FloorPlanCanvas: React.FC<{
         width={scaledWidth}
         height={scaledHeight}
         onClick={onStageClick}
-        style={{ cursor: isDrawing ? 'crosshair' : isOver ? 'copy' : 'default' }}
+        style={{ cursor: isDrawing ? 'crosshair' : 'default' }}
       >
         <Layer>
           {/* DWG Background Image or Placeholder */}
@@ -446,19 +382,6 @@ const FloorPlanCanvas: React.FC<{
             </Group>
           )}
 
-          {/* Drop indicator */}
-          {isOver && (
-            <Rect
-              x={0}
-              y={0}
-              width={scaledWidth}
-              height={scaledHeight}
-              fill="rgba(59, 130, 246, 0.1)"
-              stroke="#3B82F6"
-              strokeWidth={2}
-              dash={[10, 5]}
-            />
-          )}
         </Layer>
       </Stage>
     </div>
@@ -482,8 +405,6 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
     setZoomLevel,
     uploadedFiles,
     selectedFloor,
-    assignedDevices,
-    assignDeviceToRoom,
   } = useFloorMapStore();
 
   // Local state
@@ -500,7 +421,6 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
     h: number;
   } | null>(null);
   const [activeFloorTab, setActiveFloorTab] = useState(selectedFloor);
-  const [showDeviceLibrary, setShowDeviceLibrary] = useState(true);
   const [dwgError, setDwgError] = useState(false);
   const stageRef = useRef<KonvaStage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -643,16 +563,6 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
     setNewZoneName('');
   };
 
-  const handleDeviceDrop = (device: Device, x: number, y: number) => {
-    // Find which zone the device was dropped in
-    const targetZone = currentFloorZones.find(
-      (zone) => x >= zone.x && x <= zone.x + zone.w && y >= zone.y && y <= zone.y + zone.h
-    );
-
-    if (targetZone) {
-      assignDeviceToRoom(device.id, targetZone.id);
-    }
-  };
 
   const totalZones = currentFloorZones.filter((z) => z.isDefined).length;
   const totalArea = currentFloorZones.reduce((sum, z) => sum + z.area, 0);
@@ -663,56 +573,14 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
   const undefinedArea = 100 - coverage;
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="space-y-6">
-        <div className={`grid gap-6 ${showDeviceLibrary ? 'lg:grid-cols-[1fr_3fr_1fr]' : 'lg:grid-cols-[1.2fr_1fr]'}`}>
-          {/* Device Library Sidebar */}
-          {showDeviceLibrary && (
-            <div className="space-y-4">
-              <div className="bg-white rounded-lg border border-gray-200 p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Package className="h-5 w-5 text-primary" />
-                    Device Library
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowDeviceLibrary(false)}
-                    className="h-6 w-6 p-0"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <div className="space-y-2 max-h-[600px] overflow-y-auto">
-                  {deviceLibrary.map((device) => (
-                    <DraggableDevice key={device.id} device={device} />
-                  ))}
-                </div>
-                <div className="mt-4 pt-4 border-t text-xs text-muted-foreground text-center">
-                  Drag devices onto the floor plan
-                </div>
-              </div>
+    <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+        {/* Left Panel - Floor Plan Editor */}
+        <div className="space-y-4">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold">Floor Plan Editor</h3>
             </div>
-          )}
-
-          {/* Left Panel - Floor Plan Editor */}
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold">Floor Plan Editor</h3>
-                {!showDeviceLibrary && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowDeviceLibrary(true)}
-                    className="h-8"
-                  >
-                    <Package className="mr-2 h-4 w-4" />
-                    Show Devices
-                  </Button>
-                )}
-              </div>
 
               {/* Floor Tabs */}
               {availableFloors.length > 1 && (
@@ -795,7 +663,6 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
                   dwgFile={dwgFile}
                   onZoneClick={handleZoneClick}
                   onStageClick={handleStageClick}
-                  onDeviceDrop={handleDeviceDrop}
                   stageRef={stageRef as React.RefObject<KonvaStage>}
                   isDrawing={isDrawing}
                   selectionPoints={selectionPoints}
@@ -909,20 +776,6 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
                     </div>
                   </div>
 
-                  {/* Devices in Zone */}
-                  {assignedDevices[selectedZone.id] && assignedDevices[selectedZone.id].length > 0 && (
-                    <div className="mb-4 space-y-2 rounded-lg shadow border border-gray-200 bg-white p-4">
-                      <h4 className="text-sm font-semibold">Devices in Zone</h4>
-                      <div className="space-y-1">
-                        {assignedDevices[selectedZone.id].map((device) => (
-                          <div key={device.id} className="text-xs text-muted-foreground flex items-center gap-2">
-                            <Package className="h-3 w-3" />
-                            {device.name || device.id}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </>
               ) : (
                 <div className="mb-4 rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-muted-foreground">
@@ -1027,7 +880,6 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
-    </DndProvider>
+    </div>
   );
 };
