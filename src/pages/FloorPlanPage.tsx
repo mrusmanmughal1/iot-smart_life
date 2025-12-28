@@ -33,10 +33,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { DataTable } from '@/components/common/DataTable/DataTable';
-import {
-  createSortableColumn,
-  createActionsColumn,
-} from '@/components/common/DataTable/columns';
+import { createActionsColumn } from '@/components/common/DataTable/columns';
 import {
   Map,
   Building2,
@@ -63,6 +60,10 @@ import {
   Plug,
   BarChart3,
 } from 'lucide-react';
+import { useFloorPlans } from '@/features/floorPlan/hooks';
+import type { FloorPlan as ApiFloorPlan } from '@/services/api/floor-plans.api';
+import { LoadingOverlay } from '@/components/common/LoadingSpinner';
+import { ErrorMessage } from '@/components/common/ErrorMessage';
 
 interface FloorPlan {
   id: string;
@@ -83,6 +84,25 @@ interface FloorPlan {
   category: string;
   status: 'active' | 'draft' | 'archived';
 }
+// Transform API FloorPlan to local FloorPlan format
+const transformFloorPlan = (apiPlan: ApiFloorPlan): FloorPlan => {
+  return {
+    id: apiPlan.id,
+    name: apiPlan.name,
+    building: apiPlan.building || '',
+    floor: apiPlan.floor || '',
+    imageUrl: apiPlan.imageUrl || '',
+    devices: apiPlan.devices?.length || 0,
+    assets: 0, // API doesn't provide assets count, defaulting to 0
+    zones: apiPlan.zones?.length || 0,
+    dimensions: apiPlan.dimensions,
+    scale: apiPlan.scale || '1:100',
+    createdAt: new Date(apiPlan.createdAt),
+    lastModified: new Date(apiPlan.updatedAt),
+    category: apiPlan.category || 'Other',
+    status: apiPlan.status || 'draft',
+  };
+};
 
 interface DeviceMarker {
   id: string;
@@ -98,73 +118,6 @@ interface DeviceMarker {
 }
 
 type FloorPlanRow = Row<FloorPlan>;
-
-const floorPlans: FloorPlan[] = [
-  {
-    id: '1',
-    name: 'Factory Floor - Production Area',
-    building: 'Manufacturing Plant A',
-    floor: 'Ground Floor',
-    imageUrl: '/floor-plans/factory-floor.png',
-    devices: 45,
-    assets: 12,
-    zones: 6,
-    dimensions: { width: 100, height: 80 },
-    scale: '1:100',
-    createdAt: new Date('2025-01-15'),
-    lastModified: new Date('2025-01-28'),
-    category: 'Industrial',
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Office Building - 2nd Floor',
-    building: 'Corporate HQ',
-    floor: '2nd Floor',
-    imageUrl: '/floor-plans/office-floor.png',
-    devices: 28,
-    assets: 8,
-    zones: 4,
-    dimensions: { width: 60, height: 40 },
-    scale: '1:50',
-    createdAt: new Date('2025-01-10'),
-    lastModified: new Date('2025-01-25'),
-    category: 'Commercial',
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'Warehouse - Storage Area',
-    building: 'Distribution Center',
-    floor: 'Main Level',
-    imageUrl: '/floor-plans/warehouse.png',
-    devices: 67,
-    assets: 23,
-    zones: 8,
-    dimensions: { width: 120, height: 90 },
-    scale: '1:200',
-    createdAt: new Date('2025-01-05'),
-    lastModified: new Date('2025-01-20'),
-    category: 'Logistics',
-    status: 'active',
-  },
-  {
-    id: '4',
-    name: 'Hospital Wing - ICU',
-    building: 'Medical Center',
-    floor: '3rd Floor',
-    imageUrl: '/floor-plans/hospital.png',
-    devices: 34,
-    assets: 15,
-    zones: 5,
-    dimensions: { width: 50, height: 45 },
-    scale: '1:75',
-    createdAt: new Date('2025-01-20'),
-    lastModified: new Date('2025-01-29'),
-    category: 'Healthcare',
-    status: 'draft',
-  },
-];
 
 const deviceMarkers: DeviceMarker[] = [
   {
@@ -225,6 +178,22 @@ export default function FloorPlans() {
   const [showZones, setShowZones] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
 
+  const { data: floorPlansData, isLoading, isError } = useFloorPlans();
+  const apiFloorPlans = floorPlansData?.data?.data?.data;
+
+  // Transform API data to local FloorPlan format
+  const floorPlans: FloorPlan[] | undefined =
+    apiFloorPlans?.map(transformFloorPlan);
+
+  if (isLoading) return <LoadingOverlay />;
+  if (isError)
+    return (
+      <ErrorMessage
+        title="Error loading floor plans"
+        // error={errorFloorPlans}
+        onRetry={() => window.location.reload()}
+      />
+    );
   const quickActions = [
     {
       label: 'Create New',
@@ -323,10 +292,7 @@ export default function FloorPlans() {
         );
       },
     },
-    // createSortableColumn(
-    //   'lastModified',
-    //   'Last Modified'
-    // ) as ColumnDef<FloorPlan>,
+
     createActionsColumn((row: FloorPlanRow) => [
       {
         label: 'View',
@@ -352,10 +318,10 @@ export default function FloorPlans() {
     ]) as ColumnDef<FloorPlan>,
   ];
 
-  const filteredPlans = floorPlans.filter(
+  const filteredPlans = floorPlans?.filter(
     (plan) =>
-      plan.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      plan.building.toLowerCase().includes(searchQuery.toLowerCase())
+      plan?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      plan.building?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -382,7 +348,7 @@ export default function FloorPlans() {
             <Map className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{floorPlans.length}</div>
+            <div className="text-2xl font-bold">{floorPlans?.length}</div>
             <p className="text-xs text-muted-foreground">Facility layouts</p>
           </CardContent>
         </Card>
@@ -396,7 +362,7 @@ export default function FloorPlans() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold  ">
-              {floorPlans.filter((p) => p.status === 'active').length}
+              {floorPlans?.filter((p) => p.status === 'active').length}
             </div>
             <p className="text-xs text-muted-foreground">In use</p>
           </CardContent>
@@ -411,7 +377,7 @@ export default function FloorPlans() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {floorPlans.reduce((sum, p) => sum + p.devices, 0)}
+              {floorPlans?.reduce((sum, p) => sum + p.devices, 0)}
             </div>
             <p className="text-xs text-muted-foreground">Mapped devices</p>
           </CardContent>
@@ -424,7 +390,7 @@ export default function FloorPlans() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {floorPlans.reduce((sum, p) => sum + p.zones, 0)}
+              {floorPlans?.reduce((sum, p) => sum + p.zones, 0)}
             </div>
             <p className="text-xs text-muted-foreground">Defined areas</p>
           </CardContent>
@@ -439,7 +405,7 @@ export default function FloorPlans() {
             <CardContent>
               <DataTable
                 columns={columns}
-                data={filteredPlans}
+                data={filteredPlans || []}
                 searchKey="name"
               />
             </CardContent>
@@ -448,7 +414,7 @@ export default function FloorPlans() {
 
         <TabsContent value="gallery" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {floorPlans.map((plan) => (
+            {floorPlans?.map((plan) => (
               <Card
                 key={plan.id}
                 className="overflow-hidden hover:shadow-lg transition-shadow"
@@ -456,7 +422,7 @@ export default function FloorPlans() {
                 <div className="aspect-video bg-muted flex items-center justify-center relative">
                   <Map className="h-16 w-16 text-muted-foreground" />
                   <Badge className="absolute top-2 right-2">
-                    {plan.devices} devices
+                    {plan?.devices} devices
                   </Badge>
                 </div>
                 <CardHeader>
@@ -506,8 +472,8 @@ export default function FloorPlans() {
         <TabsContent value="categories" className="space-y-6">
           {['Industrial', 'Commercial', 'Logistics', 'Healthcare'].map(
             (category) => {
-              const plans = floorPlans.filter((p) => p.category === category);
-              if (plans.length === 0) return null;
+              const plans = floorPlans?.filter((p) => p.category === category);
+              if (!plans || plans.length === 0) return null;
 
               return (
                 <Card key={category}>
@@ -519,7 +485,7 @@ export default function FloorPlans() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-4 md:grid-cols-2">
-                      {plans.map((plan) => (
+                      {plans?.map((plan) => (
                         <div
                           key={plan.id}
                           className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
@@ -765,7 +731,7 @@ export default function FloorPlans() {
 
               {/* Device Markers */}
               {showDevices &&
-                deviceMarkers.map((device) => (
+                deviceMarkers?.map((device) => (
                   <div
                     key={device.id}
                     className="absolute group cursor-pointer"

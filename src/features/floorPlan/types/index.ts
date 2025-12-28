@@ -52,3 +52,4 @@ export interface Room {
   name: string;
   devices: Device[];
 }
+ 

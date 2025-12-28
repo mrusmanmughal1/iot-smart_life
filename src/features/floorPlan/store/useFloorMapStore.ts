@@ -64,7 +64,7 @@ interface FloorMapStore {
   updateRoom: (roomId: string, updates: Partial<Room>) => void;
   removeRoom: (roomId: string) => void;
   assignedDevices: Record<string, Device[]>; // roomId -> devices
-  assignDeviceToRoom: (deviceId: string, roomId: string) => void;
+  assignDeviceToRoom: (device: Device, roomId: string) => void;
   unassignDeviceFromRoom: (deviceId: string, roomId: string) => void;
 
   // Reset all data
@@ -249,27 +249,26 @@ export const useFloorMapStore = create<FloorMapStore>()(
         });
       },
 
-      assignDeviceToRoom: (deviceId: string, roomId: string) => {
+      assignDeviceToRoom: (device: Device, roomId: string) => {
         set((state) => {
           const newAssignedDevices = { ...state.assignedDevices };
           const roomDevices = newAssignedDevices[roomId] || [];
 
           // Check if device is already assigned to this room
-          if (!roomDevices.some((d) => d.id === deviceId)) {
+          if (!roomDevices.some((d) => d.id === device.id)) {
             // Remove device from other rooms first
             Object.keys(newAssignedDevices).forEach((id) => {
               if (id !== roomId) {
                 newAssignedDevices[id] = newAssignedDevices[id].filter(
-                  (d) => d.id !== deviceId
+                  (d) => d.id !== device.id
                 );
               }
             });
 
-            // Add device to the room (you'll need to get the device object)
-            // For now, we'll just track the assignment
+            // Add the full device object to the room
             newAssignedDevices[roomId] = [
               ...roomDevices,
-              { id: deviceId } as Device, // You'll need to pass the full device object
+              device,
             ];
           }
 

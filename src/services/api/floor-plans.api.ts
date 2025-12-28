@@ -6,28 +6,85 @@ export interface FloorPlanDimensions {
   scale?: number; // pixels per meter
 }
 
+export interface DevicePosition {
+  x: number;
+  y: number;
+}
+
+export interface FloorPlanDevice {
+  name: string;
+  type: string;
+  deviceId: string;
+  position: DevicePosition;
+}
+
+export interface ZoneBoundary {
+  x: number;
+  y: number;
+}
+
+export interface FloorPlanZone {
+  id: string;
+  name: string;
+  color: string;
+  boundaries: ZoneBoundary[];
+}
+
+export interface GridSettings {
+  gridSize: number;
+  showGrid: boolean;
+  snapToGrid: boolean;
+}
+
+export interface DefaultColors {
+  zones: string;
+  gateways: string;
+  sensorsToGrid: string;
+  sensorsToGateway: string;
+}
+
+export interface FloorPlanSettings {
+  autoSave: boolean;
+  gridSettings: GridSettings;
+  defaultColors: DefaultColors;
+  measurementUnit: string;
+}
+
 export interface DeviceMarker {
   deviceId: string;
   x: number;
   y: number;
   rotation?: number;
   icon?: string;
+  // Legacy support - can also use the new structure
+  name?: string;
+  type?: string;
+  position?: DevicePosition;
 }
 
 export interface FloorPlan {
   id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+  createdBy?: string | null;
+  updatedBy?: string | null;
   name: string;
   description?: string;
   building?: string;
   floor?: string;
   imageUrl?: string;
+  category?: string;
+  status?: 'active' | 'archived' | 'draft';
   dimensions: FloorPlanDimensions;
-  deviceMarkers: DeviceMarker[];
-  metadata?: Record<string, any>;
+  scale?: string;
+  devices: FloorPlanDevice[];
+  zones: FloorPlanZone[];
+  deviceMarkers?: DeviceMarker[]; // Legacy support
+  metadata?: Record<string, unknown>;
   userId: string;
-  tenantId?: string;
-  createdAt: string;
-  updatedAt: string;
+  tenantId?: string | null;
+  settings?: FloorPlanSettings;
 }
 
 export interface FloorPlanQuery {
@@ -40,12 +97,14 @@ export interface FloorPlanQuery {
 
 export interface PaginatedResponse<T> {
   message: string;
-  data: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
+  data: {
+    data: T[];
+    meta?: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    };
   };
 }
 
@@ -107,11 +166,11 @@ export const floorPlansApi = {
 
   // Get devices on floor plan
   getDevices: (id: string) =>
-    apiClient.get<ApiResponse<any[]>>(`/floor-plans/${id}/devices`),
+    apiClient.get<ApiResponse<FloorPlanDevice[]>>(`/floor-plans/${id}/devices`),
 
   // Get statistics
   getStatistics: () =>
-    apiClient.get<ApiResponse<any>>('/floor-plans/statistics'),
+    apiClient.get<ApiResponse<Record<string, unknown>>>('/floor-plans/statistics'),
 
   // Clone floor plan
   clone: (id: string, newName: string) =>

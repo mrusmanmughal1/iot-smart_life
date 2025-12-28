@@ -27,7 +27,10 @@ import {
   Loader2,
 } from 'lucide-react';
 import type { FilterFormValues } from '@/features/floorPlan/types';
-import { useFloorMapStore, type UploadedFile } from '@/features/floorPlan/store';
+import {
+  useFloorMapStore,
+  type UploadedFile,
+} from '@/features/floorPlan/store';
 
 interface DwgImportStepProps {
   register: UseFormRegister<FilterFormValues>;
@@ -72,7 +75,6 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
     // Note: For actual DWG rendering, you'd need a specialized library
     // This creates a blob URL that can be used to reference the file
     if (
-   
       file.name.endsWith('.dwg') ||
       file.name.endsWith('.dxf') ||
       file.type.includes('dwg') ||
@@ -122,12 +124,28 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
     (acceptedFiles: File[]) => {
       if (isUploading) return;
 
+      // Get current uploaded files to determine next available floor
+      const currentFloors = uploadedFiles.map((f) => f.floor);
+      const getNextFloor = (index: number): string => {
+        // If uploading multiple files, assign them to sequential floors
+        if (acceptedFiles.length > 1) {
+          const floorIndex = floorOptions.findIndex(
+            (f) => f.value === selectedFloor
+          );
+          const nextFloorIndex = (floorIndex + index) % floorOptions.length;
+          return floorOptions[nextFloorIndex].value;
+        }
+        // Single file uses selected floor
+        return selectedFloor;
+      };
+
       // Create and add files to store
       acceptedFiles.forEach((file, index) => {
+        const assignedFloor = getNextFloor(index);
         const newFile: UploadedFile = {
           id: `file-${Date.now()}-${index}`,
           file,
-          floor: selectedFloor,
+          floor: assignedFloor,
           progress: 0,
           status: 'pending',
           previewUrl: createFilePreview(file),
@@ -140,7 +158,14 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
         }, 100);
       });
     },
-    [selectedFloor, isUploading, createFilePreview, addUploadedFile, simulateUpload]
+    [
+      selectedFloor,
+      isUploading,
+      createFilePreview,
+      addUploadedFile,
+      simulateUpload,
+      uploadedFiles,
+    ]
   );
 
   // Configure dropzone
@@ -235,8 +260,7 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
                       : 'Drop DWG Files Here Or Click To Browse.'}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Supported formats: .dwg, .dxf , (max 50MB
-                    each).
+                    Supported formats: .dwg, .dxf , (max 50MB each).
                     <br />
                     You can upload multiple files for different floors.
                   </p>
@@ -269,27 +293,7 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
           </div>
 
           {/* Floor Selection */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Select Floor</h3>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Floor:</span>
-              <Select value={selectedFloor} onValueChange={setSelectedFloor}>
-                <SelectTrigger className="h-8 w-40 border text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {floorOptions.map((floor) => (
-                    <SelectItem key={floor.value} value={floor.value}>
-                      {floor.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Files will be assigned to the selected floor
-            </p>
-          </div>
+           
 
           {/* Scale settings */}
           <div className="space-y-3">
@@ -305,14 +309,14 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
                   placeholder="1:100"
                 />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center  w-52 gap-2">
                 <span className="text-muted-foreground">Unit:</span>
                 <Controller
                   control={control}
                   name="drawingUnit"
                   render={({ field }) => (
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="h-8 w-32 border text-xs">
+                      <SelectTrigger className="h-8 w-40 border text-xs">
                         <SelectValue placeholder="Meters" />
                       </SelectTrigger>
                       <SelectContent className="">
@@ -494,18 +498,9 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
                 </ul>
               )}
             </div>
-            <div className="rounded-md border border-gray-200  hover:shadow-md bg-white p-4">
-              <h4 className="mb-2 text-sm font-semibold">Quick Preview</h4>
-              <p className="text-xs text-muted-foreground">
-                Click the eye icon to preview DWG files. Preview will show a
-                popup with the basic floor plan so you can verify room
-                boundaries and structure before processing.
-              </p>
-            </div>
           </div>
         </div>
       </div>
-
       {/* Footer actions */}
       <div className="flex flex-wrap  gap-3 pt-2 text-xs">
         <Button variant="outline" type="button">
