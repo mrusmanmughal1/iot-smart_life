@@ -134,7 +134,7 @@ const QuickActionButton = ({
   color,
   onClick,
 }: {
-  label: string;
+  label: string | React.ReactNode;
   icon: React.ElementType;
   color: string;
   onClick: () => void;
@@ -144,7 +144,7 @@ const QuickActionButton = ({
     className={`${color} text-white px-3 py-2 rounded text-xs font-medium hover:opacity-90 transition-opacity`}
   >
     <div className="flex flex-col items-center gap-1">
-      <Icon className="h-4 w-4" />
+      {/* <Icon className="h-4 w-4" /> */}
       <span>{label}</span>
     </div>
   </button>
