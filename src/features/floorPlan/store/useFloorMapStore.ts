@@ -66,6 +66,9 @@ interface FloorMapStore {
   assignedDevices: Record<string, Device[]>; // roomId -> devices
   assignDeviceToRoom: (device: Device, roomId: string) => void;
   unassignDeviceFromRoom: (deviceId: string, roomId: string) => void;
+  devicePositions: Record<string, { x: number; y: number; zoneId: string | null; floor: string }>;
+  setDevicePosition: (deviceId: string, position: { x: number; y: number; zoneId: string | null; floor: string }) => void;
+  removeDevicePosition: (deviceId: string) => void;
 
   // Reset all data
   reset: () => void;
@@ -94,6 +97,7 @@ const defaultState = {
   zoomLevel: 100,
   rooms: [] as Room[],
   assignedDevices: {} as Record<string, Device[]>,
+  devicePositions: {} as Record<string, { x: number; y: number; zoneId: string | null; floor: string }>,
 };
 
 export const useFloorMapStore = create<FloorMapStore>()(
@@ -284,6 +288,23 @@ export const useFloorMapStore = create<FloorMapStore>()(
             (d) => d.id !== deviceId
           );
           return { assignedDevices: newAssignedDevices };
+        });
+      },
+
+      setDevicePosition: (deviceId: string, position: { x: number; y: number; zoneId: string | null; floor: string }) => {
+        set((state) => ({
+          devicePositions: {
+            ...state.devicePositions,
+            [deviceId]: position,
+          },
+        }));
+      },
+
+      removeDevicePosition: (deviceId: string) => {
+        set((state) => {
+          const newPositions = { ...state.devicePositions };
+          delete newPositions[deviceId];
+          return { devicePositions: newPositions };
         });
       },
 

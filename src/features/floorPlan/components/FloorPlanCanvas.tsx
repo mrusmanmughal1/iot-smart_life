@@ -1,304 +1,382 @@
-// Enhanced FloorPlanCanvas.tsx with CAD Room Detection Integration
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { useDrop } from 'react-dnd';
-import { FaSearchPlus, FaSearchMinus, FaHome } from 'react-icons/fa';
-import { PlacedDevice, DragItem, FloorPlanCanvasProps, Room, FloorStructure } from '@/types';
-import { useEstimationStore } from '@/store/estimationStore';
-import { useLanguage } from '@/contexts/LanguageContext';
-import EnhancedFloorPlanViewer from '../FloorPlanViewer';
-import PlacedDeviceComponent from '../DevicePlacement';
+import {
+  Stage,
+  Layer,
+  Rect,
+  Text,
+  Group,
+  Line,
+  Image as KonvaImage,
+} from 'react-konva';
+import type { Zone } from '@/features/floorPlan/types';
+import type { Stage as KonvaStage } from 'konva/lib/Stage';
+import { useState, useEffect, useRef } from 'react';
 
-const EnhancedFloorPlanCanvas: React.FC<FloorPlanCanvasProps> = ({ floor }) => {
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const { updateFloorPlan } = useEstimationStore();
-  const { t } = useLanguage();
-  const [scale, setScale] = useState(1);
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
-  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
-  const [cadData, setCADData] = useState<any>(null);
-  const [floorStructure, setFloorStructure] = useState<FloorStructure | null>(null);
-  const [hoveredRoom, setHoveredRoom] = useState<Room | null>(null);
-
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: 'device',
-    drop: (item: DragItem, monitor) => {
-      if (!canvasRef.current) return;
-
-      const canvasRect = canvasRef.current.getBoundingClientRect();
-      const offset = monitor.getClientOffset();
-
-      if (offset) {
-        const x = Math.max(0, (offset.x - canvasRect.left) / scale - 20);
-        const y = Math.max(0, (offset.y - canvasRect.top) / scale - 20);
-
-        const uniqueId = `placed-${floor.id}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-        const newDevice: PlacedDevice = {
-          deviceId: item.device.id,
-          id: uniqueId,
-          x: Math.min(x, (canvasSize.width / scale) - 40),
-          y: Math.min(y, (canvasSize.height / scale) - 40),
-          rotation: 0,
-          scale: 1
-        };
-
-        const updatedDevices = [...(floor.devices || []), newDevice];
-        updateFloorPlan(floor.id, {
-          devices: updatedDevices,
-          cadData: cadData ? { ...cadData, floorStructure } : undefined
-        });
-        setSelectedDeviceId(newDevice.id);
-
-        console.log('Device placed in room context:', {
-          deviceId: item.device.id,
-          position: { x: newDevice.x, y: newDevice.y },
-          nearestRoom: hoveredRoom?.name || 'Unknown',
-          floorStructure: floorStructure ? 'Available' : 'None'
-        });
-      }
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  }), [floor.id, floor.devices, scale, canvasSize, updateFloorPlan, cadData, floorStructure, hoveredRoom]);
-
-  const handleCADParsed = useCallback((parsedData: any, parsedFloorStructure: FloorStructure) => {
-    setCADData(parsedData);
-    setFloorStructure(parsedFloorStructure);
-
-    // Update floor plan with parsed structure
-    updateFloorPlan(floor.id, {
-      cadData: { ...parsedData, floorStructure: parsedFloorStructure }
-    });
-
-    console.log('Floor structure parsed:', {
-      rooms: parsedFloorStructure.rooms.length,
-      walls: parsedFloorStructure.walls.length,
-      doors: parsedFloorStructure.doors.length,
-      windows: parsedFloorStructure.windows.length
-    });
-  }, [floor.id, updateFloorPlan]);
-
-  const handleRoomHover = useCallback((room: Room | null) => {
-    setHoveredRoom(room);
-  }, []);
-
-  const handleRemoveDevice = (deviceId: string) => {
-    const updatedDevices = (floor.devices || []).filter(d => d.id !== deviceId);
-    updateFloorPlan(floor.id, { devices: updatedDevices });
-    if (selectedDeviceId === deviceId) {
-      setSelectedDeviceId('');
-    }
+// Color mapping for zone types
+const getZoneColor = (type: string): string => {
+  const colors: Record<string, string> = {
+    Room: '#93C5FD',
+    Office: '#FCD34D',
+    Lobby: '#86EFAC',
+    Corridor: '#C4B5FD',
+    Storage: '#FCA5A5',
   };
+  return colors[type] || '#E5E7EB';
+};
 
-  const handleMoveDevice = (deviceId: string, x: number, y: number) => {
-    const updatedDevices = (floor.devices || []).map(d =>
-      d.id === deviceId
-        ? {
-          ...d,
-          x: Math.max(10, Math.min(x, (canvasSize.width / scale) - 50)),
-          y: Math.max(10, Math.min(y, (canvasSize.height / scale) - 50))
-        }
-        : d
-    );
-    updateFloorPlan(floor.id, { devices: updatedDevices });
+// Floor Plan Canvas with Drop Zone
+const FloorPlanCanvas: React.FC<{
+  zones: Zone[];
+  selectedZoneId: string | null;
+  zoomLevel: number;
+  dwgImageUrl?: string;
+  dwgFile?: File;
+  onZoneClick: (zoneId: string) => void;
+  onStageClick: () => void;
+  stageRef: React.RefObject<KonvaStage>;
+  isDrawing: boolean;
+  selectionPoints: Array<{ x: number; y: number }>;
+  onDwgError?: (hasError: boolean) => void;
+}> = ({
+  zones,
+  selectedZoneId,
+  zoomLevel,
+  dwgImageUrl,
+  dwgFile,
+  onZoneClick,
+  onStageClick,
+  stageRef,
+  isDrawing,
+  selectionPoints,
+  onDwgError,
+}) => {
+  const [dwgImage, setDwgImage] = useState<HTMLImageElement | null>(null);
+  const [dwgError, setDwgError] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    // Find which room the device is now in
-    if (floorStructure) {
-      const deviceRoom = floorStructure.rooms.find(room => {
-        const bounds = room.bounds;
-        return x >= bounds.minX && x <= bounds.maxX && y >= bounds.minY && y <= bounds.maxY;
-      });
+  const stageWidth = 800;
+  const stageHeight = 500;
+  const scaledWidth = (stageWidth * zoomLevel) / 100;
+  const scaledHeight = (stageHeight * zoomLevel) / 100;
 
-      console.log('Device moved:', {
-        deviceId,
-        newPosition: { x, y },
-        newRoom: deviceRoom?.name || 'Outside rooms',
-        roomType: deviceRoom?.type || 'none'
-      });
-    }
-  };
-
-  const handleRotateDevice = (deviceId: string) => {
-    const updatedDevices = (floor.devices || []).map(d =>
-      d.id === deviceId
-        ? { ...d, rotation: ((d.rotation || 0) + 90) % 360 }
-        : d
-    );
-    updateFloorPlan(floor.id, { devices: updatedDevices });
-  };
-
-  const handleResizeDevice = (deviceId: string, newScale: number) => {
-    const updatedDevices = (floor.devices || []).map(d =>
-      d.id === deviceId
-        ? { ...d, scale: newScale }
-        : d
-    );
-    updateFloorPlan(floor.id, { devices: updatedDevices });
-  };
-
-  const handleSelectDevice = (deviceId: string) => {
-    setSelectedDeviceId(deviceId);
-  };
-
-  const handleZoomIn = () => {
-    setScale(prev => Math.min(prev * 1.2, 3));
-  };
-
-  const handleZoomOut = () => {
-    setScale(prev => Math.max(prev / 1.2, 0.3));
-  };
-
-  const handleCanvasClick = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    const isDeviceElement = target.closest('[data-device-id]') ||
-      target.closest('[data-device-control]') ||
-      target.classList.contains('device-container');
-
-    if (!isDeviceElement) {
-      setSelectedDeviceId('');
-    }
-  };
-
+  // Parse and render DWG/DXF file
   useEffect(() => {
-    if (canvasRef.current) {
-      const updateCanvasSize = () => {
-        const rect = canvasRef.current!.getBoundingClientRect();
-        setCanvasSize({ width: rect.width, height: rect.height });
-      };
+    const parseAndRenderDWG = async () => {
+      if (!dwgFile && !dwgImageUrl) {
+        setDwgImage(null);
+        setDwgError(false);
+        onDwgError?.(false);
+        return;
+      }
 
-      updateCanvasSize();
-      window.addEventListener('resize', updateCanvasSize);
-      return () => window.removeEventListener('resize', updateCanvasSize);
-    }
-  }, []);
+      try {
+        setDwgError(false);
 
-  drop(canvasRef);
+        // If we have a file, parse it
+        if (dwgFile) {
+          console.log('Parsing DWG file:', dwgFile.name);
+          const { EnhancedCADParser } = await import(
+            '@/features/floorPlan/services/EnhancedCADParser'
+          );
+
+          let dxf: {
+            entities?: unknown[];
+            header?: unknown;
+            layers?: unknown;
+            tables?: unknown;
+            blocks?: unknown;
+          };
+          try {
+            if (dwgFile.name.toLowerCase().endsWith('.dxf')) {
+              console.log('Parsing as DXF...');
+              const result = await EnhancedCADParser.parseDXF(dwgFile);
+              dxf = result.dxf;
+              console.log('DXF parsed successfully:', dxf);
+            } else if (dwgFile.name.toLowerCase().endsWith('.dwg')) {
+              console.log('Parsing as DWG...');
+              const result = await EnhancedCADParser.parseDWG(dwgFile);
+              dxf = result.dxf;
+              console.log('DWG parsed successfully:', dxf);
+            } else {
+              throw new Error('Unsupported file format');
+            }
+
+            // Wait for canvas to be ready
+            if (canvasRef.current) {
+              console.log(
+                'Rendering to canvas, size:',
+                scaledWidth,
+                'x',
+                scaledHeight
+              );
+              const canvas = canvasRef.current;
+
+              // Make canvas temporarily visible for getBoundingClientRect to work
+              const originalDisplay = canvas.style.display;
+              canvas.style.display = 'block';
+              canvas.style.width = scaledWidth + 'px';
+              canvas.style.height = scaledHeight + 'px';
+
+              // Force a reflow to ensure dimensions are set
+              void canvas.offsetHeight;
+
+              // Render the DXF to canvas (this will use getBoundingClientRect)
+              try {
+                EnhancedCADParser.renderDXFToCanvas(dxf, canvas);
+                console.log('DXF rendered to canvas');
+
+                // Hide canvas again
+                canvas.style.display = originalDisplay || 'none';
+
+                // Convert canvas to image
+                const img = new Image();
+                img.onload = () => {
+                  console.log(
+                    'DWG image loaded successfully, dimensions:',
+                    img.width,
+                    'x',
+                    img.height
+                  );
+                  setDwgImage(img);
+                  setDwgError(false);
+                  onDwgError?.(false);
+                };
+                img.onerror = (error) => {
+                  console.error('Error loading image from canvas:', error);
+                  setDwgError(true);
+                  onDwgError?.(true);
+                };
+                const dataUrl = canvas.toDataURL('image/png');
+                console.log(
+                  'Canvas data URL generated, length:',
+                  dataUrl.length
+                );
+                if (dataUrl.length < 100) {
+                  console.warn('Canvas data URL is very short, might be empty');
+                }
+                img.src = dataUrl;
+              } catch (renderError) {
+                console.error('Error rendering DXF to canvas:', renderError);
+                canvas.style.display = originalDisplay || 'none';
+                setDwgError(true);
+                onDwgError?.(true);
+              }
+            } else {
+              console.error('Canvas ref is not available');
+              setDwgError(true);
+              onDwgError?.(true);
+            }
+          } catch (error) {
+            console.error('Error parsing DWG/DXF:', error);
+            setDwgError(true);
+            onDwgError?.(true);
+          }
+        } else if (dwgImageUrl) {
+          // Fallback to image loading for non-DWG files
+          console.log('Loading image from URL:', dwgImageUrl);
+          const img = new window.Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            console.log('Image loaded from URL');
+            setDwgImage(img);
+            setDwgError(false);
+            onDwgError?.(false);
+          };
+          img.onerror = (error) => {
+            console.error('Error loading image from URL:', error);
+            setDwgImage(null);
+            setDwgError(true);
+            onDwgError?.(true);
+          };
+          img.src = dwgImageUrl;
+        }
+      } catch (error) {
+        console.error('Error loading DWG file:', error);
+        setDwgError(true);
+        onDwgError?.(true);
+      }
+    };
+
+    parseAndRenderDWG();
+  }, [dwgFile, dwgImageUrl, onDwgError, scaledWidth, scaledHeight]);
 
   return (
     <div className="relative">
-      {/* Controls */}
-      <div className="absolute top-4 right-4 z-50 flex gap-2">
-        <button
-          onClick={handleZoomIn}
-          className="p-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200"
-          title={t('floorPlan.zoomIn')}
-        >
-          <FaSearchPlus className="text-gray-600" />
-        </button>
-        <button
-          onClick={handleZoomOut}
-          className="p-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200"
-          title={t('floorPlan.zoomOut')}
-        >
-          <FaSearchMinus className="text-gray-600" />
-        </button>
-        <div className="px-3 py-2 bg-white rounded-lg shadow-md text-sm text-gray-600 border border-gray-200">
-          {Math.round(scale * 100)}%
-        </div>
-      </div>
-
-      {/* Floor Structure Summary */}
-      {floorStructure && (
-        <div className="absolute bottom-4 left-4 z-50 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3 max-w-64">
-          <div className="flex items-center gap-2 mb-2">
-            <FaHome className="text-accent-500" />
-            <span className="text-sm font-medium text-gray-800">Floor Structure</span>
-          </div>
-          <div className="text-xs text-gray-600 space-y-1">
-            <div>Rooms: {floorStructure.rooms.length}</div>
-            <div>Walls: {floorStructure.walls.length}</div>
-            <div>Doors: {floorStructure.doors.length}</div>
-            <div>Windows: {floorStructure.windows.length}</div>
-            <div>Devices: {(floor.devices || []).length}</div>
-          </div>
-          {hoveredRoom && (
-            <div className="mt-2 pt-2 border-t border-gray-200">
-              <div className="text-xs font-medium text-purple-600">
-                Hovering: {hoveredRoom.name}
-              </div>
-              <div className="text-xs text-gray-500">
-                {Math.round(hoveredRoom.area)} sq ft
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Canvas */}
-      <div
+      {/* Hidden canvas for DWG rendering */}
+      <canvas
         ref={canvasRef}
-        onClick={handleCanvasClick}
-        className={`
-          relative w-full h-96 lg:h-[500px] border-2 border-dashed rounded-xl overflow-hidden
-          ${isOver ? 'border-accent-500 bg-accent-50/50' : 'border-gray-300'}
-          ${cadData ? 'bg-white' : 'bg-gray-50'}
-          transition-all duration-200 cursor-crosshair
-        `}
         style={{
-          backgroundImage: cadData ? 'none' : `
-            radial-gradient(circle, #e5e7eb 1px, transparent 1px)
-          `,
-          backgroundSize: cadData ? 'auto' : `${20 * scale}px ${20 * scale}px`,
-          backgroundPosition: '0 0'
+          position: 'absolute',
+          visibility: 'hidden',
+          width: scaledWidth,
+          height: scaledHeight,
         }}
+      />
+      <Stage
+        ref={stageRef}
+        width={scaledWidth}
+        height={scaledHeight}
+        onClick={onStageClick}
+        style={{ cursor: isDrawing ? 'crosshair' : 'default' }}
       >
-        {/* Floor Plan Background with Room Detection */}
-        <EnhancedFloorPlanViewer
-          floor={floor}
-          scale={scale}
-          onCADParsed={handleCADParsed}
-          onRoomHover={handleRoomHover}
-        />
+        <Layer>
+          {/* DWG Background Image or Placeholder */}
+          {dwgImage ? (
+            <KonvaImage
+              image={dwgImage}
+              x={0}
+              y={0}
+              width={scaledWidth}
+              height={scaledHeight}
+              opacity={0.7}
+            />
+          ) : dwgError ? (
+            // Placeholder for DWG files that can't be displayed as images
+            <Group>
+              <Rect
+                x={0}
+                y={0}
+                width={scaledWidth}
+                height={scaledHeight}
+                fill="#F3F4F6"
+                stroke="#D1D5DB"
+                strokeWidth={2}
+                dash={[5, 5]}
+              />
+              <Text
+                x={scaledWidth / 2}
+                y={scaledHeight / 2 - 20}
+                text="DWG File Loaded"
+                fontSize={16}
+                fontStyle="bold"
+                fill="#6B7280"
+                align="center"
+                verticalAlign="middle"
+                offsetX={60}
+                offsetY={8}
+              />
+              <Text
+                x={scaledWidth / 2}
+                y={scaledHeight / 2 + 10}
+                text="(DWG files require conversion to image format for preview)"
+                fontSize={12}
+                fill="#9CA3AF"
+                align="center"
+                verticalAlign="middle"
+                offsetX={150}
+                offsetY={6}
+              />
+            </Group>
+          ) : null}
 
-        {/* Drop Overlay */}
-        {isOver && (
-          <div className="absolute inset-0 bg-accent-500/10 flex items-center justify-center z-40 pointer-events-none">
-            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border-2 border-accent-500 border-dashed">
-              <div className="text-accent-700 text-lg font-medium text-center">
-                {hoveredRoom
-                  ? `Place device in ${hoveredRoom.name}`
-                  : t('floorPlan.dropDeviceHere')
-                }
-              </div>
-            </div>
-          </div>
-        )}
+          {/* Existing Zones */}
+          {zones.map((zone) => {
+            const isSelected = zone.id === selectedZoneId;
+            const zoneColor = getZoneColor(zone.type);
 
-        {/* Placed Devices */}
-        {(floor.devices || []).map(placedDevice => (
-          <PlacedDeviceComponent
-            key={placedDevice.id}
-            placedDevice={placedDevice}
-            onRemove={handleRemoveDevice}
-            onMove={handleMoveDevice}
-            onRotate={handleRotateDevice}
-            onResize={handleResizeDevice}
-            onSelect={handleSelectDevice}
-            isSelected={selectedDeviceId === placedDevice.id}
-            scale={scale}
-          />
-        ))}
-      </div>
+            return (
+              <Group
+                key={zone.id}
+                onClick={() => onZoneClick(zone.id)}
+                onTap={() => onZoneClick(zone.id)}
+              >
+                {/* Zone Rectangle */}
+                <Rect
+                  x={zone.x}
+                  y={zone.y}
+                  width={zone.w}
+                  height={zone.h}
+                  fill={zoneColor}
+                  opacity={0.6}
+                  stroke={isSelected ? '#3B82F6' : '#9CA3AF'}
+                  strokeWidth={isSelected ? 3 : 2}
+                  dash={isSelected ? [] : [5, 5]}
+                  cornerRadius={8}
+                />
+                {/* Zone Title Overlay */}
+                <Rect
+                  x={zone.x + zone.w / 2 - 60}
+                  y={zone.y + zone.h / 2 - 12}
+                  width={120}
+                  height={24}
+                  fill="rgba(255, 255, 255, 0.95)"
+                  cornerRadius={4}
+                  shadowBlur={4}
+                  shadowColor="rgba(0, 0, 0, 0.1)"
+                />
+                <Text
+                  x={zone.x + zone.w / 2}
+                  y={zone.y + zone.h / 2}
+                  text={zone.name}
+                  fontSize={12}
+                  fontStyle="bold"
+                  fill="#1F2937"
+                  align="center"
+                  verticalAlign="middle"
+                  offsetX={60}
+                  offsetY={6}
+                />
+                {/* Zone Type (shown when selected) */}
+                {isSelected && (
+                  <>
+                    <Rect
+                      x={zone.x}
+                      y={zone.y + zone.h - 20}
+                      width={zone.w}
+                      height={20}
+                      fill="rgba(0, 0, 0, 0.6)"
+                      cornerRadius={[0, 0, 8, 8]}
+                    />
+                    <Text
+                      x={zone.x + zone.w / 2}
+                      y={zone.y + zone.h - 10}
+                      text={zone.type}
+                      fontSize={10}
+                      fill="#FFFFFF"
+                      align="center"
+                      verticalAlign="middle"
+                      offsetX={zone.w / 2}
+                      offsetY={5}
+                    />
+                  </>
+                )}
+              </Group>
+            );
+          })}
 
-      {/* Canvas Statistics */}
-      <div className="mt-4 flex justify-between items-center text-sm text-gray-600">
-        <div className="flex items-center gap-4">
-          <span>{t('floorPlan.devicesPlaced')}: <strong>{(floor.devices || []).length}</strong></span>
-          {floor.dwgFile && (
-            <span>File: <strong>{floor.dwgFile.name}</strong></span>
+          {/* Selection Preview */}
+          {isDrawing && selectionPoints.length > 0 && (
+            <Group>
+              {/* Draw polygon from selection points */}
+              {selectionPoints.length > 1 && (
+                <Line
+                  points={selectionPoints.flatMap((p) => [p.x, p.y])}
+                  closed={false}
+                  stroke="#3B82F6"
+                  strokeWidth={2}
+                  dash={[5, 5]}
+                  fill="rgba(59, 130, 246, 0.2)"
+                />
+              )}
+              {/* Draw points */}
+              {selectionPoints.map((point, idx) => (
+                <Group key={idx}>
+                  <Rect
+                    x={point.x - 4}
+                    y={point.y - 4}
+                    width={8}
+                    height={8}
+                    fill="#3B82F6"
+                    stroke="#FFFFFF"
+                    strokeWidth={2}
+                    cornerRadius={4}
+                  />
+                </Group>
+              ))}
+            </Group>
           )}
-          {floorStructure && (
-            <span>Rooms: <strong>{floorStructure.rooms.length}</strong></span>
-          )}
-        </div>
-        <div className="flex items-center gap-4">
-          <span>{t('floorPlan.scale')}: <strong>{Math.round(scale * 100)}%</strong></span>
-          <span>Canvas: <strong>{canvasSize.width} × {canvasSize.height}px</strong></span>
-        </div>
-      </div>
+        </Layer>
+      </Stage>
     </div>
   );
 };
-
-export default EnhancedFloorPlanCanvas;
+export default FloorPlanCanvas;

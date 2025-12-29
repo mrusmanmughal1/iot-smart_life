@@ -17,11 +17,11 @@ import { useFloorMapStore } from '@/features/floorPlan/store';
 import type { StepId } from '@/features/floorPlan/store';
 
 const steps: { id: StepId; label: string }[] = [
-  { id: 1, label: 'Asset' },
-  { id: 2, label: 'DWG Import' },
-  { id: 3, label: 'Zone Setup' },
-  { id: 4, label: 'Device Link' },
-  { id: 5, label: 'Review' },
+  { id: 1, label: 'Asset' },  // Step 1: Asset Selection    
+  { id: 2, label: 'DWG Import' }, // Step 2: DWG Import
+  { id: 3, label: 'Zone Setup' }, // Step 3: Zone Setup
+  { id: 4, label: 'Device Link' }, // Step 4: Device Link
+  { id: 5, label: '3D View' }, // Step 5: 3D View
 ];
 
 export default function FloorMapCreatePage() {
