@@ -190,7 +190,7 @@ export default function AssignPermissionsPage() {
               <div className="flex gap-3">
                 <Button
                   onClick={handleAdd}
-                  className="bg-secondary hover:bg-secondary/90 text-white"
+                  variant="secondary"
                 >
                   Add
                 </Button>
@@ -203,7 +203,7 @@ export default function AssignPermissionsPage() {
                       if (perm) handleRemove(perm.id);
                     }
                   }}
-                  className="bg-gray-500 hover:bg-gray-400 text-white"
+                  variant="ghost"
                 >
                   Remove
                 </Button>

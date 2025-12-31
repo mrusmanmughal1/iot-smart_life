@@ -11,24 +11,24 @@ const buttonVariants = cva(
         default:
           'bg-black text-white hover:bg-black/80 active:bg-black/90 cursor-pointer shadow-sm  ',
         primary:
-          'bg-[#43489C] text-white     rounded-xl hover:bg-[#43488C] active:bg-[#43487C]  shadow-sm ',
+          'bg-[#43489C] text-white     rounded-xl hover:bg-[#43489C]/90 active:bg-[#43489C]/90  shadow-sm ',
 
         secondary:
-          'bg-[#C36BA8] text-white rounded-xl  hover:bg-[#C36BA7] active:bg-[#C36BA6] shadow-sm',
+          'bg-[#A53887] text-white rounded-xl  hover:bg-[#A53887]/90 active:bg-[#A53887]/90 shadow-sm',
         ghost:
-          'bg-[#D5D5D587] text-gray-700 rounded-xl  hover:bg-[#D5D5D585] active:bg-[#D5D5D587] shadow-sm',
+          'bg-[#D5D5D587] text-gray-700 rounded-xl  hover:bg-[#D5D5D587]/90 active:bg-[#D5D5D587]/90 shadow-sm',
         link: 'text-purple-600 underline-offset-4 hover:underline hover:text-purple-700',
         success:
-          ' bg-green-600 text-white hover:bg-green-700 active:bg-green-800 shadow-sm',
+          ' bg-green-600 text-white hover:bg-green-600/90 active:bg-green-600/90 shadow-sm',
         warning:
-          'bg-yellow-600 text-white hover:bg-yellow-700 active:bg-yellow-800 shadow-sm',
-        info: 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-sm',
+          'bg-yellow-600 text-white hover:bg-yellow-600/90 active:bg-yellow-600/90 shadow-sm',
+        info: 'bg-blue-600 text-white hover:bg-blue-600/90 active:bg-blue-600/90 shadow-sm',
         social:
           'bg-white text-gray-700 cursor-pointer bg-gray-100 active:bg-gray-200 shadow-sm',
         outline:
           'border border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300',
         destructive:
-          'bg-red-800 text-white hover:bg-red-700 active:bg-red-800 shadow-sm',
+          'bg-red-800 text-white hover:bg-red-800/90 active:bg-red-800/90 shadow-sm',
       },
       size: {
         default: 'h-10 px-4 py-2 rounded-3xl',

@@ -311,8 +311,8 @@ export default function CustomerUserAssociationPage() {
                     </div>
                     <Button
                       size="icon"
-                      variant="ghost"
-                      className="h-6 w-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                      variant="primary"
+                      className="h-6 w-6 rounded-full  "
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAddUser(user.id);
@@ -326,8 +326,9 @@ export default function CustomerUserAssociationPage() {
             </div>
             <div className="flex gap-2 pt-4  ">
               <Button
-                className="flex-1 bg-secondary hover:bg-secondary/90 text-white"
+                className="flex-1  "
                 onClick={handleBulkAssign}
+                variant="secondary"
                 disabled={selectedAvailableUsers.size === 0}
               >
                 Assign
@@ -335,6 +336,7 @@ export default function CustomerUserAssociationPage() {
               <Button
                 variant="outline"
                 className="flex-1"
+                
                 onClick={() => setSelectedAvailableUsers(new Set())}
                 disabled={selectedAvailableUsers.size === 0}
               >
@@ -392,8 +394,8 @@ export default function CustomerUserAssociationPage() {
                     )}
                     <Button
                       size="icon"
-                      variant="ghost"
-                      className="h-6 w-6 rounded-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                      variant="secondary"
+                      className="h-6 w-6 rounded-full  "
                       onClick={(e) => {
                         e.stopPropagation();
                         handleRemoveUser(user.id);
@@ -407,7 +409,8 @@ export default function CustomerUserAssociationPage() {
             </div>
             <div className="flex gap-2 pt-4  ">
               <Button
-                className="flex-1 bg-secondary hover:bg-secondary/90 text-white"
+                className="flex-1  "
+                variant="secondary"
                 onClick={handleBulkAssign}
                 disabled={selectedAssignedUsers.size === 0}
               >
@@ -493,10 +496,14 @@ export default function CustomerUserAssociationPage() {
 
             {/* Action Buttons */}
             <div className="space-y-2 pt-4  ">
-              <Button className="w-full bg-secondary hover:bg-secondary/90 text-white">
+              <Button className="w-full    " 
+              variant="secondary"
+              >
                 Bulk Assign Role
               </Button>
-              <Button className="w-full bg-secondary hover:bg-secondary/90 text-white">
+              <Button className="w-full    " 
+              variant="secondary"
+              >
                 Export List
               </Button>
             </div>
@@ -512,7 +519,9 @@ export default function CustomerUserAssociationPage() {
         >
           Cancel
         </Button>
-        <Button className="px-8 bg-secondary hover:bg-secondary/90 text-white">
+        <Button className="px-8    " 
+        variant="secondary"
+        >
           Apply
         </Button>
       </div>

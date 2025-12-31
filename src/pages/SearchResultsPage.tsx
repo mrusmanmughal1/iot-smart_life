@@ -138,34 +138,22 @@ export default function SearchResultsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader title="" />
       <div className="mx-auto space-y-6">
         {/* Header Section */}
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-start gap-4">
-              <Avatar className="h-12 w-12 bg-gray-200">
-                <AvatarFallback className="text-gray-600 font-semibold">
-                  JD
-                </AvatarFallback>
-              </Avatar>
               <div className="flex-1">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                <h1 className="text-xl font-semibold text-gray-900 mb-2">
                   Search Results
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-sm">
                   Found 12 results for "{searchQuery}" in Users and Customers
                 </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Applied Filters Section */}
-        {appliedFilters.length > 0 && (
-          <Card className="bg-white shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
+            {appliedFilters.length > 0 && (
+              <div className="flex items-center  mt-4 justify-between">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-sm font-medium text-gray-700">
                     Applied Filters:
@@ -197,9 +185,9 @@ export default function SearchResultsPage() {
                   Clear All
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            )}
+          </CardContent>
+        </Card>
 
         {/* Filter and Action Bar */}
         <Card className="bg-white shadow-sm">
@@ -268,7 +256,7 @@ export default function SearchResultsPage() {
         </Card>
 
         {/* Data Table */}
-        <Card className="bg-white shadow-sm">
+        <Card className="bg-white shadow-sm p-8">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
@@ -305,11 +293,11 @@ export default function SearchResultsPage() {
                     <TableRow key={result.id} className="hover:bg-gray-50">
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8 bg-gray-200">
+                          {/* <Avatar className="h-8 w-8 bg-gray-200">
                             <AvatarFallback className="text-gray-600 text-xs font-semibold">
                               {result.avatar}
                             </AvatarFallback>
-                          </Avatar>
+                          </Avatar> */}
                           <div>
                             <p className="font-medium text-gray-900">
                               {result.name}

@@ -146,12 +146,38 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.analytics',
     href: '/analytics',
     icon: <BarChart3 className="h-5 w-5" />,
-    
   },
   {
     titleKey: 'nav.usersAndRoles',
-    href: '/users',
     icon: <Users className="h-5 w-5" />,
+    children: [
+      {
+        titleKey: 'nav.usersAndRoles',
+        href: '/users-management',
+        icon: <Users className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.customerUserAssociation',
+        href: '/users-management/customer-user-association',
+        icon: <Users className="h-4 w-4" />,
+      },
+      
+      {
+        titleKey: 'nav.customerAdministrator',
+        href: '/users-management/customer-administrator',
+        icon: <Users className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.rolePermissionManagement',
+        href: '/users-management/role-permission-management',
+        icon: <Users className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.assignPermissions',
+        href: '/users-management/assign-permissions',
+        icon: <Users className="h-4 w-4" />,
+      },
+    ],
   },
   {
     titleKey: 'nav.automation',
@@ -256,12 +282,17 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   };
 
   // Recursive function to find all active parent keys
-  const findActiveParents = (items: NavItem[], parentKey?: string): string[] => {
+  const findActiveParents = (
+    items: NavItem[],
+    parentKey?: string
+  ): string[] => {
     const activeKeys: string[] = [];
-    
+
     items.forEach((item) => {
-      const currentKey = parentKey ? `${parentKey}.${item.titleKey}` : item.titleKey;
-      
+      const currentKey = parentKey
+        ? `${parentKey}.${item.titleKey}`
+        : item.titleKey;
+
       if (item.children) {
         const hasActiveChild = item.children.some((child) => {
           if (child.href && location.pathname === child.href) return true;
@@ -271,20 +302,20 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           }
           return false;
         });
-        
+
         if (hasActiveChild) {
           activeKeys.push(item.titleKey);
           if (parentKey) {
             activeKeys.push(parentKey);
           }
         }
-        
+
         // Recursively check nested children
         const nestedKeys = findActiveParents(item.children, item.titleKey);
         activeKeys.push(...nestedKeys);
       }
     });
-    
+
     return [...new Set(activeKeys)]; // Remove duplicates
   };
 

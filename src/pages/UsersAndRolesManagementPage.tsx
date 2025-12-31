@@ -12,9 +12,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { PageHeader } from '@/components/common/PageHeader';
-import { Plus, Search, ChevronRight, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { DeleteRoleModal } from '@/components/users/DeleteRoleModal';
 
 interface SystemRole {
   id: string;
@@ -84,12 +84,14 @@ export default function UsersAndRolesManagementPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Users');
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   const handleAddUser = () => {
     toast.success('Add user functionality');
   };
 
-  const handleViewDetails = (roleId: string) => {
+  const handleViewDetails = () => {
     navigate(`/users/role-permission-management`);
   };
 
@@ -98,8 +100,18 @@ export default function UsersAndRolesManagementPage() {
   };
 
   const handleDelete = (roleId: string) => {
-    if (window.confirm('Are you sure you want to delete this role?')) {
-      toast.success('Role deleted successfully');
+    const role = roles.find((r) => r.id === roleId);
+    if (role) {
+      setSelectedRole(role);
+      setDeleteModalOpen(true);
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedRole) {
+      // TODO: Implement actual delete API call
+      toast.success(`Role "${selectedRole.roleName}" deleted successfully`);
+      setSelectedRole(null);
     }
   };
 
@@ -111,22 +123,23 @@ export default function UsersAndRolesManagementPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader title="" />
-      <div className="mx-auto space-y-6">
+      <div className="mx-auto space-y-4">
         {/* Header Section */}
-        <div className="space-y-4">
+        <div className="space-y-2">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              <h1 className="text-2xl font-semibold text-gray-900 mb-1">
                 Users and Roles Management
               </h1>
-              <p className="text-gray-600">Role: Customer Administrator</p>
+              <p className="text-gray-600 text-sm">
+                Role: Customer Administrator
+              </p>
             </div>
             <Button
               onClick={handleAddUser}
-              className="bg-primary hover:bg-primary/90 text-white"
+              variant="secondary"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4  " />
               Add User
             </Button>
           </div>
@@ -176,7 +189,7 @@ export default function UsersAndRolesManagementPage() {
 
         {/* System Roles Section */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-900">System Roles</h2>
+          <h2 className="text-xl font-semibold text-gray-900">System Roles</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {systemRoles.map((role) => (
               <Card key={role.id} className="bg-white shadow-sm">
@@ -200,8 +213,8 @@ export default function UsersAndRolesManagementPage() {
                   </ul>
                   <div className="flex justify-end pt-2">
                     <Button
-                      onClick={() => handleViewDetails(role.id)}
-                      className="bg-secondary hover:bg-secondary/90 text-white"
+                      onClick={handleViewDetails}
+                      variant="secondary"
                     >
                       View Details
                     </Button>
@@ -214,10 +227,10 @@ export default function UsersAndRolesManagementPage() {
 
         {/* Users and Roles Management Table */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="text-xl font-semibold text-gray-900">
             Users and Roles Management
           </h2>
-          <Card className="bg-white shadow-sm">
+          <Card className="bg-white p-8 shadow-sm">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
@@ -242,7 +255,6 @@ export default function UsersAndRolesManagementPage() {
                       <TableRow key={role.id} className="hover:bg-gray-50">
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
-                            <ChevronRight className="w-4 h-4 text-gray-400" />
                             {role.roleName}
                           </div>
                         </TableCell>
@@ -262,17 +274,14 @@ export default function UsersAndRolesManagementPage() {
                               size="sm"
                               className="bg-gray-200 hover:bg-gray-300 text-gray-700"
                             >
-                              <Edit className="h-4 w-4 mr-1" />
-                              EDIT
+                              <Edit className="h-4 w-4  " />
                             </Button>
                             <Button
                               onClick={() => handleDelete(role.id)}
-                              variant="destructive"
+                              variant="secondary"
                               size="sm"
-                              className="bg-purple-600 hover:bg-purple-700 text-white"
                             >
-                              <Trash2 className="h-4 w-4 mr-1" />
-                              DELETE
+                              <Trash2 className="h-4 w-4  " />
                             </Button>
                           </div>
                         </TableCell>
@@ -287,7 +296,7 @@ export default function UsersAndRolesManagementPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-secondary-main/30 text-white border-2 border-secondary-main shadow-sm">
+          <Card className="bg-secondary-main/20 text-white border-2 border-secondary-main shadow-sm">
             <CardContent className="p-6">
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-600 mb-2">
@@ -297,7 +306,7 @@ export default function UsersAndRolesManagementPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-success/30 text-white border-2 border-success shadow-sm">
+          <Card className="bg-success/20 text-white border-2 border-success shadow-sm">
             <CardContent className="p-6">
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-600 mb-2">
@@ -307,7 +316,7 @@ export default function UsersAndRolesManagementPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-yellow-500/30 text-white border-2 border-yellow-500 shadow-sm">
+          <Card className="bg-yellow-500/20 text-white border-2 border-yellow-500 shadow-sm">
             <CardContent className="p-6">
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-600 mb-2">
@@ -318,6 +327,14 @@ export default function UsersAndRolesManagementPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Delete Role Modal */}
+        <DeleteRoleModal
+          open={deleteModalOpen}
+          onOpenChange={setDeleteModalOpen}
+          role={selectedRole}
+          onConfirm={handleDeleteConfirm}
+        />
       </div>
     </div>
   );

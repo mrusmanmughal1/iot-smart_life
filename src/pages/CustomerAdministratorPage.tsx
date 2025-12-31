@@ -16,40 +16,160 @@ interface Permission {
 
 const permissions: Permission[] = [
   // Dashboard Management
-  { id: 'view-dashboards', label: 'View Dashboards', granted: true, category: 'Dashboard Management' },
-  { id: 'create-dashboards', label: 'Create Dashboards', granted: true, category: 'Dashboard Management' },
-  { id: 'edit-dashboards', label: 'Edit Dashboards', granted: true, category: 'Dashboard Management' },
-  { id: 'delete-dashboards', label: 'Delete Dashboards', granted: true, category: 'Dashboard Management' },
-  
+  {
+    id: 'view-dashboards',
+    label: 'View Dashboards',
+    granted: true,
+    category: 'Dashboard Management',
+  },
+  {
+    id: 'create-dashboards',
+    label: 'Create Dashboards',
+    granted: true,
+    category: 'Dashboard Management',
+  },
+  {
+    id: 'edit-dashboards',
+    label: 'Edit Dashboards',
+    granted: true,
+    category: 'Dashboard Management',
+  },
+  {
+    id: 'delete-dashboards',
+    label: 'Delete Dashboards',
+    granted: true,
+    category: 'Dashboard Management',
+  },
+
   // Device Management
-  { id: 'view-devices', label: 'View Devices', granted: true, category: 'Device Management' },
-  { id: 'manage-devices', label: 'Manage Devices', granted: true, category: 'Device Management' },
-  { id: 'configure-devices', label: 'Configure Devices', granted: true, category: 'Device Management' },
-  { id: 'delete-devices', label: 'Delete Devices', granted: false, category: 'Device Management' },
-  
+  {
+    id: 'view-devices',
+    label: 'View Devices',
+    granted: true,
+    category: 'Device Management',
+  },
+  {
+    id: 'manage-devices',
+    label: 'Manage Devices',
+    granted: true,
+    category: 'Device Management',
+  },
+  {
+    id: 'configure-devices',
+    label: 'Configure Devices',
+    granted: true,
+    category: 'Device Management',
+  },
+  {
+    id: 'delete-devices',
+    label: 'Delete Devices',
+    granted: false,
+    category: 'Device Management',
+  },
+
   // User Management
-  { id: 'view-users', label: 'View Users', granted: true, category: 'User Management' },
-  { id: 'create-users', label: 'Create Users', granted: true, category: 'User Management' },
-  { id: 'edit-users', label: 'Edit Users', granted: true, category: 'User Management' },
-  { id: 'assign-roles', label: 'Assign Roles', granted: true, category: 'User Management' },
-  
+  {
+    id: 'view-users',
+    label: 'View Users',
+    granted: true,
+    category: 'User Management',
+  },
+  {
+    id: 'create-users',
+    label: 'Create Users',
+    granted: true,
+    category: 'User Management',
+  },
+  {
+    id: 'edit-users',
+    label: 'Edit Users',
+    granted: true,
+    category: 'User Management',
+  },
+  {
+    id: 'assign-roles',
+    label: 'Assign Roles',
+    granted: true,
+    category: 'User Management',
+  },
+
   // Data Access
-  { id: 'view-telemetry', label: 'View Telemetry', granted: true, category: 'Data Access' },
-  { id: 'view-attributes', label: 'View Attributes', granted: true, category: 'Data Access' },
-  { id: 'export-data', label: 'Export Data', granted: false, category: 'Data Access' },
-  { id: 'delete-telemetry', label: 'Delete Telemetry', granted: false, category: 'Data Access' },
-  
+  {
+    id: 'view-telemetry',
+    label: 'View Telemetry',
+    granted: true,
+    category: 'Data Access',
+  },
+  {
+    id: 'view-attributes',
+    label: 'View Attributes',
+    granted: true,
+    category: 'Data Access',
+  },
+  {
+    id: 'export-data',
+    label: 'Export Data',
+    granted: false,
+    category: 'Data Access',
+  },
+  {
+    id: 'delete-telemetry',
+    label: 'Delete Telemetry',
+    granted: false,
+    category: 'Data Access',
+  },
+
   // Report Generation
-  { id: 'create-reports', label: 'Create Reports', granted: true, category: 'Report Generation' },
-  { id: 'schedule-reports', label: 'Schedule Reports', granted: true, category: 'Report Generation' },
-  { id: 'export-reports', label: 'Export Reports', granted: false, category: 'Report Generation' },
-  { id: 'share-reports', label: 'Share Reports', granted: true, category: 'Report Generation' },
-  
+  {
+    id: 'create-reports',
+    label: 'Create Reports',
+    granted: true,
+    category: 'Report Generation',
+  },
+  {
+    id: 'schedule-reports',
+    label: 'Schedule Reports',
+    granted: true,
+    category: 'Report Generation',
+  },
+  {
+    id: 'export-reports',
+    label: 'Export Reports',
+    granted: false,
+    category: 'Report Generation',
+  },
+  {
+    id: 'share-reports',
+    label: 'Share Reports',
+    granted: true,
+    category: 'Report Generation',
+  },
+
   // System Access
-  { id: 'system-admin', label: 'System Admin', granted: false, category: 'System Access' },
-  { id: 'view-audit-logs', label: 'View Audit Logs', granted: true, category: 'System Access' },
-  { id: 'manage-settings', label: 'Manage Settings', granted: false, category: 'System Access' },
-  { id: 'system-backup', label: 'System Backup', granted: false, category: 'System Access' },
+  {
+    id: 'system-admin',
+    label: 'System Admin',
+    granted: false,
+    category: 'System Access',
+  },
+  {
+    id: 'view-audit-logs',
+    label: 'View Audit Logs',
+    granted: true,
+    category: 'System Access',
+  },
+  {
+    id: 'manage-settings',
+    label: 'Manage Settings',
+    granted: false,
+    category: 'System Access',
+  },
+  {
+    id: 'system-backup',
+    label: 'System Backup',
+    granted: false,
+    category: 'System Access',
+  },
 ];
 
 const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
@@ -104,10 +224,26 @@ export default function CustomerAdministratorPage() {
 
   // Summary permissions (top right)
   const summaryPermissions = [
-    { category: 'Dashboard Management', permissions: ['View Dashboards', 'Create Dashboards', 'Delete Dashboards'] },
-    { category: 'Device Management', permissions: ['View Devices', 'Manage Devices', 'Delete Devices'] },
-    { category: 'User Management', permissions: ['View Users', 'Create Users', 'Edit Users'] },
-    { category: 'Data Access', permissions: ['View Telemetry', 'Export Data', 'Delete Telemetr'] },
+    {
+      category: 'Dashboard Management',
+      permissions: [
+        'View Dashboards',
+        'Create Dashboards',
+        'Delete Dashboards',
+      ],
+    },
+    {
+      category: 'Device Management',
+      permissions: ['View Devices', 'Manage Devices', 'Delete Devices'],
+    },
+    {
+      category: 'User Management',
+      permissions: ['View Users', 'Create Users', 'Edit Users'],
+    },
+    {
+      category: 'Data Access',
+      permissions: ['View Telemetry', 'Export Data', 'Delete Telemetr'],
+    },
   ];
 
   return (
@@ -129,55 +265,58 @@ export default function CustomerAdministratorPage() {
               <div className="flex gap-3">
                 <Button
                   onClick={handleEditRole}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white"
                 >
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4  " />
                   Edit Role
                 </Button>
                 <Button
                   onClick={handleDelete}
-                  variant="destructive"
-                  className="bg-pink-500 hover:bg-pink-600 text-white"
+                  variant="secondary"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash2 className="h-4 w-4  " />
                   Delete
                 </Button>
               </div>
             </div>
             <div className="bg-gray-50 rounded-lg p-4 w-80 space-y-3 grid grid-cols-2 w-full gap-4">
-                    {summaryPermissions.map((summary) => (
-                      <div key={summary.category}>
-                        <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                          {summary.category}:
-                        </h3>
-                        <div className="space-y-1">
-                          {summary.permissions.map((permName) => {
-                            const permission = permissions.find(
-                              (p) => p.label === permName
-                            );
-                            return (
-                              <div
-                                key={permName}
-                                className="flex items-center gap-2 text-sm"
-                              >
-                                <PermissionCheckbox
-                                  granted={permission?.granted || false}
-                                />
-                                <span className="text-gray-700">{permName}</span>
-                              </div>
-                            );
-                          })}
+              {summaryPermissions.map((summary) => (
+                <div key={summary.category}>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                    {summary.category}:
+                  </h3>
+                  <div className="space-y-1">
+                    {summary.permissions.map((permName) => {
+                      const permission = permissions.find(
+                        (p) => p.label === permName
+                      );
+                      return (
+                        <div
+                          key={permName}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <PermissionCheckbox
+                            granted={permission?.granted || false}
+                          />
+                          <span className="text-gray-700">{permName}</span>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
         {/* Tabs */}
-        <Card className="bg-white shadow-sm">
+        <Card className="bg-white shadow-sm p-4">
           <CardContent className="p-0">
-            <Tabs defaultValue="permissions" value={activeTab} onValueChange={setActiveTab}>
+            <Tabs
+              defaultValue="permissions"
+              value={activeTab}
+              onValueChange={setActiveTab}
+            >
               <TabsList className="w-full justify-start rounded-none border-b border-slate-200 bg-transparent p-0">
                 <TabsTrigger
                   value="permissions"
@@ -205,9 +344,8 @@ export default function CustomerAdministratorPage() {
                   <h2 className="text-2xl font-bold text-gray-900">
                     Permission Matrix
                   </h2>
-                  
+
                   {/* Summary Section */}
-                  
                 </div>
 
                 {/* Permission Categories */}
@@ -233,7 +371,9 @@ export default function CustomerAdministratorPage() {
                               key={permission.id}
                               className="flex items-center gap-3"
                             >
-                              <PermissionCheckbox granted={permission.granted} />
+                              <PermissionCheckbox
+                                granted={permission.granted}
+                              />
                               <span className="text-sm text-gray-900 flex-1">
                                 {permission.label}
                               </span>
@@ -292,4 +432,3 @@ export default function CustomerAdministratorPage() {
     </div>
   );
 }
-

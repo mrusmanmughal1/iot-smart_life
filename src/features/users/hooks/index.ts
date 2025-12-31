@@ -5,7 +5,10 @@ import { userService } from '../services/usersService';
 export const useUsers = (params?: any) => {
   return useQuery({
     queryKey: ['users', params],
-    queryFn: () => usersApi.getAll(params),
+    queryFn: async () => {
+      const response = await usersApi.getAll(params);
+      return response.data.data.data;
+    },
   });
 };
 

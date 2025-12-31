@@ -69,20 +69,28 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+export interface UsersResponse {
+  message: string;
+  data: User[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
 
 export interface ApiResponse<T> {
-  message: string;
   data: T;
 }
 
 export const usersApi = {
   // Get all users
   getAll: (params?: UserQuery) =>
-    apiClient.get<PaginatedResponse<User>>('/users', { params }),
+    apiClient.get<ApiResponse<UsersResponse>>('/users', { params }),
 
   // Get user by ID
-  getById: (id: string) =>
-    apiClient.get<ApiResponse<User>>(`/users/${id}`),
+  getById: (id: string) => apiClient.get<ApiResponse<User>>(`/users/${id}`),
 
   // Create user
   create: (data: Partial<User> & { password: string }) =>
@@ -93,12 +101,10 @@ export const usersApi = {
     apiClient.patch<ApiResponse<User>>(`/users/${id}`, data),
 
   // Delete user
-  delete: (id: string) =>
-    apiClient.delete(`/users/${id}`),
+  delete: (id: string) => apiClient.delete(`/users/${id}`),
 
   // Get current user
-  getCurrentUser: () =>
-    apiClient.get<ApiResponse<User>>('/users/me'),
+  getCurrentUser: () => apiClient.get<ApiResponse<User>>('/users/me'),
 
   // Update current user profile
   updateProfile: (data: Partial<User>) =>
@@ -133,11 +139,12 @@ export const usersApi = {
 
   // Update user permissions
   updatePermissions: (id: string, permissions: string[]) =>
-    apiClient.patch<ApiResponse<User>>(`/users/${id}/permissions`, { permissions }),
+    apiClient.patch<ApiResponse<User>>(`/users/${id}/permissions`, {
+      permissions,
+    }),
 
   // Get user statistics
-  getStatistics: () =>
-    apiClient.get<ApiResponse<any>>('/users/statistics'),
+  getStatistics: () => apiClient.get<ApiResponse<any>>('/users/statistics'),
 
   // Enable 2FA
   enable2FA: (id: string) =>
@@ -159,8 +166,7 @@ export const usersApi = {
 // Permissions API
 export const permissionsApi = {
   // Get all permissions
-  getAll: () =>
-    apiClient.get<ApiResponse<Permission[]>>('/permissions'),
+  getAll: () => apiClient.get<ApiResponse<Permission[]>>('/permissions'),
 
   // Get permission by ID
   getById: (id: string) =>
@@ -168,18 +174,18 @@ export const permissionsApi = {
 
   // Get permissions by resource
   getByResource: (resource: string) =>
-    apiClient.get<ApiResponse<Permission[]>>(`/permissions/resource/${resource}`),
+    apiClient.get<ApiResponse<Permission[]>>(
+      `/permissions/resource/${resource}`
+    ),
 };
 
 // Roles API
 export const rolesApi = {
   // Get all roles
-  getAll: () =>
-    apiClient.get<ApiResponse<Role[]>>('/roles'),
+  getAll: () => apiClient.get<ApiResponse<Role[]>>('/roles'),
 
   // Get role by ID
-  getById: (id: string) =>
-    apiClient.get<ApiResponse<Role>>(`/roles/${id}`),
+  getById: (id: string) => apiClient.get<ApiResponse<Role>>(`/roles/${id}`),
 
   // Create role
   create: (data: Partial<Role>) =>
@@ -190,8 +196,7 @@ export const rolesApi = {
     apiClient.patch<ApiResponse<Role>>(`/roles/${id}`, data),
 
   // Delete role
-  delete: (id: string) =>
-    apiClient.delete(`/roles/${id}`),
+  delete: (id: string) => apiClient.delete(`/roles/${id}`),
 
   // Assign role to user
   assignToUser: (roleId: string, userId: string) =>

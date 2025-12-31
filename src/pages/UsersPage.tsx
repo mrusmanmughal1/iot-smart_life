@@ -21,11 +21,29 @@ import { useUsers } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User } from '@/services/api/users.api';
+import { DeleteUserModal } from '@/components/users/DeleteUserModal';
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 export default function UsersPage() {
   const { t } = useTranslation();
   const { data: usersData, isLoading } = useUsers();
-  const users = usersData?.data?.data || [];
+  const users = usersData || [];
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const handleDeleteClick = (user: User) => {
+    setSelectedUser(user);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedUser) {
+      // TODO: Implement actual delete API call
+      toast.success(`User ${selectedUser.name || selectedUser.email} deleted successfully`);
+      setSelectedUser(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -103,7 +121,10 @@ export default function UsersPage() {
                             <Edit className="h-4 w-4 mr-2" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600">
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => handleDeleteClick(user)}
+                          >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete
                           </DropdownMenuItem>
@@ -117,6 +138,14 @@ export default function UsersPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete User Modal */}
+      <DeleteUserModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        user={selectedUser}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }

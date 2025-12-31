@@ -358,16 +358,16 @@ export const router = createBrowserRouter([
       },
       //  -------------------Users Management Routes-------------------
       {
-        path: '/users',
+        path: '/users-management',
         element: (
           <AppLayout>
-           <Outlet />
-         </AppLayout>
+            <Outlet />
+          </AppLayout>
         ),
         children: [
           {
             index: true,
-            element: <UsersPage />,
+            element: <UsersAndRolesManagementPage />,
           },
           {
             path: 'customer-user-association',
@@ -386,16 +386,12 @@ export const router = createBrowserRouter([
             element: <RolePermissionManagementPage />,
           },
           {
-            path: 'users-and-roles-management',
-            element: <UsersAndRolesManagementPage />,
+            path: 'assign-permissions',
+            element: <AssignPermissionsPage />,
           },
           {
             path: 'search-results',
             element: <SearchResultsPage />,
-          },
-          {
-            path: 'assign-permission/:userId?',
-            element: <AssignPermissionsPage />,
           },
         ],
       },

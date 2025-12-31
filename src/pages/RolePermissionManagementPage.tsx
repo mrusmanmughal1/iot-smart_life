@@ -309,7 +309,6 @@ export default function RolePermissionManagementPage() {
                     <TableRow key={permission.id} className="hover:bg-gray-50">
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
                           {permission.permission}
                         </div>
                       </TableCell>
@@ -346,13 +345,13 @@ export default function RolePermissionManagementPage() {
                 <div className="flex gap-3">
                   <Button
                     onClick={handleGrantAll}
-                    className="bg-primary hover:bg-primary/90 text-white"
+                    variant="primary"
                   >
                     Grant All Permissions
                   </Button>
                   <Button
                     onClick={handleRevokeAll}
-                    className="bg-secondary hover:bg-secondary/90 text-white"
+                    variant="secondary"
                   >
                     Revoke All Permissions
                   </Button>
