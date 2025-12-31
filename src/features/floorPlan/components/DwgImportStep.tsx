@@ -532,7 +532,7 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
               
               if (completedFiles.length === 0) {
                 toast.error(
-                  'No files uploaded',
+                 
                   'Please upload at least one DWG file before proceeding.'
                 );
                 return;

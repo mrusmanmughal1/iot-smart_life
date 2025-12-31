@@ -20,13 +20,12 @@ import {
 import { useUsers } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { User } from '@/services/api/users.api';
 
 export default function UsersPage() {
   const { t } = useTranslation();
   const { data: usersData, isLoading } = useUsers();
-
-  const users = usersData?.data?.data.data || [];
-  console.log(users);
+  const users = usersData?.data?.data || [];
 
   return (
     <div className="space-y-6">
@@ -67,7 +66,7 @@ export default function UsersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users?.map((user: IUser) => (
+                {users?.map((user: User) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
