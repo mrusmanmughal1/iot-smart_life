@@ -69,6 +69,7 @@ interface FloorMapStore {
   devicePositions: Record<string, { x: number; y: number; zoneId: string | null; floor: string }>;
   setDevicePosition: (deviceId: string, position: { x: number; y: number; zoneId: string | null; floor: string }) => void;
   removeDevicePosition: (deviceId: string) => void;
+  clearDevicePositions: () => void;
 
   // Reset all data
   reset: () => void;
@@ -291,6 +292,7 @@ export const useFloorMapStore = create<FloorMapStore>()(
         });
       },
 
+      // Device Positions management
       setDevicePosition: (deviceId: string, position: { x: number; y: number; zoneId: string | null; floor: string }) => {
         set((state) => ({
           devicePositions: {
@@ -308,6 +310,10 @@ export const useFloorMapStore = create<FloorMapStore>()(
         });
       },
 
+      clearDevicePositions: () => {
+        set({ devicePositions: {} });
+      },
+
       // Reset all data
       reset: () => {
         const state = get();
@@ -317,7 +323,7 @@ export const useFloorMapStore = create<FloorMapStore>()(
             URL.revokeObjectURL(file.previewUrl);
           }
         });
-        set(defaultState);
+        set({ ...defaultState });
       },
     }),
     {
@@ -335,6 +341,7 @@ export const useFloorMapStore = create<FloorMapStore>()(
         // Note: uploadedFiles and filteredAssets are not persisted
         // as they contain File objects which can't be serialized
         assignedDevices: state.assignedDevices,
+        devicePositions: state.devicePositions,
       }),
     }
   )

@@ -761,37 +761,117 @@ export class EnhancedCADParser {
 
   static getEntityPoints(entity: any): Array<{ x: number; y: number }> {
     const points: Array<{ x: number; y: number }> = [];
+    if (!entity) return points;
 
-    switch (entity.type) {
+    const entityType = (entity.type || '').toUpperCase();
+
+    switch (entityType) {
       case 'LINE':
-        if (entity.vertices?.length >= 2) {
-          points.push({ x: entity.vertices[0].x, y: entity.vertices[0].y }, { x: entity.vertices[1].x, y: entity.vertices[1].y });
+        // DXF parser format: startPoint and endPoint
+        if (entity.startPoint && entity.endPoint) {
+          points.push(
+            { x: entity.startPoint.x || 0, y: entity.startPoint.y || 0 },
+            { x: entity.endPoint.x || 0, y: entity.endPoint.y || 0 }
+          );
+        }
+        // Alternative format: start and end
+        else if (entity.start && entity.end) {
+          points.push(
+            { x: entity.start.x || 0, y: entity.start.y || 0 },
+            { x: entity.end.x || 0, y: entity.end.y || 0 }
+          );
+        }
+        // Alternative format: vertices array
+        else if (entity.vertices?.length >= 2) {
+          const v1 = entity.vertices[0];
+          const v2 = entity.vertices[1];
+          points.push(
+            { x: (typeof v1 === 'object' && v1.x !== undefined) ? v1.x : (Array.isArray(v1) ? v1[0] : 0), 
+              y: (typeof v1 === 'object' && v1.y !== undefined) ? v1.y : (Array.isArray(v1) ? v1[1] : 0) },
+            { x: (typeof v2 === 'object' && v2.x !== undefined) ? v2.x : (Array.isArray(v2) ? v2[0] : 0), 
+              y: (typeof v2 === 'object' && v2.y !== undefined) ? v2.y : (Array.isArray(v2) ? v2[1] : 0) }
+          );
         }
         break;
       case 'LWPOLYLINE':
       case 'POLYLINE':
-        entity.vertices?.forEach((vertex: any) => points.push({ x: vertex.x, y: vertex.y }));
+        if (entity.vertices && Array.isArray(entity.vertices)) {
+          entity.vertices.forEach((vertex: any) => {
+            if (typeof vertex === 'object') {
+              points.push({ 
+                x: vertex.x !== undefined ? vertex.x : (Array.isArray(vertex) ? vertex[0] : 0), 
+                y: vertex.y !== undefined ? vertex.y : (Array.isArray(vertex) ? vertex[1] : 0) 
+              });
+            } else if (Array.isArray(vertex)) {
+              points.push({ x: vertex[0] || 0, y: vertex[1] || 0 });
+            }
+          });
+        }
         break;
       case 'CIRCLE':
-        const radius = entity.radius || 1;
-        points.push(
-          { x: entity.center.x - radius, y: entity.center.y - radius },
-          { x: entity.center.x + radius, y: entity.center.y + radius }
-        );
+        if (entity.center && entity.radius !== undefined) {
+          const radius = entity.radius || 1;
+          const cx = entity.center.x || 0;
+          const cy = entity.center.y || 0;
+          points.push(
+            { x: cx - radius, y: cy - radius },
+            { x: cx + radius, y: cy + radius }
+          );
+        }
         break;
       case 'ARC':
-        const arcRadius = entity.radius || 1;
-        points.push(
-          { x: entity.center.x - arcRadius, y: entity.center.y - arcRadius },
-          { x: entity.center.x + arcRadius, y: entity.center.y + arcRadius }
-        );
+        if (entity.center && entity.radius !== undefined) {
+          const arcRadius = entity.radius || 1;
+          const cx = entity.center.x || 0;
+          const cy = entity.center.y || 0;
+          points.push(
+            { x: cx - arcRadius, y: cy - arcRadius },
+            { x: cx + arcRadius, y: cy + arcRadius }
+          );
+        }
         break;
       case 'INSERT':
-        points.push({ x: entity.position.x, y: entity.position.y });
+        if (entity.position) {
+          points.push({ x: entity.position.x || 0, y: entity.position.y || 0 });
+        } else if (entity.insertionPoint) {
+          points.push({ x: entity.insertionPoint.x || 0, y: entity.insertionPoint.y || 0 });
+        }
+        break;
+      case 'SPLINE':
+        if (entity.controlPoints && Array.isArray(entity.controlPoints)) {
+          entity.controlPoints.forEach((cp: any) => {
+            if (typeof cp === 'object') {
+              points.push({ x: cp.x || 0, y: cp.y || 0 });
+            }
+          });
+        } else if (entity.vertices && Array.isArray(entity.vertices)) {
+          entity.vertices.forEach((v: any) => {
+            if (typeof v === 'object') {
+              points.push({ x: v.x || 0, y: v.y || 0 });
+            }
+          });
+        }
         break;
       default:
-        if (entity.vertices) {
-          entity.vertices.forEach((vertex: any) => points.push({ x: vertex.x, y: vertex.y }));
+        // Generic handling for entities with vertices
+        if (entity.vertices && Array.isArray(entity.vertices)) {
+          entity.vertices.forEach((vertex: any) => {
+            if (typeof vertex === 'object') {
+              points.push({ 
+                x: vertex.x !== undefined ? vertex.x : (Array.isArray(vertex) ? vertex[0] : 0), 
+                y: vertex.y !== undefined ? vertex.y : (Array.isArray(vertex) ? vertex[1] : 0) 
+              });
+            } else if (Array.isArray(vertex)) {
+              points.push({ x: vertex[0] || 0, y: vertex[1] || 0 });
+            }
+          });
+        }
+        // Handle startPoint/endPoint format
+        if (entity.startPoint) {
+          points.push({ x: entity.startPoint.x || 0, y: entity.startPoint.y || 0 });
+        }
+        if (entity.endPoint) {
+          points.push({ x: entity.endPoint.x || 0, y: entity.endPoint.y || 0 });
         }
         break;
     }

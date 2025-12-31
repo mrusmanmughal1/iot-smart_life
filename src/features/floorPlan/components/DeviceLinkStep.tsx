@@ -513,16 +513,19 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
     console.log('Drag started with device:', device, 'JSON:', deviceJson);
   };
 
+  // Use device positions from store instead of local state
+  const devicePositions = storeDevicePositions;
+
   // Filter device positions by current floor
-  const devicePositions = useMemo(() => {
+  const currentFloorDevicePositions = useMemo(() => {
     const filtered: Record<string, { x: number; y: number; zoneId: string | null; floor: string }> = {};
-    Object.entries(storeDevicePositions).forEach(([deviceId, position]) => {
+    Object.entries(devicePositions).forEach(([deviceId, position]) => {
       if (position.floor === activeFloorTab) {
         filtered[deviceId] = position;
       }
     });
     return filtered;
-  }, [storeDevicePositions, activeFloorTab]);
+  }, [devicePositions, activeFloorTab]);
 
   // Debug: Log device positions when they change
   useEffect(() => {
@@ -552,10 +555,10 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
       unassignDeviceFromRoom(device.id, device.assignedTo);
     }
     
-        // Store device position if drop coordinates are provided
-        if (dropX !== undefined && dropY !== undefined) {
-          setDevicePosition(device.id, { x: dropX, y: dropY, zoneId: zoneId || null, floor: activeFloorTab });
-        }
+    // Store device position if drop coordinates are provided
+    if (dropX !== undefined && dropY !== undefined) {
+      setDevicePosition(device.id, { x: dropX, y: dropY, zoneId: zoneId || null, floor: activeFloorTab });
+    }
   };
 
   const handleRemoveDevice = (deviceId: string, zoneId: string) => {
@@ -567,7 +570,7 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
 
   const handleDeleteDevice = (deviceId: string) => {
     // Remove device from any zone assignment
-    const position = storeDevicePositions[deviceId];
+    const position = devicePositions[deviceId];
     if (position?.zoneId) {
       unassignDeviceFromRoom(deviceId, position.zoneId);
     }
@@ -717,7 +720,7 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
                          }
                          
                          // Update position and zone assignment
-                         const currentPosition = storeDevicePositions[parsed.deviceId];
+                         const currentPosition = devicePositions[parsed.deviceId];
                          
                          // If zone changed, update assignment
                          if (droppedZoneId && currentPosition?.zoneId !== droppedZoneId) {
@@ -807,16 +810,14 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
                  );
                })}
                {/* Device Name Labels - displayed where devices are dropped (anywhere on canvas) */}
-               {Object.entries(devicePositions)
-                 .filter(([, position]) => position.floor === activeFloorTab) // Filter by current floor
-                 .map(([deviceId, position]) => {
-                   // Get the device object
-                   const device = availableDevices.find((d) => d.id === deviceId);
-                   if (!device) return null;
+               {Object.entries(currentFloorDevicePositions).map(([deviceId, position]) => {
+                 // Get the device object
+                 const device = availableDevices.find((d) => d.id === deviceId);
+                 if (!device) return null;
 
-                   // Check if device is in a zone (for styling)
-                   const isInZone = position.zoneId !== null;
-                   const zone = isInZone ? currentFloorZones.find((z) => z.id === position.zoneId) : null;
+                 // Check if device is in a zone (for styling)
+                 const isInZone = position.zoneId !== null;
+                 const zone = isInZone ? currentFloorZones.find((z) => z.id === position.zoneId) : null;
 
                  return (
                    <div

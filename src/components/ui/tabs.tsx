@@ -15,15 +15,15 @@ interface TabsProps {
   className?: string;
 }
 
-export function Tabs({ 
-  defaultValue, 
-  value: controlledValue, 
-  onValueChange, 
-  children, 
-  className = '' 
+export function Tabs({
+  defaultValue,
+  value: controlledValue,
+  onValueChange,
+  children,
+  className = '',
 }: TabsProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
-  
+
   const value = controlledValue !== undefined ? controlledValue : internalValue;
   const handleValueChange = (newValue: string) => {
     if (controlledValue === undefined) {
@@ -34,9 +34,7 @@ export function Tabs({
 
   return (
     <TabsContext.Provider value={{ value, onValueChange: handleValueChange }}>
-      <div className={className}>
-        {children}
-      </div>
+      <div className={className}>{children}</div>
     </TabsContext.Provider>
   );
 }
@@ -48,7 +46,7 @@ interface TabsListProps {
 
 export function TabsList({ children, className = '' }: TabsListProps) {
   return (
-    <div 
+    <div
       className={`inline-flex h-10 items-center justify-center rounded-md bg-slate-100 p-1 text-slate-500 ${className}`}
       role="tablist"
     >
@@ -64,9 +62,14 @@ interface TabsTriggerProps {
   disabled?: boolean;
 }
 
-export function TabsTrigger({ value, children, className = '', disabled = false }: TabsTriggerProps) {
+export function TabsTrigger({
+  value,
+  children,
+  className = '',
+  disabled = false,
+}: TabsTriggerProps) {
   const context = useContext(TabsContext);
-  
+
   if (!context) {
     throw new Error('TabsTrigger must be used within Tabs');
   }
@@ -81,8 +84,8 @@ export function TabsTrigger({ value, children, className = '', disabled = false 
       disabled={disabled}
       onClick={() => context.onValueChange(value)}
       className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
-        isActive 
-          ? 'bg-white text-slate-900 shadow-sm' 
+        isActive
+          ? 'bg-primary text-white shadow-sm'
           : 'text-slate-600 hover:text-slate-900'
       } ${className}`}
     >
@@ -97,9 +100,13 @@ interface TabsContentProps {
   className?: string;
 }
 
-export function TabsContent({ value, children, className = '' }: TabsContentProps) {
+export function TabsContent({
+  value,
+  children,
+  className = '',
+}: TabsContentProps) {
   const context = useContext(TabsContext);
-  
+
   if (!context) {
     throw new Error('TabsContent must be used within Tabs');
   }

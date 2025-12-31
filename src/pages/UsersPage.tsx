@@ -1,10 +1,22 @@
 import { useTranslation } from 'react-i18next';
-import {  MoreVertical, Edit, Trash2, UserPlus } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, UserPlus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useUsers } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -13,13 +25,16 @@ export default function UsersPage() {
   const { t } = useTranslation();
   const { data: usersData, isLoading } = useUsers();
 
-  const users = usersData?.data?.data || [];
+  const users = usersData?.data?.data.data || [];
+  console.log(users);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t('users.title')}</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            {t('users.title')}
+          </h1>
           <p className="text-slate-500 mt-2">Manage users and their roles</p>
         </div>
         <Button>
@@ -52,7 +67,7 @@ export default function UsersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user: any) => (
+                {users?.map((user: IUser) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">

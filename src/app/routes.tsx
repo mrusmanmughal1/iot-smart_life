@@ -62,8 +62,14 @@ import AssetProfileDetails from '@/pages/AssetProfileDetails.tsx';
 import DeviceProfileDetails from '@/pages/DeviceProfileDetails.tsx';
 import EmailVerification from '@/pages/EmailVerification.tsx';
 import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
+import CustomerUserAssociationPage from '@/pages/CustomerUserAssociationPage.tsx';
+import EditRolePage from '@/pages/EditRolePage.tsx';
+import CustomerAdministratorPage from '@/pages/CustomerAdministratorPage.tsx';
+import RolePermissionManagementPage from '@/pages/RolePermissionManagementPage.tsx';
+import UsersAndRolesManagementPage from '@/pages/UsersAndRolesManagementPage.tsx';
+import SearchResultsPage from '@/pages/SearchResultsPage.tsx';
+import AssignPermissionsPage from '@/pages/AssignPermissionsPage.tsx';
 export const router = createBrowserRouter([
-
   {
     path: '/',
     element: <Navigate to="/login" replace />,
@@ -174,7 +180,7 @@ export const router = createBrowserRouter([
         path: '/analytics',
         element: <AnalyticsPage />,
       },
-     
+
       {
         path: '/settings',
         element: <SettingsPage />,
@@ -347,6 +353,49 @@ export const router = createBrowserRouter([
           {
             path: 'report-templates',
             element: <ReportTemplatesPage />,
+          },
+        ],
+      },
+      //  -------------------Users Management Routes-------------------
+      {
+        path: '/users',
+        element: (
+          <AppLayout>
+           <Outlet />
+         </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <UsersPage />,
+          },
+          {
+            path: 'customer-user-association',
+            element: <CustomerUserAssociationPage />,
+          },
+          {
+            path: 'edit-role/:id',
+            element: <EditRolePage />,
+          },
+          {
+            path: 'customer-Administrator',
+            element: <CustomerAdministratorPage />,
+          },
+          {
+            path: 'role-permission-management',
+            element: <RolePermissionManagementPage />,
+          },
+          {
+            path: 'users-and-roles-management',
+            element: <UsersAndRolesManagementPage />,
+          },
+          {
+            path: 'search-results',
+            element: <SearchResultsPage />,
+          },
+          {
+            path: 'assign-permission/:userId?',
+            element: <AssignPermissionsPage />,
           },
         ],
       },

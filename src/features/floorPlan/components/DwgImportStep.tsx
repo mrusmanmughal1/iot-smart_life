@@ -26,6 +26,7 @@ import {
   MoreVertical,
   Loader2,
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import type { FilterFormValues } from '@/features/floorPlan/types';
 import {
   useFloorMapStore,
@@ -502,19 +503,48 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
         </div>
       </div>
       {/* Footer actions */}
-      <div className="flex flex-wrap  gap-3 pt-2 text-xs">
-        <Button variant="outline" type="button">
-          Save Draft
-        </Button>
-        <Button variant="outline" type="button">
-          + Add More
-        </Button>
-        <Button variant="outline" type="button" onClick={onPrevious}>
-          Previous
-        </Button>
-        <Button type="button" onClick={onNext}>
-          Next
-        </Button>
+      <div className="space-y-3">
+        {uploadedFiles.length === 0 && (
+          <div className="flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm">
+            <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0" />
+            <p className="text-amber-800">
+              Please upload at least one DWG file to continue to the next step.
+            </p>
+          </div>
+        )}
+        <div className="flex flex-wrap  gap-3 pt-2 text-xs">
+          <Button variant="outline" type="button">
+            Save Draft
+          </Button>
+          <Button variant="outline" type="button">
+            + Add More
+          </Button>
+          <Button variant="outline" type="button" onClick={onPrevious}>
+            Previous
+          </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              // Check if there are any completed files
+              const completedFiles = uploadedFiles.filter(
+                (f) => f.status === 'completed'
+              );
+              
+              if (completedFiles.length === 0) {
+                toast.error(
+                  'No files uploaded',
+                  'Please upload at least one DWG file before proceeding.'
+                );
+                return;
+              }
+              
+              onNext();
+            }}
+            disabled={uploadedFiles.length === 0}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
