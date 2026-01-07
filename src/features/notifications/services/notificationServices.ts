@@ -29,15 +29,22 @@ export const notificationService = {
       userId,
     });
 
+    // Access the nested data structure: BackendEnvelope<BackendEnvelope<PaginatedResponse<Notification>>>
+    // unread.data = BackendEnvelope<PaginatedResponse<Notification>>
+    // unread.data.data = BackendEnvelope<PaginatedResponse<Notification>> (second level)
+    // unread.data.data.data = PaginatedResponse<Notification>
+    // unread.data.data.data.data = Notification[]
+    const notifications = unread.data.data.data.data;
+
     // Group by type
-    const grouped = unread.data.data.reduce((acc, notif) => {
+    const grouped = notifications.reduce((acc, notif) => {
       if (!acc[notif.type]) acc[notif.type] = [];
       acc[notif.type].push(notif);
       return acc;
     }, {} as Record<NotificationType, Notification[]>);
 
     return {
-      total: unread.data.data.length,
+      total: notifications.length,
       byType: grouped,
     };
   },
@@ -85,14 +92,17 @@ export const notificationService = {
       read: true,
     });
 
-    if (old.data.data.length > 0) {
+    // Access the nested data structure: BackendEnvelope<BackendEnvelope<PaginatedResponse<Notification>>>
+    const oldNotifications = old.data.data.data.data;
+
+    if (oldNotifications.length > 0) {
       await notificationsApi.bulkDelete(
-        old.data.data.map(n => n.id)
+        oldNotifications.map(n => n.id)
       );
     }
 
     return {
-      deleted: old.data.data.length,
+      deleted: oldNotifications.length,
       cutoffDate: cutoffDate.toISOString(),
     };
   },

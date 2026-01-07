@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-2">
       <PageHeader
         title="Device Analytics and Monitoring - Building AGW-01"
         actions={[

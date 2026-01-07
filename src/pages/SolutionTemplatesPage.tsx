@@ -55,20 +55,24 @@ export default function SolutionTemplates() {
 
   // Create debounced search handler (900ms delay)
   const debouncedSearch = useMemo(
-    () => debounce((value: string) => {
-      handleSearch(value);
-    }, 300),
+    () =>
+      debounce((value: string) => {
+        handleSearch(value);
+      }, 300),
     []
   );
 
   // Handle input change with immediate UI update and debounced search
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Update input value immediately for responsive UI (doesn't trigger API)
-    setInputValue(value);
-    // Debounce the actual search API call
-    debouncedSearch(value);
-  }, [debouncedSearch]);
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      // Update input value immediately for responsive UI (doesn't trigger API)
+      setInputValue(value);
+      // Debounce the actual search API call
+      debouncedSearch(value);
+    },
+    [debouncedSearch]
+  );
 
   // Sync input value when searchQuery changes externally (e.g., clear filters)
   useEffect(() => {
@@ -104,14 +108,14 @@ export default function SolutionTemplates() {
 
       <div className="border border-secondary p-4 rounded-2xl">
         {/* Search Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B]">
+        <div className="flex w flex-col md:flex-row justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black" />
             <Input
               placeholder={t('solutionTemplates.searchPlaceholder')}
               value={inputValue}
               onChange={handleInputChange}
-              className="pl-10 w-96 rounded-md"
+              className="pl-10 w-full md:w-96 rounded-md"
             />
           </div>
           <Button
@@ -124,13 +128,13 @@ export default function SolutionTemplates() {
         </div>
 
         {/* Popular Domain Section */}
-        <div className="  rounded-lg p-4  ">
+        <div className="  rounded-lg md:p-4  ">
           <h2 className="text-sm font-semibold text-gray-600 mb-4">
             {t('solutionTemplates.popularDomain')}
           </h2>
           <div className="relative">
             <div className="flex items-center gap-4  ">
-              <div className="flex gap-4 flex-wrap  w-full">
+              <div className="flex md:gap-4 gap-2 flex-wrap  w-full">
                 {categories.map((category) => (
                   <button
                     key={category.key}
@@ -143,7 +147,10 @@ export default function SolutionTemplates() {
                   >
                     {/* <category.icon className="h-10 w-10" /> */}
                     <span className="text-sm font-medium">
-                      {t(category.translationKey || `solutionTemplates.categories.${category.key}`)}
+                      {t(
+                        category.translationKey ||
+                          `solutionTemplates.categories.${category.key}`
+                      )}
                     </span>
                   </button>
                 ))}
@@ -169,80 +176,82 @@ export default function SolutionTemplates() {
           {!isLoading && (
             <div className="grid gap-6 md:grid-cols-3">
               {paginatedTemplates.map((template) => (
-              <Card
-                key={template.id}
-                className="hover:shadow-lg transition-shadow"
-              >
-                <CardHeader className="pb-3">
-                  {/* Thumbnail Images */}
-                  <div className="flex gap-2 mb-4">
-                    {template.images.map((image, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 h-20 bg-gray-200 rounded-lg overflow-hidden relative"
-                        style={{
-                          background:
-                            index === 0
-                              ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                              : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                        }}
-                      >
-                        <img
-                          src={image}
-                          alt={`${template.name} preview ${index + 1}`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
+                <Card
+                  key={template.id}
+                  className="hover:shadow-lg transition-shadow"
+                >
+                  <CardHeader className="pb-3">
+                    {/* Thumbnail Images */}
+                    <div className="flex gap-2 mb-4">
+                      {template.images.map((image, index) => (
+                        <div
+                          key={index}
+                          className="flex-1 h-20 bg-gray-200 rounded-lg overflow-hidden relative"
+                          style={{
+                            background:
+                              index === 0
+                                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                                : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                           }}
-                        />
-                      </div>
-                    ))}
-                  </div>
+                        >
+                          <img
+                            src={image}
+                            alt={`${template.name} preview ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
 
-                  <CardTitle className="text-lg font-bold text-gray-900 mb-2">
-                    {template.name}
-                  </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
-                    {template.description}
-                  </CardDescription>
-                </CardHeader>
+                    <CardTitle className="text-lg font-bold text-gray-900 mb-2">
+                      {template.name}
+                    </CardTitle>
+                    <CardDescription className="text-sm text-gray-600">
+                      {template.description}
+                    </CardDescription>
+                  </CardHeader>
 
-                <CardContent className="space-y-4">
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {template.tags.map((tag) => (
-                      <Badge
-                        key={tag}
-                        className="bg-blue-100 text-blue-700 border-0 text-xs rounded-md px-2 py-1"
+                  <CardContent className="space-y-4">
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {template.tags.map((tag) => (
+                        <Badge
+                          key={tag}
+                          className="bg-blue-100 text-blue-700 border-0 text-xs rounded-md px-2 py-1"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 pt-2">
+                      <Button
+                        className="flex-1 bg-primary hover:bg-primary/90 text-white"
+                        onClick={() =>
+                          navigate(`/solution-templates/preview/${template.id}`)
+                        }
                       >
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      className="flex-1 bg-primary hover:bg-primary/90 text-white"
-                      onClick={() => navigate(`/solution-templates/preview/${template.id}`)}
-                    >
-                      {t('solutionTemplates.preview')}
-                    </Button>
-                    <Button
-                      className={`flex-1 ${
-                        template.isActivated
-                          ? 'bg-secondary hover:bg-secondary/90 text-white'
-                          : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
-                      }`}
-                    >
-                      {template.isActivated
-                        ? t('solutionTemplates.activated')
-                        : t('solutionTemplates.activate')}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                        {t('solutionTemplates.preview')}
+                      </Button>
+                      <Button
+                        className={`flex-1 ${
+                          template.isActivated
+                            ? 'bg-secondary hover:bg-secondary/90 text-white'
+                            : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                        }`}
+                      >
+                        {template.isActivated
+                          ? t('solutionTemplates.activated')
+                          : t('solutionTemplates.activate')}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
