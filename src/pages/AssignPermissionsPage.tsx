@@ -188,10 +188,7 @@ export default function AssignPermissionsPage() {
                 </p>
               </div>
               <div className="flex gap-3">
-                <Button
-                  onClick={handleAdd}
-                  variant="secondary"
-                >
+                <Button onClick={handleAdd} variant="secondary">
                   Add
                 </Button>
                 <Button
@@ -211,7 +208,6 @@ export default function AssignPermissionsPage() {
             </div>
           </CardContent>
         </Card>
-
         {/* Three Panel Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Available Permissions Panel */}
@@ -382,7 +378,8 @@ export default function AssignPermissionsPage() {
               <div className="flex gap-3 pt-4  ">
                 <Button
                   onClick={handleSave}
-                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
+                  variant="secondary"
+                  className="flex-1"
                 >
                   Save
                 </Button>

@@ -75,12 +75,23 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
-
+export interface BackendEnvelope<T> {
+  data: T;
+}
 export const notificationsApi = {
   // Get all notifications
-  getAll: (params?: NotificationQuery) =>
-    apiClient.get<PaginatedResponse<Notification>>('/notifications', { params }),
+  // getAll: (params?: NotificationQuery) =>
+  //   apiClient.get<PaginatedResponse<Notification>>('/notifications', { params }),
 
+  getAll: (params?: NotificationQuery) =>
+    apiClient.get<
+      BackendEnvelope<
+        BackendEnvelope<
+          PaginatedResponse<Notification>
+        >
+      >
+    >('/notifications', { params }),
+  
   // Get notification by ID
   getById: (id: string) =>
     apiClient.get<ApiResponse<Notification>>(`/notifications/${id}`),

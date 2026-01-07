@@ -37,7 +37,6 @@ class WebSocketClient {
       const wsUrl = token ? `${this.url}?token=${token}` : this.url;
 
       try {
-
         this.ws = new WebSocket(wsUrl);
 
         this.ws.onopen = () => {
@@ -119,7 +118,11 @@ class WebSocketClient {
   private attemptReconnect(): void {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       setTimeout(() => {
-        console.log(`Attempting to reconnect (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
+        console.log(
+          `Attempting to reconnect (${this.reconnectAttempts + 1}/${
+            this.maxReconnectAttempts
+          })`
+        );
         this.reconnectAttempts++;
         this.connect().catch(console.error);
       }, this.reconnectInterval);

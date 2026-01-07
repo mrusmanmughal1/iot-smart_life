@@ -325,7 +325,7 @@ export default function EditRolePage() {
 
                 {/* Legend */}
                 <div className="pt-4  ">
-                  <p className="text-sm font-medium text-gray-900">Note:</p>
+                  <p className="text-sm font-medium text-gray-900">Note :</p>
                   <p className="text-xs text-gray-500">
                     Green = Enabled <br /> Gray = Disabled
                   </p>

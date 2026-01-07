@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -88,15 +88,11 @@ export default function UsersAndRolesManagementPage() {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   const handleAddUser = () => {
-    toast.success('Add user functionality');
-  };
-
-  const handleViewDetails = () => {
-    navigate(`/users/role-permission-management`);
+    toast.success('Add user functionality');  
   };
 
   const handleEdit = (roleId: string) => {
-    navigate(`/users/edit-role/${roleId}`);
+    navigate(`/users-management/edit-role/${roleId}`);
   };
 
   const handleDelete = (roleId: string) => {
@@ -135,17 +131,14 @@ export default function UsersAndRolesManagementPage() {
                 Role: Customer Administrator
               </p>
             </div>
-            <Button
-              onClick={handleAddUser}
-              variant="secondary"
-            >
+            <Button onClick={handleAddUser} variant="secondary">
               <Plus className="h-4 w-4  " />
               Add User
             </Button>
           </div>
 
           {/* Navigation Tabs and Search */}
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center  justify-between mt-6 gap-4">
             <Tabs
               defaultValue="Users"
               value={activeTab}
@@ -184,44 +177,6 @@ export default function UsersAndRolesManagementPage() {
                 className="w-full"
               />
             </div>
-          </div>
-        </div>
-
-        {/* System Roles Section */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">System Roles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {systemRoles.map((role) => (
-              <Card key={role.id} className="bg-white shadow-sm">
-                <CardContent className="p-6 space-y-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {role.title}
-                    </h3>
-                    <p className="text-sm text-gray-600">{role.description}</p>
-                  </div>
-                  <ul className="space-y-2">
-                    {role.features.map((feature, idx) => (
-                      <li
-                        key={idx}
-                        className="text-sm text-gray-700 flex items-start gap-2"
-                      >
-                        <span className="text-gray-400 mt-1">•</span>
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="flex justify-end pt-2">
-                    <Button
-                      onClick={handleViewDetails}
-                      variant="secondary"
-                    >
-                      View Details
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
 

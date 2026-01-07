@@ -1,6 +1,6 @@
-import React, { useState, useMemo, Suspense, useEffect } from 'react';
+import React, { useState, useMemo, Suspense, useEffect, useRef } from 'react';
 import { Control, UseFormRegister } from 'react-hook-form';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import {
   OrbitControls,
   PerspectiveCamera,
@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Download, Share2 } from 'lucide-react';
+import { Download, Share2, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import type { FilterFormValues } from '@/features/floorPlan/types';
 import { useFloorMapStore } from '@/features/floorPlan/store';
 import { useDevices } from '@/features/devices/hooks';
@@ -24,7 +24,7 @@ interface ReviewStepProps {
   control: Control<FilterFormValues>;
   onPrevious: () => void;
   onSave: () => void;
-} 
+}
 
 // Helper function to get zone color
 const getZoneColor = (type: string): string => {
@@ -47,6 +47,23 @@ const getDeviceColor = (type: string): string => {
     actuator: '#EF4444',
   };
   return colors[type.toLowerCase()] || '#9CA3AF';
+};
+
+// Camera Controls Component - Helper to expose camera and controls
+const CameraControls: React.FC<{
+  cameraRef?: React.MutableRefObject<THREE.PerspectiveCamera | null>;
+  controlsRef?: React.MutableRefObject<any>;
+}> = ({ cameraRef }) => {
+  const { camera } = useThree();
+
+  // Expose camera to parent
+  useEffect(() => {
+    if (cameraRef && camera) {
+      cameraRef.current = camera as THREE.PerspectiveCamera;
+    }
+  }, [camera, cameraRef]);
+
+  return null;
 };
 
 // 3D Floor Component
@@ -89,7 +106,7 @@ const Floor3D: React.FC<{
 }) => {
   const floorHeight = 0.1;
   const wallHeight = 2.5; // Height of walls in 3D units
-  const wallThickness = 0.2; // Thickness of walls
+  const wallThickness = 0.1; // Thickness of walls
   const floorY = floorIndex * 3; // 3 units between floors
   const [dwgGeometry, setDwgGeometry] = useState<THREE.BufferGeometry | null>(
     null
@@ -264,7 +281,8 @@ const Floor3D: React.FC<{
             const points: number[] = [];
 
             // Helper function to convert 2D point to 3D
-            const to3D = (x: number, y: number, z: number = 0.02) => {
+            // Render outline above the floor base (floorHeight = 0.1, so use 0.15 to be clearly visible)
+            const to3D = (x: number, y: number, z: number = 0.15) => {
               const normalizedX = (x - centerX) * scale;
               const normalizedY = (y - centerY) * scale;
               return [normalizedX, z, normalizedY];
@@ -819,7 +837,7 @@ const Floor3D: React.FC<{
       <mesh position={[0, 0, 0]} receiveShadow>
         <boxGeometry args={[20, floorHeight, 15]} />
         <meshStandardMaterial
-          color={isSelected ? '#E5E7EB' : '#9CA3AF'}
+          color="#5B8C3E"
           opacity={isSelected ? 1 : 0.5}
           transparent
         />
@@ -844,7 +862,7 @@ const Floor3D: React.FC<{
               wallThickness,
             ]}
           />
-          <meshStandardMaterial color="#D1D5DB" />
+          <meshStandardMaterial color="#D4A574" />
         </mesh>
         {/* South Wall (back) */}
         <mesh
@@ -863,7 +881,7 @@ const Floor3D: React.FC<{
               wallThickness,
             ]}
           />
-          <meshStandardMaterial color="#D1D5DB" />
+          <meshStandardMaterial color="#D4A574" />
         </mesh>
         {/* East Wall (right) */}
         <mesh
@@ -882,7 +900,7 @@ const Floor3D: React.FC<{
               buildingBounds.maxZ - buildingBounds.minZ,
             ]}
           />
-          <meshStandardMaterial color="#D1D5DB" />
+          <meshStandardMaterial color="#D4A574" />
         </mesh>
         {/* West Wall (left) */}
         <mesh
@@ -901,16 +919,9 @@ const Floor3D: React.FC<{
               buildingBounds.maxZ - buildingBounds.minZ,
             ]}
           />
-          <meshStandardMaterial color="#D1D5DB" />
+          <meshStandardMaterial color="#D4A574" />
         </mesh>
       </group>
-
-      {/* DWG Outline - Green color */}
-      {showDwgOutline && dwgGeometry && (
-        <lineSegments geometry={dwgGeometry}>
-          <lineBasicMaterial color="#10B981" linewidth={2} />
-        </lineSegments>
-      )}
 
       {/* Zones with Walls */}
       {showZones &&
@@ -931,14 +942,14 @@ const Floor3D: React.FC<{
             <group key={`zone-${idx}`}>
               {/* Zone Floor */}
               <mesh
-                position={[x, floorHeight / 2 + 0.01, z]}
+                position={[x, floorHeight / 2 + 0.02, z]}
                 castShadow
                 receiveShadow
               >
                 <boxGeometry args={[width, 0.05, depth]} />
                 <meshStandardMaterial
                   color={getZoneColor(zone.type)}
-                  opacity={0.6}
+                  opacity={0.8}
                   transparent
                 />
               </mesh>
@@ -1044,10 +1055,17 @@ const Floor3D: React.FC<{
           );
         })}
 
+      {/* DWG Outline - Green color - Render above floor, visible across entire floor */}
+      {showDwgOutline && dwgGeometry && (
+        <lineSegments geometry={dwgGeometry}>
+          <lineBasicMaterial color="#10B981" linewidth={3} />
+        </lineSegments>
+      )}
+
       {/* Ceiling */}
       <mesh position={[0, wallHeight, 0]} receiveShadow>
         <boxGeometry args={[20, 0.1, 15]} />
-        <meshStandardMaterial color="#F3F4F6" opacity={0.7} transparent />
+        <meshStandardMaterial color="#F3F4F6" opacity={0.2} transparent />
       </mesh>
 
       {/* Devices */}
@@ -1116,6 +1134,8 @@ const Scene3D: React.FC<{
   showZones: boolean;
   showConnections: boolean;
   showDwgOutline: boolean;
+  cameraRef?: React.MutableRefObject<THREE.PerspectiveCamera | null>;
+  controlsRef?: React.MutableRefObject<any>;
 }> = ({
   floors,
   selectedFloor,
@@ -1124,6 +1144,8 @@ const Scene3D: React.FC<{
   showZones,
   showConnections,
   showDwgOutline,
+  cameraRef,
+  controlsRef,
 }) => {
   return (
     <>
@@ -1133,16 +1155,25 @@ const Scene3D: React.FC<{
       <pointLight position={[-10, 10, -5]} intensity={0.5} />
 
       {/* Camera */}
-      <PerspectiveCamera makeDefault position={[15, 10, 15]} fov={50} />
+      <PerspectiveCamera
+        ref={cameraRef}
+        makeDefault
+        position={[15, 10, 15]}
+        fov={50}
+      />
 
       {/* Orbit Controls */}
       <OrbitControls
+        ref={controlsRef}
         enablePan={true}
         enableZoom={true}
         enableRotate={true}
         minDistance={5}
         maxDistance={50}
       />
+
+      {/* Camera Controls Helper */}
+      <CameraControls cameraRef={cameraRef} />
 
       {/* Grid Helper */}
       <gridHelper args={[30, 30, '#4B5563', '#1F2937']} />
@@ -1252,7 +1283,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   const assignedDevicesKeysCount = Object.keys(assignedDevices).length;
   React.useEffect(() => {
     // Increment counter to force Canvas re-render when data changes
-    setRenderCounter(prev => prev + 1);
+    setRenderCounter((prev) => prev + 1);
   }, [devicePositions, zones.length, assignedDevicesKeysCount]);
 
   const [selectedFloor, setSelectedFloor] = useState<string>('Ground');
@@ -1262,6 +1293,10 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   const [showConnections, setShowConnections] = useState<boolean>(false);
   const [showZones, setShowZones] = useState<boolean>(true);
   const [showDwgOutline, setShowDwgOutline] = useState<boolean>(true);
+
+  // Camera and controls refs
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const controlsRef = useRef<any>(null);
 
   // Get available floors from uploaded files
   const availableFloors = useMemo(() => {
@@ -1284,8 +1319,22 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   // This ensures the 3D view re-renders when returning from DeviceLinkStep
   const renderKey = useMemo(() => {
     const devicePositionsKey = JSON.stringify(devicePositions);
-    const zonesKey = JSON.stringify(zones.map(z => ({ id: z.id, x: z.x, y: z.y, w: z.w, h: z.h, floor: z.floor })));
-    const assignedDevicesKey = JSON.stringify(Object.keys(assignedDevices).map(k => ({ zoneId: k, deviceIds: assignedDevices[k].map(d => d.id) })));
+    const zonesKey = JSON.stringify(
+      zones.map((z) => ({
+        id: z.id,
+        x: z.x,
+        y: z.y,
+        w: z.w,
+        h: z.h,
+        floor: z.floor,
+      }))
+    );
+    const assignedDevicesKey = JSON.stringify(
+      Object.keys(assignedDevices).map((k) => ({
+        zoneId: k,
+        deviceIds: assignedDevices[k].map((d) => d.id),
+      }))
+    );
     // Include renderCounter to force re-render when component mounts
     return `${devicePositionsKey}-${zonesKey}-${assignedDevicesKey}-${renderCounter}`;
   }, [devicePositions, zones, assignedDevices, renderCounter]);
@@ -1415,6 +1464,77 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
     console.log('Share link');
   };
 
+  const handleTopView = () => {
+    if (cameraRef.current && controlsRef.current) {
+      const camera = cameraRef.current;
+      const controls = controlsRef.current;
+
+      // Set camera to top view (looking down from above)
+      camera.position.set(0, 25, 0);
+      camera.lookAt(0, 0, 0);
+
+      // Update controls target
+      if (controls.target) {
+        controls.target.set(0, 0, 0);
+        controls.update();
+      }
+    }
+  };
+
+  const handleZoomIn = () => {
+    if (cameraRef.current && controlsRef.current) {
+      const camera = cameraRef.current;
+      const controls = controlsRef.current;
+
+      // Get current direction from camera to origin
+      const direction = new THREE.Vector3()
+        .subVectors(camera.position, controls.target || new THREE.Vector3())
+        .normalize();
+
+      const currentDistance = camera.position.distanceTo(
+        controls.target || new THREE.Vector3()
+      );
+      const newDistance = Math.max(5, currentDistance * 0.8);
+
+      // Move camera closer while maintaining direction
+      const target = controls.target || new THREE.Vector3();
+      camera.position.copy(target).add(direction.multiplyScalar(newDistance));
+      camera.updateProjectionMatrix();
+
+      // Update controls
+      if (controls.update) {
+        controls.update();
+      }
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (cameraRef.current && controlsRef.current) {
+      const camera = cameraRef.current;
+      const controls = controlsRef.current;
+
+      // Get current direction from camera to origin
+      const direction = new THREE.Vector3()
+        .subVectors(camera.position, controls.target || new THREE.Vector3())
+        .normalize();
+
+      const currentDistance = camera.position.distanceTo(
+        controls.target || new THREE.Vector3()
+      );
+      const newDistance = Math.min(50, currentDistance * 1.2);
+
+      // Move camera further while maintaining direction
+      const target = controls.target || new THREE.Vector3();
+      camera.position.copy(target).add(direction.multiplyScalar(newDistance));
+      camera.updateProjectionMatrix();
+
+      // Update controls
+      if (controls.update) {
+        controls.update();
+      }
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
@@ -1449,6 +1569,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                     showZones={showZones}
                     showConnections={showConnections}
                     showDwgOutline={showDwgOutline}
+                    cameraRef={cameraRef}
+                    controlsRef={controlsRef}
                   />
                 </Canvas>
               </Suspense>
@@ -1458,6 +1580,37 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 <span className="text-sm font-semibold text-gray-900">
                   3D Floor Map Preview
                 </span>
+              </div>
+
+              {/* Camera Controls */}
+              <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleTopView}
+                  className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-md"
+                  title="Top View"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleZoomIn}
+                  className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-md"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleZoomOut}
+                  className="bg-white/90 backdrop-blur-sm hover:bg-white shadow-md"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </CardContent>

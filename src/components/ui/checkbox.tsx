@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Check } from 'lucide-react';
 
-export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface CheckboxProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
@@ -20,9 +21,7 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             <Check className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" />
           </div>
         </div>
-        {label && (
-          <span className="text-sm text-gray-700">{label}</span>
-        )}
+        {label && <span className="text-sm text-gray-700">{label}</span>}
       </label>
     );
   }

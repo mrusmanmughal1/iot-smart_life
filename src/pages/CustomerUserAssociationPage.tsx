@@ -12,6 +12,7 @@ import {
   SelectItem,
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useUsers } from '@/features/users/hooks';
 
 interface User {
   id: string;
@@ -104,6 +105,8 @@ export default function CustomerUserAssociationPage() {
   const [selectedAssignedUsers, setSelectedAssignedUsers] = useState<
     Set<string>
   >(new Set());
+
+  const { data: users } = useUsers();
 
   const customerInfo = {
     name: 'Acme Corporation',
@@ -281,12 +284,12 @@ export default function CustomerUserAssociationPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3 max-h-[500px] overflow-y-auto">
-              {filteredAvailableUsers.length === 0 ? (
+              {users?.length === 0 ? (
                 <p className="text-sm text-slate-500 text-center py-8">
                   No available users
                 </p>
               ) : (
-                filteredAvailableUsers.map((user) => (
+                users?.map((user) => (
                   <div
                     key={user.id}
                     className={`flex items-center gap-3 p-3 rounded-lg border ${
@@ -336,7 +339,6 @@ export default function CustomerUserAssociationPage() {
               <Button
                 variant="outline"
                 className="flex-1"
-                
                 onClick={() => setSelectedAvailableUsers(new Set())}
                 disabled={selectedAvailableUsers.size === 0}
               >
@@ -496,14 +498,10 @@ export default function CustomerUserAssociationPage() {
 
             {/* Action Buttons */}
             <div className="space-y-2 pt-4  ">
-              <Button className="w-full    " 
-              variant="secondary"
-              >
+              <Button className="w-full    " variant="secondary">
                 Bulk Assign Role
               </Button>
-              <Button className="w-full    " 
-              variant="secondary"
-              >
+              <Button className="w-full    " variant="secondary">
                 Export List
               </Button>
             </div>
@@ -519,9 +517,7 @@ export default function CustomerUserAssociationPage() {
         >
           Cancel
         </Button>
-        <Button className="px-8    " 
-        variant="secondary"
-        >
+        <Button className="px-8    " variant="secondary">
           Apply
         </Button>
       </div>

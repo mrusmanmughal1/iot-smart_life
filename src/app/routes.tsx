@@ -20,8 +20,12 @@ import AssetsPage from '@/pages/AssetsPage.tsx';
 import AlarmsPage from '@/pages/AlarmsPage.tsx';
 import UsersPage from '@/pages/UsersPage.tsx';
 import UserDetailsPermissionsPage from '@/pages/UserDetailsPermissionsPage.tsx';
+import CreateUserPage from '@/pages/CreateUserPage.tsx';
+import BulkUserManagementPage from '@/pages/BulkUserManagementPage.tsx';
 import NotificationsPage from '@/pages/NotificationsPage.tsx';
 import AnalyticsPage from '@/pages/AnalyticsPage.tsx';
+import DeviceAnalyticsPage from '@/pages/DeviceAnalyticsPage.tsx';
+import IndividualDeviceAnalyticsPage from '@/pages/IndividualDeviceAnalyticsPage.tsx';
 import ReportTemplatesPage from '@/pages/ReportTemplatesPage.tsx';
 import AlertConfigurationPage from '@/pages/AlertConfigurationPage.tsx';
 import BuildingHierarchyChartPage from '@/pages/BuildingHierarchyChartPage.tsx';
@@ -69,14 +73,14 @@ import RolePermissionManagementPage from '@/pages/RolePermissionManagementPage.t
 import UsersAndRolesManagementPage from '@/pages/UsersAndRolesManagementPage.tsx';
 import SearchResultsPage from '@/pages/SearchResultsPage.tsx';
 import AssignPermissionsPage from '@/pages/AssignPermissionsPage.tsx';
+import CreateCustomerPage from '@/pages/CreateCustomerPage.tsx';
+import CreateRolePage from '@/pages/CreateRolePage.tsx';
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Navigate to="/login" replace />,
   },
-
   //  --------------------public routes--------------------
-
   {
     element: <PublicRoute />,
     errorElement: <RouteErrorPage />,
@@ -131,9 +135,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
-
   //  --------------------protected routes--------------------
-
   {
     element: <ProtectedRoute />,
     errorElement: <RouteErrorPage />,
@@ -167,6 +169,14 @@ export const router = createBrowserRouter([
             element: <UsersPage />,
           },
           {
+            path: 'create',
+            element: <CreateUserPage />,
+          },
+          {
+            path: 'bulk-management',
+            element: <BulkUserManagementPage />,
+          },
+          {
             path: ':id/permissions',
             element: <UserDetailsPermissionsPage />,
           },
@@ -178,7 +188,25 @@ export const router = createBrowserRouter([
       },
       {
         path: '/analytics',
-        element: <AnalyticsPage />,
+        element: (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <AnalyticsPage />,
+          },
+          {
+            path: 'device-analytics',
+            element: <DeviceAnalyticsPage />,
+          },
+          {
+            path: 'device-analytics/:id',
+            element: <IndividualDeviceAnalyticsPage />,
+          },
+        ],
       },
 
       {
@@ -308,7 +336,6 @@ export const router = createBrowserRouter([
         element: <AuditPage />,
       },
       // --------------------- protected routes ---------------------
-
       // ----------------------- floor plans ------------------------
       {
         path: '/floor-plans',
@@ -374,6 +401,10 @@ export const router = createBrowserRouter([
             element: <CustomerUserAssociationPage />,
           },
           {
+            path: 'create-role',
+            element: <CreateRolePage />,
+          },
+          {
             path: 'edit-role/:id',
             element: <EditRolePage />,
           },
@@ -395,7 +426,21 @@ export const router = createBrowserRouter([
           },
         ],
       },
-
+      // --------------------Customer Management Routes--------------------
+      {
+        path: '/customer-management',
+        element: (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <CreateCustomerPage />,
+          },
+        ],
+      },
       {
         path: '/automation',
         element: (
@@ -408,7 +453,6 @@ export const router = createBrowserRouter([
         path: '/subscription-plans',
         element: <SubscriptionPlans />,
       },
-
       {
         path: '/integrations',
         element: (
@@ -449,7 +493,6 @@ export const router = createBrowserRouter([
           </AppLayout>
         ),
       },
-
       {
         path: '/images',
         element: (

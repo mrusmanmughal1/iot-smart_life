@@ -104,9 +104,9 @@ export default function SolutionTemplates() {
 
       <div className="border border-secondary p-4 rounded-2xl">
         {/* Search Bar */}
-        <div className="flex justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B]">
+        <div className="flex flex-col md:flex-row justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B]">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black" />
             <Input
               placeholder={t('solutionTemplates.searchPlaceholder')}
               value={inputValue}
