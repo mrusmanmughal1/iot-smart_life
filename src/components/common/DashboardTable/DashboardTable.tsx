@@ -193,8 +193,8 @@ export function DashboardTable({
     <div className="space-y-4">
       {/* Bulk Delete Button */}
       {selectedIds.length > 0 && (
-        <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-          <span className="text-sm text-gray-600">
+        <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200 dark:bg-gray-800 dark:text-white">
+          <span className="text-sm text-gray-600 dark:text-white">
             {selectedIds.length} item{selectedIds.length > 1 ? 's' : ''}{' '}
             selected
           </span>
@@ -212,8 +212,8 @@ export function DashboardTable({
 
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-primary">
-            <tr className="border-b border-gray-200">
+          <thead className="bg-primary dark:bg-gray-800 dark:text-white">
+            <tr className="border-b border-gray-200 dark:border-gray-700">
               <th className="text-left py-3 px-4 text-sm font-semibold text-white w-12">
                 <Checkbox
                   checked={isAllSelected}
@@ -222,27 +222,27 @@ export function DashboardTable({
                 />
               </th>
               {columns.title && (
-                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white dark:text-white">
                   {t(defaultTranslationKeys.title)}
                 </th>
               )}
               {columns.createdTime && (
-                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white dark:text-white">
                   {t(defaultTranslationKeys.createdTime)}
                 </th>
               )}
               {columns.status && (
-                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white dark:text-white">
                   {t(defaultTranslationKeys.activateDeactivate)}
                 </th>
               )}
               {columns.customerName && (
-                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white dark:text-white">
                   {t(defaultTranslationKeys.customerName)}
                 </th>
               )}
               {columns.actions && (
-                <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                <th className="text-left py-3 px-4 text-sm font-semibold text-white dark:text-white">
                   {t(defaultTranslationKeys.actions)}
                 </th>
               )}
@@ -253,7 +253,7 @@ export function DashboardTable({
               <tr>
                 <td
                   colSpan={Object.values(columns).filter(Boolean).length + 1}
-                  className="py-8 px-4 text-center text-gray-500"
+                  className="py-8 px-4 text-center text-gray-500 dark:text-white"
                 >
                   {defaultEmptyMessage}
                 </td>
@@ -262,7 +262,7 @@ export function DashboardTable({
               data.map((item) => (
                 <tr
                   key={item.id}
-                  className={`border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors ${
+                  className={`border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors dark:bg-gray-800 dark:text-white ${
                     selectedIds.includes(item.id) ? 'bg-blue-50' : ''
                   }`}
                 >
@@ -291,24 +291,11 @@ export function DashboardTable({
                           <div className="">
                             <NavLink
                               to={`/${linkto}/${item.id}`}
-                              className="text-sm font-medium text-gray-900"
+                              className="text-sm font-medium text-gray-900 dark:text-white"
                             >
                               {item.title}
                             </NavLink>
                           </div>
-                          {/* {item.tag && item.tagColor && (
-                          <Badge
-                            className={`${item.tagColor} text-xs mt-1 border-0`}
-                          >
-                            {item.tag && defaultTranslationKeys.tagPrefix
-                              ? t(
-                                  `${
-                                    defaultTranslationKeys.tagPrefix
-                                  }.${item.tag.toLowerCase()}`
-                                )
-                              : item.tag}
-                          </Badge>
-                        )} */}
                         </div>
                       </div>
                     </td>

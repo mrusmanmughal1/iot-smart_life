@@ -10,18 +10,6 @@ export const CheckEmailForm: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email') || '';
-  
-  // Mask email for display (e.g., xxxxxxxxx@gmail.com)
-  
-  const maskEmail = (email: string) => {
-    if (!email) return '';
-    const [localPart, domain] = email.split('@');
-    if (!domain) return email;
-    
-    // Mask the entire local part with 'x' characters
-    const maskedLocal = 'x'.repeat(Math.max(localPart.length, 5));
-    return maskedLocal + '@' + domain;
-  };
 
   const { mutate: resendEmail, isPending: isResending } = useMutation({
     mutationFn: authService.forgotPassword,
@@ -29,11 +17,17 @@ export const CheckEmailForm: React.FC = () => {
       toast.success(t('auth.checkEmail.resendSuccess'));
     },
     onError: (error: unknown) => {
-      const errorMessage = 
-        (error && typeof error === 'object' && 'response' in error && 
-         error.response && typeof error.response === 'object' && 'data' in error.response &&
-         error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data &&
-         typeof error.response.data.message === 'string')
+      const errorMessage =
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'data' in error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' &&
+        'message' in error.response.data &&
+        typeof error.response.data.message === 'string'
           ? error.response.data.message
           : t('auth.checkEmail.resendError');
       toast.error(errorMessage);
@@ -54,12 +48,10 @@ export const CheckEmailForm: React.FC = () => {
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           {t('auth.checkEmail.title')}
         </h2>
-
         {/* Instructional Text */}
         <p className="text-base text-gray-600 mb-6">
-          {t('auth.checkEmail.instruction', { email: maskEmail(email) })}
+          {t('auth.checkEmail.instruction', { email })}
         </p>
-
         {/* Resend Section */}
         <div className="mb-6">
           <span className="text-sm text-gray-500">
@@ -70,10 +62,11 @@ export const CheckEmailForm: React.FC = () => {
             disabled={isResending || !email}
             className="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isResending ? t('auth.checkEmail.resending') : t('auth.checkEmail.clickToResend')}
+            {isResending
+              ? t('auth.checkEmail.resending')
+              : t('auth.checkEmail.clickToResend')}
           </button>
         </div>
-
         {/* Back to Login Link */}
         <Link
           to="/login"
@@ -86,4 +79,3 @@ export const CheckEmailForm: React.FC = () => {
     </div>
   );
 };
-

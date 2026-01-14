@@ -22,7 +22,7 @@ export const LoginPage: React.FC = () => {
       <div className="flex  flex-col md:flex-row gap-3 mb-8">
         <Button
           variant="social"
-          className="flex-1 h-12 rounded-full text-xs"
+          className="flex-1 h-12 rounded-full text-xs dark:bg-gray-800  dark:text-white dark:hover:bg-gray-700"
           type="button"
           onClick={handleGoogleLogin}
         >
@@ -31,7 +31,7 @@ export const LoginPage: React.FC = () => {
         </Button>
         <Button
           variant="social"
-          className="flex-1 h-12 rounded-full text-xs"
+          className="flex-1 h-12 rounded-full text-xs dark:bg-gray-800  dark:text-white dark:hover:bg-gray-700"
           type="button"
         >
           <img src={AppleIcon} alt="Apple" className="w-4 h-4 mr-2" />
@@ -39,7 +39,7 @@ export const LoginPage: React.FC = () => {
         </Button>
         <Button
           variant="social"
-          className="flex-1 h-12 rounded-full text-xs"
+          className="flex-1 h-12 rounded-full text-xs dark:bg-gray-800  dark:text-white dark:hover:bg-gray-700"
           type="button"
           onClick={handleGithubLogin}
           

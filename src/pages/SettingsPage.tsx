@@ -14,49 +14,53 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">{t('settings.title')}</h1>
-        <p className="text-slate-500 mt-2">Manage your application preferences</p>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+            {t('settings.title')}
+          </h1>
+          <p className="text-slate-500 mt-2 dark:text-white">
+            Manage your application preferences
+          </p>
+        </div>
+
+        <Tabs defaultValue="general" className="space-y-4">
+          <TabsList className="dark:bg-gray-800 dark:text-white">
+            <TabsTrigger value="general">
+              <Settings className="h-4 w-4 mr-2" />
+              General
+            </TabsTrigger>
+            <TabsTrigger value="notifications">
+              <Bell className="h-4 w-4 mr-2" />
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger value="security">
+              <Shield className="h-4 w-4 mr-2" />
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="account">
+              <User className="h-4 w-4 mr-2" />
+              Account
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="general">
+            <GeneralSettingsTab />
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <NotificationsTab />
+          </TabsContent>
+
+          <TabsContent value="security">
+            <SecurityTab />
+          </TabsContent>
+
+          <TabsContent value="account">
+            <AccountTab />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <Tabs defaultValue="general" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="general">
-            <Settings className="h-4 w-4 mr-2" />
-            General
-          </TabsTrigger>
-          <TabsTrigger value="notifications">
-            <Bell className="h-4 w-4 mr-2" />
-            Notifications
-          </TabsTrigger>
-          <TabsTrigger value="security">
-            <Shield className="h-4 w-4 mr-2" />
-            Security
-          </TabsTrigger>
-          <TabsTrigger value="account">
-            <User className="h-4 w-4 mr-2" />
-            Account
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="general">
-          <GeneralSettingsTab />
-        </TabsContent>
-
-        <TabsContent value="notifications">
-          <NotificationsTab />
-        </TabsContent>
-
-        <TabsContent value="security">
-          <SecurityTab />
-        </TabsContent>
-
-        <TabsContent value="account">
-          <AccountTab />
-        </TabsContent>
-      </Tabs>
-    </div>
     </AppLayout>
   );
 }

@@ -91,7 +91,7 @@ export const LoginForm: React.FC = () => {
           <div className="flex justify-start">
             <Link
               to="/forgot-password"
-              className="text-sm text-[#545454] underline hover:text-[#1976D2] transition-colors"
+              className="text-sm text-[#545454] dark:text-white underline hover:text-[#1976D2] transition-colors"
             >
               {t('auth.login.forgotPassword')}
             </Link>

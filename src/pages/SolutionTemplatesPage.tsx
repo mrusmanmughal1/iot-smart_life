@@ -101,7 +101,7 @@ export default function SolutionTemplates() {
     <div className="space-y-6">
       {/* Header Section */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold dark:text-white text-gray-900">
           {t('solutionTemplates.title')}
         </h1>
       </div>
@@ -129,7 +129,7 @@ export default function SolutionTemplates() {
 
         {/* Popular Domain Section */}
         <div className="  rounded-lg md:p-4  ">
-          <h2 className="text-sm font-semibold text-gray-600 mb-4">
+          <h2 className="text-sm font-semibold dark:text-white text-gray-600 mb-4">
             {t('solutionTemplates.popularDomain')}
           </h2>
           <div className="relative">
@@ -139,14 +139,14 @@ export default function SolutionTemplates() {
                   <button
                     key={category.key}
                     onClick={() => handleCategoryChange(category.key)}
-                    className={`  flex-shrink-0 p-4  rounded-xl transition-all flex flex-col items-center gap-3 ${
+                    className={`  flex-shrink-0 p-4  rounded-xl transition-all flex flex-col items-center dark:bg-gray-800 dark:text-white gap-3 ${
                       selectedCategory === category.key
                         ? 'bg-primary text-white shadow-md'
                         : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                     }`}
                   >
                     {/* <category.icon className="h-10 w-10" /> */}
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-medium dark:text-white">
                       {t(
                         category.translationKey ||
                           `solutionTemplates.categories.${category.key}`

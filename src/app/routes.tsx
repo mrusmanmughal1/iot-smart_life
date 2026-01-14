@@ -26,6 +26,8 @@ import NotificationsPage from '@/pages/NotificationsPage.tsx';
 import AnalyticsPage from '@/pages/AnalyticsPage.tsx';
 import DeviceAnalyticsPage from '@/pages/DeviceAnalyticsPage.tsx';
 import IndividualDeviceAnalyticsPage from '@/pages/IndividualDeviceAnalyticsPage.tsx';
+import DashboardAnalyticsPage from '@/pages/DashboardAnalyticsPage.tsx';
+import ProductionOverviewPage from '@/pages/ProductionOverviewPage.tsx';
 import ReportTemplatesPage from '@/pages/ReportTemplatesPage.tsx';
 import AlertConfigurationPage from '@/pages/AlertConfigurationPage.tsx';
 import BuildingHierarchyChartPage from '@/pages/BuildingHierarchyChartPage.tsx';
@@ -80,6 +82,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Navigate to="/login" replace />,
   },
+
   //  --------------------public routes--------------------
   {
     element: <PublicRoute />,
@@ -135,6 +138,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
+
   //  --------------------protected routes--------------------
   {
     element: <ProtectedRoute />,
@@ -205,6 +209,14 @@ export const router = createBrowserRouter([
           {
             path: 'device-analytics/:id',
             element: <IndividualDeviceAnalyticsPage />,
+          },
+          {
+            path: 'dashboard-analytics',
+            element: <DashboardAnalyticsPage />,
+          },
+          {
+            path: 'product-overview',
+            element: <ProductionOverviewPage />,
           },
         ],
       },

@@ -77,7 +77,7 @@ export default function DashboardsPage() {
       <div className="space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <h1 className="text-2xl font-semibold dark:text-white text-gray-900">
             {t('solutionDashboards.title')}
           </h1>
         </div>
@@ -87,20 +87,20 @@ export default function DashboardsPage() {
           <div className="flex gap-2">
             <button
               onClick={() => handleTabChange('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all dark:bg-gray-800 dark:text-white ${
                 selectedTab === 'all'
                   ? 'bg-secondary text-white shadow-md'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-white'
               }`}
             >
               {t('solutionDashboards.tabs.all')}
             </button>
             <button
               onClick={() => handleTabChange('group')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all dark:bg-gray-800 dark:text-white ${
                 selectedTab === 'group'
                   ? 'bg-secondary text-white shadow-md'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-white'
               }`}
             >
               {t('solutionDashboards.tabs.group')}
@@ -109,7 +109,7 @@ export default function DashboardsPage() {
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-            <Button className="bg-secondary hover:bg-secondary/90 text-white">
+            <Button className="bg-secondary hover:bg-secondary/90 text-white dark:bg-gray-800 dark:text-white">
               <Plus className="h-4 w-4 mr-2" />
               {t('solutionDashboards.createNewDashboard')}
                   <ChevronDown className="h-4 w-4 ml-2" />
@@ -131,14 +131,14 @@ export default function DashboardsPage() {
             <Button
               variant="ghost"
               size="icon"
-              className="border border-gray-300"
+              className="border border-gray-300 dark:bg-gray-800 dark:text-white"
             >
               <SearchIcon className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="border border-gray-300"
+              className="border border-gray-300 dark:bg-gray-800 dark:text-white"
               onClick={handleRefresh}
               disabled={isLoading}
             >
@@ -150,13 +150,13 @@ export default function DashboardsPage() {
         </div>
 
         {/* Main Content Card */}
-        <Card className="shadow-lg rounded-xl border-secondary/50">
+        <Card className="shadow-lg rounded-xl border-secondary/50 dark:bg-gray-800 dark:text-white">
           <CardContent className="p-6">
             {/* Search/Filter Bar */}
             <div className="flex gap-3 mb-6">
               <Button
                 onClick={handleShowCustomerDashboards}
-                className="bg-secondary text-white hover:bg-secondary/90"
+                className="bg-secondary text-white hover:bg-secondary/90 dark:bg-gray-700 dark:text-white"
               >
                 <Diamond className="h-4 w-4 mr-2" />
                 {t('solutionDashboards.showCustomerDashboards')}

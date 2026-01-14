@@ -6,7 +6,6 @@ import { cn } from '@/lib/util';
 
 interface AppLayoutProps {
   children: React.ReactNode;
-  showBreadcrumbs?: boolean;
 }
 
 export const AppLayout = ({ children }: AppLayoutProps) => {
@@ -14,15 +13,20 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
   const { isRTL } = useRTL();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
-    <Sidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
-    <div className={cn(
-      "flex-1 flex flex-col min-w-0",
-      isRTL ? "lg:mr-64" : "lg:ml-64"
-    )}>
+    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 transition-colors">
+      <Sidebar
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+      />
+      <div
+        className={cn(
+          'flex-1 flex flex-col min-w-0',
+          isRTL ? 'lg:mr-64' : 'lg:ml-64'
+        )}
+      >
         <Header onMenuClick={() => setIsMobileMenuOpen(true)} />
-        <main className="flex-1 overflow-y-auto bg-gray-50">
-          <div className="container  px-2 md:px-10 py-6 max-w-full">
+        <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 transition-colors">
+          <div className="container px-2 md:px-10 py-6 max-w-full">
             {children}
           </div>
         </main>

@@ -34,6 +34,7 @@ import {
   FolderKanbanIcon,
   History,
 } from 'lucide-react';
+import { useThemeStore } from '@/stores/useThemeStore';
 
 interface NavItem {
   titleKey: string;
@@ -161,7 +162,7 @@ const getNavItems = (): NavItem[] => [
         href: '/users-management/customer-user-association',
         icon: <Users className="h-4 w-4" />,
       },
-      
+
       {
         titleKey: 'nav.customerAdministrator',
         href: '/users-management/customer-administrator',
@@ -269,6 +270,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const location = useLocation();
   const navItems = getNavItems();
   const isRTL = direction === 'rtl';
+  const { effectiveTheme } = useThemeStore();
 
   const isActive = (href: string) => location.pathname === href;
 
@@ -354,7 +356,10 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
       <aside
         className={cn(
-          'fixed top-0 z-50 h-screen w-64 bg-primary flex flex-col',
+          'fixed top-0 z-50 h-screen w-64 bg-primary   flex flex-col',
+          effectiveTheme === 'dark' && 'bg-gray-900 border-gray-800',
+          // Fallback for Tailwind dark: classes
+          'dark:bg-gray-900 border-primary dark:border-gray-950 border ',
           'transform transition-transform duration-300 ease-in-out',
           isRTL ? 'right-0' : 'left-0',
           'lg:translate-x-0',

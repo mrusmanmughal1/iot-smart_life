@@ -5,7 +5,6 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import '../styles/globals.css';
 
 function App() {
-  
   return (
     <ErrorBoundary
       onError={(error, errorInfo) => {

@@ -145,9 +145,15 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   return (
     <header
       className={cn(
-        'h-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800',
-        'flex items-center justify-between px-10 sticky top-0 z-30 transition-colors',
-        direction === 'rtl' && 'flex-row-reverse'
+        'h-20 border-b transition-colors',
+        'flex items-center justify-between px-10 sticky top-0 z-30',
+        direction === 'rtl' && 'flex-row-reverse',
+        // Light mode
+        effectiveTheme === 'light' && 'bg-white border-gray-200',
+        // Dark mode
+        effectiveTheme === 'dark' && 'bg-gray-900 border-gray-800',
+        // Fallback for Tailwind dark: classes
+        'dark:bg-gray-900 dark:border-gray-800'
       )}
     >
       {/* Left Section */}
@@ -188,7 +194,6 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
           </div>
         </div>
       </div>
-
       {/* Right Section */}
       <div
         className={cn(

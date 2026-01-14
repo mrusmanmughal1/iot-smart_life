@@ -80,7 +80,7 @@ export function LanguageSwitcher({
             <span className="text-lg">{lang.flag}</span>
             {showLabel && (
               <span className="text-sm font-medium">
-                {lang.code.toUpperCase()}
+                {lang.code.toUpperCase()}ss
               </span>
             )}
           </button>
@@ -94,7 +94,7 @@ export function LanguageSwitcher({
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'p-2 px-3 bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors',
+          'p-2 px-3 bg-gray-100 dark:bg-gray-800  dark:hover:bg-gray-700 rounded-lg transition-colors',
           'flex items-center gap-2',
           isOpen && 'bg-gray-100 dark:bg-gray-800'
         )}

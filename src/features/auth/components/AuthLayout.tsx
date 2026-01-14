@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import AuthBg from '../../../assets/images/auth-bg.png';
 import SmartLifeImg from '../../../assets/images/smartlife-text-black.png';
+import SmartLifeImgWhite from '../../../assets/images/smartlife-text-white.png';
+
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { NavLink } from 'react-router-dom';
+import { useThemeStore } from '@/stores/useThemeStore';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -21,10 +24,12 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     img.src = AuthBg;
   }, []);
 
+  const { effectiveTheme } = useThemeStore();
+
   return (
     <div className="max-h-screen flex w-full">
       {/* Left Side - Background Image */}
-      <div className="flex-1 hidden md:block h-screen  object-cover overflow-hidden  ">
+      <div className="flex-1 hidden md:block h-screen dark:bg-gray-900  object-cover overflow-hidden  ">
         <img
           src={AuthBg}
           alt="Auth Background"
@@ -38,7 +43,9 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
           <div className="flex justify-between mb-14">
             <NavLink to="/">
               <img
-                src={SmartLifeImg}
+                src={
+                  effectiveTheme === 'light' ? SmartLifeImg : SmartLifeImgWhite
+                }
                 alt="Auth Logo"
                 width={150}
                 className=" "

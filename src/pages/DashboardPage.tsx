@@ -162,7 +162,7 @@ export const DashboardPage = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">
+            <h1 className="text-2xl font-semibold dark:text-white text-slate-900">
               {t('dashboard.overview')}
             </h1>
           </div>
@@ -181,19 +181,22 @@ export const DashboardPage = () => {
                     : 'opacity-50 cursor-not-allowed'
                 }`}
               >
-                <ChevronLeft size={26} className="text-gray-700" />
+                <ChevronLeft
+                  size={26}
+                  className="text-gray-700 dark:text-white"
+                />
               </button>
 
               <div
                 ref={scrollContainerRef}
-                className="flex flex-1 items-center gap-4 bg-[#D9D9D92B]  rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
+                className="flex flex-1 items-center gap-4 bg-[#D9D9D92B] dark:bg-gray-700  rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
               >
                 <div className="flex gap-4 w-full  p-4">
                   {solutions.map((solution) => (
                     <button
                       key={solution.key}
                       onClick={() => setSelectedCategory(solution.key)}
-                      className={`min-w-[140px] sm:min-w-[160px] flex-shrink-0 p-4 py-8 rounded-xl transition-all flex flex-col items-center gap-3 ${
+                      className={`min-w-[140px] sm:min-w-[160px] flex-shrink-0 p-4 py-8 rounded-xl dark:bg-gray-800 dark:text-white transition-all flex flex-col items-center gap-3 ${
                         solution.active || selectedCategory === solution.key
                           ? 'bg-secondary text-white shadow-md'
                           : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
@@ -358,7 +361,6 @@ export const DashboardPage = () => {
                     </p>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                     
                     <Progress value={65} max={100} />
                   </div>
                 </CardContent>
@@ -413,11 +415,10 @@ export const DashboardPage = () => {
                       <span className="font-semibold text-gray-900">12/30</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                    <Progress value={65} max={100} />
-
+                      <Progress value={65} max={100} />
                     </div>
                   </div>
-                  <div>   
+                  <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-600">
                         {t('dashboard.dashboards')}
@@ -425,8 +426,7 @@ export const DashboardPage = () => {
                       <span className="font-semibold text-gray-900">5/10</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                    <Progress value={65} max={100} />
-
+                      <Progress value={65} max={100} />
                     </div>
                   </div>
                 </CardContent>
@@ -446,12 +446,12 @@ export const DashboardPage = () => {
                   className={`cursor-pointer rounded-xl overflow-hidden  hover:shadow-lg transition border-0`}
                 >
                   <CardHeader
-                    className={`text-lg font-semibold mb-2 ${dashboard.textColor} bg-gradient-to-br ${dashboard.gradient}`}
+                    className={`text-lg font-semibold mb-2 ${dashboard.textColor} bg-gradient-to-br ${dashboard.gradient} dark:bg-gray-800 dark:text-white`}
                   >
                     <p>{dashboard.title}</p>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <p className={`text-sm  text-center text-gray-500`}>
+                    <p className={`text-sm  text-center text-gray-500 dark:text-white`}>
                       {dashboard.subtitle}
                     </p>
                   </CardContent>
