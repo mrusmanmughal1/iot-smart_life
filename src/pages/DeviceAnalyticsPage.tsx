@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
@@ -39,26 +41,35 @@ const activityData = [
   { date: '26/8', value: 2200 },
 ];
 
-// Mock data for recent activity
-const recentActivity = [
+// Helper function to get localized recent activity
+const getRecentActivity = (t: TFunction) => [
   {
     id: '1',
-    message: 'Device "Sensor-001" generated 2.3MB of data',
-    time: '2 min ago',
+    message: t('deviceAnalytics.activityMessages.deviceGeneratedData', {
+      deviceName: 'Sensor-001',
+      size: '2.3MB',
+    }),
+    time: t('analytics.timeAgo.minutes', { count: 2 }),
   },
   {
     id: '2',
-    message: 'Dashboard "Production Overview" consumed 450MB',
-    time: '5 min ago',
+    message: t('deviceAnalytics.activityMessages.dashboardConsumed', {
+      dashboardName: 'Production Overview',
+      size: '450MB',
+    }),
+    time: t('analytics.timeAgo.minutes', { count: 5 }),
   },
   {
     id: '3',
-    message: 'Alert triggered: Temperature threshold exceeded',
-    time: '8 min ago',
+    message: t('deviceAnalytics.activityMessages.alertTriggered', {
+      message: 'Temperature threshold exceeded',
+    }),
+    time: t('analytics.timeAgo.minutes', { count: 8 }),
   },
 ];
 
 export default function DeviceAnalyticsPage() {
+  const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState('7d');
 
   return (
@@ -66,22 +77,22 @@ export default function DeviceAnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Device Analytics
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            {t('deviceAnalytics.title')}
           </h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Overview of your IoT platform analytics
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {t('deviceAnalytics.subtitle')}
           </p>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange} className="w-40">
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select time range" />
+          <SelectTrigger className="w-[180px] dark:bg-gray-800 dark:border-gray-700">
+            <SelectValue placeholder={t('deviceAnalytics.selectTimeRange')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="24h">Last 24 hours</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
-            <SelectItem value="30d">Last 30 days</SelectItem>
-            <SelectItem value="90d">Last 90 days</SelectItem>
+            <SelectItem value="24h">{t('deviceAnalytics.last24Hours')}</SelectItem>
+            <SelectItem value="7d">{t('deviceAnalytics.last7Days')}</SelectItem>
+            <SelectItem value="30d">{t('deviceAnalytics.last30Days')}</SelectItem>
+            <SelectItem value="90d">{t('deviceAnalytics.last90Days')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -89,65 +100,65 @@ export default function DeviceAnalyticsPage() {
       {/* Key Metrics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Total Devices */}
-        <Card className="bg-green-50 border-green-200">
+        <Card className="bg-green-50 border-green-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Total Devices
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('deviceAnalytics.totalDevices')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">247</div>
-            <div className="flex items-center gap-1 text-sm text-green-600 mt-1">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">247</div>
+            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 12% from last week</span>
+              <span>{t('deviceAnalytics.trendUpPercent', { percent: 12 })}</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Data Generated */}
-        <Card className="bg-purple-50 border-purple-200">
+        <Card className="bg-purple-50 border-purple-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Data Generated
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('deviceAnalytics.dataGenerated')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">1.2TB</div>
-            <div className="flex items-center gap-1 text-sm text-green-600 mt-1">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">1.2TB</div>
+            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 8% from last week</span>
+              <span>{t('deviceAnalytics.trendUpPercent', { percent: 8 })}</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Active Alerts */}
-        <Card className="bg-orange-50 border-orange-200">
+        <Card className="bg-orange-50 border-orange-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Active Alerts
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('deviceAnalytics.activeAlerts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">23</div>
-            <div className="flex items-center gap-1 text-sm text-green-600 mt-1">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">23</div>
+            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 5% from last week</span>
+              <span>{t('deviceAnalytics.trendUpPercent', { percent: 5 })}</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Uptime */}
-        <Card className="bg-violet-50 border-violet-200">
+        <Card className="bg-violet-50 border-violet-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Uptime
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('deviceAnalytics.uptime')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">99.8%</div>
-            <div className="flex items-center gap-1 text-sm text-green-600 mt-1">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">99.8%</div>
+            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 0.2% from last week</span>
+              <span>{t('deviceAnalytics.trendUpPercent', { percent: 0.2 })}</span>
             </div>
           </CardContent>
         </Card>
@@ -156,9 +167,11 @@ export default function DeviceAnalyticsPage() {
       {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         {/* Device Activity Trends */}
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Device Activity Trends</CardTitle>
+            <CardTitle className="dark:text-white">
+              {t('deviceAnalytics.deviceActivityTrends')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -183,8 +196,8 @@ export default function DeviceAnalyticsPage() {
                     border: '1px solid #E5E7EB',
                     borderRadius: '8px',
                   }}
-                  labelFormatter={(value) => `Date: ${value}`}
-                  formatter={(value: number) => [`${value} kW/h`, 'Total']}
+                  labelFormatter={(value) => t('deviceAnalytics.tooltipDate', { value })}
+                  formatter={(value: number) => [`${value} kW/h`, t('deviceAnalytics.tooltipTotal')]}
                 />
                 <Area
                   type="monotone"
@@ -206,9 +219,11 @@ export default function DeviceAnalyticsPage() {
         </Card>
 
         {/* Data Consumption by Dashboard */}
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Data Consumption by Dashboard</CardTitle>
+            <CardTitle className="dark:text-white">
+              {t('deviceAnalytics.dataConsumptionByDashboard')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col items-center justify-center h-[300px]">
@@ -244,12 +259,14 @@ export default function DeviceAnalyticsPage() {
                 </svg>
                 {/* Center text */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-3xl font-bold text-gray-900">25°C</span>
-                  <span className="text-xs text-gray-500 mt-1">Celsius</span>
+                  <span className="text-3xl font-bold text-gray-900 dark:text-white">25°C</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {t('deviceAnalytics.celsius')}
+                  </span>
                 </div>
               </div>
               {/* Scale labels */}
-              <div className="flex justify-between w-48 mt-4 text-xs text-gray-600">
+              <div className="flex justify-between w-48 mt-4 text-xs text-gray-600 dark:text-gray-400">
                 <span>05°C</span>
                 <span>15°C</span>
                 <span>25°C</span>
@@ -260,19 +277,21 @@ export default function DeviceAnalyticsPage() {
       </div>
 
       {/* Recent Activity */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle className="dark:text-white">
+            {t('deviceAnalytics.recentActivity')}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recentActivity.map((activity) => (
+            {getRecentActivity(t).map((activity) => (
               <div
                 key={activity.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700"
               >
-                <p className="text-sm text-gray-700">{activity.message}</p>
-                <span className="text-xs text-gray-500">{activity.time}</span>
+                <p className="text-sm text-gray-700 dark:text-gray-300">{activity.message}</p>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</span>
               </div>
             ))}
           </div>

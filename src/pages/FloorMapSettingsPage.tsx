@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,6 +37,7 @@ const defaultSettings: FloorMapSettingsForm = {
 };
 
 export default function FloorMapSettingsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isResetting, setIsResetting] = useState(false);
 
@@ -50,12 +52,12 @@ export default function FloorMapSettingsPage() {
   const snapToGrid = watch('snapToGrid');
   const gridSize = watch('gridSize');
 
-  const onSubmit = async (data: FloorMapSettingsForm) => {
+  const onSubmit = async () => {
     try {
       // TODO: Implement API call to save settings
-      toast.success('Settings applied successfully');
+      toast.success(t('floorplans.settings.settingsAppliedSuccessfully'));
     } catch (error) {
-      toast.error('Failed to apply settings');
+      toast.error(t('floorplans.settings.failedToApplySettings'));
       console.error('Error saving settings:', error);
     }
   };
@@ -65,7 +67,7 @@ export default function FloorMapSettingsPage() {
     reset(defaultSettings);
     setTimeout(() => {
       setIsResetting(false);
-      toast.success('Settings reset to defaults');
+      toast.success(t('floorplans.settings.settingsResetToDefaults'));
     }, 300);
   };
 
@@ -76,10 +78,10 @@ export default function FloorMapSettingsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Floor Map Settings and Configuration"
+        title={t('floorplans.settings.title')}
         actions={[
           {
-            label: 'Back',
+            label: t('common.back'),
             onClick: () => navigate('/floor-plans'),
           },
         ]}
@@ -90,14 +92,14 @@ export default function FloorMapSettingsPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             {/* General Settings */}
             <div className="space-y-3 pt-5">
-              <h3 className="text-lg font-semibold text-gray-900">
-                General Settings
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t('floorplans.settings.generalSettings')}
               </h3>
 
               {/* Measurement Units */}
-              <div className="space-y-3 bg-gray-100 p-3 rounded-lg">
-                <Label className="text-sm font-medium text-gray-700">
-                  Measurement Units
+              <div className="space-y-3 bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('floorplans.settings.measurementUnits')}
                 </Label>
                 <div className="flex gap-3">
                   <Button
@@ -109,10 +111,10 @@ export default function FloorMapSettingsPage() {
                     className={
                       measurementUnit === 'metric'
                         ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300'
                     }
                   >
-                    Metric (m)
+                    {t('floorplans.settings.metric')}
                   </Button>
                   <Button
                     type="button"
@@ -123,22 +125,22 @@ export default function FloorMapSettingsPage() {
                     className={
                       measurementUnit === 'imperial'
                         ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300'
                     }
                   >
-                    Imperial (ft)
+                    {t('floorplans.settings.imperial')}
                   </Button>
                 </div>
               </div>
 
               {/* Auto-save Configuration */}
-              <div className="space-y-3 bg-gray-100 p-3 rounded-lg">
+              <div className="space-y-3 bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
                 <div className="flex items-center justify-between">
                   <Label
                     htmlFor="autoSave"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Enable auto-save
+                    {t('floorplans.settings.enableAutoSave')}
                   </Label>
                   <Switch
                     id="autoSave"
@@ -149,26 +151,26 @@ export default function FloorMapSettingsPage() {
                   />
                 </div>
                 {autoSaveEnabled && (
-                  <div className="text-sm text-gray-600 ml-0">
-                    Interval: {watch('autoSaveInterval')} minutes
+                  <div className="text-sm text-gray-600 dark:text-gray-400 ml-0">
+                    {t('floorplans.settings.interval', { minutes: watch('autoSaveInterval') })}
                   </div>
                 )}
               </div>
             </div>
 
             {/* Grid Settings */}
-            <div className="space-y-3   ">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Grid Settings
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {t('floorplans.settings.gridSettings')}
               </h3>
 
-              <div className="space-y-4 bg-gray-100 p-3 rounded-lg">
+              <div className="space-y-4 bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
                 <div className="flex items-center justify-between">
                   <Label
                     htmlFor="showGrid"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Show grid
+                    {t('floorplans.settings.showGrid')}
                   </Label>
                   <Switch
                     id="showGrid"
@@ -180,9 +182,9 @@ export default function FloorMapSettingsPage() {
                 <div className="flex items-center justify-between">
                   <Label
                     htmlFor="snapToGrid"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Snap to grid
+                    {t('floorplans.settings.snapToGrid')}
                   </Label>
                   <Switch
                     id="snapToGrid"
@@ -196,10 +198,12 @@ export default function FloorMapSettingsPage() {
                 <div className="space-y-2 flex items-center justify-between">
                   <Label
                     htmlFor="gridSize"
-                    className="text-sm font-medium text-gray-700"
+                    className="text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
-                    Grid size: {gridSize}
-                    {measurementUnit === 'metric' ? 'm' : 'ft'}
+                    {t('floorplans.settings.gridSize', { 
+                      size: gridSize, 
+                      unit: measurementUnit === 'metric' ? 'm' : 'ft' 
+                    })}
                   </Label>
                   <Input
                     id="gridSize"
@@ -210,16 +214,16 @@ export default function FloorMapSettingsPage() {
                       valueAsNumber: true,
                       min: 0.1,
                     })}
-                    className="w-32"
+                    className="w-32 dark:bg-gray-700 dark:text-white"
                   />
                 </div>
               </div>
             </div>
 
             {/* Footer Actions */}
-            <div className="flex items-center justify-end gap-3 border-t pt-6">
+            <div className="flex items-center justify-end gap-3 border-t border-gray-200 dark:border-gray-700 pt-6">
               <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancel
+                {t('floorplans.settings.cancel')}
               </Button>
               <Button
                 type="button"
@@ -227,10 +231,10 @@ export default function FloorMapSettingsPage() {
                 onClick={handleReset}
                 disabled={isResetting}
               >
-                Reset Default
+                {t('floorplans.settings.resetDefault')}
               </Button>
               <Button type="submit" variant="default">
-                Apply Changes
+                {t('floorplans.settings.applyChanges')}
               </Button>
             </div>
           </form>

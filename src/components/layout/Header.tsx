@@ -21,6 +21,7 @@ import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { useQuery } from '@tanstack/react-query';
 import { subscriptionsApi } from '@/services/api/subscriptions.api';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface SubscriptionResponse {
   id: string;
@@ -63,7 +64,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { user } = useAppStore();
   const { notifications } = useNotificationStore();
   const { mutate: logout } = useLogout();
-
+  const { t } = useTranslation();
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -147,20 +148,20 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
       className={cn(
         'h-20 border-b transition-colors',
         'flex items-center justify-between px-10 sticky top-0 z-30',
-        direction === 'rtl' && 'flex-row-reverse',
+        direction === 'rtl' && 'flex-row',
         // Light mode
         effectiveTheme === 'light' && 'bg-white border-gray-200',
         // Dark mode
         effectiveTheme === 'dark' && 'bg-gray-900 border-gray-800',
         // Fallback for Tailwind dark: classes
-        'dark:bg-gray-900 dark:border-gray-800'
+        'dark:bg-gray-900 dark:border-gray-800 '
       )}
     >
       {/* Left Section */}
       <div
         className={cn(
           'flex items-center gap-4',
-          direction === 'rtl' && 'flex-row-reverse'
+          direction === 'rtl' && 'flex-row-reverse '
         )}
       >
         <button
@@ -173,7 +174,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
           <div className="flex items-center gap-4">
             <div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Current Plan
+                {t('common.currentPlan')}
               </p>
               <p className="text-sm font-medium text-gray-900 dark:text-white">
                 {currentSubscription
@@ -184,7 +185,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             {currentSubscription && (
               <div className="border-l border-gray-200 dark:border-gray-700 pl-4">
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Next Billing
+                  {t('common.nextBilling')}
                 </p>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
                   {getNextBillingDate()}
@@ -198,7 +199,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
       <div
         className={cn(
           'flex items-center gap-3',
-          direction === 'rtl' && 'flex-row-reverse'
+          direction === 'rtl' && 'flex-row'
         )}
       >
         {/* Language Switcher */}
@@ -415,11 +416,11 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   className={cn(
                     'w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700',
                     'dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
-                    direction === 'rtl' && 'flex-row-reverse'
+                    direction === 'rtl' && 'flex-row-reverse justify-end'
                   )}
                 >
                   <Settings className="h-4 w-4" />
-                  <span>Settings</span>
+                  <span>{t('common.settings')}</span>
                 </button>
               </Link>
 
@@ -430,11 +431,11 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 className={cn(
                   'w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600',
                   'dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
-                  direction === 'rtl' && 'flex-row-reverse'
+                  direction === 'rtl' && 'flex-row-reverse justify-end'
                 )}
               >
                 <LogOut className="h-4 w-4" />
-                <span>Logout</span>
+                <span>{t('common.logout')}</span>
               </button>
             </div>
           )}

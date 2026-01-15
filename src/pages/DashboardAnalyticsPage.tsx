@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Card,
   CardContent,
@@ -40,17 +42,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-// Mock data for dashboard table
-const dashboardData = [
+// Helper function to get localized dashboard data
+const getDashboardData = (t: TFunction) => [
   {
     id: '1',
     name: 'Building A - Main Office',
     co2Emissions: '2.4 kg',
     temperature: '24.5°C',
     humidity: '68%',
-    energyUsage: '2 min ago',
+    energyUsage: t('analytics.timeAgo.minutes', { count: 2 }),
     lastUpdated: '99.8%',
-    status: 'ACTIVE',
+    status: t('dashboardAnalytics.status.active'),
     statusColor: 'text-green-600',
     statusDot: 'bg-green-500',
   },
@@ -59,10 +61,10 @@ const dashboardData = [
     name: 'Warehouse B',
     co2Emissions: '3.1 kg',
     temperature: '24.5°C',
-    humidity: '1 day ago',
-    energyUsage: '5 min ago',
+    humidity: t('analytics.timeAgo.hours', { count: 24 }),
+    energyUsage: t('analytics.timeAgo.minutes', { count: 5 }),
     lastUpdated: '99.2%',
-    status: 'Processing',
+    status: t('dashboardAnalytics.status.processing'),
     statusColor: 'text-blue-600',
     statusDot: 'bg-blue-500',
   },
@@ -71,10 +73,10 @@ const dashboardData = [
     name: 'Retail Store C',
     co2Emissions: '2.4 kg',
     temperature: '24.5°C',
-    humidity: '3 days ago',
-    energyUsage: '2 hours ago',
+    humidity: t('analytics.timeAgo.hoursPlural', { count: 72 }),
+    energyUsage: t('analytics.timeAgo.hoursPlural', { count: 2 }),
     lastUpdated: '87.3%',
-    status: 'ERROR',
+    status: t('dashboardAnalytics.status.error'),
     statusColor: 'text-purple-600',
     statusDot: 'bg-purple-500',
   },
@@ -97,6 +99,7 @@ const environmentalTrendsData = [
 ];
 
 export default function DashboardAnalyticsPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('data-consumption');
   const [timeRange, setTimeRange] = useState('7d');
   const [sortBy, setSortBy] = useState('co2');
@@ -117,10 +120,10 @@ export default function DashboardAnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Dashboard Analytics
+            {t('dashboardAnalytics.title')}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Monitor environmental metrics and dashboard performance
+            {t('dashboardAnalytics.subtitle')}
           </p>
         </div>
       </div>
@@ -138,33 +141,33 @@ export default function DashboardAnalyticsPage() {
               : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700'
           )}
         >
-          Data Consumption
+          {t('dashboardAnalytics.dataConsumption')}
         </Button>
 
         {/* Time Range Dropdown */}
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[200px] bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-            <SelectValue placeholder="Time Range: 7 days" />
+            <SelectValue placeholder={t('dashboardAnalytics.timeRange7Days')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="24h">Time Range: 24 hours</SelectItem>
-            <SelectItem value="7d">Time Range: 7 days</SelectItem>
-            <SelectItem value="30d">Time Range: 30 days</SelectItem>
-            <SelectItem value="90d">Time Range: 90 days</SelectItem>
+            <SelectItem value="24h">{t('dashboardAnalytics.timeRange24Hours')}</SelectItem>
+            <SelectItem value="7d">{t('dashboardAnalytics.timeRange7Days')}</SelectItem>
+            <SelectItem value="30d">{t('dashboardAnalytics.timeRange30Days')}</SelectItem>
+            <SelectItem value="90d">{t('dashboardAnalytics.timeRange90Days')}</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Sort By Dropdown */}
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger className="w-[160px] bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-            <SelectValue placeholder="Sort by: CO2" />
+            <SelectValue placeholder={t('dashboardAnalytics.sortByCO2')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="co2">Sort by: CO2</SelectItem>
-            <SelectItem value="temperature">Sort by: Temperature</SelectItem>
-            <SelectItem value="humidity">Sort by: Humidity</SelectItem>
-            <SelectItem value="energy">Sort by: Energy Usage</SelectItem>
-            <SelectItem value="name">Sort by: Name</SelectItem>
+            <SelectItem value="co2">{t('dashboardAnalytics.sortByCO2')}</SelectItem>
+            <SelectItem value="temperature">{t('dashboardAnalytics.sortByTemperature')}</SelectItem>
+            <SelectItem value="humidity">{t('dashboardAnalytics.sortByHumidity')}</SelectItem>
+            <SelectItem value="energy">{t('dashboardAnalytics.sortByEnergyUsage')}</SelectItem>
+            <SelectItem value="name">{t('dashboardAnalytics.sortByName')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -174,7 +177,7 @@ export default function DashboardAnalyticsPage() {
           className="ml-auto bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
         >
           <Download className="mr-2 h-4 w-4" />
-          Export Data
+          {t('dashboardAnalytics.exportData')}
         </Button>
       </div>
 
@@ -184,18 +187,34 @@ export default function DashboardAnalyticsPage() {
           <Table>
             <TableHeader>
               <TableRow className="dark:border-gray-700">
-                <TableHead className="font-semibold dark:text-gray-300">DASHBOARD NAME</TableHead>
-                <TableHead className="font-semibold dark:text-gray-300">CO2 EMISSIONS</TableHead>
-                <TableHead className="font-semibold dark:text-gray-300">TEMPERATURE</TableHead>
-                <TableHead className="font-semibold dark:text-gray-300">HUMIDITY</TableHead>
-                <TableHead className="font-semibold dark:text-gray-300">ENERGY USAGE</TableHead>
-                <TableHead className="font-semibold dark:text-gray-300">LAST UPDATED</TableHead>
-                <TableHead className="font-semibold dark:text-gray-300">STATUS</TableHead>
-                <TableHead className="font-semibold dark:text-gray-300">ACTIONS</TableHead>
+                <TableHead className="font-semibold dark:text-gray-300">
+                  {t('dashboardAnalytics.tableHeaders.dashboardName')}
+                </TableHead>
+                <TableHead className="font-semibold dark:text-gray-300">
+                  {t('dashboardAnalytics.tableHeaders.co2Emissions')}
+                </TableHead>
+                <TableHead className="font-semibold dark:text-gray-300">
+                  {t('dashboardAnalytics.tableHeaders.temperature')}
+                </TableHead>
+                <TableHead className="font-semibold dark:text-gray-300">
+                  {t('dashboardAnalytics.tableHeaders.humidity')}
+                </TableHead>
+                <TableHead className="font-semibold dark:text-gray-300">
+                  {t('dashboardAnalytics.tableHeaders.energyUsage')}
+                </TableHead>
+                <TableHead className="font-semibold dark:text-gray-300">
+                  {t('dashboardAnalytics.tableHeaders.lastUpdated')}
+                </TableHead>
+                <TableHead className="font-semibold dark:text-gray-300">
+                  {t('dashboardAnalytics.tableHeaders.status')}
+                </TableHead>
+                <TableHead className="font-semibold dark:text-gray-300">
+                  {t('dashboardAnalytics.tableHeaders.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {dashboardData.map((dashboard) => (
+              {getDashboardData(t).map((dashboard) => (
                 <TableRow key={dashboard.id} className="dark:border-gray-700">
                   <TableCell className="font-medium dark:text-white">
                     {dashboard.name}
@@ -247,7 +266,9 @@ export default function DashboardAnalyticsPage() {
         {/* Environmental Metrics Trends */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="dark:text-white">Environmental Metrics Trends</CardTitle>
+            <CardTitle className="dark:text-white">
+              {t('dashboardAnalytics.environmentalMetricsTrends')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={400}>
@@ -282,7 +303,7 @@ export default function DashboardAnalyticsPage() {
                   dataKey="co2"
                   stroke="#8B5CF6"
                   strokeWidth={3}
-                  name="CO2 Emissions"
+                  name={t('dashboardAnalytics.co2Emissions')}
                   dot={false}
                 />
                 <Line
@@ -290,7 +311,7 @@ export default function DashboardAnalyticsPage() {
                   dataKey="temperature"
                   stroke="#1E40AF"
                   strokeWidth={3}
-                  name="Temperature"
+                  name={t('dashboardAnalytics.temperature')}
                   dot={false}
                 />
                 <Line
@@ -298,7 +319,7 @@ export default function DashboardAnalyticsPage() {
                   dataKey="humidity"
                   stroke="#F97316"
                   strokeWidth={3}
-                  name="Humidity"
+                  name={t('dashboardAnalytics.humidity')}
                   dot={false}
                 />
               </LineChart>
@@ -309,14 +330,16 @@ export default function DashboardAnalyticsPage() {
         {/* Environmental Impact Summary */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="dark:text-white">Environmental Impact Summary</CardTitle>
+            <CardTitle className="dark:text-white">
+              {t('dashboardAnalytics.environmentalImpactSummary')}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 grid grid-cols-2 gap-6 dark:bg-gray-800 dark:border-gray-700">
             {/* Total CO2 Emissions */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Total CO2 Emissions (7 days)
+                  {t('dashboardAnalytics.totalCO2Emissions')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -325,7 +348,7 @@ export default function DashboardAnalyticsPage() {
                 </span>
                 <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
                   <TrendingUp className="h-4 w-4" />
-                  <span>12% from last week</span>
+                  <span>{t('dashboardAnalytics.trendUpPercent', { percent: 12 })}</span>
                 </div>
               </div>
             </div>
@@ -334,7 +357,7 @@ export default function DashboardAnalyticsPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Energy Consumption
+                  {t('dashboardAnalytics.energyConsumption')}
                 </span>
               </div>
               <div className="flex items-center gap-2 mb-2">
@@ -343,12 +366,12 @@ export default function DashboardAnalyticsPage() {
                 </span>
                 <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400">
                   <TrendingUp className="h-4 w-4" />
-                  <span>5% from last week</span>
+                  <span>{t('dashboardAnalytics.trendUpPercent', { percent: 5 })}</span>
                 </div>
               </div>
               <div>
                 <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                  <span>Sustainability Target: 80%</span>
+                  <span>{t('dashboardAnalytics.sustainabilityTarget', { percent: 80 })}</span>
                 </div>
                 <Progress value={75} className="h-2" />
               </div>
@@ -358,7 +381,7 @@ export default function DashboardAnalyticsPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Carbon Footprint
+                  {t('dashboardAnalytics.carbonFootprint')}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -367,7 +390,7 @@ export default function DashboardAnalyticsPage() {
                 </span>
                 <div className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
                   <TrendingDown className="h-4 w-4" />
-                  <span>8% from last week</span>
+                  <span>{t('dashboardAnalytics.trendDownPercent', { percent: 8 })}</span>
                 </div>
               </div>
             </div>
@@ -376,7 +399,7 @@ export default function DashboardAnalyticsPage() {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Efficiency Score
+                  {t('dashboardAnalytics.efficiencyScore')}
                 </span>
               </div>
               <div className="flex items-center gap-2 mb-2">
@@ -385,12 +408,12 @@ export default function DashboardAnalyticsPage() {
                 </span>
                 <div className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
                   <TrendingDown className="h-4 w-4" />
-                  <span>3% from last week</span>
+                  <span>{t('dashboardAnalytics.trendDownPercent', { percent: 3 })}</span>
                 </div>
               </div>
               <div>
                 <div className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
-                  <span>Optimization Goal: 87%</span>
+                  <span>{t('dashboardAnalytics.optimizationGoal', { percent: 87 })}</span>
                 </div>
                 <Progress value={100} className="h-2" />
               </div>

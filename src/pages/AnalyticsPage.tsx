@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { PageHeader } from '@/components/common/PageHeader';
 import {
   Card,
@@ -48,55 +50,57 @@ interface DeviceEvent {
   dotColor: string;
 }
 
-const deviceEvents: DeviceEvent[] = [
+// Helper function to get localized device events
+const getDeviceEvents = (t: TFunction): DeviceEvent[] => [
   {
     id: '1',
     deviceId: 'GW-01',
-    event: 'Connected',
-    time: '5 min ago',
+    event: t('analytics.events.connected'),
+    time: t('analytics.timeAgo.minutes', { count: 5 }),
     location: 'Room 101',
-    color: 'bg-pink-100',
+    color: 'bg-pink-100 dark:bg-pink-900',
     dotColor: 'bg-red-500',
   },
   {
     id: '2',
     deviceId: 'S-15',
-    event: 'Disconnected',
-    time: '1 hour ago',
+    event: t('analytics.events.disconnected'),
+    time: t('analytics.timeAgo.hours', { count: 1 }),
     location: 'Kitchen',
-    color: 'bg-purple-100',
+    color: 'bg-purple-100 dark:bg-purple-900',
     dotColor: 'bg-blue-500',
   },
   {
     id: '3',
     deviceId: 'S-08',
-    event: 'Low Battery Warning',
-    time: '2 hours ago',
+    event: t('analytics.events.lowBatteryWarning'),
+    time: t('analytics.timeAgo.hoursPlural', { count: 2 }),
     location: 'Reception',
-    color: 'bg-orange-100',
+    color: 'bg-orange-100 dark:bg-orange-900',
     dotColor: 'bg-red-500',
   },
   {
     id: '4',
     deviceId: 'S-12',
-    event: 'Data transmission successful',
-    time: '3 hours ago',
+    event: t('analytics.events.dataTransmissionSuccessful'),
+    time: t('analytics.timeAgo.hoursPlural', { count: 3 }),
     location: 'Office 102',
-    color: 'bg-blue-100',
+    color: 'bg-blue-100 dark:bg-blue-900',
     dotColor: 'bg-blue-500',
   },
   {
     id: '5',
     deviceId: 'S-13',
-    event: 'Low Battery Warning',
-    time: '2 hours ago',
+    event: t('analytics.events.lowBatteryWarning'),
+    time: t('analytics.timeAgo.hoursPlural', { count: 2 }),
     location: 'Reception',
-    color: 'bg-orange-100',
+    color: 'bg-orange-100 dark:bg-orange-900',
     dotColor: 'bg-red-500',
   },
 ];
 
 export default function AnalyticsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedFilter, setSelectedFilter] = useState<string>('all-floors');
 
@@ -118,14 +122,14 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6  ">
       <PageHeader
-        title="Device Analytics and Monitoring - Building AGW-01"
+        title={t('analytics.title', { building: 'AGW-01' })}
         actions={[
           {
-            label: 'Report Templates',
+            label: t('analytics.reportTemplates'),
             onClick: () => navigate('/report-templates'),
           },
           {
-            label: 'Back',
+            label: t('common.back'),
             onClick: () => navigate('/floor-plans'),
           },
         ]}
@@ -133,12 +137,14 @@ export default function AnalyticsPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-3">
-        <span className="text-sm font-medium text-gray-700">Filters:</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          {t('analytics.filters')}
+        </span>
         <div className="flex gap-2">
           {[
-            { id: 'all-floors', label: 'All Floors' },
-            { id: 'all-rooms', label: 'All Rooms' },
-            { id: 'last-7-days', label: 'Last 7 Days' },
+            { id: 'all-floors', label: t('analytics.allFloors') },
+            { id: 'all-rooms', label: t('analytics.allRooms') },
+            { id: 'last-7-days', label: t('analytics.last7Days') },
           ].map((filter) => (
             <Button
               key={filter.id}
@@ -148,7 +154,7 @@ export default function AnalyticsPage() {
               className={
                 selectedFilter === filter.id
                   ? 'bg-primary text-white'
-                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700'
               }
             >
               {filter.label}
@@ -159,62 +165,62 @@ export default function AnalyticsPage() {
 
       {/* Key Metrics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-green-500 border-2">
+        <Card className="border-green-500 border-2 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Active Devices
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('analytics.activeDevices')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">24</div>
-            <div className="flex items-center gap-1 text-sm text-green-600 mt-1">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">24</div>
+            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 2 from last week</span>
+              <span>{t('analytics.trendUpFromLastWeek', { count: 2 })}</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Offline Devices
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('analytics.offlineDevices')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">3</div>
-            <div className="flex items-center gap-1 text-sm text-green-600 mt-1">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">3</div>
+            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingDown className="h-4 w-4" />
-              <span>↓ 1 from last week</span>
+              <span>{t('analytics.trendDownFromLastWeek', { count: 1 })}</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Critical Alerts
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('analytics.criticalAlerts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">5</div>
-            <div className="flex items-center gap-1 text-sm text-red-600 mt-1">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">5</div>
+            <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 2 from last week</span>
+              <span>{t('analytics.trendUpFromLastWeek', { count: 2 })}</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">
-              Data Points Today
+            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('analytics.dataPointsToday')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">1,247</div>
-            <div className="flex items-center gap-1 text-sm text-green-600 mt-1">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">1,247</div>
+            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 15% from yesterday</span>
+              <span>{t('analytics.trendUpFromYesterday', { percent: 15 })}</span>
             </div>
           </CardContent>
         </Card>
@@ -223,9 +229,11 @@ export default function AnalyticsPage() {
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         {/* Device Status Timeline */}
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Device Status Timeline</CardTitle>
+            <CardTitle className="dark:text-white">
+              {t('analytics.deviceStatusTimeline')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -256,7 +264,7 @@ export default function AnalyticsPage() {
                   dataKey="online"
                   stroke="#3b82f6"
                   strokeWidth={2}
-                  name="Online"
+                  name={t('analytics.online')}
                   dot={{ r: 4 }}
                 />
                 <Line
@@ -264,7 +272,7 @@ export default function AnalyticsPage() {
                   dataKey="offline"
                   stroke="#ec4899"
                   strokeWidth={2}
-                  name="Offline"
+                  name={t('analytics.offline')}
                   dot={{ r: 4 }}
                 />
               </LineChart>
@@ -273,16 +281,18 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Recent Device Events */}
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Recent Device Events</CardTitle>
+            <CardTitle className="dark:text-white">
+              {t('analytics.recentDeviceEvents')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 max-h-[300px] overflow-y-auto">
-              {deviceEvents.map((event) => (
+              {getDeviceEvents(t).map((event) => (
                 <div
                   key={event.id}
-                  className={`${event.color} rounded-lg p-3 border border-gray-200 shadow-sm`}
+                  className={`${event.color} rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm`}
                 >
                   <div className="flex items-start gap-2">
                     <div
@@ -290,17 +300,17 @@ export default function AnalyticsPage() {
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-sm text-gray-900">
+                        <span className="font-semibold text-sm text-gray-900 dark:text-white">
                           {event.deviceId}
                         </span>
-                        <span className="text-xs text-gray-600">
+                        <span className="text-xs text-gray-600 dark:text-gray-400">
                           {event.time}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                         {event.event}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                         {event.location}
                       </p>
                     </div>
@@ -313,59 +323,82 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Performance Metrics */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
-          <CardTitle>Performance Metrics</CardTitle>
+          <CardTitle className="dark:text-white">
+            {t('analytics.performanceMetrics')}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Performance Metrics</p>
-              <p className="text-2xl font-bold text-gray-900">2.3ms</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Network Uptime</p>
-              <p className="text-2xl font-bold text-gray-900">99.8%</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Data Loss Rate</p>
-              <p className="text-2xl font-bold text-green-600">0.02%</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-1">
-                Signal Strength Avg
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                {t('analytics.performanceMetrics')}
               </p>
-              <p className="text-2xl font-bold text-green-600">-65 dBm</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">2.3ms</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">
-                Battery Health Average
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                {t('analytics.networkUptime')}
               </p>
-              <p className="text-2xl font-bold text-orange-600">78%</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">99.8%</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                {t('analytics.dataLossRate')}
+              </p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">0.02%</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                {t('analytics.signalStrengthAvg')}
+              </p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">-65 dBm</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                {t('analytics.batteryHealthAverage')}
+              </p>
+              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">78%</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Footer Actions */}
-      <div className="flex items-center justify-between border-t pt-4">
+      <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => navigate('/floor-plans')}>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/floor-plans')}
+            className="dark:border-gray-700 dark:text-gray-300"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
-          <Button variant="outline" onClick={handleExport3D}>
+          <Button 
+            variant="outline" 
+            onClick={handleExport3D}
+            className="dark:border-gray-700 dark:text-gray-300"
+          >
             <Download className="mr-2 h-4 w-4" />
-            Export 3D
+            {t('analytics.export3D')}
           </Button>
-          <Button onClick={handleSetAlerts} className="bg-primary text-white">
+          <Button 
+            onClick={handleSetAlerts} 
+            className="bg-primary text-white"
+          >
             <Bell className="mr-2 h-4 w-4" />
-            Set Alerts
+            {t('analytics.setAlerts')}
           </Button>
         </div>
-        <Button variant="outline" onClick={handleRefresh}>
+        <Button 
+          variant="outline" 
+          onClick={handleRefresh}
+          className="dark:border-gray-700 dark:text-gray-300"
+        >
           <RefreshCw className="mr-2 h-4 w-4" />
-          Refresh
+          {t('analytics.refresh')}
         </Button>
       </div>
     </div>

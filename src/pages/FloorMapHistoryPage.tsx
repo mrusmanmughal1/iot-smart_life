@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -93,7 +94,7 @@ const mockVersions: FloorMapVersion[] = [
 ];
 
 export default function FloorMapHistoryPage() {
-  
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedVersions, setSelectedVersions] = useState<string[]>([]);
   const currentVersion = mockVersions.find((v) => v.isCurrent);
@@ -129,7 +130,7 @@ export default function FloorMapHistoryPage() {
   const handleCompare = () => {
     if (selectedVersions.length !== 2) {
       // TODO: Show error message
-      console.log('Please select exactly 2 versions to compare');
+      console.log(t('floorplans.history.pleaseSelectTwoVersions'));
       return;
     }
     // TODO: Navigate to compare page
@@ -141,10 +142,10 @@ export default function FloorMapHistoryPage() {
     <div className="space-y-6">
 
       <PageHeader
-        title="Floor Map History and Versions - Building A"
+        title={t('floorplans.history.title', { building: 'Building A' })}
         actions={[
           {
-            label: 'Back',
+            label: t('common.back'),
             onClick: () => navigate('/floor-plans'),
           },
         ]}
@@ -152,19 +153,19 @@ export default function FloorMapHistoryPage() {
 
       {/* Current Version */}
       {currentVersion ? (
-        <Card className="bg-purple-50 border-purple-200">
+        <Card className="bg-purple-50 border-purple-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <Badge className="bg-purple-600 text-white mb-2">
-                  Current Version
+                  {t('floorplans.history.currentVersion')}
                 </Badge>
-                <CardTitle className=" font-semibold text-gray-900">
-                  Version {currentVersion.version} -{' '}
+                <CardTitle className="font-semibold text-gray-900 dark:text-white">
+                  {t('floorplans.history.version', { version: currentVersion.version })} -{' '}
                   {currentVersion.description}
                 </CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
-                  Version {currentVersion.version} -{' '}
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {t('floorplans.history.version', { version: currentVersion.version })} -{' '}
                   {currentVersion.description}
                 </p>
               </div>
@@ -174,10 +175,12 @@ export default function FloorMapHistoryPage() {
       ) : null}
 
       {/* Version History */}
-      <Card>
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Version History</CardTitle>
+            <CardTitle className="dark:text-white">
+              {t('floorplans.history.versionHistory')}
+            </CardTitle>
             {historyVersions.length > 0 && (
               <div className="flex items-center gap-2">
                 <Checkbox
@@ -190,9 +193,9 @@ export default function FloorMapHistoryPage() {
                 />
                 <label
                   htmlFor="select-all"
-                  className="text-sm text-gray-600 cursor-pointer"
+                  className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
                 >
-                  Select All
+                  {t('floorplans.history.selectAll')}
                 </label>
               </div>
             )}
@@ -214,18 +217,21 @@ export default function FloorMapHistoryPage() {
                     />
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-sm text-gray-900">
-                          Version {version.version}
+                        <h3 className="font-semibold text-sm text-gray-900 dark:text-white">
+                          {t('floorplans.history.version', { version: version.version })}
                         </h3>
                       </div>
-                      <p className="text-xs text-gray-700 mb-2">
+                      <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
                         {version.description}
                       </p>
-                      <p className="text-xs text-gray-600 mb-1">
-                        Modified: {version.modifiedDate} by {version.modifiedBy}
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                        {t('floorplans.history.modified', { 
+                          date: version.modifiedDate, 
+                          user: version.modifiedBy 
+                        })}
                       </p>
-                      <p className="text-xs text-gray-600">
-                        Changes: {version.changes}
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {t('floorplans.history.changes', { changes: version.changes })}
                       </p>
                     </div>
                   </div>
@@ -237,11 +243,11 @@ export default function FloorMapHistoryPage() {
       </Card>
 
       {/* Footer Actions */}
-      <div className="flex items-center justify-between border-t pt-4 overflow-x-auto">
+      <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4 overflow-x-auto">
         <div className="flex gap-3">
           <Button variant="outline" onClick={handleExportHistory}>
             <Download className="mr-2 h-4 w-4" />
-            Export History
+            {t('floorplans.history.exportHistory')}
           </Button>
           <Button
             variant="outline"
@@ -249,7 +255,7 @@ export default function FloorMapHistoryPage() {
             disabled={selectedVersions.length === 0}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete Selected
+            {t('floorplans.history.deleteSelected')}
           </Button>
           <Button
             onClick={handleCompare}
@@ -257,12 +263,15 @@ export default function FloorMapHistoryPage() {
             className="bg-primary text-white"
           >
             <GitCompare className="mr-2 h-4 w-4" />
-            Compare
+            {t('floorplans.history.compare')}
           </Button>
         </div>
-        <div className="bg-gray-800 text-white px-4 py-2 rounded-lg">
+        <div className="bg-gray-800 dark:bg-gray-900 text-white px-4 py-2 rounded-lg">
           <span className="text-sm font-medium">
-            Total Versions: {mockVersions.length} | Active: 1
+            {t('floorplans.history.totalVersions', { 
+              total: mockVersions.length, 
+              active: 1 
+            })}
           </span>
         </div>
       </div>

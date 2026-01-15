@@ -20,7 +20,7 @@ import {
 } from '@/features/profiles/hooks';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import toast from 'react-hot-toast';
-
+import { useTranslation } from 'react-i18next';
 interface AssetProfile {
   id: string;
   name: string;
@@ -33,6 +33,7 @@ interface AssetProfile {
 }
 
 export default function AssetProfiles() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: assetProfiles } = useAssetProfiles();
   // API response structure: response.data.data.data (nested response)
@@ -111,11 +112,11 @@ export default function AssetProfiles() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Asset Profiles"
-        description="Manage asset configuration profiles and property templates"
+        title={t('assetProfiles.title')}
+        description={t('assetProfiles.subtitle')}
         actions={[
           {
-            label: 'Create Profile',
+            label: t('assetProfiles.createProfile'),
             onClick: () => setIsCreateOpen(true),
             icon: <Plus className="h-4 w-4 mr-2" />,
           },
@@ -126,14 +127,14 @@ export default function AssetProfiles() {
         <Card className="bg-primary text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm  text-white font-medium">
-              Total Profiles
+              {t('assetProfiles.totalProfiles')}
             </CardTitle>
             <Building2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{assetProfilesData.length}</div>
             <p className="text-xs text-muted-foreground">
-              Asset configurations
+                {t('assetProfiles.assetConfigurations')}
             </p>
           </CardContent>
         </Card>
@@ -141,7 +142,7 @@ export default function AssetProfiles() {
         <Card className="bg-secondary text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
-              Total Assets
+              {t('assetProfiles.totalAssets')}
             </CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -150,7 +151,7 @@ export default function AssetProfiles() {
               {assetProfilesData.reduce((sum:number, p:AssetProfile) => sum + p.assets, 0)}
             </div> */}
             <p className="text-xs text-muted-foreground">
-              Using these profiles
+              {t('assetProfiles.usingTheseProfiles')}
             </p>
           </CardContent>
         </Card>
@@ -158,7 +159,7 @@ export default function AssetProfiles() {
         <Card className="bg-success text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
-              Industrial
+              {t('assetProfiles.industrial')}
             </CardTitle>
             <Factory className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -169,13 +170,13 @@ export default function AssetProfiles() {
                   .length
               }
             </div>
-            <p className="text-xs text-muted-foreground">Facilities</p>
+            <p className="text-xs text-muted-foreground">{t('assetProfiles.facilities')}</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white text-black">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Commercial</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('assetProfiles.commercial')}</CardTitle>
             <Home className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -185,7 +186,7 @@ export default function AssetProfiles() {
                   .length
               }
             </div>
-            <p className="text-xs text-muted-foreground">Buildings</p>
+            <p className="text-xs text-muted-foreground">{t('assetProfiles.buildings')}</p>
           </CardContent>
         </Card>
       </div>

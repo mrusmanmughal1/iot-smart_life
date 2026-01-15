@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -18,7 +20,54 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-// Mock data for data consumption by device
+// Helper function to get localized widget performance data
+const getWidgetPerformanceData = (t: TFunction) => [
+  {
+    name: t('productionOverview.widgetNames.temperatureChart'),
+    loadTime: '1.2s',
+    status: t('productionOverview.widgetStatus.good'),
+    statusColor: 'text-green-600',
+    statusDot: 'bg-green-500',
+  },
+  {
+    name: t('productionOverview.widgetNames.pressureGauge'),
+    loadTime: '0.8s',
+    status: t('productionOverview.widgetStatus.good'),
+    statusColor: 'text-green-600',
+    statusDot: 'bg-green-500',
+  },
+  {
+    name: t('productionOverview.widgetNames.motorStatus'),
+    loadTime: '3.1s',
+    status: t('productionOverview.widgetStatus.slow'),
+    statusColor: 'text-orange-600',
+    statusDot: 'bg-orange-500',
+  },
+  {
+    name: t('productionOverview.widgetNames.flowRateGraph'),
+    loadTime: '1.5s',
+    status: t('productionOverview.widgetStatus.good'),
+    statusColor: 'text-green-600',
+    statusDot: 'bg-green-500',
+  },
+  {
+    name: t('productionOverview.widgetNames.alarmPanel'),
+    loadTime: '4.2s',
+    status: t('productionOverview.widgetStatus.poor'),
+    statusColor: 'text-red-600',
+    statusDot: 'bg-red-500',
+  },
+];
+
+// Helper function to get localized recent activity
+const getRecentActivity = (t: TFunction) => [
+  t('productionOverview.activityMessages.dashboardLoaded', { user: 'admin@company.com' }),
+  t('productionOverview.activityMessages.widgetRefresh', { widgetName: t('productionOverview.widgetNames.temperatureChart') }),
+  t('productionOverview.activityMessages.newDeviceConnected', { deviceName: 'Sensor-012' }),
+  t('productionOverview.activityMessages.alertResolved', { alertMessage: 'High pressure warning' }),
+];
+
+// Mock data for data consumption by device (device names don't need translation)
 const deviceConsumptionData = [
   { device: 'Gateway-002', value: 180, percentage: 40, color: '#3B82F6' },
   { device: 'Sensor-001', value: 135, percentage: 30, color: '#EC4899' },
@@ -26,53 +75,9 @@ const deviceConsumptionData = [
   { device: 'Motor-003', value: 54, percentage: 12, color: '#000000' },
   { device: 'Valve-007', value: 27, percentage: 6, color: '#EF4444' },
 ];
-// Mock data for widget performance table
-const widgetPerformanceData = [
-  {
-    name: 'Temperature Chart',
-    loadTime: '1.2s',
-    status: 'Good',
-    statusColor: 'text-green-600',
-    statusDot: 'bg-green-500',
-  },
-  {
-    name: 'Pressure Gauge',
-    loadTime: '0.8s',
-    status: 'Good',
-    statusColor: 'text-green-600',
-    statusDot: 'bg-green-500',
-  },
-  {
-    name: 'Motor Status',
-    loadTime: '3.1s',
-    status: 'Slow',
-    statusColor: 'text-orange-600',
-    statusDot: 'bg-orange-500',
-  },
-  {
-    name: 'Flow Rate Graph',
-    loadTime: '1.5s',
-    status: 'Good',
-    statusColor: 'text-green-600',
-    statusDot: 'bg-green-500',
-  },
-  {
-    name: 'Alarm Panel',
-    loadTime: '4.2s',
-    status: 'Poor',
-    statusColor: 'text-red-600',
-    statusDot: 'bg-red-500',
-  },
-];
-// Mock data for recent activity
-const recentActivity = [
-  'Dashboard loaded by admin@company.com',
-  'Widget refresh: Temperature Chart',
-  'New device connected: Sensor-012',
-  'Alert resolved: High pressure warning',
-];
 
 export default function ProductionOverviewPage() {
+  const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState('7d');
 
   const handleRefresh = () => {
@@ -86,21 +91,21 @@ export default function ProductionOverviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            Dashboard Analytics - Production Overview
+            {t('productionOverview.title')}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Detailed analytics for Production Overview dashboard
+            {t('productionOverview.subtitle')}
           </p>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[220px] bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-            <SelectValue placeholder="Time Range: Last 7 days" />
+            <SelectValue placeholder={t('productionOverview.timeRangeLast7Days')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="24h">Time Range: Last 24 hours</SelectItem>
-            <SelectItem value="7d">Time Range: Last 7 days</SelectItem>
-            <SelectItem value="30d">Time Range: Last 30 days</SelectItem>
-            <SelectItem value="90d">Time Range: Last 90 days</SelectItem>
+            <SelectItem value="24h">{t('productionOverview.timeRangeLast24Hours')}</SelectItem>
+            <SelectItem value="7d">{t('productionOverview.timeRangeLast7Days')}</SelectItem>
+            <SelectItem value="30d">{t('productionOverview.timeRangeLast30Days')}</SelectItem>
+            <SelectItem value="90d">{t('productionOverview.timeRangeLast90Days')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -111,7 +116,7 @@ export default function ProductionOverviewPage() {
         <Card className="bg-green-50 border-green-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Total Devices
+              {t('productionOverview.totalDevices')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -120,7 +125,7 @@ export default function ProductionOverviewPage() {
             </div>
             <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 12% from last week</span>
+              <span>{t('productionOverview.trendUpPercent', { percent: 12 })}</span>
             </div>
           </CardContent>
         </Card>
@@ -129,7 +134,7 @@ export default function ProductionOverviewPage() {
         <Card className="bg-purple-50 border-purple-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Data Generated
+              {t('productionOverview.dataGenerated')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -138,7 +143,7 @@ export default function ProductionOverviewPage() {
             </div>
             <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 18% from last week</span>
+              <span>{t('productionOverview.trendUpPercent', { percent: 18 })}</span>
             </div>
           </CardContent>
         </Card>
@@ -147,7 +152,7 @@ export default function ProductionOverviewPage() {
         <Card className="bg-orange-50 border-orange-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Active Alerts
+              {t('productionOverview.activeAlerts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -156,7 +161,7 @@ export default function ProductionOverviewPage() {
             </div>
             <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 5% from last week</span>
+              <span>{t('productionOverview.trendUpPercent', { percent: 5 })}</span>
             </div>
           </CardContent>
         </Card>
@@ -165,7 +170,7 @@ export default function ProductionOverviewPage() {
         <Card className="bg-purple-50 border-purple-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Uptime
+              {t('productionOverview.uptime')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -174,7 +179,7 @@ export default function ProductionOverviewPage() {
             </div>
             <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>↑ 0.2% from last week</span>
+              <span>{t('productionOverview.trendUpPercent', { percent: 0.2 })}</span>
             </div>
           </CardContent>
         </Card>
@@ -188,7 +193,7 @@ export default function ProductionOverviewPage() {
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
               <CardTitle className="dark:text-white">
-                Data Consumption by Device
+                {t('productionOverview.dataConsumptionByDevice')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -221,11 +226,13 @@ export default function ProductionOverviewPage() {
           {/* Recent Activity */}
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
-              <CardTitle className="dark:text-white">Recent Activity</CardTitle>
+              <CardTitle className="dark:text-white">
+                {t('productionOverview.recentActivity')}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentActivity.map((activity, index) => (
+                {getRecentActivity(t).map((activity, index) => (
                   <div
                     key={index}
                     className="text-sm text-gray-600 dark:text-gray-400 py-2 border-b border-gray-200 dark:border-gray-700 last:border-0"
@@ -244,7 +251,7 @@ export default function ProductionOverviewPage() {
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
               <CardTitle className="dark:text-white">
-                Widget Performance
+                {t('productionOverview.widgetPerformance')}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
@@ -252,18 +259,18 @@ export default function ProductionOverviewPage() {
                 <TableHeader>
                   <TableRow className="dark:border-gray-700">
                     <TableHead className="font-semibold dark:text-gray-300">
-                      WIDGET NAME
+                      {t('productionOverview.tableHeaders.widgetName')}
                     </TableHead>
                     <TableHead className="font-semibold dark:text-gray-300">
-                      LOAD TIME
+                      {t('productionOverview.tableHeaders.loadTime')}
                     </TableHead>
                     <TableHead className="font-semibold dark:text-gray-300">
-                      STATUS
+                      {t('productionOverview.tableHeaders.status')}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {widgetPerformanceData.map((widget, index) => (
+                  {getWidgetPerformanceData(t).map((widget, index) => (
                     <TableRow key={index} className="dark:border-gray-700">
                       <TableCell className="font-medium dark:text-white">
                         {widget.name}
@@ -294,7 +301,7 @@ export default function ProductionOverviewPage() {
           <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardHeader>
               <CardTitle className="dark:text-white">
-                Widget Performance
+                {t('productionOverview.widgetPerformance')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -302,25 +309,25 @@ export default function ProductionOverviewPage() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    Online: 10 devices
+                    {t('productionOverview.statusSummary.online', { count: 10 })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-orange-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    Warning: 2 devices
+                    {t('productionOverview.statusSummary.warning', { count: 2 })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    Offline: 0 devices
+                    {t('productionOverview.statusSummary.offline', { count: 0 })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-red-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    Maintenance: 1 device
+                    {t('productionOverview.statusSummary.maintenance', { count: 1 })}
                   </span>
                 </div>
               </div>
@@ -332,14 +339,14 @@ export default function ProductionOverviewPage() {
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          Last Updated: 2 Minutes Ago • Auto-Refresh: Enabled (30s Interval)
+          {t('productionOverview.footer.lastUpdated', { time: 2 })} • {t('productionOverview.footer.autoRefresh', { interval: 30 })}
         </div>
         <Button
           onClick={handleRefresh}
           className="bg-purple-600 hover:bg-purple-700 text-white"
         >
           <RefreshCw className="mr-2 h-4 w-4" />
-          Refresh
+          {t('productionOverview.refresh')}
         </Button>
       </div>
     </div>

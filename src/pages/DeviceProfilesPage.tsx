@@ -28,7 +28,7 @@ import {
   useCreateDeviceProfile,
 } from '@/features/profiles/hooks';
 import toast from 'react-hot-toast';
-
+import { useTranslation } from 'react-i18next';
 // API Response type for device profile
 interface DeviceProfileApiResponse {
   id: string;
@@ -45,7 +45,7 @@ interface DeviceProfileApiResponse {
 export default function DeviceProfiles() {
   const { data: deviceProfiles } = useDeviceProfiles();
   const createDeviceProfileMutation = useCreateDeviceProfile();
-
+  const { t } = useTranslation();
   // Transform API response to table format
   // API structure: response.data.data.data (nested response)
   const deviceProfilesData: DeviceProfile[] = useMemo(() => {
@@ -161,11 +161,11 @@ export default function DeviceProfiles() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Device Profiles"
-        description="Manage device configuration templates"
+        title={t('deviceProfiles.title')}
+        description={t('deviceProfiles.subtitle')}
         actions={[
           {
-            label: 'Create Profile',
+            label: t('deviceProfiles.createProfile'),
             onClick: () => setIsCreateOpen(true),
             icon: <Plus className="h-4 w-4 mr-2" />,
           },
@@ -177,7 +177,7 @@ export default function DeviceProfiles() {
         <Card className="bg-primary ">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm text-white font-medium">
-              Total Profiles
+              {t('deviceProfiles.totalProfiles')}
             </CardTitle>
             <Settings className="h-4 w-4 text-white text-muted-foreground" />
           </CardHeader>
@@ -186,7 +186,7 @@ export default function DeviceProfiles() {
               {deviceProfilesData.length}
             </div>
             <p className="text-xs text-muted-foreground">
-              Device configurations
+              {t('deviceProfiles.deviceConfigurations')}
             </p>
           </CardContent>
         </Card>
@@ -194,7 +194,7 @@ export default function DeviceProfiles() {
         <Card className="bg-secondary text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
-              Total Devices
+              {t('deviceProfiles.totalDevices')}
             </CardTitle>
             <Cpu className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -203,7 +203,7 @@ export default function DeviceProfiles() {
               {deviceProfilesData.reduce((sum, p) => sum + (p.devices || 0), 0)}
             </div>
             <p className="text-xs text-muted-foreground">
-              Using these profiles
+              {t('deviceProfiles.usingTheseProfiles')}
             </p>
           </CardContent>
         </Card>
@@ -211,7 +211,7 @@ export default function DeviceProfiles() {
         <Card className="bg-white border-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Default Profiles
+              {t('deviceProfiles.defaultProfiles')}
             </CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -219,7 +219,7 @@ export default function DeviceProfiles() {
             <div className="text-2xl font-bold">
               {deviceProfilesData.filter((p) => p.type === 'Gateway').length}
             </div>
-            <p className="text-xs text-muted-foreground">Gateway profiles</p>
+            <p className="text-xs text-muted-foreground">{t('deviceProfiles.gatewayProfiles')}</p>
           </CardContent>
         </Card>
       </div>

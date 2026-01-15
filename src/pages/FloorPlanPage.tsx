@@ -64,7 +64,7 @@ import { useFloorPlans } from '@/features/floorPlan/hooks';
 import type { FloorPlan as ApiFloorPlan } from '@/services/api/floor-plans.api';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
-
+import { useTranslation } from 'react-i18next';
 interface FloorPlan {
   id: string;
   name: string;
@@ -168,6 +168,7 @@ const deviceMarkers: DeviceMarker[] = [
 ];
 
 export default function FloorPlans() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -196,30 +197,30 @@ export default function FloorPlans() {
     );
   const quickActions = [
     {
-      label: 'Create New',
-      title: 'Floor Map',
+      label: t('floorplans.createNew'),
+      title: t('floorplans.floorMap'),
       description: 'Start with asset selection',
       icon: <PlusSquare className="h-5 w-5 text-primary" />,
       onClick: () => navigate('/floor-plans/create'),
     },
     {
-      label: 'Import DWG',
+      label: t('floorplans.importDWG'),
       title: 'Files',
-      description: 'Upload building plans',
+      description: t('floorplans.uploadBuildingPlans'),
       icon: <FileInput className="h-5 w-5 text-primary" />,
       onClick: () => setIsCreateOpen(true),
     },
     {
-      label: 'Device',
-      title: 'Management',
-      description: 'Manage device associations',
+      label: t('floorplans.device'),
+      title: t('floorplans.deviceManagement'),
+      description: t('floorplans.manageDeviceAssociations'),
       icon: <Plug className="h-5 w-5 text-primary" />,
       onClick: () => setActiveTab('plans'),
     },
     {
-      label: 'Analytics',
-      title: 'Dashboard',
-      description: 'View floor map insights',
+      label: t('floorplans.analytics'),
+      title: t('floorplans.dashboard'),
+      description: t('floorplans.viewFloorMapInsights'),
       icon: <BarChart3 className="h-5 w-5 text-primary" />,
       onClick: () => setActiveTab('plans'),
     },
@@ -228,7 +229,7 @@ export default function FloorPlans() {
   const columns: ColumnDef<FloorPlan>[] = [
     {
       accessorKey: 'name',
-      header: 'Name',
+      header: t('floorplans.name'),
       cell: ({ row }: { row: FloorPlanRow }) => (
         <div>
           <div className="font-medium">{row.getValue('name') as string}</div>
@@ -240,7 +241,7 @@ export default function FloorPlans() {
     },
     {
       accessorKey: 'category',
-      header: 'Category',
+        header: t('floorplans.category'),
       cell: ({ row }: { row: FloorPlanRow }) => {
         const category = row.getValue('category') as string;
         const icons: Record<string, React.ReactNode> = {
@@ -259,23 +260,23 @@ export default function FloorPlans() {
     },
     {
       accessorKey: 'devices',
-      header: 'Devices',
+      header: t('floorplans.devices'),
       cell: ({ row }: { row: FloorPlanRow }) => (
         <Badge variant="outline">
-          {row.getValue('devices') as number} devices
+          {row.getValue('devices') as number} {t('floorplans.devices')}
         </Badge>
       ),
     },
     {
       accessorKey: 'zones',
-      header: 'Zones',
+      header: t('floorplans.zones'),
       cell: ({ row }: { row: FloorPlanRow }) => (
-        <Badge variant="outline">{row.getValue('zones') as number} zones</Badge>
+        <Badge variant="outline">{row.getValue('zones') as number} {t('floorplans.zones')}</Badge>
       ),
     },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: t('floorplans.status'),
       cell: ({ row }: { row: FloorPlanRow }) => {
         const status = row.getValue('status') as string;
         const colors = {
@@ -295,22 +296,22 @@ export default function FloorPlans() {
 
     createActionsColumn((row: FloorPlanRow) => [
       {
-        label: 'View',
+        label: t('floorplans.view'),
         onClick: () => {
           setSelectedPlan(row.original);
           setIsViewerOpen(true);
         },
         icon: <Eye className="h-4 w-4" />,
       },
-      { label: 'Edit', onClick: () => {}, icon: <Edit className="h-4 w-4" /> },
-      { label: 'Copy', onClick: () => {}, icon: <Copy className="h-4 w-4" /> },
+      { label: t('floorplans.edit'), onClick: () => {}, icon: <Edit className="h-4 w-4" /> },
+      { label: t('floorplans.copy'), onClick: () => {}, icon: <Copy className="h-4 w-4" /> },
       {
-        label: 'Export',
+        label: t('floorplans.export'),
         onClick: () => {},
         icon: <Download className="h-4 w-4" />,
       },
       {
-        label: 'Delete',
+          label: t('floorplans.delete'),
         onClick: () => {},
         icon: <Trash2 className="h-4 w-4" />,
         variant: 'destructive' as const,
@@ -327,11 +328,11 @@ export default function FloorPlans() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Floor Plans"
-        description="Visualize and manage facility layouts with device placement"
+        title={t('floorplans.title')}
+        description={t('floorplans.subtitle')}
         actions={[
           {
-            label: 'Upload Floor Plan',
+            label: t('floorplans.uploadFloorPlan'),
             onClick: () => setIsCreateOpen(true),
             icon: <Upload className="h-4 w-4 mr-2" />,
           },
@@ -343,20 +344,20 @@ export default function FloorPlans() {
         <Card className="bg-primary text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium   text-white">
-              Total Floor Plans
+              {t('floorplans.totalFloorPlans')}
             </CardTitle>
             <Map className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{floorPlans?.length}</div>
-            <p className="text-xs text-muted-foreground">Facility layouts</p>
+            <p className="text-xs text-muted-foreground">{t('floorplans.facilityLayouts')}</p>
           </CardContent>
         </Card>
 
         <Card className="bg-secondary text-white">
           <CardHeader className="flex flex-row  items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium   text-white">
-              Active Plans
+              {t('floorplans.activeFloorPlans')}
             </CardTitle>
             <CheckCircle2 className="h-4 w-4  " />
           </CardHeader>
@@ -364,14 +365,14 @@ export default function FloorPlans() {
             <div className="text-2xl font-bold  ">
               {floorPlans?.filter((p) => p.status === 'active').length}
             </div>
-            <p className="text-xs text-muted-foreground">In use</p>
+            <p className="text-xs text-muted-foreground">{t('floorplans.inUse')}</p>
           </CardContent>
         </Card>
 
         <Card className="bg-success text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
-              Total Devices
+              {t('floorplans.totalDevices')}
             </CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -379,20 +380,20 @@ export default function FloorPlans() {
             <div className="text-2xl font-bold">
               {floorPlans?.reduce((sum, p) => sum + p.devices, 0)}
             </div>
-            <p className="text-xs text-muted-foreground">Mapped devices</p>
+            <p className="text-xs text-muted-foreground">{t('floorplans.mappedDevices')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Zones</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('floorplans.totalZones')}</CardTitle>
             <Layers className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {floorPlans?.reduce((sum, p) => sum + p.zones, 0)}
             </div>
-            <p className="text-xs text-muted-foreground">Defined areas</p>
+            <p className="text-xs text-muted-foreground">{t('floorplans.definedAreas')}</p>
           </CardContent>
         </Card>
       </div>
@@ -422,7 +423,7 @@ export default function FloorPlans() {
                 <div className="aspect-video bg-muted flex items-center justify-center relative">
                   <Map className="h-16 w-16 text-muted-foreground" />
                   <Badge className="absolute top-2 right-2">
-                    {plan?.devices} devices
+                    {plan?.devices} {t('floorplans.devices')}
                   </Badge>
                 </div>
                 <CardHeader>
@@ -437,11 +438,11 @@ export default function FloorPlans() {
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-muted-foreground">Zones:</span>
+                      <span className="text-muted-foreground">{t('floorplans.zones')}:</span>
                       <span className="ml-2 font-medium">{plan.zones}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Scale:</span>
+                      <span className="text-muted-foreground">{t('floorplans.scale')}:</span>
                       <span className="ml-2 font-medium">{plan.scale}</span>
                     </div>
                   </div>
@@ -457,11 +458,11 @@ export default function FloorPlans() {
                     }}
                   >
                     <Eye className="h-4 w-4 mr-2" />
-                    View
+                    {t('floorplans.view')}
                   </Button>
                   <Button variant="outline" size="sm" className="flex-1">
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit
+                    {t('floorplans.edit')}
                   </Button>
                 </CardFooter>
               </Card>
@@ -480,7 +481,7 @@ export default function FloorPlans() {
                   <CardHeader>
                     <CardTitle>{category}</CardTitle>
                     <CardDescription>
-                      {plans.length} floor plans
+                      {plans.length} {t('floorplans.floorPlans')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -501,7 +502,7 @@ export default function FloorPlans() {
                             <div>
                               <p className="font-medium">{plan.name}</p>
                               <p className="text-sm text-muted-foreground">
-                                {plan.devices} devices • {plan.zones} zones
+                                {plan.devices} {t('floorplans.devices')} • {plan.zones} {t('floorplans.zones')}
                               </p>
                             </div>
                           </div>
@@ -519,7 +520,7 @@ export default function FloorPlans() {
 
       {/* Quick Actions */}
       <div className="space-y-3">
-        <h3 className="text-xl font-semibold text-gray-900">Quick Actions</h3>
+        <h3 className="text-xl font-semibold text-gray-900">{t('floorplans.quickActions')}</h3>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {quickActions.map((action) => (
             <button
@@ -547,88 +548,88 @@ export default function FloorPlans() {
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Upload Floor Plan</DialogTitle>
+            <DialogTitle>{t('floorplans.uploadFloorPlan')}</DialogTitle>
             <DialogDescription>
-              Upload a floor plan image and configure settings
+              {t('floorplans.uploadFloorPlanDescription')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="plan-name">Floor Plan Name *</Label>
+                  <Label htmlFor="plan-name">{t('floorplans.floorPlanName')} <span className="text-red-500">*</span></Label>
               <Input
                 id="plan-name"
-                placeholder="e.g., Factory Floor - Production Area"
+                placeholder={t('floorplans.floorPlanNamePlaceholder')}
               />
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="building">Building *</Label>
+                <Label htmlFor="building">{t('floorplans.building')} <span className="text-red-500">*</span></Label>
                 <Input
                   id="building"
-                  placeholder="e.g., Manufacturing Plant A"
+                  placeholder={t('floorplans.buildingPlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="floor">Floor/Level *</Label>
-                <Input id="floor" placeholder="e.g., Ground Floor" />
+                <Label htmlFor="floor">{t('floorplans.floor')} <span className="text-red-500">*</span></Label>
+                <Input id="floor" placeholder={t('floorplans.floorPlaceholder')} />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category">{t('floorplans.category')} <span className="text-red-500">*</span></Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t('floorplans.categoryPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="industrial">Industrial</SelectItem>
-                  <SelectItem value="commercial">Commercial</SelectItem>
-                  <SelectItem value="residential">Residential</SelectItem>
-                  <SelectItem value="logistics">Logistics</SelectItem>
-                  <SelectItem value="healthcare">Healthcare</SelectItem>
-                  <SelectItem value="education">Education</SelectItem>
+                  <SelectItem value="industrial">{t('floorplans.industrial')}</SelectItem>
+                  <SelectItem value="commercial">{t('floorplans.commercial')}</SelectItem>
+                  <SelectItem value="residential">{t('floorplans.residential')}</SelectItem>
+                  <SelectItem value="logistics">{t('floorplans.logistics')}</SelectItem>
+                  <SelectItem value="healthcare">{t('floorplans.healthcare')}</SelectItem>
+                  <SelectItem value="education">{t('floorplans.education')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="image">Floor Plan Image *</Label>
+              <Label htmlFor="image">{t('floorplans.floorPlanImage')} <span className="text-red-500">*</span></Label>
               <div className="border-2 border-dashed rounded-lg p-8 text-center hover:bg-muted/50 cursor-pointer transition-colors">
                 <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-sm font-medium mb-1">
-                  Click to upload or drag and drop
+                  {t('floorplans.clickToUploadOrDragAndDrop')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  PNG, JPG, SVG up to 10MB
+                  {t('floorplans.pngJpgSvgUpTo10Mb')}
                 </p>
               </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="width">Width (meters)</Label>
+                <Label htmlFor="width">{t('floorplans.width')} (meters)</Label>
                 <Input id="width" type="number" placeholder="100" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="height">Height (meters)</Label>
+                <Label htmlFor="height">{t('floorplans.height')} (meters)</Label>
                 <Input id="height" type="number" placeholder="80" />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="scale">Scale</Label>
+                <Label htmlFor="scale">{t('floorplans.scale')}</Label>
                 <Input id="scale" placeholder="1:100" />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('floorplans.description')}</Label>
               <Textarea
                 id="description"
-                placeholder="Floor plan description..."
+                placeholder={t('floorplans.floorPlanDescriptionPlaceholder')}
                 rows={3}
               />
             </div>
@@ -636,9 +637,9 @@ export default function FloorPlans() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
-              Cancel
+              {t('floorplans.cancel')}
             </Button>
-            <Button>Upload Floor Plan</Button>
+            <Button>{t('floorplans.uploadFloorPlan')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -655,8 +656,7 @@ export default function FloorPlans() {
                 </DialogDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline">{selectedPlan?.devices} devices</Badge>
-                <Badge variant="outline">{selectedPlan?.zones} zones</Badge>
+                <Badge variant="outline">{selectedPlan?.devices} {t('floorplans.devices')} {t('floorplans.zones')}</Badge>
               </div>
             </div>
           </DialogHeader>
@@ -672,7 +672,7 @@ export default function FloorPlans() {
                     onCheckedChange={setShowDevices}
                   />
                   <Label htmlFor="show-devices" className="cursor-pointer">
-                    Show Devices
+                    {t('floorplans.showDevices')}
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -682,7 +682,7 @@ export default function FloorPlans() {
                     onCheckedChange={setShowZones}
                   />
                   <Label htmlFor="show-zones" className="cursor-pointer">
-                    Show Zones
+                    {t('floorplans.showZones')}
                   </Label>
                 </div>
                 <div className="flex items-center gap-2">
@@ -692,7 +692,7 @@ export default function FloorPlans() {
                     onCheckedChange={setShowHeatmap}
                   />
                   <Label htmlFor="show-heatmap" className="cursor-pointer">
-                    Heat Map
+                    {t('floorplans.heatMap')}
                   </Label>
                 </div>
               </div>
@@ -700,11 +700,11 @@ export default function FloorPlans() {
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm">
                   <Grid3x3 className="h-4 w-4 mr-2" />
-                  Grid
+                  {t('floorplans.grid')}
                 </Button>
                 <Button variant="outline" size="sm">
                   <Maximize2 className="h-4 w-4 mr-2" />
-                  Fullscreen
+                  {t('floorplans.fullscreen')}
                 </Button>
               </div>
             </div>
@@ -784,7 +784,7 @@ export default function FloorPlans() {
                     }}
                   >
                     <div className="absolute -top-6 left-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
-                      Zone A - Production
+                      {t('floorplans.zoneA')} - {t('floorplans.production')}
                     </div>
                   </div>
                   <div
@@ -797,7 +797,7 @@ export default function FloorPlans() {
                     }}
                   >
                     <div className="absolute -top-6 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded">
-                      Zone B - Storage
+                      {t('floorplans.zoneB')} - {t('floorplans.storage')}
                     </div>
                   </div>
                 </>
@@ -808,41 +808,41 @@ export default function FloorPlans() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-green-500" />
-                <span className="text-sm">Online</span>
+                <span className="text-sm">{t('floorplans.online')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                <span className="text-sm">Warning</span>
+                <span className="text-sm">{t('floorplans.warning')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-gray-500" />
-                <span className="text-sm">Offline</span>
+                    <span className="text-sm">{t('floorplans.offline')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Thermometer className="h-4 w-4" />
-                <span className="text-sm">Sensor</span>
+                <span className="text-sm">{t('floorplans.sensor')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4" />
-                <span className="text-sm">Meter</span>
+                <span className="text-sm">{t('floorplans.meter')}</span>
               </div>
             </div>
 
             {/* Plan Info */}
             <div className="grid grid-cols-3 gap-4 p-4 border rounded-lg">
               <div>
-                <p className="text-sm text-muted-foreground">Dimensions</p>
+                <p className="text-sm text-muted-foreground">{t('floorplans.dimensions')}</p>
                 <p className="font-semibold">
                   {selectedPlan?.dimensions.width}m ×{' '}
                   {selectedPlan?.dimensions.height}m
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Scale</p>
+                <p className="text-sm text-muted-foreground">{t('floorplans.scale')}</p>
                 <p className="font-semibold">{selectedPlan?.scale}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Last Modified</p>
+                <p className="text-sm text-muted-foreground">{t('floorplans.lastModified')}</p>
                 <p className="font-semibold">
                   {selectedPlan?.lastModified.toLocaleDateString()}
                 </p>
@@ -852,15 +852,15 @@ export default function FloorPlans() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsViewerOpen(false)}>
-              Close
+              {t('floorplans.close')}
             </Button>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
-              Export
+              {t('floorplans.export')}
             </Button>
             <Button>
               <Edit className="h-4 w-4 mr-2" />
-              Edit Plan
+              {t('floorplans.editPlan')}
             </Button>
           </DialogFooter>
         </DialogContent>

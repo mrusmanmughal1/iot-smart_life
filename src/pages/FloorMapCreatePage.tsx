@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, useWatch } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { FilterFormValues, AssetOption } from '@/features/floorPlan/types';
@@ -16,16 +17,17 @@ import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { useFloorMapStore } from '@/features/floorPlan/store';
 import type { StepId } from '@/features/floorPlan/store';
 
-const steps: { id: StepId; label: string }[] = [
-  { id: 1, label: 'Asset' },  // Step 1: Asset Selection    
-  { id: 2, label: 'DWG Import' }, // Step 2: DWG Import
-  { id: 3, label: 'Zone Setup' }, // Step 3: Zone Setup
-  { id: 4, label: 'Device Link' }, // Step 4: Device Link
-  { id: 5, label: '3D View' }, // Step 5: 3D View
-];
-
 export default function FloorMapCreatePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
+
+  const steps: { id: StepId; label: string }[] = [
+    { id: 1, label: t('floorplans.create.stepAsset') },
+    { id: 2, label: t('floorplans.create.stepDwgImport') },
+    { id: 3, label: t('floorplans.create.stepZoneSetup') },
+    { id: 4, label: t('floorplans.create.stepDeviceLink') },
+    { id: 5, label: t('floorplans.create.step3dView') },
+  ];
 
   // Zustand store
   const {
@@ -166,17 +168,19 @@ export default function FloorMapCreatePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Floor Map Advanced Features"
+        title={t('floorplans.create.title')}
         actions={[
           {
-            label: 'Back',
+            label: t('common.back'),
             onClick: handleBack,
           },
         ]}
       />
       <Card className="">
         <CardHeader className="py-4">
-          <CardTitle>Create Floor Map - Step {currentStep} of 5</CardTitle>
+          <CardTitle className="dark:text-white">
+            {t('floorplans.create.stepTitle', { current: currentStep, total: 5 })}
+          </CardTitle>
         </CardHeader>
         <div className="space-y-3 relative m-4 relative">
           <div className="   h-3 rounded-full bg-muted">

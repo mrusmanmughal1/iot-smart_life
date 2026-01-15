@@ -189,7 +189,7 @@ export default function DevicesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">{t('devices.title')}</h1>
-          <p className="text-slate-500 mt-2">Manage and monitor all your IoT devices</p>
+          <p className="text-slate-500 mt-2">{t('devices.subtitle')}</p>
         </div>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -202,9 +202,9 @@ export default function DevicesPage() {
       {/* Devices Table */}
       <Card>
         <CardHeader>
-          <CardTitle>All Devices</CardTitle>
+          <CardTitle>{t('devices.allDevices')}</CardTitle>
           <CardDescription>
-            {tableData.length} {tableData.length === 1 ? 'device' : 'devices'} found
+              {t('devices.devicesCount', { count: tableData.length })}
           </CardDescription>
         </CardHeader>
         <CardContent>
