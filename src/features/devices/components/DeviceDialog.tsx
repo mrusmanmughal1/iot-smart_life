@@ -88,8 +88,8 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl rounded-lg border-none  overflow-hidden shadow-none">
-        <DialogHeader>
+      <DialogContent className="max-w-3xl rounded-lg border-none  overflow-hidden shadow-none dark:bg-gray-950 dark:border-gray-700 ">
+        <DialogHeader className="dark:text-white dark:bg-gray-950 dark:border-gray-700 dark:border-b">
           <DialogTitle>
             {isCreateMode ? t('devices.addDevice') : t('devices.editDevice')}
           </DialogTitle>

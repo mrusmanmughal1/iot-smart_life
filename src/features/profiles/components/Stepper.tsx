@@ -27,7 +27,7 @@ export const Stepper: React.FC<StepperProps> = ({
     stepId <= currentStep || isStepCompleted(stepId);
 
   return (
-    <div className="w-full">
+    <div className="w-full dark:text-white">
       <div className="flex items-center justify-between">
         {steps.map((step, index) => {
           const isCompleted = isStepCompleted(step.id);

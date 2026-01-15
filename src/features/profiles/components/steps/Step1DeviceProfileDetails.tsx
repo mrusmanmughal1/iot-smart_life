@@ -28,8 +28,8 @@ export const Step1DeviceProfileDetails: React.FC<Step1DeviceProfileDetailsProps>
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg text-primary font-semibold mb-1">Device Profile Details</h3>
-        <p className="text-sm text-gray-500">
+        <h3 className="text-lg text-primary font-semibold mb-1 dark:text-white">Device Profile Details</h3>
+        <p className="text-sm text-gray-500 dark:text-white">
           Provide basic information about the device profile
         </p>
       </div>

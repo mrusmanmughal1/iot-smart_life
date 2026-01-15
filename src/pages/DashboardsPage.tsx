@@ -117,12 +117,12 @@ export default function DashboardsPage() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
-                className="w-56 absolute border border-secondary/50 shadow-md rounded-md  "
+                className="w-56 absolute border border-secondary/50 shadow-md rounded-md dark:bg-gray-950 dark:border-gray-700 "
               >
-                <DropdownMenuItem onClick={handleCreateDashboard}>
+                <DropdownMenuItem onClick={handleCreateDashboard} className="dark:text-white dark:hover:bg-gray-800">
                   {t('solutionDashboards.createNewDashboard')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleOpenImportModal}>
+                <DropdownMenuItem onClick={handleOpenImportModal} className="dark:text-white dark:hover:bg-gray-800">
                   {t('solutionDashboards.importDashboard') ||
                     'Import Dashboard'}
                 </DropdownMenuItem>

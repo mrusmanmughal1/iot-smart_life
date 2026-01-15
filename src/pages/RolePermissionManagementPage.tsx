@@ -227,7 +227,7 @@ export default function RolePermissionManagementPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <PageHeader title="" />
       <div className="mx-auto space-y-6">
         <PageHeader
@@ -375,18 +375,18 @@ export default function RolePermissionManagementPage() {
             </div>
           </CardContent>
         </Card>
-        <div className="bg-gray-100 rounded-lg p-4 space-y-2">
+        <div className="bg-gray-100 rounded-lg p-4 space-y-2 dark:bg-gray-800 dark:border-gray-700">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-green-500"></div>
-            <span className="text-sm text-gray-700">Allowed</span>
+            <span className="text-sm text-gray-700 dark:text-white">Allowed</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-red-500"></div>
-            <span className="text-sm text-gray-700">Denied</span>
+            <span className="text-sm text-gray-700 dark:text-white">Denied</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-yellow-500"></div>
-            <span className="text-sm text-gray-700">Conditional</span>
+            <span className="text-sm text-gray-700 dark:text-white">Conditional</span>
           </div>
         </div>
       </div>

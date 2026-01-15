@@ -47,7 +47,7 @@ interface TabsListProps {
 export function TabsList({ children, className = '' }: TabsListProps) {
   return (
     <div
-      className={`inline-flex h-10 items-center justify-center rounded-md bg-slate-100 p-1 text-slate-500 ${className}`}
+      className={`inline-flex h-10 items-center justify-center rounded-md bg-slate-100 p-1 text-slate-500 dark:bg-gray-900 dark:border-gray-700 dark:text-white ${className}`}
       role="tablist"
     >
       {children}
@@ -85,8 +85,8 @@ export function TabsTrigger({
       onClick={() => context.onValueChange(value)}
       className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
         isActive
-          ? 'bg-primary text-white shadow-sm'
-          : 'text-slate-600 hover:text-slate-900'
+          ? 'bg-primary text-white shadow-sm dark:bg-gray-950 dark:hover:bg-gray-800 dark:text-white'
+          : 'text-slate-600 hover:text-slate-900 dark:text-white'
       } ${className}`}
     >
       {children}

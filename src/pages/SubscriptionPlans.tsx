@@ -313,9 +313,9 @@ export default function SubscriptionPlans() {
 
   return (
     <AppLayout>
-      <div className="space-y-6 border bg-[#fff6fb]/50 p-6 rounded-lg border-secondary ">
+      <div className="space-y-6 border bg-[#fff6fb]/50 p-6 rounded-lg border-secondary dark:bg-gray-800 dark:border-gray-700 ">
         <div className="">
-          <Badge className="text-base  mb-4 font-normal px-4 py-2 bg-secondary text-white">
+          <Badge className="text-base  mb-4 font-normal px-4 py-2 bg-secondary dark:bg-gray-900 dark:border-gray-700 text-white">
             Subscription
           </Badge>
           <div className="text-2xl font-semibold">
@@ -329,21 +329,21 @@ export default function SubscriptionPlans() {
 
         {/* Current Plan Card */}
         {currentSubscriptionResponse && (
-          <Card className="border-secondary">
+          <Card className="border-secondary ">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 dark:text-white">
                     Current Plan:{' '}
                     {plans.find((p) => p.id === currentPlanId)?.name ||
                       currentPlanId}
-                    <Badge className="text-base px-4 bg-secondary text-white">
+                    <Badge className="text-base px-4 bg-secondary dark:bg-gray-900 dark:border-gray-700 text-white">
                       {currentSubscriptionResponse.status === 'active'
                         ? 'Active'
                         : currentSubscriptionResponse.status}
                     </Badge>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="dark:text-white">
                     {currentSubscriptionResponse.nextBillingDate && (
                       <>
                         Next billing date:{' '}
@@ -366,8 +366,8 @@ export default function SubscriptionPlans() {
             htmlFor="billing"
             className={`cursor-pointer ${
               billingPeriod === 'monthly'
-                ? 'font-semibold text-gray-900'
-                : 'text-gray-500'
+                ? 'font-semibold text-gray-900 dark:text-white'
+                : 'text-gray-500 dark:text-white'
             }`}
           >
             Monthly
@@ -384,7 +384,7 @@ export default function SubscriptionPlans() {
               htmlFor="billing"
               className={`cursor-pointer ${
                 billingPeriod === 'yearly'
-                  ? 'font-semibold text-gray-900'
+                  ? 'font-semibold text-gray-900 dark:text-white'
                   : 'text-gray-500'
               }`}
             >
@@ -537,10 +537,10 @@ export default function SubscriptionPlans() {
         {/* Feature Comparison */}
         <Card className="border-gray-200 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">
+            <CardTitle className="text-2xl font-bold dark:text-white">
               Feature Comparison
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="dark:text-white">
               Compare features across all plans side by side
             </CardDescription>
           </CardHeader>
@@ -549,14 +549,16 @@ export default function SubscriptionPlans() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b-2 border-gray-200">
-                    <th className="text-left py-4 pr-8 font-semibold text-gray-900">
+                    <th className="text-left py-4 pr-8 font-semibold text-gray-900 dark:text-white">
                       Feature
                     </th>
                     {plans.map((plan) => (
                       <th
                         key={plan.id}
                         className={`text-center py-4 px-4 font-semibold ${
-                          plan.isPopular ? 'text-primary' : 'text-gray-900'
+                          plan.isPopular
+                            ? 'text-primary'
+                            : 'text-gray-900 dark:text-white'
                         }`}
                       >
                         {plan.name}
@@ -575,9 +577,9 @@ export default function SubscriptionPlans() {
                   ].map((row) => (
                     <tr
                       key={row.key}
-                      className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                      className="border-b border-gray-100 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800 transition-colors"
                     >
-                      <td className="py-4 pr-8 font-medium text-gray-900">
+                      <td className="py-4 pr-8 font-medium text-gray-900 dark:text-white">
                         {row.feature}
                       </td>
                       {plans.map((plan) => (
@@ -587,7 +589,7 @@ export default function SubscriptionPlans() {
                             plan.isPopular ? 'bg-primary/5' : ''
                           }`}
                         >
-                          <span className="font-semibold text-gray-900">
+                          <span className="font-semibold text-gray-900 dark:text-white">
                             {plan.limits[row.key as keyof typeof plan.limits]}
                           </span>
                         </td>

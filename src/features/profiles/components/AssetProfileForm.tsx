@@ -71,8 +71,8 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] rounded-3xl pb-10  overflow-hidden ">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] rounded-3xl pb-10  overflow-hidden dark:bg-gray-950 dark:border-gray-700 ">
+        <DialogHeader className="dark:text-white dark:bg-gray-950 dark:border-gray-700 dark:border-b">
           <DialogTitle>Add Asset Profile</DialogTitle>
           <DialogDescription>
             Create a new asset profile configuration
@@ -228,7 +228,7 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
                
             </div>
 
-            <DialogFooter className="p-4 absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+            <DialogFooter className="p-4 absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 ">
               <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>

@@ -301,7 +301,7 @@ export function DashboardTable({
                     </td>
                   )}
                   {columns.createdTime && (
-                    <td className="py-4 px-4 text-sm text-gray-600">
+                    <td className="py-4 px-4 text-sm text-gray-600 dark:text-white">
                       {item.createdTime}
                     </td>
                   )}
@@ -311,8 +311,8 @@ export function DashboardTable({
                         onClick={() => handleStatusToggle(item.id)}
                         className={`text-xs px-5 h-8  rounded-full ${
                           item.status === 'active'
-                            ? 'bg-green-500 hover:bg-green-600 text-white'
-                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                            ? 'bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:text-white'
+                            : 'bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:text-white'
                         }`}
                       >
                         {item.status === 'active'
@@ -322,7 +322,7 @@ export function DashboardTable({
                     </td>
                   )}
                   {columns.customerName && (
-                    <td className="py-4 px-4 text-sm text-gray-600">
+                    <td className="py-4 px-4 text-sm text-gray-600 dark:text-white">
                       {item.customerName}
                     </td>
                   )}
@@ -331,7 +331,7 @@ export function DashboardTable({
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleAction('view', item.id)}
-                          className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
+                          className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors dark:text-white dark:hover:text-secondary dark:hover:bg-gray-800"
                           title="View"
                           aria-label="View"
                         >
@@ -339,7 +339,7 @@ export function DashboardTable({
                         </button>
                         <button
                           onClick={() => handleAction('delete', item.id)}
-                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-gray-100 rounded transition-colors"
+                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-gray-100 rounded transition-colors dark:text-white dark:hover:text-red-600 dark:hover:bg-gray-800"
                           title="Delete"
                           aria-label="Delete"
                         >
@@ -347,7 +347,7 @@ export function DashboardTable({
                         </button>
                         <button
                           onClick={() => handleAction('download', item.id)}
-                          className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors"
+                          className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors dark:text-white dark:hover:text-secondary dark:hover:bg-gray-800"
                           title="Download"
                           aria-label="Download"
                         >

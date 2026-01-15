@@ -26,19 +26,19 @@ export default function SettingsPage() {
 
         <Tabs defaultValue="general" className="space-y-4">
           <TabsList className="dark:bg-gray-800 dark:text-white">
-            <TabsTrigger value="general">
+            <TabsTrigger value="general" className="dark:text-white">
               <Settings className="h-4 w-4 mr-2" />
               General
             </TabsTrigger>
-            <TabsTrigger value="notifications">
+            <TabsTrigger value="notifications" className="dark:text-white">
               <Bell className="h-4 w-4 mr-2" />
               Notifications
             </TabsTrigger>
-            <TabsTrigger value="security">
+            <TabsTrigger value="security" className="dark:text-white">
               <Shield className="h-4 w-4 mr-2" />
               Security
             </TabsTrigger>
-            <TabsTrigger value="account">
+            <TabsTrigger value="account" className="dark:text-white">
               <User className="h-4 w-4 mr-2" />
               Account
             </TabsTrigger>

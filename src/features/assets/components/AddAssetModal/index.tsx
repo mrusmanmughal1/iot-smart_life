@@ -273,9 +273,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-2xl p-0 overflow-hidden dark:bg-gray-950 dark:border-gray-700 ">
         {/* Header */}
-        <DialogHeader className="bg-primary text-white p-4 rounded-t-lg">
+        <DialogHeader className="bg-primary text-white p-4 rounded-t-lg dark:bg-gray-950 dark:border-gray-700 dark:border-b">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-white text-lg font-semibold">
               {t('addAsset.title') || 'Add New Asset'}
@@ -291,7 +291,7 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
         </DialogHeader>
 
         {/* Body */}
-        <div className="p-6 bg-white max-h-[70vh] overflow-y-auto">
+        <div className="p-6 bg-white max-h-[70vh] overflow-y-auto dark:bg-gray-950 dark:border-gray-700">
           <form className="space-y-4">
             {/* Asset Name */}
             <div>

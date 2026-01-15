@@ -247,7 +247,7 @@ export default function CustomerAdministratorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <PageHeader title="" />
       <div className="mx-auto space-y-6">
         {/* Header Section */}
@@ -255,10 +255,10 @@ export default function CustomerAdministratorPage() {
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900 mb-2 dark:text-white">
                   Customer Administrator
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-white">
                   Full access to customer resources and user management
                 </p>
               </div>
@@ -270,16 +270,13 @@ export default function CustomerAdministratorPage() {
                   <Edit className="h-4 w-4  " />
                   Edit Role
                 </Button>
-                <Button
-                  onClick={handleDelete}
-                  variant="secondary"
-                >
+                <Button onClick={handleDelete} variant="secondary">
                   <Trash2 className="h-4 w-4  " />
                   Delete
                 </Button>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 w-80 space-y-3 grid grid-cols-2 w-full gap-4">
+            <div className="bg-gray-50 rounded-lg p-4 w-80 space-y-3 grid grid-cols-2 w-full gap-4 dark:bg-gray-900 dark:border-gray-700">
               {summaryPermissions.map((summary) => (
                 <div key={summary.category}>
                   <h3 className="text-sm font-semibold text-gray-900 mb-2">
@@ -293,12 +290,14 @@ export default function CustomerAdministratorPage() {
                       return (
                         <div
                           key={permName}
-                          className="flex items-center gap-2 text-sm"
+                          className="flex items-center gap-2 text-sm dark:text-white"
                         >
                           <PermissionCheckbox
                             granted={permission?.granted || false}
                           />
-                          <span className="text-gray-700">{permName}</span>
+                          <span className="text-gray-700 dark:text-white">
+                            {permName}
+                          </span>
                         </div>
                       );
                     })}
@@ -341,7 +340,7 @@ export default function CustomerAdministratorPage() {
               {/* Permissions Tab */}
               <TabsContent value="permissions" className="p-6 space-y-6">
                 <div className="flex items-start justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Permission Matrix
                   </h2>
 
@@ -357,11 +356,11 @@ export default function CustomerAdministratorPage() {
                         className={`${
                           category === 'Report Generation'
                             ? 'bg-green-50 border-green-200'
-                            : 'bg-white'
+                            : 'bg-white dark:bg-gray-900 dark:border-gray-700'
                         }`}
                       >
                         <CardHeader>
-                          <CardTitle className="text-lg font-semibold text-gray-900">
+                          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
                             {category}
                           </CardTitle>
                         </CardHeader>
@@ -374,7 +373,7 @@ export default function CustomerAdministratorPage() {
                               <PermissionCheckbox
                                 granted={permission.granted}
                               />
-                              <span className="text-sm text-gray-900 flex-1">
+                              <span className="text-sm text-gray-900 flex-1 dark:text-white">
                                 {permission.label}
                               </span>
                             </div>
@@ -389,13 +388,13 @@ export default function CustomerAdministratorPage() {
                 <div className="flex items-center gap-6 pt-4 border-t">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 dark:text-white">
                       Granted Permission
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-gray-300"></div>
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 dark:text-white">
                       Denied Permission
                     </span>
                   </div>
@@ -405,10 +404,10 @@ export default function CustomerAdministratorPage() {
               {/* Assigned Users Tab */}
               <TabsContent value="assigned-users" className="p-6">
                 <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Assigned Users
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 dark:text-white">
                     List of users assigned to this role will appear here.
                   </p>
                 </div>
@@ -417,10 +416,10 @@ export default function CustomerAdministratorPage() {
               {/* Activity Log Tab */}
               <TabsContent value="activity-log" className="p-6">
                 <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     Activity Log
                   </h2>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 dark:text-white">
                     Activity log for this role will appear here.
                   </p>
                 </div>

@@ -172,18 +172,18 @@ export default function AssignPermissionsPage() {
   const permissionLevel = getPermissionLevel(assigned.length);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <PageHeader title="" />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
+      
       <div className="mx-auto space-y-6">
         {/* Header Section */}
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2 dark:text-white">
                   Assign Permissions
                 </h1>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-white">
                   User: john.doe@company.com
                 </p>
               </div>
@@ -239,7 +239,7 @@ export default function AssignPermissionsPage() {
 
                     return (
                       <div key={category} className="space-y-3">
-                        <h3 className="text-sm font-semibold text-gray-900">
+                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                           {category}
                         </h3>
                         <RadioGroup
@@ -257,7 +257,7 @@ export default function AssignPermissionsPage() {
                               />
                               <Label
                                 htmlFor={permission.id}
-                                className="text-sm text-gray-700 cursor-pointer flex-1"
+                                className="text-sm text-gray-700 cursor-pointer flex-1 dark:text-white"
                               >
                                 {permission.label}
                               </Label>
@@ -275,7 +275,7 @@ export default function AssignPermissionsPage() {
           {/* Assigned Permissions Panel */}
           <Card className="bg-white shadow-sm rounded-lg">
             <CardHeader>
-              <CardTitle className="text-lg font-semibold text-gray-900">
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
                 Assigned Permissions
               </CardTitle>
             </CardHeader>
@@ -293,7 +293,7 @@ export default function AssignPermissionsPage() {
                 {assignedSearch && (
                   <button
                     onClick={() => setAssignedSearch('')}
-                    className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-white"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -302,18 +302,18 @@ export default function AssignPermissionsPage() {
 
               <div className="space-y-2 max-h-[600px] overflow-y-auto">
                 {filteredAssignedPermissions.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-8">
+                  <p className="text-sm text-gray-500 text-center py-8 dark:text-white">
                     No assigned permissions
                   </p>
                 ) : (
                   filteredAssignedPermissions.map((permission) => (
                     <div
                       key={permission.id}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors dark:bg-gray-900 dark:border-gray-700"
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-gray-400">•</span>
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm text-gray-900 dark:text-white">
                           {permission.label}
                         </span>
                       </div>
@@ -340,23 +340,23 @@ export default function AssignPermissionsPage() {
             <CardContent className="space-y-4">
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+                  <p className="text-sm font-medium text-gray-600 dark:text-white mb-1">
                     Current Role
                   </p>
-                  <p className="text-base text-gray-900">Customer User</p>
+                  <p className="text-base text-gray-900 dark:text-white">Customer User</p>
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+                  <p className="text-sm font-medium text-gray-600 dark:text-white mb-1">
                     Total Permissions
                   </p>
-                  <p className="text-base text-gray-900">
+                  <p className="text-base text-gray-900 dark:text-white ">
                     {assigned.length} assigned
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-white mb-2">
                     Permission Level
                   </p>
                   <Badge
@@ -367,10 +367,10 @@ export default function AssignPermissionsPage() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
+                  <p className="text-sm font-medium text-gray-600 dark:text-white mb-1">
                     Last Modified
                   </p>
-                  <p className="text-base text-gray-900">2024-03-15 14:30</p>
+                  <p className="text-base text-gray-900 dark:text-white">2024-03-15 14:30</p>
                 </div>
               </div>
 

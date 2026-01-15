@@ -61,7 +61,7 @@ export function SelectTrigger({ children, className = '', disabled = false, id }
       id={id}
       disabled={disabled}
       onClick={() => context.setOpen(!context.open)}
-      className={`flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-100 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`flex h-10 w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-100 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-950 dark:border-gray-700 dark:text-white dark:placeholder:text-gray-400 dark:focus:ring-0 ${className}`}
     >
       {children}
       <ChevronDown className="h-4 w-4 opacity-50" />
@@ -82,7 +82,7 @@ export function SelectValue({ placeholder = 'Select...', className = '' }: Selec
   }
 
   return (
-    <span className={className}>
+    <span className={`dark:text-white ${className}`}>
       {context.value || placeholder}
     </span>
   );
@@ -124,7 +124,7 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
   return (
     <div
       ref={contentRef}
-      className={`absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg ${className}`}
+      className={`absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg dark:bg-gray-950 dark:border-gray-700 dark:text-white ${className}`}
     >
       {children}
     </div>
@@ -150,8 +150,8 @@ export function SelectItem({ value, children, className = '', disabled = false }
   return (
     <div
       onClick={() => !disabled && context.onValueChange(value)}
-      className={`relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none hover:bg-slate-100 focus:bg-slate-100 ${
-        isSelected ? 'bg-slate-50' : ''
+      className={`relative flex w-full cursor-pointer select-none items-center rounded-sm py-2 pl-8 pr-2 text-sm outline-none hover:bg-slate-100 dark:hover:bg-gray-800 dark:text-white focus:bg-slate-100 dark:focus:bg-gray-800 ${
+        isSelected ? 'bg-slate-50 dark:bg-gray-800' : ''
       } ${disabled ? 'pointer-events-none opacity-50' : ''} ${className}`}
     >
       {isSelected && (

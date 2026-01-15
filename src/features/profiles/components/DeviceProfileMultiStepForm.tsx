@@ -242,10 +242,10 @@ export const DeviceProfileMultiStepForm: React.FC<
         }
       }}
     >
-      <DialogContent className="max-w-4xl max-h-[90vh] rounded-3xl  overflow-hidden ">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] rounded-3xl  overflow-hidden dark:bg-gray-950 dark:border-gray-700 ">
+        <DialogHeader className="dark:text-white dark:bg-gray-950 dark:border-gray-700 dark:border-b">
           <DialogTitle>Create Device Profile</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="dark:text-white">
             Follow the steps to create a new device profile
           </DialogDescription>
         </DialogHeader>
@@ -265,11 +265,11 @@ export const DeviceProfileMultiStepForm: React.FC<
               }}
               className="space-y-6"
             >
-              <div className="min-h-[400px] shadow  border border-gray-200 rounded-lg  mt-4 mb-32 p-4">
+              <div className="min-h-[400px] shadow  border border-gray-200 rounded-lg  mt-4 mb-32 p-4 dark:border-gray-700">
                 {renderStepContent()}
               </div>
 
-              <DialogFooter className="flex p-4 justify-between absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+              <DialogFooter className="flex p-4 justify-between absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 dark:bg-gray-950 dark:border-gray-700">
                 <div>
                   {currentStep > 1 && (
                     <Button

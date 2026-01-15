@@ -118,16 +118,16 @@ export default function UsersAndRolesManagementPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <div className="mx-auto space-y-4">
         {/* Header Section */}
         <div className="space-y-2">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-1">
+              <h1 className="text-2xl font-semibold text-gray-900 mb-1 dark:text-white">
                 Users and Roles Management
               </h1>
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 text-sm dark:text-white">
                 Role: Customer Administrator
               </p>
             </div>
@@ -147,19 +147,19 @@ export default function UsersAndRolesManagementPage() {
               <TabsList className="bg-transparent p-0 h-auto">
                 <TabsTrigger
                   value="Users"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600"
+                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
                 >
                   Users
                 </TabsTrigger>
                 <TabsTrigger
                   value="Customers"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600"
+                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
                 >
                   Customers
                 </TabsTrigger>
                 <TabsTrigger
                   value="Roles"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600"
+                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
                 >
                   Roles
                 </TabsTrigger>
@@ -182,10 +182,10 @@ export default function UsersAndRolesManagementPage() {
 
         {/* Users and Roles Management Table */}
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
             Users and Roles Management
           </h2>
-          <Card className="bg-white p-8 shadow-sm">
+          <Card className="bg-white p-8 shadow-sm dark:bg-gray-900 dark:border-gray-700">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <Table>
@@ -207,7 +207,7 @@ export default function UsersAndRolesManagementPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredRoles.map((role) => (
-                      <TableRow key={role.id} className="hover:bg-gray-50">
+                      <TableRow key={role.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
                             {role.roleName}
@@ -251,33 +251,33 @@ export default function UsersAndRolesManagementPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-secondary-main/20 text-white border-2 border-secondary-main shadow-sm">
+          <Card className="bg-secondary-main/20 text-white border-2 border-secondary-main shadow-sm dark:bg-gray-900 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-sm font-medium text-gray-600 mb-2">
+                <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
                   Total Roles
                 </p>
-                <p className="text-3xl font-bold text-gray-900">12</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">12</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-success/20 text-white border-2 border-success shadow-sm">
+          <Card className="bg-success/20 text-white border-2 border-success shadow-sm dark:bg-gray-900 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-sm font-medium text-gray-600 mb-2">
+                <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
                   Active Roles
                 </p>
-                <p className="text-3xl font-bold text-gray-900">10</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">10</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-yellow-500/20 text-white border-2 border-yellow-500 shadow-sm">
+          <Card className="bg-yellow-500/20 text-white border-2 border-yellow-500 shadow-sm dark:bg-gray-900 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-sm font-medium text-gray-600 mb-2">
+                <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
                   Custom Roles
                 </p>
-                <p className="text-3xl font-bold text-gray-900">09</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white">09</p>
               </div>
             </CardContent>
           </Card>

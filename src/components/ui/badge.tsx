@@ -12,7 +12,7 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const baseStyles =
-    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2';
+    'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 dark:text-white';
 
   const variants = {
     default: 'bg-purple-600 text-white hover:bg-purple-700',

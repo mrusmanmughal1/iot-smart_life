@@ -441,10 +441,10 @@ export function SecurityTab() {
           )}
 
           {!shouldShowMethodSelection && (
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
-              <div className="flex items-center gap-2 text-slate-600">
+            <div className="p-4 bg-slate-50 dark:bg-gray-900 dark:border-gray-700 border border-slate-200 rounded-lg">
+              <div className="flex items-center gap-2 text-slate-600 dark:text-white">
                 <XCircle className="h-4 w-4" />
-                <p className="text-sm">
+                <p className="text-sm dark:text-white">
                   Two-factor authentication is currently disabled
                 </p>
               </div>

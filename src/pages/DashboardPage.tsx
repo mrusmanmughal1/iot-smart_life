@@ -168,7 +168,7 @@ export const DashboardPage = () => {
           </div>
           <Settings className="h-6 w-6" />
         </div>
-        <div className="border p-4 rounded-lg  border-secondary shadow-xl">
+        <div className="border dark:border-gray-700 p-4 rounded-lg  border-secondary shadow-xl">
           {/* Solution Category Selection Bar */}
           <div className="relative">
             <div className="flex items-center gap-4 pb-4">
@@ -189,7 +189,7 @@ export const DashboardPage = () => {
 
               <div
                 ref={scrollContainerRef}
-                className="flex flex-1 items-center gap-4 bg-[#D9D9D92B] dark:bg-gray-700  rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
+                className="flex flex-1 items-center gap-4 bg-[#D9D9D92B] dark:bg-gray-950  rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
               >
                 <div className="flex gap-4 w-full  p-4">
                   {solutions.map((solution) => (
@@ -198,8 +198,8 @@ export const DashboardPage = () => {
                       onClick={() => setSelectedCategory(solution.key)}
                       className={`min-w-[140px] sm:min-w-[160px] flex-shrink-0 p-4 py-8 rounded-xl dark:bg-gray-800 dark:text-white transition-all flex flex-col items-center gap-3 ${
                         solution.active || selectedCategory === solution.key
-                          ? 'bg-secondary text-white shadow-md'
-                          : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                          ? 'bg-secondary text-white shadow-md border border-gray-200'
+                          : 'bg-white text-gray-700 hover:bg-gray-50 '
                       }`}
                     >
                       <solution.icon className="h-10 w-10" />
@@ -239,7 +239,7 @@ export const DashboardPage = () => {
                   <CardDescription>
                     <Link
                       to="/solution-templates"
-                      className="text-secondary text-xs mt-1 hover:underline"
+                      className="text-secondary dark:text-white text-xs mt-1 hover:underline"
                     >
                       {t('dashboard.viewAll')}
                     </Link>
@@ -299,10 +299,10 @@ export const DashboardPage = () => {
               {/* Connected Devices Card */}
               <Card className="flex items-center  justify-between pt-2 pb-10">
                 <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-600">
+                  <CardTitle className="text-lg font-semibold text-gray-600 dark:text-white">
                     {t('dashboard.connectedDevices')}
                   </CardTitle>
-                  <CardDescription className="text-sm  text-gray-500">
+                  <CardDescription className="text-sm  text-gray-500 dark:text-white">
                     {t('dashboard.connections', { count: 12 })}
                   </CardDescription>
                   <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
@@ -334,7 +334,7 @@ export const DashboardPage = () => {
                           </Pie>
                         </PieChart>
                       </ResponsiveContainer>
-                      <span className="absolute text-2xl font-semibold text-gray-900">
+                      <span className="absolute text-2xl font-semibold text-gray-900 dark:text-white">
                         20%
                       </span>
                     </div>
@@ -436,7 +436,7 @@ export const DashboardPage = () => {
 
           {/* Recently Accessed Dashboards */}
           <div className="mt-4 p-4">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               {t('dashboard.recentlyAccessedDashboards')}
             </h2>
             <div className="grid gap-6 md:grid-cols-3">
@@ -446,12 +446,14 @@ export const DashboardPage = () => {
                   className={`cursor-pointer rounded-xl overflow-hidden  hover:shadow-lg transition border-0`}
                 >
                   <CardHeader
-                    className={`text-lg font-semibold mb-2 ${dashboard.textColor} bg-gradient-to-br ${dashboard.gradient} dark:bg-gray-800 dark:text-white`}
+                    className={`text-lg font-semibold mb-2 ${dashboard.textColor}  bg-gradient-to-br ${dashboard.gradient} dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
                   >
                     <p>{dashboard.title}</p>
                   </CardHeader>
                   <CardContent className="p-6">
-                    <p className={`text-sm  text-center text-gray-500 dark:text-white`}>
+                    <p
+                      className={`text-sm  text-center text-gray-500 dark:text-white`}
+                    >
                       {dashboard.subtitle}
                     </p>
                   </CardContent>

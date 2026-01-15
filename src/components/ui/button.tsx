@@ -80,7 +80,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }) + ' dark:text-white dark:bg-gray-700 dark:border-gray-700 dark:hover:bg-gray-800 dark:hover:text-white')}
         ref={ref}
         disabled={disabled || isLoading}
         {...props}

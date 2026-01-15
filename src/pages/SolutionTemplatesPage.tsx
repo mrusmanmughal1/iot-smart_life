@@ -106,9 +106,9 @@ export default function SolutionTemplates() {
         </h1>
       </div>
 
-      <div className="border border-secondary p-4 rounded-2xl">
+      <div className="border border-secondary dark:border-gray-700 p-4 rounded-2xl">
         {/* Search Bar */}
-        <div className="flex w flex-col md:flex-row justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B]">
+        <div className="flex w flex-col md:flex-row justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B] dark:bg-gray-950">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black" />
             <Input
@@ -119,7 +119,7 @@ export default function SolutionTemplates() {
             />
           </div>
           <Button
-            className="bg-secondary hover:bg-secondary/90 text-white"
+            className="bg-secondary hover:bg-secondary/90 text-white dark:bg-gray-800 dark:text-white"
             onClick={() => navigate('/solution-templates/create')}
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -141,8 +141,8 @@ export default function SolutionTemplates() {
                     onClick={() => handleCategoryChange(category.key)}
                     className={`  flex-shrink-0 p-4  rounded-xl transition-all flex flex-col items-center dark:bg-gray-800 dark:text-white gap-3 ${
                       selectedCategory === category.key
-                        ? 'bg-primary text-white shadow-md'
-                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                        ? 'bg-primary text-white shadow-md hover:bg-gray-50 border border-gray-200'
+                        : 'bg-white text-gray-700 '
                     }`}
                   >
                     {/* <category.icon className="h-10 w-10" /> */}
