@@ -84,6 +84,7 @@ const defaultFormValues: FilterFormValues = {
   zoneName: undefined,
   zoneType: undefined,
   zoneDescription: undefined,
+  floorName: undefined,
 };
 
 const defaultState = {

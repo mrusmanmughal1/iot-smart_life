@@ -11,19 +11,22 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import AppLayout from '@/components/layout/AppLayout';
 import { PageHeader } from '@/components/common/PageHeader';
+import { PaginatedNotificationsResponse } from '@/services/api';
 
 export default function NotificationsPage() {
   const { t } = useTranslation();
-  const { data: notificationsData, isLoading } = useNotifications();
-  const markAsRead = useMarkAsRead();
-  const notifications = notificationsData?.data || [];
+  const { data: notificationsData , isLoading }: { data:  any, isLoading: boolean } = useNotifications();
 
+  
+  const markAsRead = useMarkAsRead();
+  const notifications: PaginatedNotificationsResponse | any  =  notificationsData?.data || [];
+ console.log(notificationsData ,"notificationsData")
   return (
     <AppLayout>
       <div className="space-y-6">
         <PageHeader
           title="All Notifications"
-          description={`(${notifications.length}) notifications found`}
+          description={`(${notificationsData?.limit}) notifications found`}
         />
         <Card className="shadow-lg rounded-xl pt-4 border-secondary/50">
           <CardHeader>
@@ -36,7 +39,7 @@ export default function NotificationsPage() {
                   <Skeleton key={i} className="h-20 w-full" />
                 ))}
               </div>
-            ) : notifications.length === 0 ? (
+            ) : notifications.limit === 0 ? (
               <div className="text-center py-12">
                 <Bell className="h-12 w-12 mx-auto text-slate-400 mb-4" />
                 <p className="text-slate-500">
@@ -45,12 +48,11 @@ export default function NotificationsPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                {notifications.map((notification: any) => (
+                {notificationsData.data.map((notification: any) => (
                   <div
                     key={notification.id}
-                    className={`p-4 border rounded-lg hover:bg-slate-50 transition-colors ${
-                      !notification.read ? 'bg-purple-50 border-purple-200' : ''
-                    }`}
+                    className={`p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-slate-50 transition-colors ${!notification.read ? 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-700' : ''
+                      }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">

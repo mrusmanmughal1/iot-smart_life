@@ -10,11 +10,10 @@ import {
   Moon,
   Monitor,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useRTL } from '@/hooks/useRTL';
 import { useAppStore } from '@/stores/useAppStore';
-import { useNotificationStore } from '@/stores/useNotificationStore';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { cn } from '@/lib/util';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
@@ -22,6 +21,8 @@ import { useQuery } from '@tanstack/react-query';
 import { subscriptionsApi } from '@/services/api/subscriptions.api';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { useMarkAsRead, useNotifications } from '@/features/notifications/hooks';
+import type { Notification } from '@/services/api/notifications.api';
 
 interface SubscriptionResponse {
   id: string;
@@ -53,6 +54,7 @@ interface SubscriptionResponse {
 }
 
 export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
+  const navigate = useNavigate();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isThemeOpen, setIsThemeOpen] = useState(false);
@@ -62,9 +64,25 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { theme, setTheme, effectiveTheme } = useThemeStore();
   const { direction } = useRTL();
   const { user } = useAppStore();
-  const { notifications } = useNotificationStore();
   const { mutate: logout } = useLogout();
   const { t } = useTranslation();
+  const { data: notificationsData, isLoading } = useNotifications();
+  const markAsRead = useMarkAsRead();
+  // Extract notifications from nested API response structure
+  // Handle both array and paginated response formats
+  const notificationsArray  =   (notificationsData?.data || []) as Notification[];
+  
+  // Calculate unread count
+  const unreadCount = notificationsArray.filter((notif) => !notif.read).length;
+  
+  // Get recent notifications (last 5, prioritizing unread)
+  const recentNotifications = [...notificationsArray]
+    .sort((a, b) => {
+      // Sort unread first, then by date
+      if (a.read !== b.read) return a.read ? 1 : -1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    })
+    .slice(0, 5);
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -296,8 +314,10 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg relative transition-colors"
           >
             <Bell className="h-5 w-5 dark:text-gray-300" />
-            {notifications.length > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-semibold rounded-full">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
             )}
           </button>
 
@@ -305,50 +325,91 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
           {isNotifOpen && (
             <div
               className={cn(
-                'absolute mt-2 w-72 bg-white dark:bg-gray-800 shadow-lg border border-gray-100',
+                'absolute mt-2 w-80 bg-white dark:bg-gray-800 shadow-lg border border-gray-100',
                 'dark:border-gray-700 rounded-xl py-2 z-50 animate-fade-in max-h-96 overflow-y-auto',
                 direction === 'rtl' ? 'left-0' : 'right-0'
               )}
             >
-              <p
-                className={cn(
-                  'px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 border-b dark:border-gray-700',
-                  direction === 'rtl' && 'text-right'
-                )}
-              >
-                Notifications ({notifications.length})
-              </p>
+              <div className="flex items-center justify-between px-4 py-2   dark:border-gray-700">
+                <p
+                  className={cn(
+                    'text-sm font-semibold text-gray-700 dark:text-gray-300',
+                    direction === 'rtl' && 'text-right'
+                  )}
+                >
+                  {t('notifications.title')}
+                </p>
+                  <button className="flex items-center gap-2 text-xs underline text-primary cursor-pointer text-gray-500 dark:text-gray-400" onClick={() => {
+                    // markAllAsRead.mutate();
+                    setIsNotifOpen(false);
+                  }}>
+                 Mark all as read    
+                  </button>
+              </div>
               <div className="max-h-64 overflow-y-auto">
-                {notifications.length === 0 ? (
+                {isLoading ? (
                   <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                    No new notifications
+                    {t('common.loading')}...
+                  </div>
+                ) : recentNotifications.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    {t('notifications.noNotifications')}
                   </div>
                 ) : (
-                  notifications.map((notif) => (
+                  recentNotifications.map((notif) => (
                     <div
                       key={notif.id}
+                      onClick={() => {
+                        if (!notif.read) {
+                          markAsRead.mutate(notif.id);
+                        }
+                        if (notif.actionUrl) {
+                          navigate(notif.actionUrl);
+                        }
+                        setIsNotifOpen(false);
+                      }}
                       className={cn(
-                        'px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer',
+                        'px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors',
                         'border-b border-gray-100 dark:border-gray-700 last:border-0',
+                        !notif.read && 'bg-purple-50 dark:bg-purple-900/20',
                         direction === 'rtl' && 'text-right'
                       )}
                     >
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {notif.title}
-                      </p>
-                      {notif.message && (
-                        <p className="text-gray-600 dark:text-gray-400 text-xs mt-1">
-                          {notif.message}
-                        </p>
-                      )}
+                      <div className="flex items-start gap-2">
+                        {!notif.read && (
+                          <span className="mt-1.5 w-2 h-2 bg-purple-600 rounded-full flex-shrink-0"></span>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className={cn(
+                            "font-medium text-gray-900 dark:text-white",
+                            !notif.read && "font-semibold"
+                          )}>
+                            {notif.title}
+                          </p>
+                          {notif.message && (
+                            <p className="text-gray-600 dark:text-gray-400 text-xs mt-1 line-clamp-2">
+                              {notif.message}
+                            </p>
+                          )}
+                          {notif.createdAt && (
+                            <p className="text-gray-400 dark:text-gray-500 text-[10px] mt-1">
+                              {format(new Date(notif.createdAt), 'MMM dd, HH:mm')}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ))
                 )}
               </div>
-              {notifications.length > 0 && (
-                <button className="block text-center w-full text-xs text-indigo-600 dark:text-indigo-400 py-2 border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                  View all
-                </button>
+              {recentNotifications.length > 0 && (
+                <Link
+                  to="/notifications"
+                  onClick={() => setIsNotifOpen(false)}
+                  className="block text-center w-full text-xs text-indigo-600 dark:text-indigo-400 py-2 border-t dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  {t('notifications.viewAll') || 'View all'}
+                </Link>
               )}
             </div>
           )}
@@ -365,7 +426,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             className={cn(
               'flex items-center gap-2 cursor-pointer hover:bg-gray-100',
               'dark:hover:bg-gray-800 rounded-lg px-3 py-2 transition-colors',
-              direction === 'rtl' && 'flex-row-reverse'
+              direction === 'rtl' && 'flex-row '
             )}
           >
             <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">

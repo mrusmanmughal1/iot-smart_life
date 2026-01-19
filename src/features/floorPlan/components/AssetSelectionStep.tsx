@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Control,
   Controller,
   UseFormRegister,
   UseFormSetValue,
 } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -16,6 +19,7 @@ import {
 } from '@/components/ui/select';
 import type { AssetOption, FilterFormValues } from '@/features/floorPlan/types';
 import { Badge } from '@/components/ui/badge';
+import { floorPlansApi } from '@/services/api/floor-plans.api';
 
 interface AssetSelectionStepProps {
   register: UseFormRegister<FilterFormValues>;
@@ -38,6 +42,54 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({
   onCancel,
   onNext,
 }) => {
+  const [floorName, setFloorName] = useState('');
+
+  const { mutate: createFloorPlan, isPending } = useMutation({
+    mutationFn: async (data: { assetId: string; name: string; status: string }) => {
+      // Create FormData for the API
+      
+      return floorPlansApi.create({
+        assetId: data.assetId,
+        name: data.name,
+        status: data.status,
+      });
+      
+    },
+    onSuccess: () => {
+      toast.success('Floor plan created successfully');
+      // Store the created floor plan ID if needed
+      onNext();
+    },
+    onError: (error: unknown) => {
+      const errorMessage =
+        (error && typeof error === 'object' && 'response' in error &&
+         error.response && typeof error.response === 'object' && 'data' in error.response &&
+         error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data &&
+         typeof error.response.data.message === 'string')
+          ? error.response.data.message
+          : 'Failed to create floor plan';
+      toast.error(errorMessage);
+    },
+  });
+
+  const handleNext = () => {
+    if (!selectedAssetId) {
+      toast.error('Please select an asset');
+      return;
+    }
+
+    if (!floorName.trim()) {
+      toast.error('Please enter a floor name');
+      return;
+    }
+
+    createFloorPlan({
+      assetId: selectedAssetId,
+      name: floorName.trim(),
+      status: 'draft',
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -48,6 +100,21 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({
           Choose the asset (building/facility) for which you want to create a
           floor map.
         </p>
+      </div>
+
+      {/* Floor Name Input */}
+      <div className="space-y-2">
+        <Label htmlFor="floorName" className="text-sm text-black dark:text-white font-medium">Floor Name</Label>
+        <Input
+          id="floorName"
+          placeholder="e.g., Factory Floor - Production Area"
+          value={floorName}
+          onChange={(e) => {
+            setFloorName(e.target.value);
+            setValue('floorName', e.target.value);
+          }}
+          className="bg-white border rounded-md"
+        />
       </div>
 
       {/* Filters */}
@@ -118,7 +185,7 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({
               key={asset.id}
               type="button"
               onClick={() => onSelectAsset(asset.id)}
-              className={`relative flex h-full flex-col overflow-hidden border-gray-300 justify-between rounded-e-xl border bg-white p-6 ps-10 text-left transition-shadow ${
+              className={`relative flex h-full flex-col overflow-hidden border-gray-300 justify-between rounded-e-xl border bg-white p-2 ps-10 text-left transition-shadow ${
                 isSelected
                   ? '  shadow-md border-primary border-2'
                   : 'border-border  hover:shadow-sm'
@@ -144,11 +211,15 @@ export const AssetSelectionStep: React.FC<AssetSelectionStepProps> = ({
       </div>
 
       <div className="mt-4 flex items-center gap-2  ">
-        <Button variant="outline" type="button" onClick={onCancel}>
+        <Button variant="outline" type="button" onClick={onCancel} disabled={isPending}>
           Cancel
         </Button>
-        <Button type="button" onClick={onNext} disabled={!selectedAssetId}>
-          Next
+        <Button 
+          type="button" 
+          onClick={handleNext} 
+          disabled={!selectedAssetId || !floorName.trim() || isPending}
+        >
+          {isPending ? 'Creating...' : 'Next'}
         </Button>
       </div>
     </div>

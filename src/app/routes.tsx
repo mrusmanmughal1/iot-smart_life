@@ -28,6 +28,7 @@ import DeviceAnalyticsPage from '@/pages/DeviceAnalyticsPage.tsx';
 import IndividualDeviceAnalyticsPage from '@/pages/IndividualDeviceAnalyticsPage.tsx';
 import DashboardAnalyticsPage from '@/pages/DashboardAnalyticsPage.tsx';
 import ProductionOverviewPage from '@/pages/ProductionOverviewPage.tsx';
+import GeoAnalyticsPage from '@/pages/GeoAnalyticsPage.tsx';
 import ReportTemplatesPage from '@/pages/ReportTemplatesPage.tsx';
 import AlertConfigurationPage from '@/pages/AlertConfigurationPage.tsx';
 import BuildingHierarchyChartPage from '@/pages/BuildingHierarchyChartPage.tsx';
@@ -198,7 +199,7 @@ export const router = createBrowserRouter([
           </AppLayout>
         ),
         children: [
-          {
+          {                             
             index: true,
             element: <AnalyticsPage />,
           },
@@ -217,6 +218,10 @@ export const router = createBrowserRouter([
           {
             path: 'product-overview',
             element: <ProductionOverviewPage />,
+          },
+          {
+            path: 'geo-analytics',
+            element: <GeoAnalyticsPage />,
           },
         ],
       },

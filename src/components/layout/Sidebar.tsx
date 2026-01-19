@@ -371,11 +371,11 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         )}
       >
         {/* Header */}
-        <div className=" p-5 flex items-center justify-between px-4   border-white/10 flex-shrink-0">
+        <div className=" p-3 flex items-center justify-between px-4 border-b border-white/10     flex-shrink-0">
           <img
             src={Image}
             alt="Smart Life"
-            className="h-16 w-auto object-contain mx-auto "
+            className="h-14 w-auto object-contain mx-auto "
           />
           <button
             onClick={onClose}

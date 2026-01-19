@@ -6,7 +6,7 @@ export const useNotifications = (params?: any) => {
     queryKey: ['notifications', params],
     queryFn: async () => {
       const response = await notificationsApi.getAll(params);
-      return response.data.data.data;
+      return response.data.data;
     },
   });
 };

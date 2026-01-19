@@ -25,28 +25,13 @@ export const notificationService = {
    */
   async getUnreadGrouped(userId?: string) {
     const unread = await notificationsApi.getAll({
-      read: false,
+      isRead: false,
       userId,
     });
+ 
+    return unread.data.data.data;
 
-    // Access the nested data structure: BackendEnvelope<BackendEnvelope<PaginatedResponse<Notification>>>
-    // unread.data = BackendEnvelope<PaginatedResponse<Notification>>
-    // unread.data.data = BackendEnvelope<PaginatedResponse<Notification>> (second level)
-    // unread.data.data.data = PaginatedResponse<Notification>
-    // unread.data.data.data.data = Notification[]
-    const notifications = unread.data.data.data.data;
 
-    // Group by type
-    const grouped = notifications.reduce((acc, notif) => {
-      if (!acc[notif.type]) acc[notif.type] = [];
-      acc[notif.type].push(notif);
-      return acc;
-    }, {} as Record<NotificationType, Notification[]>);
-
-    return {
-      total: notifications.length,
-      byType: grouped,
-    };
   },
 
   /**
@@ -65,7 +50,7 @@ export const notificationService = {
     variables: Record<string, any>
   ) {
     const template = await notificationTemplatesApi.getById(templateId);
-    
+
     // Replace variables in template
     let body = template.data.data.body;
     Object.entries(variables).forEach(([key, value]) => {
@@ -83,29 +68,29 @@ export const notificationService = {
   /**
    * Clean old notifications
    */
-  async cleanOldNotifications(daysOld: number = 30) {
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+  // async cleanOldNotifications(daysOld: number = 30) {
+  //   const cutoffDate = new Date();
+  //   cutoffDate.setDate(cutoffDate.getDate() - daysOld);
 
-    const old = await notificationsApi.getAll({
-      endDate: cutoffDate.toISOString(),
-      read: true,
-    });
+  //   const old = await notificationsApi.getAll({
 
-    // Access the nested data structure: BackendEnvelope<BackendEnvelope<PaginatedResponse<Notification>>>
-    const oldNotifications = old.data.data.data.data;
+  //     isRead: true,
+  //   });
 
-    if (oldNotifications.length > 0) {
-      await notificationsApi.bulkDelete(
-        oldNotifications.map(n => n.id)
-      );
-    }
+  //   // Access the nested data structure: BackendEnvelope<BackendEnvelope<PaginatedResponse<Notification>>>
+  //   const oldNotifications = old.data.data;
 
-    return {
-      deleted: oldNotifications.length,
-      cutoffDate: cutoffDate.toISOString(),
-    };
-  },
+  //   if (oldNotifications.length > 0) {
+  //     await notificationsApi.bulkDelete(
+  //       oldNotifications.map(n => n.id)
+  //     );
+  //   }
+
+  //   return {
+  //     deleted: oldNotifications.length,
+  //     cutoffDate: cutoffDate.toISOString(),
+  //   };
+  // },
 
   /**
    * Get notification statistics
@@ -171,7 +156,7 @@ export const templateService = {
   }) {
     // Validate template variables
     const variables = this.extractVariables(template.body);
-    
+
     return notificationTemplatesApi.create({
       ...template,
       enabled: true,
@@ -208,7 +193,7 @@ export const templateService = {
    */
   async cloneTemplate(templateId: string, newName: string) {
     const original = await notificationTemplatesApi.getById(templateId);
-    
+
     return notificationTemplatesApi.create({
       ...original.data.data,
       id: undefined,

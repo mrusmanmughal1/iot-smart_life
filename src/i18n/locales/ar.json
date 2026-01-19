@@ -32,7 +32,8 @@
     "currentPlan": "الخطة الحالية",
     "nextBilling": "الفاتورة القادمة",
     "settings": "الإعدادات",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "signup": "تسجيل الدخول"
   },
   "nav": {
     "overview": "نظرة عامة",
@@ -441,6 +442,7 @@
   "floorplans": {
     "title": "الخرائط الأرضية",
     "subtitle": "إدارة ومراقبة كل الخرائط الأرضية",
+    "floorMaps": "الخرائط الأرضية",
     "totalFloorPlans": "إجمالي الخرائط الأرضية",
     "floorPlansCount": "{{count}} خريطة أرضية",
     "activeFloorPlans": "الخرائط الأرضية النشطة",
@@ -943,12 +945,55 @@
     },
     "refresh": "تحديث"
   },
+  "geoAnalytics": {
+    "title": "التحليلات الجغرافية",
+    "subtitle": "التوزيع الجغرافي وتحليلات الأجهزة القائمة على الموقع",
+    "deviceDistributionMap": "خريطة توزيع الأجهزة",
+    "totalDevices": "الإجمالي",
+    "devices": "أجهزة",
+    "data": "البيانات",
+    "growth": "نمو",
+    "decline": "انخفاض",
+    "viewMode": "وضع العرض",
+    "heatmap": "خريطة الحرارة",
+    "clusters": "المجموعات",
+    "locationBasedPerformance": "الأداء القائم على الموقع",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "exportMap": "تصدير الخريطة",
+    "refresh": "تحديث",
+    "filters": {
+      "filter": "تصفية",
+      "time": "الوقت",
+      "allRegions": "جميع المناطق",
+      "last24Hours": "آخر 24 ساعة",
+      "last7Days": "آخر 7 أيام",
+      "last30Days": "آخر 30 يوم",
+      "last90Days": "آخر 90 يوم"
+    },
+    "regions": {
+      "northAmerica": "أمريكا الشمالية",
+      "asia": "آسيا",
+      "europe": "أوروبا",
+      "australia": "أستراليا",
+      "others": "أخرى"
+    },
+    "tableHeaders": {
+      "region": "المنطقة",
+      "avgResponseTime": "متوسط وقت الاستجابة",
+      "uptime": "وقت التشغيل",
+      "dataQuality": "جودة البيانات",
+      "alertRate": "معدل التنبيه",
+      "status": "الحالة"
+    }
+  },
   "notifications": {
     "title": "الإشعارات",
     "markAsRead": "وضع علامة كمقروء",
     "markAllAsRead": "وضع علامة على الكل كمقروء",
     "noNotifications": "لا توجد إشعارات",
-    "unreadCount": "{{count}} إشعارات غير مقروءة"
+    "unreadCount": "{{count}} إشعارات غير مقروءة",
+    "viewAll": "عرض الكل"
   },
   "settings": {
     "title": "الإعدادات",
@@ -957,7 +1002,26 @@
     "theme": "السمة",
     "notifications": "إعدادات الإشعارات",
     "security": "الأمان",
-    "account": "إعدادات الحساب"
+    "account": "إعدادات الحساب",
+    "changePassword": {
+      "title": "تغيير كلمة المرور",
+      "currentPassword": "كلمة المرور الحالية",
+      "currentPasswordPlaceholder": "أدخل كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور الجديدة",
+      "confirmPasswordPlaceholder": "أكد كلمة المرور الجديدة",
+      "updatePassword": "تحديث كلمة المرور",
+      "updating": "جاري التحديث...",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+      "confirmPasswordRequired": "يرجى تأكيد كلمة المرور",
+      "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+      "passwordUpdatedSuccessfully": "تم تحديث كلمة المرور بنجاح",
+      "failedToUpdatePassword": "فشل تحديث كلمة المرور",
+      "oldPasswordIncorrect": "كلمة المرور الحالية غير صحيحة",
+      "newPasswordSameAsOld": "يجب أن تكون كلمة المرور الجديدة مختلفة عن الحالية"
+    }
   },
   "errors": {
     "generic": "حدث خطأ",
@@ -989,7 +1053,8 @@
       "loginError": "فشل تسجيل الدخول. يرجى التحقق من بيانات الاعتماد الخاصة بك.",
       "loginSuccess": "تم تسجيل الدخول بنجاح",
       "loginWithGoogle": "تسجيل الدخول باستخدام Google",
-      "loginWithGithub": "تسجيل الدخول باستخدام GitHub"
+      "loginWithGithub": "تسجيل الدخول باستخدام GitHub",
+      "donthaveaccount": "ليس لديك حساب؟"
     },
     "register": {
       "title": "إنشاء حساب",

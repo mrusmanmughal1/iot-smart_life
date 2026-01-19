@@ -112,7 +112,7 @@ export const usersApi = {
 
   // Change password
   changePassword: (oldPassword: string, newPassword: string) =>
-    apiClient.post<ApiResponse<any>>('/users/me/password', {
+    apiClient.post<ApiResponse<any>>('/auth/change-password', {
       oldPassword,
       newPassword,
     }),

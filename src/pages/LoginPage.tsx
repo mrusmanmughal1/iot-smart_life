@@ -55,12 +55,12 @@ export const LoginPage: React.FC = () => {
       {/* Register Link */}
       <div className="text-center mt-20">
         <p className="text-sm text-[#545454]">
-          Don't have an account?{' '}
+          {t('auth.login.donthaveaccount')}
           <Link
             to="/register"
             className="text-[#1976D2]   font-semibold hover:underline"
           >
-            Sign up
+             {t('common.signup')}
           </Link>
         </p>
       </div>

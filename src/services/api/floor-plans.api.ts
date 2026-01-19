@@ -123,9 +123,9 @@ export const floorPlansApi = {
     apiClient.get<ApiResponse<FloorPlan>>(`/floor-plans/${id}`),
 
   // Create floor plan
-  create: (data: FormData) =>
+  create: (data: any) =>
     apiClient.post<ApiResponse<FloorPlan>>('/floor-plans', data, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': 'application/json' },
     }),
 
   // Update floor plan

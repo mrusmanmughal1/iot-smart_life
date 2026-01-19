@@ -7,6 +7,7 @@ export interface FilterFormValues {
   zoneName?: string;
   zoneType?: string;
   zoneDescription?: string;
+  floorName?: string;
 }
 
 export interface AssetOption {

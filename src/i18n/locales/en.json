@@ -32,7 +32,8 @@
     "currentPlan": "Current Plan",
     "nextBilling": "Next Billing",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "signup": "Signup"
   },
   "nav": {
     "overview": "Overview",
@@ -648,6 +649,7 @@
   "floorplans": {
     "title": "Floor Plans",
     "subtitle": "Manage and monitor all your floor plans",
+    "floorMap": "Floor Maps",
     "totalFloorPlans": "Total Floor Plans",
     "floorPlansCount": "{{count}} floor plans",
     "activeFloorPlans": "Active Floor Plans",
@@ -966,12 +968,55 @@
     },
     "refresh": "Refresh"
   },
+  "geoAnalytics": {
+    "title": "Geo Analytics",
+    "subtitle": "Geographic distribution and location-based device analytics",
+    "deviceDistributionMap": "Device Distribution Map",
+    "totalDevices": "Total",
+    "devices": "devices",
+    "data": "Data",
+    "growth": "growth",
+    "decline": "decline",
+    "viewMode": "View Mode",
+    "heatmap": "Heatmap",
+    "clusters": "Clusters",
+    "locationBasedPerformance": "Location-Based Performance",
+    "online": "Online",
+    "offline": "Offline",
+    "exportMap": "Export Map",
+    "refresh": "Refresh",
+    "filters": {
+      "filter": "Filter",
+      "time": "Time",
+      "allRegions": "All Regions",
+      "last24Hours": "Last 24 hours",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days"
+    },
+    "regions": {
+      "northAmerica": "North America",
+      "asia": "Asia",
+      "europe": "Europe",
+      "australia": "Australia",
+      "others": "Others"
+    },
+    "tableHeaders": {
+      "region": "REGION",
+      "avgResponseTime": "AVG RESPONSE TIME",
+      "uptime": "UPTIME",
+      "dataQuality": "DATA QUALITY",
+      "alertRate": "ALERT RATE",
+      "status": "STATUS"
+    }
+  },
   "notifications": {
     "title": "Notifications",
     "markAsRead": "Mark as Read",
     "markAllAsRead": "Mark All as Read",
     "noNotifications": "No notifications",
-    "unreadCount": "{{count}} unread notifications"
+    "unreadCount": "{{count}} unread notifications",
+    "viewAll": "View All"
   },
   "settings": {
     "title": "Settings",
@@ -980,7 +1025,26 @@
     "theme": "Theme",
     "notifications": "Notification Settings",
     "security": "Security",
-    "account": "Account Settings"
+    "account": "Account Settings",
+    "changePassword": {
+      "title": "Change Password",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "updatePassword": "Update Password",
+      "updating": "Updating...",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "passwordUpdatedSuccessfully": "Password updated successfully",
+      "failedToUpdatePassword": "Failed to update password",
+      "oldPasswordIncorrect": "Current password is incorrect",
+      "newPasswordSameAsOld": "New password must be different from current password"
+    }
   },
   "errors": {
     "generic": "An error occurred",
@@ -1012,7 +1076,9 @@
       "loginError": "Login failed. Please check your credentials.",
       "loginSuccess": "Login successful",
       "loginWithGoogle": "Sign in with Google",
-      "loginWithGithub": "Sign in with GitHub"
+      "loginWithGithub": "Sign in with GitHub",
+      "donthaveaccount": "Don't have an account?"
+      
     },
     "register": {
       "title": "Create Account",

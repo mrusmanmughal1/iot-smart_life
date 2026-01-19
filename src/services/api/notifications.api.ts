@@ -28,9 +28,14 @@ export interface Notification {
   relatedEntityId?: string;
   relatedEntityType?: string;
   actionUrl?: string;
-  metadata?: Record<string, any>;
   createdAt: string;
-  readAt?: string;
+  updatedAt: string;
+  readAt: string;
+  isRead: boolean;
+  endDate: string;
+
+
+
 }
 
 export interface NotificationTemplate {
@@ -51,13 +56,11 @@ export interface NotificationQuery {
   search?: string;
   type?: NotificationType;
   priority?: NotificationPriority;
-  read?: boolean;
+  isRead?: boolean;
   userId?: string;
-  tenantId?: string;
-  startDate?: string;
-  endDate?: string;
   page?: number;
   limit?: number;
+
 }
 
 export interface PaginatedResponse<T> {
@@ -69,6 +72,14 @@ export interface PaginatedResponse<T> {
     limit: number;
     totalPages: number;
   };
+}
+export interface PaginatedNotificationsResponse {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  unreadCount: number;
+  data: Notification[];
 }
 
 export interface ApiResponse<T> {
@@ -85,13 +96,16 @@ export const notificationsApi = {
 
   getAll: (params?: NotificationQuery) =>
     apiClient.get<
+
       BackendEnvelope<
         BackendEnvelope<
-          PaginatedResponse<Notification>
+          PaginatedNotificationsResponse
         >
       >
+
+
     >('/notifications', { params }),
-  
+
   // Get notification by ID
   getById: (id: string) =>
     apiClient.get<ApiResponse<Notification>>(`/notifications/${id}`),
