@@ -91,7 +91,6 @@ export default function CreateDashboardPage() {
         <h1 className="text-2xl font-semibold text-gray-900">
           {t('createDashboard.title') || 'Create New Dashboard'}
         </h1>
-
         {/* Form Card */}
         <Card className="shadow-lg rounded-xl border-gray-200">
           <CardContent className="p-6">
@@ -108,7 +107,7 @@ export default function CreateDashboardPage() {
                   id="name"
                   {...register('name')}
                   placeholder={t('createDashboard.dashboardTitlePlaceholder') || 'Enter dashboard title'}
-                  className="w-full"
+                  className="w-full border rounded-md"
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>

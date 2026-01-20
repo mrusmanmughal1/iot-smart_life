@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   useNotifications,
   useMarkAsRead,
+  DeleteNotificationById,
 } from '@/features/notifications/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
@@ -17,10 +18,9 @@ export default function NotificationsPage() {
   const { t } = useTranslation();
   const { data: notificationsData , isLoading }: { data:  any, isLoading: boolean } = useNotifications();
 
-  
+  const {mutate: deleteNotificationById} = DeleteNotificationById();
   const markAsRead = useMarkAsRead();
   const notifications: PaginatedNotificationsResponse | any  =  notificationsData?.data || [];
- console.log(notificationsData ,"notificationsData")
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -58,7 +58,7 @@ export default function NotificationsPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="font-medium">{notification.title}</p>
-                          {!notification.read && (
+                          {!notification.isRead && (
                             <Badge variant="default" className="h-5">
                               New
                             </Badge>
@@ -84,7 +84,7 @@ export default function NotificationsPage() {
                             <CheckCheck className="h-4 w-4" />
                           </Button>
                         )}
-                        <Button size="sm" variant="ghost">
+                        <Button size="sm" variant="ghost" onClick={() => deleteNotificationById(notification.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

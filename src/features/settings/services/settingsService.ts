@@ -14,13 +14,13 @@ export interface ApiResponse<T> {
 export const settingsService = {
   // Get general settings
   async getGeneralSettings(): Promise<GeneralSettings> {
-    const response = await apiClient.get<ApiResponse<GeneralSettings>>('/settings/general');
+    const response = await apiClient.get<ApiResponse<GeneralSettings>>('/settings');
     return response.data.data;
   },
 
   // Update general settings
   async updateGeneralSettings(settings: Partial<GeneralSettings>): Promise<GeneralSettings> {
-    const response = await apiClient.patch<ApiResponse<GeneralSettings>>(
+    const response = await apiClient.put<ApiResponse<GeneralSettings>>(
       '/settings/general',
       settings
     );

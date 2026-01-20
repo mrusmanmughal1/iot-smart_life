@@ -11,7 +11,6 @@ import {
   Monitor,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useThemeStore } from '@/stores/useThemeStore';
 import { useRTL } from '@/hooks/useRTL';
 import { useAppStore } from '@/stores/useAppStore';
 import { useLogout } from '@/features/auth/hooks/useLogout';
@@ -21,8 +20,9 @@ import { useQuery } from '@tanstack/react-query';
 import { subscriptionsApi } from '@/services/api/subscriptions.api';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { useMarkAsRead, useNotifications } from '@/features/notifications/hooks';
-import type { Notification } from '@/services/api/notifications.api';
+import { useMarkAllAsRead, useMarkAsRead, useNotifications } from '@/features/notifications/hooks';
+import type { Notification, PaginatedNotificationsResponse } from '@/services/api/notifications.api';
+import { useGeneralSettings } from '@/features/settings/hooks';
 
 interface SubscriptionResponse {
   id: string;
@@ -61,20 +61,24 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const profileRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const themeRef = useRef<HTMLDivElement>(null);
-  const { theme, setTheme, effectiveTheme } = useThemeStore();
   const { direction } = useRTL();
   const { user } = useAppStore();
   const { mutate: logout } = useLogout();
   const { t } = useTranslation();
   const { data: notificationsData, isLoading } = useNotifications();
   const markAsRead = useMarkAsRead();
-  // Extract notifications from nested API response structure
-  // Handle both array and paginated response formats
-  const notificationsArray  =   (notificationsData?.data || []) as Notification[];
-  
-  // Calculate unread count
-  const unreadCount = notificationsArray.filter((notif) => !notif.read).length;
-  
+  const markAllAsRead = useMarkAllAsRead();
+  const {
+    settings,
+
+    handleLanguageChange,
+    handleThemeChange,
+
+
+  } = useGeneralSettings();
+  const notificationsDataResponse = notificationsData as unknown as PaginatedNotificationsResponse;
+  const notificationsArray = (notificationsData?.data || []) as Notification[];
+
   // Get recent notifications (last 5, prioritizing unread)
   const recentNotifications = [...notificationsArray]
     .sort((a, b) => {
@@ -168,9 +172,9 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         'flex items-center justify-between px-10 sticky top-0 z-30',
         direction === 'rtl' && 'flex-row',
         // Light mode
-        effectiveTheme === 'light' && 'bg-white border-gray-200',
+        settings?.theme === 'light' && 'bg-white border-gray-200',
         // Dark mode
-        effectiveTheme === 'dark' && 'bg-gray-900 border-gray-800',
+        settings?.theme === 'dark' && 'bg-gray-900 border-gray-800',
         // Fallback for Tailwind dark: classes
         'dark:bg-gray-900 dark:border-gray-800 '
       )}
@@ -221,7 +225,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         )}
       >
         {/* Language Switcher */}
-        <LanguageSwitcher />
+        <LanguageSwitcher settings={settings} handleLanguageChange={handleLanguageChange} />
         {/* Theme Switcher */}
         <div className="relative" ref={themeRef}>
           <button
@@ -233,7 +237,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             title="Change theme"
           >
-            {effectiveTheme === 'dark' ? (
+            {settings?.theme === 'dark' ? (
               <Moon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
             ) : (
               <Sun className="h-5 w-5 text-gray-700 dark:text-gray-300" />
@@ -253,15 +257,15 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               </p>
               <button
                 onClick={() => {
-                  setTheme('light');
+                  handleThemeChange('light');
                   setIsThemeOpen(false);
                 }}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50',
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
-                  theme === 'light' &&
-                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                  settings?.theme === 'light' &&
+                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Sun className="h-4 w-4" />
@@ -269,15 +273,15 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               </button>
               <button
                 onClick={() => {
-                  setTheme('dark');
+                  handleThemeChange('dark');
                   setIsThemeOpen(false);
                 }}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50',
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
-                  theme === 'dark' &&
-                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                  settings?.theme === 'dark' &&
+                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Moon className="h-4 w-4" />
@@ -285,15 +289,15 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               </button>
               <button
                 onClick={() => {
-                  setTheme('system');
+                  handleThemeChange('system');
                   setIsThemeOpen(false);
                 }}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50',
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
-                  theme === 'system' &&
-                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                  settings?.theme === 'system' &&
+                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Monitor className="h-4 w-4" />
@@ -314,11 +318,12 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg relative transition-colors"
           >
             <Bell className="h-5 w-5 dark:text-gray-300" />
-            {unreadCount > 0 && (
+            {notificationsDataResponse?.unreadCount > 0 && (
               <span className="absolute top-0 right-0 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-semibold rounded-full">
-                {unreadCount > 9 ? '9+' : unreadCount}
+                {notificationsDataResponse?.unreadCount > 9 ? '9+' : notificationsDataResponse?.unreadCount}
               </span>
             )}
+
           </button>
 
           {/* Notifications Dropdown */}
@@ -339,12 +344,12 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 >
                   {t('notifications.title')}
                 </p>
-                  <button className="flex items-center gap-2 text-xs underline text-primary cursor-pointer text-gray-500 dark:text-gray-400" onClick={() => {
-                    // markAllAsRead.mutate();
-                    setIsNotifOpen(false);
-                  }}>
-                 Mark all as read    
-                  </button>
+                <button className="flex items-center gap-2 text-xs underline text-primary cursor-pointer text-gray-500 dark:text-gray-400" onClick={() => {
+                  markAllAsRead.mutate();
+                  setIsNotifOpen(false);
+                }}>
+                  Mark all as read
+                </button>
               </div>
               <div className="max-h-64 overflow-y-auto">
                 {isLoading ? (
@@ -371,18 +376,18 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                       className={cn(
                         'px-4 py-3 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors',
                         'border-b border-gray-100 dark:border-gray-700 last:border-0',
-                        !notif.read && 'bg-purple-50 dark:bg-purple-900/20',
+                        !notif.isRead && 'bg-purple-50 dark:bg-purple-900/20',
                         direction === 'rtl' && 'text-right'
                       )}
                     >
                       <div className="flex items-start gap-2">
-                        {!notif.read && (
+                        {!notif.isRead && (
                           <span className="mt-1.5 w-2 h-2 bg-purple-600 rounded-full flex-shrink-0"></span>
                         )}
                         <div className="flex-1 min-w-0">
                           <p className={cn(
                             "font-medium text-gray-900 dark:text-white",
-                            !notif.read && "font-semibold"
+                            !notif.isRead && "font-semibold"
                           )}>
                             {notif.title}
                           </p>

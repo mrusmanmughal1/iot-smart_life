@@ -6,20 +6,23 @@ import { languages } from '@/i18n/languages';
 import { getDirection } from '@/i18n/i18n';
 
 interface LanguageSwitcherProps {
+  settings: any;
+  handleLanguageChange: (locale: string) => void;
   variant?: 'dropdown' | 'button';
   showLabel?: boolean;
   className?: string;
 }
 
 export function LanguageSwitcher({
+  settings,
+  handleLanguageChange,
   variant = 'dropdown',
   showLabel = false,
   className,
 }: LanguageSwitcherProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { i18n } = useTranslation();
-  const language = i18n.language;
+  const language = settings?.language;
   const direction = getDirection(language);
 
   // Close dropdown when clicking outside
@@ -52,13 +55,7 @@ export function LanguageSwitcher({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
 
-  const handleLanguageChange = (langCode: string) => {
-    if (langCode === 'en' || langCode === 'ar') {
-      i18n.changeLanguage(langCode).then(() => {
-        setIsOpen(false);
-      });
-    }
-  };
+
 
   const currentLanguage = languages.find((lang) => lang.code === language);
 

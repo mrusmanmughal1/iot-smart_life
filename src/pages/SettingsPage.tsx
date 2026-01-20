@@ -8,10 +8,19 @@ import {
   SecurityTab,
   AccountTab,
 } from '@/features/settings/components';
+import { useGeneralSettings } from '@/features/settings/hooks';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
-
+  const {
+    settings,
+    isLoading,
+    handleLanguageChange,
+    handleAutoRefreshToggle,
+    handleCompactModeToggle,
+    handleSaveAll,
+    isSaving,
+  } = useGeneralSettings();
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -45,7 +54,7 @@ export default function SettingsPage() {
           </TabsList>
 
           <TabsContent value="general">
-            <GeneralSettingsTab />
+            <GeneralSettingsTab settings={settings} isLoading={isLoading} handleLanguageChange={handleLanguageChange} handleAutoRefreshToggle={handleAutoRefreshToggle} handleCompactModeToggle={handleCompactModeToggle} handleSaveAll={handleSaveAll} isSaving={isSaving} />
           </TabsContent>
 
           <TabsContent value="notifications">

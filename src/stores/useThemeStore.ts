@@ -7,7 +7,10 @@ type Theme = 'light' | 'dark' | 'system';
 interface ThemeStore {
   theme: Theme;
   effectiveTheme: 'light' | 'dark';
+  language: string;
   setTheme: (theme: Theme) => void;
+  setLanguage: (language: string) => void;
+  syncFromApi: (settings: { theme?: Theme; language?: string }) => void;
   toggleTheme: () => void;
 }
 
@@ -15,10 +18,10 @@ export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
       theme: 'system',
+      language: 'en',
       effectiveTheme: getSystemTheme(),
       setTheme: (theme: Theme) => {
         const effectiveTheme = theme === 'system' ? getSystemTheme() : theme;
-        
         // Update document class
         if (typeof document !== 'undefined') {
           document.documentElement.classList.remove('light', 'dark');
@@ -27,6 +30,22 @@ export const useThemeStore = create<ThemeStore>()(
         }
 
         set({ theme, effectiveTheme });
+      },
+
+      setLanguage: (language: string) => {
+        set({ language });
+      },
+
+      syncFromApi: (settings: { theme?: Theme; language?: string }) => {
+        const currentState = get();
+
+        if (settings.theme !== undefined && settings.theme !== currentState.theme) {
+          get().setTheme(settings.theme);
+        }
+
+        if (settings.language !== undefined && settings.language !== currentState.language) {
+          set({ language: settings.language });
+        }
       },
 
       toggleTheme: () => {
@@ -38,16 +57,14 @@ export const useThemeStore = create<ThemeStore>()(
     {
       name: 'theme-storage',
       onRehydrateStorage: () => (state) => {
-        if (state   ) {
+        if (state) {
           // Calculate the effective theme based on current system preference
           const effectiveTheme =
             state.theme === 'system' ? getSystemTheme() : state.theme;
-           
           // Apply theme to document
           document.documentElement.classList.remove('light', 'dark');
           document.documentElement.classList.add(effectiveTheme);
           document.documentElement.setAttribute('data-theme', effectiveTheme);
-          
           // Update the store state with the correct effectiveTheme
           // This ensures components using effectiveTheme get the right value
           useThemeStore.setState({ effectiveTheme });

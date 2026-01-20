@@ -175,11 +175,10 @@ export const DashboardPage = () => {
               <button
                 onClick={scrollLeft}
                 disabled={!canScrollLeft}
-                className={`hidden sm:flex absolute left-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${
-                  canScrollLeft
+                className={`hidden sm:flex absolute left-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${canScrollLeft
                     ? 'opacity-100 cursor-pointer'
                     : 'opacity-50 cursor-not-allowed'
-                }`}
+                  }`}
               >
                 <ChevronLeft
                   size={26}
@@ -196,11 +195,10 @@ export const DashboardPage = () => {
                     <button
                       key={solution.key}
                       onClick={() => setSelectedCategory(solution.key)}
-                      className={`min-w-[140px] sm:min-w-[160px] flex-shrink-0 p-4 py-8 rounded-xl dark:bg-gray-800 dark:text-white transition-all flex flex-col items-center gap-3 ${
-                        solution.active || selectedCategory === solution.key
+                      className={`min-w-[140px] sm:min-w-[160px] flex-shrink-0 p-4 py-8 rounded-xl dark:bg-gray-800 dark:text-white transition-all flex flex-col items-center gap-3 ${selectedCategory === solution.key
                           ? 'bg-secondary text-white shadow-md border border-gray-200'
                           : 'bg-white text-gray-700 hover:bg-gray-50 '
-                      }`}
+                        }`}
                     >
                       <solution.icon className="h-10 w-10" />
                       <span className="text-sm font-medium">
@@ -214,11 +212,10 @@ export const DashboardPage = () => {
               <button
                 onClick={scrollRight}
                 disabled={!canScrollRight}
-                className={`hidden sm:flex absolute right-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${
-                  canScrollRight
+                className={`hidden sm:flex absolute right-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${canScrollRight
                     ? 'opacity-100 cursor-pointer'
                     : 'opacity-50 cursor-not-allowed'
-                }`}
+                  }`}
               >
                 <ChevronRight size={26} className="text-gray-700" />
               </button>

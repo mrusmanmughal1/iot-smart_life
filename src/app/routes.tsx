@@ -12,6 +12,10 @@ import { PinCodeVerificationPage } from '../pages/PinCodeVerificationPage.tsx';
 import { SelectRolePage } from '../pages/SelectRolePage.tsx';
 import { OAuthCallbackPage } from '../pages/OAuthCallbackPage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
+import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
+import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
+
+
 import MainDashboardPage from '@/pages/MainDashboardPage.tsx';
 import MainControlPanelPage from '@/pages/MainControlPanelPage.tsx';
 import DevicesPage from '@/pages/DevicesPage.tsx';
@@ -63,12 +67,10 @@ import MultiFloorBuildingViewPage from '@/pages/MultiFloorBuildingViewPage.tsx';
 import FloorMapSettingsPage from '@/pages/FloorMapSettingsPage.tsx';
 import FloorMapHistoryPage from '@/pages/FloorMapHistoryPage.tsx';
 import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
-import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 import AssetDetailsPage from '@/pages/AssetDetailsPage.tsx';
 import AssetProfileDetails from '@/pages/AssetProfileDetails.tsx';
 import DeviceProfileDetails from '@/pages/DeviceProfileDetails.tsx';
 import EmailVerification from '@/pages/EmailVerification.tsx';
-import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
 import CustomerUserAssociationPage from '@/pages/CustomerUserAssociationPage.tsx';
 import EditRolePage from '@/pages/EditRolePage.tsx';
 import CustomerAdministratorPage from '@/pages/CustomerAdministratorPage.tsx';
@@ -78,13 +80,14 @@ import SearchResultsPage from '@/pages/SearchResultsPage.tsx';
 import AssignPermissionsPage from '@/pages/AssignPermissionsPage.tsx';
 import CreateCustomerPage from '@/pages/CreateCustomerPage.tsx';
 import CreateRolePage from '@/pages/CreateRolePage.tsx';
+
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Navigate to="/login" replace />,
   },
 
-  //  --------------------public routes--------------------
+  //  --------------------public routes--------------------c=
   {
     element: <PublicRoute />,
     errorElement: <RouteErrorPage />,
@@ -297,6 +300,7 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <DashboardsPage />,
+
           },
           {
             path: 'create',

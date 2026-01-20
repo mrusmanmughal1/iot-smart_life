@@ -1,10 +1,15 @@
 export type TwoFactorMethod = 'email' | 'sms' | 'authenticator' | 'none';
 
 export interface GeneralSettings {
+  id?: string;
+  userId?: string;
   language: string;
   theme: 'light' | 'dark' | 'system';
-  autoRefresh: boolean;
+  autoRefreshDashboard: boolean;
+  dashboardRefreshInterval?: number;
   compactMode: boolean;
+  // Legacy support
+  autoRefresh?: boolean;
 }
 
 export interface NotificationSettings {

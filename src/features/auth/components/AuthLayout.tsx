@@ -6,6 +6,7 @@ import SmartLifeImgWhite from '../../../assets/images/smartlife-text-white.png';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { NavLink } from 'react-router-dom';
 import { useThemeStore } from '@/stores/useThemeStore';
+import { useGeneralSettings } from '@/features/settings/hooks';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -25,7 +26,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   }, []);
 
   const { effectiveTheme } = useThemeStore();
-
+  const { settings, isLoading, handleLanguageChange } = useGeneralSettings();
   return (
     <div className="max-h-screen flex w-full">
       {/* Left Side - Background Image */}
@@ -52,7 +53,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               />
             </NavLink>
             <div className="">
-              <LanguageSwitcher />
+              <LanguageSwitcher settings={settings} handleLanguageChange={handleLanguageChange} />
             </div>
           </div>
 

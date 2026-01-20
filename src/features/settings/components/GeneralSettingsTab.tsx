@@ -16,38 +16,25 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { languages } from '@/i18n/languages';
-import { useGeneralSettings } from '../hooks';
 import { useThemeStore } from '@/stores/useThemeStore';
+import type { GeneralSettings } from '../types/settings.types';
 
-export function GeneralSettingsTab() {
-  const { t, i18n } = useTranslation();
-  const {
-    settings,
-    isLoading,
-    handleLanguageChange,
-    handleAutoRefreshToggle,
-    handleCompactModeToggle,
-    handleSaveAll,
-    isSaving,
-  } = useGeneralSettings();
+export function GeneralSettingsTab({ settings, isLoading, handleLanguageChange, handleAutoRefreshToggle, handleCompactModeToggle, handleSaveAll, isSaving }
+  : { settings: any, isLoading: boolean, handleLanguageChange: (locale: string) => void, handleAutoRefreshToggle: (enabled: boolean) => void, handleCompactModeToggle: (enabled: boolean) => void, handleSaveAll: (settings: Partial<GeneralSettings>) => void, isSaving: boolean }) {
+  const { t } = useTranslation();
 
-  const currentLanguage = settings?.language || i18n.language;
-  const autoRefresh = settings?.autoRefresh ?? true;
+  const currentLanguage = settings?.language;
+  const autoRefresh = settings?.autoRefreshDashboard ?? settings?.autoRefresh;
   const compactMode = settings?.compactMode ?? false;
   const { theme, setTheme } = useThemeStore();
-
-  const handleSave = () => {
-    handleSaveAll({
-      language: currentLanguage,
-      theme: theme as 'light' | 'dark' | 'system',
-      autoRefresh,
-      compactMode,
-    });
+  // Handle theme change with API sync
+  const handleThemeChange = (value: string) => {
+    const newTheme = value as 'light' | 'dark' | 'system';
+    setTheme(newTheme);
+    handleSaveAll({ theme: newTheme });
   };
-
   if (isLoading) {
     return (
       <Card>
@@ -59,7 +46,6 @@ export function GeneralSettingsTab() {
       </Card>
     );
   }
-
   return (
     <Card>
       <CardHeader>
@@ -83,16 +69,13 @@ export function GeneralSettingsTab() {
             </SelectTrigger>
             <SelectContent className="dark:bg-gray-800 dark:text-white">
               {languages.map((lang) => (
-                <SelectItem key={lang.code} value={lang.code} className="dark:bg-gray-800 dark:text-white">
+                <SelectItem key={lang.code} value={lang.code} >
                   {lang.flag} {lang.name} ({lang.nativeName})
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
-
-        <Separator />
-
         <div className="space-y-2">
           <Label
             htmlFor="theme"
@@ -102,18 +85,16 @@ export function GeneralSettingsTab() {
             {t('settings.theme')}
           </Label>
           <Select
-            value={theme}
-            onValueChange={(value) =>
-              setTheme(value as 'light' | 'dark' | 'system')
-            }
+            value={settings?.theme || theme}
+            onValueChange={handleThemeChange}
           >
             <SelectTrigger className="dark:bg-gray-800 dark:text-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="light" className="dark:bg-gray-800 dark:text-white">Light</SelectItem>
-              <SelectItem value="dark" className="dark:bg-gray-800 dark:text-white">Dark</SelectItem>
-              <SelectItem value="system" className="dark:bg-gray-800 dark:text-white">System</SelectItem>
+              <SelectItem value="light" >Light</SelectItem>
+              <SelectItem value="dark" >Dark</SelectItem>
+              <SelectItem value="system" >System</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -148,9 +129,6 @@ export function GeneralSettingsTab() {
 
         <Separator />
 
-        <Button onClick={handleSave} disabled={isSaving} isLoading={isSaving}>
-          Save Changes
-        </Button>
       </CardContent>
     </Card>
   );

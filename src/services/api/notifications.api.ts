@@ -132,7 +132,7 @@ export const notificationsApi = {
 
   // Mark all as read
   markAllAsRead: (userId?: string) =>
-    apiClient.patch<ApiResponse<any>>('/notifications/read-all', { userId }),
+    apiClient.patch<ApiResponse<any>>('/notifications/read/all', { userId }),
 
   // Bulk delete
   bulkDelete: (notificationIds: string[]) =>

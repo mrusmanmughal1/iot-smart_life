@@ -32,3 +32,23 @@ export const useMarkAsRead = () => {
     },
   });
 };
+export const useMarkAllAsRead = () => {
+  const queryClient = useQueryClient();  
+  return useMutation({
+    mutationFn: () =>
+      notificationsApi.markAllAsRead(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+};
+export const DeleteNotificationById = () => {
+  const queryClient = useQueryClient();  
+  return useMutation({
+    mutationFn: (notificationId: string) =>
+      notificationsApi.delete(notificationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+};
