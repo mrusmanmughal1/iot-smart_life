@@ -137,7 +137,7 @@ export function WidgetCanvas({
     <div className="relative w-full h-full bg-gray-50 rounded-lg">
       {/* Toolbar */}
       {!readOnly && (
-        <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+        <div className="absolute -top-18 right-4 z-50 flex items-center gap-2">
           <Button
             onClick={() => setShowWidgetLibrary(!showWidgetLibrary)}
             className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-md"
@@ -204,7 +204,7 @@ export function WidgetCanvas({
       )}
 
       {/* Canvas */}
-      <div className="p-8 h-full overflow-auto">
+      <div className="  h-full overflow-auto bg-gray-200">
         {widgets.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <button

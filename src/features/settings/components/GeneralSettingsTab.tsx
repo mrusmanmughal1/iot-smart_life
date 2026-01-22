@@ -18,24 +18,60 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { languages } from '@/i18n/languages';
-import { useThemeStore } from '@/stores/useThemeStore';
 import type { GeneralSettings } from '../types/settings.types';
+import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
+import { useThemeStore } from '@/stores/useThemeStore';
 
-export function GeneralSettingsTab({ settings, isLoading, handleLanguageChange, handleAutoRefreshToggle, handleCompactModeToggle, handleSaveAll, isSaving }
-  : { settings: any, isLoading: boolean, handleLanguageChange: (locale: string) => void, handleAutoRefreshToggle: (enabled: boolean) => void, handleCompactModeToggle: (enabled: boolean) => void, handleSaveAll: (settings: Partial<GeneralSettings>) => void, isSaving: boolean }) {
-  const { t } = useTranslation();
 
-  const currentLanguage = settings?.language;
-  const autoRefresh = settings?.autoRefreshDashboard ?? settings?.autoRefresh;
-  const compactMode = settings?.compactMode ?? false;
+export function GeneralSettingsTab({ settings, isLoading, handleSaveAll, isSaving }
+  : { settings: GeneralSettings | undefined, isLoading: boolean, handleSaveAll: (settings: Partial<GeneralSettings>) => void, isSaving: boolean }) {
+  const { t, i18n } = useTranslation();
   const { theme, setTheme } = useThemeStore();
-  // Handle theme change with API sync
-  const handleThemeChange = (value: string) => {
-    const newTheme = value as 'light' | 'dark' | 'system';
-    setTheme(newTheme);
-    handleSaveAll({ theme: newTheme });
+
+
+  const [localSettings, setLocalSettings] = useState<Partial<GeneralSettings>>({
+    language: settings?.language ?? '',
+    theme: settings?.theme ?? theme,
+    autoRefreshDashboard: settings?.autoRefreshDashboard ?? false,
+    compactMode: settings?.compactMode ?? false,
+  });
+
+  useEffect(() => {
+    if (settings) {
+      setLocalSettings({
+        language: settings.language ?? '',
+        theme: settings.theme ?? theme,
+        autoRefreshDashboard: settings.autoRefreshDashboard ?? false,
+        compactMode: settings.compactMode ?? false,
+      });
+      // Update theme store if settings have theme
+      if (settings.theme) {
+        setTheme(settings.theme);
+      }
+    }
+  }, [settings, setTheme, theme]);
+
+  // Handle language change - update UI immediately but don't call API
+  const handleLanguageChange = (value: string) => {
+    setLocalSettings({ ...localSettings, language: value });
+    // Update i18n language immediately for display
+    i18n.changeLanguage(value);
   };
-  if (isLoading) {
+
+  // Handle theme change - update UI immediately but don't call API
+  const handleThemeChange = (value: string) => {
+    const themeValue = value as 'light' | 'dark' | 'auto';
+    setLocalSettings({ ...localSettings, theme: themeValue });
+    // Update theme store immediately for display
+    setTheme(themeValue);
+  };
+
+  // Only call API when save button is clicked
+  const handleAllSettingsSave = () => {
+    handleSaveAll(localSettings);
+  };
+  if (isLoading || !settings) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -63,7 +99,7 @@ export function GeneralSettingsTab({ settings, isLoading, handleLanguageChange, 
             <Globe className="h-4 w-4" />
             {t('settings.language')}
           </Label>
-          <Select value={currentLanguage} onValueChange={handleLanguageChange}>
+          <Select value={localSettings.language || 'en'} onValueChange={handleLanguageChange}>
             <SelectTrigger className="dark:bg-gray-800 dark:text-white">
               <SelectValue />
             </SelectTrigger>
@@ -85,7 +121,7 @@ export function GeneralSettingsTab({ settings, isLoading, handleLanguageChange, 
             {t('settings.theme')}
           </Label>
           <Select
-            value={settings?.theme || theme}
+            value={localSettings.theme || theme || 'light'}
             onValueChange={handleThemeChange}
           >
             <SelectTrigger className="dark:bg-gray-800 dark:text-white">
@@ -94,7 +130,7 @@ export function GeneralSettingsTab({ settings, isLoading, handleLanguageChange, 
             <SelectContent>
               <SelectItem value="light" >Light</SelectItem>
               <SelectItem value="dark" >Dark</SelectItem>
-              <SelectItem value="system" >System</SelectItem>
+              <SelectItem value="auto" >Auto</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -109,8 +145,8 @@ export function GeneralSettingsTab({ settings, isLoading, handleLanguageChange, 
             </p>
           </div>
           <Switch
-            checked={autoRefresh}
-            onCheckedChange={handleAutoRefreshToggle}
+            checked={localSettings.autoRefreshDashboard ?? false}
+            onCheckedChange={(checked) => setLocalSettings({ ...localSettings, autoRefreshDashboard: checked })}
           />
         </div>
 
@@ -122,13 +158,15 @@ export function GeneralSettingsTab({ settings, isLoading, handleLanguageChange, 
             </p>
           </div>
           <Switch
-            checked={compactMode}
-            onCheckedChange={handleCompactModeToggle}
+            checked={localSettings.compactMode ?? false}
+            onCheckedChange={(checked) => setLocalSettings({ ...localSettings, compactMode: checked })}
           />
         </div>
 
         <Separator />
-
+        <Button onClick={handleAllSettingsSave} disabled={isSaving} isLoading={isSaving}>
+          Apply &  Save Preferences
+        </Button>
       </CardContent>
     </Card>
   );

@@ -9,18 +9,27 @@ import {
   AccountTab,
 } from '@/features/settings/components';
 import { useGeneralSettings } from '@/features/settings/hooks';
+import { LoadingPage } from '@/components/common/LoadingSpinner';
+import { ErrorMessage } from '@/components/common/ErrorMessage';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
   const {
     settings,
     isLoading,
-    handleLanguageChange,
-    handleAutoRefreshToggle,
-    handleCompactModeToggle,
-    handleSaveAll,
     isSaving,
+    handleGeneralSettingsSave,
+    handleSaveNotificationSettings,
+    isSavingNotifications,
+    isError
   } = useGeneralSettings();
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
+  if (isError) {
+    return <ErrorMessage title="Failed to load settings" onRetry={() => window.location.reload()} />;
+  }
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -54,11 +63,21 @@ export default function SettingsPage() {
           </TabsList>
 
           <TabsContent value="general">
-            <GeneralSettingsTab settings={settings} isLoading={isLoading} handleLanguageChange={handleLanguageChange} handleAutoRefreshToggle={handleAutoRefreshToggle} handleCompactModeToggle={handleCompactModeToggle} handleSaveAll={handleSaveAll} isSaving={isSaving} />
+            <GeneralSettingsTab
+              settings={settings}
+              isLoading={isLoading}
+              isSaving={isSaving}
+              handleSaveAll={handleGeneralSettingsSave}
+            />
           </TabsContent>
 
           <TabsContent value="notifications">
-            <NotificationsTab />
+            <NotificationsTab
+              settings={settings}
+              isLoading={isLoading}
+              handleSaveNotificationSettings={handleSaveNotificationSettings}
+              isSaving={isSavingNotifications}
+            />
           </TabsContent>
 
           <TabsContent value="security">

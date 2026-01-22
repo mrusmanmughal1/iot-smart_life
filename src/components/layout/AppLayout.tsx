@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { useRTL } from '@/hooks/useRTL';
 import { cn } from '@/lib/util';
+import { useInitializeSettings } from '@/hooks/useInitializeSettings';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,8 @@ interface AppLayoutProps {
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isRTL } = useRTL();
+  // Initialize settings from API on mount
+  useInitializeSettings();
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900 transition-colors">

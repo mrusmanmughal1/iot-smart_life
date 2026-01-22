@@ -89,14 +89,14 @@ export default function WidgetEditorPage() {
             <h1 className="text-2xl font-semibold">
               {dashboard?.name || 'Dashboard Editor'}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-gray-500">
               Drag, drop, and resize widgets to create your custom dashboard
             </p>
           </div>
         </div>
 
         {/* Canvas */}
-        <Card className="border-gray-200">
+        <Card className="">
           <CardContent
             className="p-0"
             style={{ height: 'calc(100vh - 280px)', minHeight: '600px' }}

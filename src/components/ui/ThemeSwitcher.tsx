@@ -23,8 +23,8 @@ export function ThemeSwitcher() {
       </button>
       
       <button
-        onClick={() => setTheme('system')}
-        className={cn('btn', theme === 'system' && 'btn-primary')}
+        onClick={() => setTheme('auto')}
+        className={cn('btn', theme === 'auto' && 'btn-primary')}
       >
         <Monitor className="w-4 h-4" />
       </button>

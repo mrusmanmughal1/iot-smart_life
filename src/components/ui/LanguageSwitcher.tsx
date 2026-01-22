@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Languages } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/util';
 import { languages } from '@/i18n/languages';
 import { getDirection } from '@/i18n/i18n';
 
 interface LanguageSwitcherProps {
-  settings: any;
+  settings: { language?: string } | undefined;
   handleLanguageChange: (locale: string) => void;
   variant?: 'dropdown' | 'button';
   showLabel?: boolean;
@@ -23,7 +22,7 @@ export function LanguageSwitcher({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const language = settings?.language;
-  const direction = getDirection(language);
+  const direction = getDirection(language || 'en');
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -70,7 +69,7 @@ export function LanguageSwitcher({
               'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
               'hover:bg-gray-100 dark:hover:bg-gray-800',
               language === lang.code &&
-                'bg-primary text-primary-foreground hover:bg-primary/90'
+              'bg-primary text-primary-foreground hover:bg-primary/90'
             )}
             title={lang.name}
           >
@@ -133,7 +132,7 @@ export function LanguageSwitcher({
                 'dark:hover:bg-gray-700 transition-colors',
                 direction === 'rtl' && 'flex-row-reverse text-right',
                 language === lang.code &&
-                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
               )}
               role="menuitem"
             >

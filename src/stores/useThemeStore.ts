@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { getSystemTheme } from '@/utils/helpers/SystemHelpers';
 
-type Theme = 'light' | 'dark' | 'system';
+type Theme = 'light' | 'dark' | 'auto';
 
 interface ThemeStore {
   theme: Theme;
-  effectiveTheme: 'light' | 'dark';
+  effectiveTheme: 'light' | 'dark' | 'auto';
   language: string;
   setTheme: (theme: Theme) => void;
   setLanguage: (language: string) => void;
@@ -17,11 +17,11 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
-      theme: 'system',
+      theme: 'auto',
       language: 'en',
       effectiveTheme: getSystemTheme(),
       setTheme: (theme: Theme) => {
-        const effectiveTheme = theme === 'system' ? getSystemTheme() : theme;
+        const effectiveTheme = theme === 'auto' ? getSystemTheme() : theme;
         // Update document class
         if (typeof document !== 'undefined') {
           document.documentElement.classList.remove('light', 'dark');
@@ -39,8 +39,12 @@ export const useThemeStore = create<ThemeStore>()(
       syncFromApi: (settings: { theme?: Theme; language?: string }) => {
         const currentState = get();
 
-        if (settings.theme !== undefined && settings.theme !== currentState.theme) {
-          get().setTheme(settings.theme);
+        if (settings.theme !== undefined) {
+          // Map 'system' from API to 'auto' for theme store
+          const themeForStore: Theme = settings.theme;
+          if (themeForStore !== currentState.theme) {
+            get().setTheme(themeForStore);
+          }
         }
 
         if (settings.language !== undefined && settings.language !== currentState.language) {
@@ -60,7 +64,7 @@ export const useThemeStore = create<ThemeStore>()(
         if (state) {
           // Calculate the effective theme based on current system preference
           const effectiveTheme =
-            state.theme === 'system' ? getSystemTheme() : state.theme;
+            state.theme === 'auto' ? getSystemTheme() : state.theme;
           // Apply theme to document
           document.documentElement.classList.remove('light', 'dark');
           document.documentElement.classList.add(effectiveTheme);
@@ -80,10 +84,10 @@ if (typeof window !== 'undefined') {
     .matchMedia('(prefers-color-scheme: dark)')
     .addEventListener('change', (e) => {
       const store = useThemeStore.getState();
-      if (store.theme === 'system') {
+      if (store.theme === 'auto') {
         // Update effectiveTheme when system theme changes
         const newEffectiveTheme = e.matches ? 'dark' : 'light';
-        store.setTheme('system');
+        store.setTheme('auto');
         // Ensure the effectiveTheme is updated
         useThemeStore.setState({ effectiveTheme: newEffectiveTheme });
       }

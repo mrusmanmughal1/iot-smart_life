@@ -6,7 +6,7 @@ import SmartLifeImgWhite from '../../../assets/images/smartlife-text-white.png';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { NavLink } from 'react-router-dom';
 import { useThemeStore } from '@/stores/useThemeStore';
-import { useGeneralSettings } from '@/features/settings/hooks';
+import { useTranslation } from 'react-i18next';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -25,8 +25,15 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
     img.src = AuthBg;
   }, []);
 
-  const { effectiveTheme } = useThemeStore();
-  const { settings, isLoading, handleLanguageChange } = useGeneralSettings();
+  const { effectiveTheme, setLanguage } = useThemeStore();
+  const { i18n } = useTranslation();
+
+  // Handle language change - update UI only, no API call
+  const handleLanguageChange = (locale: string) => {
+    i18n.changeLanguage(locale);
+    setLanguage(locale);
+  };
+
   return (
     <div className="max-h-screen flex w-full">
       {/* Left Side - Background Image */}
@@ -53,7 +60,10 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               />
             </NavLink>
             <div className="">
-              <LanguageSwitcher settings={settings} handleLanguageChange={handleLanguageChange} />
+              <LanguageSwitcher 
+                settings={{ language: i18n.language }} 
+                handleLanguageChange={handleLanguageChange} 
+              />
             </div>
           </div>
 

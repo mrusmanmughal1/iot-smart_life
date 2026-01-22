@@ -22,7 +22,7 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { useMarkAllAsRead, useMarkAsRead, useNotifications } from '@/features/notifications/hooks';
 import type { Notification, PaginatedNotificationsResponse } from '@/services/api/notifications.api';
-import { useGeneralSettings } from '@/features/settings/hooks';
+import { useThemeStore } from '@/stores/useThemeStore';
 
 interface SubscriptionResponse {
   id: string;
@@ -64,18 +64,22 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { direction } = useRTL();
   const { user } = useAppStore();
   const { mutate: logout } = useLogout();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data: notificationsData, isLoading } = useNotifications();
   const markAsRead = useMarkAsRead();
   const markAllAsRead = useMarkAllAsRead();
-  const {
-    settings,
+  const { theme, setTheme, setLanguage } = useThemeStore();
 
-    handleLanguageChange,
-    handleThemeChange,
+  // Handle language change - update UI only, no API call
+  const handleLanguageChange = (locale: string) => {
+    i18n.changeLanguage(locale);
+    setLanguage(locale);
+  };
 
-
-  } = useGeneralSettings();
+  // Handle theme change - update UI only, no API call
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'auto') => {
+    setTheme(newTheme);
+  };
   const notificationsDataResponse = notificationsData as unknown as PaginatedNotificationsResponse;
   const notificationsArray = (notificationsData?.data || []) as Notification[];
 
@@ -172,9 +176,9 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         'flex items-center justify-between px-10 sticky top-0 z-30',
         direction === 'rtl' && 'flex-row',
         // Light mode
-        settings?.theme === 'light' && 'bg-white border-gray-200',
+        theme === 'light' && 'bg-white border-gray-200',
         // Dark mode
-        settings?.theme === 'dark' && 'bg-gray-900 border-gray-800',
+        theme === 'dark' && 'bg-gray-900 border-gray-800',
         // Fallback for Tailwind dark: classes
         'dark:bg-gray-900 dark:border-gray-800 '
       )}
@@ -225,7 +229,10 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         )}
       >
         {/* Language Switcher */}
-        <LanguageSwitcher settings={settings} handleLanguageChange={handleLanguageChange} />
+        <LanguageSwitcher 
+          settings={{ language: i18n.language }} 
+          handleLanguageChange={handleLanguageChange} 
+        />
         {/* Theme Switcher */}
         <div className="relative" ref={themeRef}>
           <button
@@ -237,7 +244,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             title="Change theme"
           >
-            {settings?.theme === 'dark' ? (
+            {theme === 'dark' ? (
               <Moon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
             ) : (
               <Sun className="h-5 w-5 text-gray-700 dark:text-gray-300" />
@@ -264,7 +271,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50',
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
-                  settings?.theme === 'light' &&
+                  theme === 'light' &&
                   'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
@@ -280,7 +287,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50',
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
-                  settings?.theme === 'dark' &&
+                  theme === 'dark' &&
                   'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
@@ -289,14 +296,14 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               </button>
               <button
                 onClick={() => {
-                  handleThemeChange('system');
+                  handleThemeChange('auto');
                   setIsThemeOpen(false);
                 }}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50',
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
-                  settings?.theme === 'system' &&
+                  theme === 'auto' &&
                   'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >

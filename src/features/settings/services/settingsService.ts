@@ -1,9 +1,8 @@
 import apiClient from '@/lib/axios';
 import type {
   GeneralSettings,
-  NotificationSettings,
   SecuritySettings,
-  AccountSettings,
+  AccountSettings, NotificationSettings,
 } from '../types/settings.types';
 
 export interface ApiResponse<T> {
@@ -37,7 +36,7 @@ export const settingsService = {
   async updateNotificationSettings(
     settings: Partial<NotificationSettings>
   ): Promise<NotificationSettings> {
-    const response = await apiClient.patch<ApiResponse<NotificationSettings>>(
+    const response = await apiClient.put<ApiResponse<NotificationSettings>>(
       '/settings/notifications',
       settings
     );

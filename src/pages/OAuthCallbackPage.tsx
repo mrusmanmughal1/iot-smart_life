@@ -6,17 +6,22 @@ import { authService } from '@/features/auth/services/authService.ts';
 import { toast } from 'react-hot-toast';
 import { AuthLayout } from '@/features/auth/components/AuthLayout.tsx';
 import localStorageService from '@/services/storage/localStorage.ts';
+import { useThemeStore } from '@/stores/useThemeStore';
+import { useTranslation } from 'react-i18next';
+import { settingsService } from '@/features/settings/services/settingsService';
 
 export const OAuthCallbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const setAuth = useAppStore((state) => state.setUser);
+  const { syncFromApi } = useThemeStore();
+  const { i18n } = useTranslation();
 
   const code = searchParams.get('code');
   console.log(code , 'code')
   const { mutate: handleCallback, isPending, isError } = useMutation({
     mutationFn: (code: string) => authService.handleOAuthCallback(code),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log('=== OAUTH CALLBACK SUCCESS ===');
       console.log(data , 'data')
       console.log('1. Data received:', {
@@ -72,10 +77,35 @@ export const OAuthCallbackPage: React.FC = () => {
         hasUser: !!useAppStore.getState().user,
       });
 
-      console.log('5. Showing success toast');
+      // Fetch and apply settings from API before navigating
+      try {
+        const settings = await settingsService.getGeneralSettings();
+        
+        // Sync theme from API (map 'system' to 'auto')
+        if (settings.theme) {
+          syncFromApi({ theme: settings.theme });
+        }
+
+        // Sync language from API
+        if (settings.language) {
+          syncFromApi({ language: settings.language });
+          // Update i18n language immediately
+          i18n.changeLanguage(settings.language);
+        }
+        
+        console.log('6. Settings synced from API:', {
+          theme: settings.theme,
+          language: settings.language
+        });
+      } catch (error) {
+        console.warn('Failed to fetch settings from API, using defaults:', error);
+        // Continue with navigation even if settings fetch fails
+      }
+
+      console.log('7. Showing success toast');
       toast.success('Login successful!');
 
-      console.log('6. Navigating to /dashboard');
+      console.log('8. Navigating to /dashboard');
       navigate('/dashboard', { replace: true });
 
       console.log('=== OAUTH CALLBACK FLOW COMPLETE ===');

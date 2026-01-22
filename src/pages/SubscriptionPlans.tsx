@@ -30,19 +30,60 @@ interface ApiPlan {
   name: string;
   monthlyPrice: number;
   yearlyPrice: number;
+  popular: boolean;
+  trialPeriodDays: number;
   limits: {
     devices: number;
     users: number;
-    apiCalls: number;
-    dataRetention: number;
-    storage: number;
+    customers: number;
+    apiCallsPerMonth: number;
+    dataRetentionDays: number;
+    storageGB: number;
+    dashboardTemplates: number;
+    customDashboards: number;
+    customIntegrations: number;
+    webhooks: number;
+    apiRateLimitPerMin: number;
+    concurrentConnections: number;
+    smsNotificationsPerMonth: number;
+    historicalDataQueryDays: number;
+    trainingSessions: number;
   };
   features: {
-    analytics: boolean;
-    automation: boolean;
-    integrations: boolean;
-    support: string;
-    whiteLabel: boolean;
+    realtimeAnalytics: boolean;
+    advancedAutomation: boolean;
+    ruleEngine: string;
+    restApiAccess: boolean;
+    mqttAccess: boolean;
+    customIntegrations: boolean;
+    whiteLabelBranding: boolean;
+    brandingLevel: string;
+    emailNotifications: boolean;
+    smsNotifications: boolean;
+    mobileAppAccess: boolean;
+    widgetLibrary: string;
+    alarmManagement: string;
+    advancedAlarms: boolean;
+    dataExport: string;
+    scheduledReports: string;
+    supportLevel: string;
+    slaGuarantee: boolean;
+    slaPercentage: number;
+    onboardingSupport: string;
+    floorMapping: number;
+    customDevelopment: boolean;
+    multiTenancy: boolean;
+    customerManagement: boolean;
+    roleBasedAccess: boolean;
+    auditLogs: boolean;
+    backupRecovery: boolean;
+    otaUpdates: string;
+    deviceGroups: boolean;
+    assetManagement: string;
+    geofencing: boolean;
+    customAttributes: boolean;
+    rpcCommands: boolean;
+    dataAggregation: boolean;
   };
 }
 
@@ -92,9 +133,9 @@ interface Plan {
   isEnterprise?: boolean;
 }
 
-const formatLimit = (value: number): string => {
+const formatLimit = (value: number): number | string => {
   if (value === -1) return 'Unlimited';
-  return value.toString();
+  return value;
 };
 
 const formatDataRetention = (days: number): string => {
@@ -104,11 +145,17 @@ const formatDataRetention = (days: number): string => {
   return `${days} day${days !== 1 ? 's' : ''}`;
 };
 
-const formatApiCalls = (calls: number): string => {
+const formatApiCalls = (calls: number): number | string => {
   if (calls === -1) return 'Unlimited';
   if (calls >= 1000000) return `${(calls / 1000000).toFixed(1)}M`;
   if (calls >= 1000) return `${(calls / 1000).toFixed(0)}K`;
-  return calls.toString();
+  return calls;
+};
+
+const formatStorage = (gb: number): string => {
+  if (gb === -1) return 'Unlimited';
+  if (gb >= 1000) return `${(gb / 1000).toFixed(1)}TB`;
+  return `${gb}GB`;
 };
 
 const getPlanIcon = (planId: string): React.ReactNode => {
@@ -129,37 +176,84 @@ const getPlanIcon = (planId: string): React.ReactNode => {
 const generateFeatures = (apiPlan: ApiPlan): string[] => {
   const features: string[] = [];
 
+  // Device limits
   if (apiPlan.limits.devices !== -1) {
     features.push(`Up to ${apiPlan.limits.devices} devices`);
   } else {
     features.push('Unlimited devices');
   }
 
-  if (apiPlan.features.analytics) {
-    features.push('Advanced analytics');
+  // User limits
+  if (apiPlan.limits.users !== -1) {
+    features.push(`Up to ${apiPlan.limits.users} users`);
+  } else {
+    features.push('Unlimited users');
   }
 
-  if (apiPlan.features.automation) {
-    features.push('Automation & rule chains');
+  // Analytics
+  if (apiPlan.features.realtimeAnalytics) {
+    features.push('Real-time analytics');
   }
 
-  if (apiPlan.features.integrations) {
-    features.push('Third-party integrations');
+  // Automation
+  if (apiPlan.features.advancedAutomation) {
+    features.push('Advanced automation & rule chains');
+  } else if (apiPlan.features.ruleEngine !== 'basic') {
+    features.push(`${apiPlan.features.ruleEngine} rule engine`);
   }
 
-  if (apiPlan.features.whiteLabel) {
-    features.push('White-label dashboards');
+  // Integrations
+  if (apiPlan.features.customIntegrations) {
+    if (apiPlan.limits.customIntegrations === -1) {
+      features.push('Unlimited custom integrations');
+    } else if (apiPlan.limits.customIntegrations > 0) {
+      features.push(`Up to ${apiPlan.limits.customIntegrations} custom integrations`);
+    }
   }
 
-  features.push(`${apiPlan.features.support} support`);
+  // White label
+  if (apiPlan.features.whiteLabelBranding) {
+    features.push(`${apiPlan.features.brandingLevel} white-label branding`);
+  }
+
+  // Support level
+  features.push(`${apiPlan.features.supportLevel} support`);
+
+  // Data retention
   features.push(
-    `${formatDataRetention(apiPlan.limits.dataRetention)} data retention`
+    `${formatDataRetention(apiPlan.limits.dataRetentionDays)} data retention`
   );
 
-  if (apiPlan.limits.storage !== -1) {
-    features.push(`${apiPlan.limits.storage}GB storage`);
-  } else {
-    features.push('Unlimited storage');
+  // Storage
+  features.push(formatStorage(apiPlan.limits.storageGB));
+
+  // Additional features
+  if (apiPlan.features.multiTenancy) {
+    features.push('Multi-tenancy');
+  }
+
+  if (apiPlan.features.customerManagement) {
+    features.push('Customer management');
+  }
+
+  if (apiPlan.features.roleBasedAccess) {
+    features.push('Role-based access control');
+  }
+
+  if (apiPlan.features.auditLogs) {
+    features.push('Audit logs');
+  }
+
+  if (apiPlan.features.backupRecovery) {
+    features.push('Backup & recovery');
+  }
+
+  if (apiPlan.features.geofencing) {
+    features.push('Geofencing');
+  }
+
+  if (apiPlan.features.dataAggregation) {
+    features.push('Data aggregation');
   }
 
   return features;
@@ -177,14 +271,14 @@ const transformApiPlanToPlan = (apiPlan: ApiPlan): Plan => {
     icon: getPlanIcon(apiPlan.plan),
     features: generateFeatures(apiPlan),
     limits: {
-      devices: formatLimit(apiPlan.limits.devices),
-      assets: formatLimit(apiPlan.limits.devices), // Using devices as proxy for assets
-      users: formatLimit(apiPlan.limits.users),
-      apiCalls: formatApiCalls(apiPlan.limits.apiCalls),
-      dataRetention: formatDataRetention(apiPlan.limits.dataRetention),
-      ruleChains: apiPlan.features.automation ? 'Unlimited' : '0',
+      devices: String(formatLimit(apiPlan.limits.devices)),
+      assets: String(formatLimit(apiPlan.limits.devices)), // Using devices as proxy for assets
+      users: String(formatLimit(apiPlan.limits.users)),
+      apiCalls: String(formatApiCalls(apiPlan.limits.apiCallsPerMonth)),
+      dataRetention: formatDataRetention(apiPlan.limits.dataRetentionDays),
+      ruleChains: apiPlan.features.advancedAutomation || apiPlan.features.ruleEngine !== 'basic' ? 'Unlimited' : '0',
     },
-    isPopular: apiPlan.plan === 'professional',
+    isPopular: apiPlan.popular || apiPlan.plan === 'professional',
     isEnterprise: apiPlan.plan === 'enterprise',
   };
 };
@@ -205,11 +299,22 @@ export default function SubscriptionPlans() {
     queryKey: ['subscription-plans'],
     queryFn: async () => {
       const response = await subscriptionsApi.getPlans();
-      // Handle nested API response structure: { data: { data: [...] } }
+      // Handle API response structure: { data: { json: [...] } }
       const apiResponse = response.data as unknown as
-        | { data?: ApiPlan[] }
+        | { data?: { json?: ApiPlan[] } }
+        | { json?: ApiPlan[] }
         | undefined;
-      return apiResponse?.data || [];
+      // Try different response structures
+      if (apiResponse && 'json' in apiResponse && Array.isArray(apiResponse.json)) {
+        return apiResponse.json;
+      }
+      if (apiResponse && 'data' in apiResponse && apiResponse.data && 'json' in apiResponse.data && Array.isArray(apiResponse.data.json)) {
+        return apiResponse.data.json;
+      }
+      if (apiResponse && 'data' in apiResponse && Array.isArray(apiResponse.data)) {
+        return apiResponse.data;
+      }
+      return [];
     },
   });
 
@@ -364,11 +469,10 @@ export default function SubscriptionPlans() {
         <div className="flex items-center justify-center gap-4 ">
           <Label
             htmlFor="billing"
-            className={`cursor-pointer ${
-              billingPeriod === 'monthly'
+            className={`cursor-pointer ${billingPeriod === 'monthly'
                 ? 'font-semibold text-gray-900 dark:text-white'
                 : 'text-gray-500 dark:text-white'
-            }`}
+              }`}
           >
             Monthly
           </Label>
@@ -382,11 +486,10 @@ export default function SubscriptionPlans() {
           <div className="flex items-center gap-2">
             <Label
               htmlFor="billing"
-              className={`cursor-pointer ${
-                billingPeriod === 'yearly'
+              className={`cursor-pointer ${billingPeriod === 'yearly'
                   ? 'font-semibold text-gray-900 dark:text-white'
                   : 'text-gray-500'
-              }`}
+                }`}
             >
               Yearly
             </Label>
@@ -403,47 +506,42 @@ export default function SubscriptionPlans() {
           {plans.map((plan) => (
             <Card
               key={plan.id}
-              className={`relative flex flex-col overflow-hidden rounded-3xl transition-all hover:shadow-md  hover:translate-y-[-5px] duration-500 ${
-                plan.isPopular
+              className={`relative flex flex-col overflow-hidden rounded-3xl transition-all hover:shadow-md  hover:translate-y-[-5px] duration-500 ${plan.isPopular
                   ? 'border-2 border-primary shadow-lg'
                   : 'border border-gray-400'
-              }`}
+                }`}
             >
               {/* Header Section with Plan Name and Badge */}
               <div
-                className={`px-6 pt-6 pb-4 ${
-                  plan.isPopular ? 'bg-gray-900' : 'bg-white'
-                }`}
+                className={`px-6 pt-6 pb-4 ${plan.isPopular ? 'bg-gray-900' : 'bg-white'
+                  }`}
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3
-                    className={`text-xl font-semibold ${
-                      plan.isPopular ? 'text-white' : 'text-gray-900'
-                    }`}
+                    className={`text-xl font-semibold ${plan.isPopular ? 'text-white' : 'text-gray-900'
+                      }`}
                   >
                     {plan.name} Plan
                   </h3>
                   <Badge
-                    className={`${
-                      plan.id === 'free'
+                    className={`${plan.id === 'free'
                         ? 'bg-blue-500 text-white'
                         : plan.isPopular
-                        ? 'bg-pink-500 text-white'
-                        : 'bg-blue-600 text-white'
-                    } px-6 py-1  font-semibold uppercase`}
+                          ? 'bg-pink-500 text-white'
+                          : 'bg-blue-600 text-white'
+                      } px-6 py-1  font-semibold uppercase`}
                   >
                     {plan.id === 'free'
                       ? 'FREE'
                       : plan.isPopular
-                      ? 'PRO'
-                      : 'ADVANCE'}
+                        ? 'PRO'
+                        : 'ADVANCE'}
                   </Badge>
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span
-                    className={`text-4xl font-bold ${
-                      plan.isPopular ? 'text-white' : 'text-gray-900'
-                    }`}
+                    className={`text-4xl font-bold ${plan.isPopular ? 'text-white' : 'text-gray-900'
+                      }`}
                   >
                     $
                     {billingPeriod === 'monthly'
@@ -452,9 +550,8 @@ export default function SubscriptionPlans() {
                     .00
                   </span>
                   <span
-                    className={`text-sm ${
-                      plan.isPopular ? 'text-gray-300' : 'text-gray-500'
-                    }`}
+                    className={`text-sm ${plan.isPopular ? 'text-gray-300' : 'text-gray-500'
+                      }`}
                   >
                     /month
                   </span>
@@ -463,9 +560,8 @@ export default function SubscriptionPlans() {
 
               {/* Current Plan / Upgrade Button */}
               <div
-                className={`px-6 py-3 ${
-                  plan.isPopular ? 'bg-gray-900' : 'bg-white'
-                }`}
+                className={`px-6 py-3 ${plan.isPopular ? 'bg-gray-900' : 'bg-white'
+                  }`}
               >
                 {(() => {
                   const isCurrentPlan = plan.id === currentPlanId;
@@ -498,12 +594,12 @@ export default function SubscriptionPlans() {
                       isLoading={isSubscribing === plan.id}
                     >
                       {currentPlanId &&
-                      plans.findIndex((p) => p.id === plan.id) >
+                        plans.findIndex((p) => p.id === plan.id) >
                         plans.findIndex((p) => p.id === currentPlanId)
                         ? 'Upgrade Plan'
                         : isCurrentPlan && !isBillingPeriodMatch
-                        ? 'Upgrade Plan'
-                        : 'Subscribe'}
+                          ? 'Upgrade Plan'
+                          : 'Subscribe'}
                     </Button>
                   );
                 })()}
@@ -511,19 +607,17 @@ export default function SubscriptionPlans() {
 
               {/* Features List */}
               <CardContent
-                className={`flex-1 px-6 pb-6 ${
-                  plan.isPopular
+                className={`flex-1 px-6 pb-6 ${plan.isPopular
                     ? 'bg-gray-900 text-white'
                     : 'bg-white text-gray-900'
-                }`}
+                  }`}
               >
                 <ol className="space-y-3 list-decimal list-inside">
                   {plan.features.map((feature, index) => (
                     <li
                       key={index}
-                      className={`text-sm ${
-                        plan.isPopular ? 'text-gray-300' : 'text-gray-900'
-                      }`}
+                      className={`text-sm ${plan.isPopular ? 'text-gray-300' : 'text-gray-900'
+                        }`}
                     >
                       {feature}
                     </li>
@@ -555,11 +649,10 @@ export default function SubscriptionPlans() {
                     {plans.map((plan) => (
                       <th
                         key={plan.id}
-                        className={`text-center py-4 px-4 font-semibold ${
-                          plan.isPopular
+                        className={`text-center py-4 px-4 font-semibold ${plan.isPopular
                             ? 'text-primary'
                             : 'text-gray-900 dark:text-white'
-                        }`}
+                          }`}
                       >
                         {plan.name}
                       </th>
@@ -585,9 +678,8 @@ export default function SubscriptionPlans() {
                       {plans.map((plan) => (
                         <td
                           key={plan.id}
-                          className={`text-center py-4 px-4 ${
-                            plan.isPopular ? 'bg-primary/5' : ''
-                          }`}
+                          className={`text-center py-4 px-4 ${plan.isPopular ? 'bg-primary/5' : ''
+                            }`}
                         >
                           <span className="font-semibold text-gray-900 dark:text-white">
                             {plan.limits[row.key as keyof typeof plan.limits]}

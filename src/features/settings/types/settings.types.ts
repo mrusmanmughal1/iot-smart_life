@@ -4,19 +4,25 @@ export interface GeneralSettings {
   id?: string;
   userId?: string;
   language: string;
-  theme: 'light' | 'dark' | 'system';
+  theme: 'light' | 'dark' | 'auto';
   autoRefreshDashboard: boolean;
   dashboardRefreshInterval?: number;
   compactMode: boolean;
   // Legacy support
   autoRefresh?: boolean;
+  emailNotifications: boolean;
+  alarmNotifications: boolean;
+  deviceStatusNotifications: boolean;
+  weeklyReports: boolean;
+  pushNotifications: boolean;
 }
 
 export interface NotificationSettings {
   emailNotifications: boolean;
   alarmNotifications: boolean;
-  deviceStatusChanges: boolean;
+  deviceStatusNotifications: boolean;
   weeklyReports: boolean;
+  pushNotifications: boolean;
 }
 
 export interface SecuritySettings {

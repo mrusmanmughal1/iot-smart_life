@@ -71,7 +71,7 @@ export default function CreateDashboardPage() {
 
       toast.success(t('createDashboard.success') || 'Dashboard created successfully');
       queryClient.invalidateQueries({ queryKey: ['dashboards'] });
-      navigate('/dashboards');
+      navigate('/solution-dashboards');
     } catch (error: unknown) {
       console.error('Failed to create dashboard:', error);
       const errorMessage =
@@ -82,7 +82,7 @@ export default function CreateDashboardPage() {
   };
 
   const handleCancel = () => {
-    navigate('/dashboards');
+    navigate('/solution-dashboards');
   };
 
   return (
