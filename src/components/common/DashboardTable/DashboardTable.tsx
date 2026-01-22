@@ -59,9 +59,12 @@ export interface DashboardTableProps {
     totalPages: number;
     totalItems?: number;
     itemsPerPage?: number;
-    onPageChange: (page: number) => void;
     showItemsPerPage?: boolean;
   };
+  handleNextPage?: () => void;
+  handlePreviousPage?: () => void;
+  handleFirstPage?: () => void;
+  handleLastPage?: () => void;
 }
 
 export function DashboardTable({
@@ -149,11 +152,7 @@ export function DashboardTable({
     }
   };
 
-  const handlePageChange = (page: number) => {
-    if (pagination && page >= 1 && page <= pagination.totalPages) {
-      pagination.onPageChange(page);
-    }
-  };
+  
 
   const handleTitleClick = (id: string) => {
     if (onTitleClick) {

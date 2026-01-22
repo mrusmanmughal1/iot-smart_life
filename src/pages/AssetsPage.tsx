@@ -225,7 +225,6 @@ export default function AssetsPage() {
                   totalPages,
                   totalItems: totalAssets,
                   itemsPerPage,
-                  onPageChange: handlePageChange,
                 }}
               />
             )}
