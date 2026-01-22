@@ -45,14 +45,14 @@ export const TagInput: React.FC<TagInputProps> = ({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center gap-2 min-h-[40px] w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus-within:border-secondary',
+        'flex flex-wrap items-center gap-2 min-h-[40px] w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white focus-within:border-secondary',
         className
       )}
     >
       {value.map((tag, index) => (
         <div
           key={index}
-          className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-gray-100 text-gray-700 rounded-md"
+          className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-white rounded-md"
         >
           <span>{tag}</span>
           {!disabled && (

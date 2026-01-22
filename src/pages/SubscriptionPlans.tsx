@@ -155,7 +155,7 @@ const formatApiCalls = (calls: number): number | string => {
 const formatStorage = (gb: number): string => {
   if (gb === -1) return 'Unlimited';
   if (gb >= 1000) return `${(gb / 1000).toFixed(1)}TB`;
-  return `${gb}GB`;
+  return `${gb}GB Storage Limit`;
 };
 
 const getPlanIcon = (planId: string): React.ReactNode => {
@@ -442,7 +442,7 @@ export default function SubscriptionPlans() {
                     Current Plan:{' '}
                     {plans.find((p) => p.id === currentPlanId)?.name ||
                       currentPlanId}
-                    <Badge className="text-base px-4 bg-secondary dark:bg-gray-900 dark:border-gray-700 text-white">
+                    <Badge className="text-sm font-normal px-4 bg-secondary dark:bg-gray-900 dark:border-gray-700 text-white">
                       {currentSubscriptionResponse.status === 'active'
                         ? 'Active'
                         : currentSubscriptionResponse.status}

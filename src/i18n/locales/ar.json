@@ -35,6 +35,17 @@
     "logout": "تسجيل الخروج",
     "signup": "تسجيل الدخول"
   },
+  "pagination": {
+    "showing": "عرض",
+    "to": "إلى",
+    "of": "من",
+    "results": "نتيجة",
+    "page": "صفحة",
+    "firstPage": "الصفحة الأولى",
+    "previousPage": "الصفحة السابقة",
+    "nextPage": "الصفحة التالية",
+    "lastPage": "الصفحة الأخيرة"
+  },
   "nav": {
     "overview": "نظرة عامة",
     "dashboard": "لوحة التحكم",
@@ -214,7 +225,14 @@
     "ownerRequired": "المالك مطلوب",
     "invalidImageType": "يرجى اختيار ملف صورة",
     "success": "تم إنشاء لوحة المعلومات بنجاح",
-    "error": "فشل إنشاء لوحة المعلومات"
+    "error": "فشل إنشاء لوحة المعلومات",
+    "existingDashboards": "لوحات المعلومات الموجودة",
+    "noDashboards": "لم يتم العثور على لوحات معلومات",
+    "showing": "عرض",
+    "to": "إلى",
+    "of": "من",
+    "results": "نتيجة",
+    "page": "صفحة"
   },
   "createGroup": {
     "title": "إنشاء مجموعة جديدة",
@@ -998,8 +1016,20 @@
   "settings": {
     "title": "الإعدادات",
     "general": "الإعدادات العامة",
+    "description": "إدارة تفضيلات التطبيق",
+    "generalDescription": "إدارة إعدادات التطبيق العامة",
     "language": "اللغة",
     "theme": "السمة",
+    "themeOptions": {
+      "light": "فاتح",
+      "dark": "داكن",
+      "auto": "تلقائي"
+    },
+    "autoRefreshDashboard": "تحديث لوحة التحكم تلقائياً",
+    "autoRefreshDashboardDescription": "تحديث بيانات لوحة التحكم تلقائياً",
+    "compactMode": "وضع المدمج",
+    "compactModeDescription": "عرض المزيد من المعلومات في مساحة أقل",
+    "applyAndSave": "تطبيق وحفظ التفضيلات",
     "notifications": "إعدادات الإشعارات",
     "security": "الأمان",
     "account": "إعدادات الحساب",
@@ -1021,6 +1051,12 @@
       "failedToUpdatePassword": "فشل تحديث كلمة المرور",
       "oldPasswordIncorrect": "كلمة المرور الحالية غير صحيحة",
       "newPasswordSameAsOld": "يجب أن تكون كلمة المرور الجديدة مختلفة عن الحالية"
+    },
+    "tabs": {
+      "general": "عام",
+      "notifications": "الإشعارات",
+      "security": "الأمان",
+      "account": "الحساب"
     }
   },
   "errors": {

@@ -3,15 +3,18 @@ import GridLayout, { Layout } from 'react-grid-layout';
 import { Plus, Trash2, Settings, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { TelemetryWidget, availableDevices } from './TelemetryWidget';
+import { TelemetryWidgetSettings } from './TelemetryWidgetSettings';
+import type { TelemetryWidgetConfig, DeviceTelemetry, MetricType } from './TelemetryWidget';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 export interface Widget {
   id: string;
-  type: 'chart' | 'gauge' | 'svg' | 'text' | 'image' | 'scada';
+  type: 'temperature' | 'humidity' | 'battery' | 'power' | 'signal' | 'telemetry';
   title: string;
-  content?: any;
-  config?: any;
+  content?: DeviceTelemetry[];
+  config?: TelemetryWidgetConfig;
 }
 
 interface WidgetCanvasProps {
@@ -30,6 +33,7 @@ export function WidgetCanvas({
   const [layout, setLayout] = useState<Layout[]>(initialLayout);
   const [widgets, setWidgets] = useState<Widget[]>(initialWidgets);
   const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
+  const [settingsWidgetId, setSettingsWidgetId] = useState<string | null>(null);
 
   console.log(layout, 'layout');
   console.log(widgets, 'widgets');
@@ -45,12 +49,35 @@ export function WidgetCanvas({
   );
 
   const handleAddWidget = useCallback((widgetType: Widget['type']) => {
+    const widgetTitles: Record<Widget['type'], string> = {
+      temperature: 'Temperature Widget',
+      humidity: 'Humidity Widget',
+      battery: 'Battery Widget',
+      power: 'Power Widget',
+      signal: 'Signal Widget',
+      telemetry: 'Live Device Telemetry',
+    };
+
+    const getDefaultConfig = (type: Widget['type']): TelemetryWidgetConfig => {
+      if (type === 'telemetry') {
+        return {
+          refreshInterval: 5000,
+          enabledMetrics: ['temperature', 'humidity', 'battery', 'power', 'signal'] as MetricType[],
+        };
+      }
+      // For specific metric widgets, only show that metric
+      return {
+        refreshInterval: 5000,
+        enabledMetrics: [type as MetricType],
+        deviceId: availableDevices[0].id,
+      };
+    };
+
     const newWidget: Widget = {
       id: `widget-${Date.now()}`,
       type: widgetType,
-      title: `New ${widgetType}`,
-      content: null,
-      config: {},
+      title: widgetTitles[widgetType] || `New ${widgetType}`,
+      config: getDefaultConfig(widgetType),
     };
 
     const newLayoutItem: Layout = {
@@ -80,57 +107,27 @@ export function WidgetCanvas({
   }, [layout, widgets, onSaveLayout]);
 
   const renderWidgetContent = (widget: Widget) => {
-    switch (widget.type) {
-      case 'chart':
-        return (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <div className="text-center">
-              <div className="text-4xl mb-2">📊</div>
-              <p className="text-sm">Chart Widget</p>
-            </div>
-          </div>
-        );
-      case 'gauge':
-        return (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <div className="text-center">
-              <div className="text-4xl mb-2">🎚️</div>
-              <p className="text-sm">Gauge Widget</p>
-            </div>
-          </div>
-        );
-      case 'svg':
-      case 'scada':
-        return (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <div className="text-center">
-              <div className="text-4xl mb-2">🎨</div>
-              <p className="text-sm">SCADA SVG Widget</p>
-              <p className="text-xs mt-2">Drop SVG here</p>
-            </div>
-          </div>
-        );
-      case 'text':
-        return (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <div className="text-center">
-              <div className="text-4xl mb-2">📝</div>
-              <p className="text-sm">Text Widget</p>
-            </div>
-          </div>
-        );
-      case 'image':
-        return (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <div className="text-center">
-              <div className="text-4xl mb-2">🖼️</div>
-              <p className="text-sm">Image Widget</p>
-            </div>
-          </div>
-        );
-      default:
-        return <div className="p-4">Unknown widget type</div>;
+    // All widget types are telemetry-based
+    if (['temperature', 'humidity', 'battery', 'power', 'signal', 'telemetry'].includes(widget.type)) {
+      return (
+        <TelemetryWidget
+          data={widget.content}
+          refreshInterval={widget.config?.refreshInterval}
+          enabledMetrics={widget.config?.enabledMetrics}
+          deviceId={widget.config?.deviceId}
+          onDeviceChange={(deviceId) => {
+            setWidgets((prev) =>
+              prev.map((w) =>
+                w.id === widget.id
+                  ? { ...w, config: { ...w.config, deviceId } }
+                  : w
+              )
+            );
+          }}
+        />
+      );
     }
+    return <div className="p-4">Unknown widget type</div>;
   };
 
   return (
@@ -156,55 +153,63 @@ export function WidgetCanvas({
 
       {/* Widget Library */}
       {showWidgetLibrary && (
-        <div className="absolute top-20 right-4 z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-64">
-          <h3 className="text-lg font-semibold mb-4">Add Widget</h3>
+        <div className="absolute right-4 z-50 dark:bg-gray-800 bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-64">
+          <h3 className="text-lg font-semibold mb-4 dark:text-white">Add Widget</h3>
           <div className="grid grid-cols-2 gap-2">
             <Button
               variant="outline"
-              onClick={() => handleAddWidget('chart')}
-              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleAddWidget('temperature')}
+              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
             >
-              <span className="text-2xl mb-1">📊</span>
-              <span className="text-xs">Chart</span>
+              <span className="text-2xl mb-1">🌡️</span>
+              <span className="text-xs">Temperature</span>
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleAddWidget('gauge')}
-              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleAddWidget('humidity')}
+              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
             >
-              <span className="text-2xl mb-1">🎚️</span>
-              <span className="text-xs">Gauge</span>
+              <span className="text-2xl mb-1">💧</span>
+              <span className="text-xs">Humidity</span>
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleAddWidget('scada')}
-              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleAddWidget('battery')}
+              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
             >
-              <span className="text-2xl mb-1">🎨</span>
-              <span className="text-xs">SCADA SVG</span>
+              <span className="text-2xl mb-1">🔋</span>
+              <span className="text-xs">Battery</span>
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleAddWidget('text')}
-              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleAddWidget('power')}
+              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
             >
-              <span className="text-2xl mb-1">📝</span>
-              <span className="text-xs">Text</span>
+              <span className="text-2xl mb-1">⚡</span>
+              <span className="text-xs">Power</span>
             </Button>
             <Button
               variant="outline"
-              onClick={() => handleAddWidget('image')}
-              className="h-20 flex flex-col items-center justify-center"
+              onClick={() => handleAddWidget('signal')}
+              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
             >
-              <span className="text-2xl mb-1">🖼️</span>
-              <span className="text-xs">Image</span>
+              <span className="text-2xl mb-1">📶</span>
+              <span className="text-xs">Signal</span>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleAddWidget('telemetry')}
+              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+            >
+              <span className="text-2xl mb-1">📡</span>
+              <span className="text-xs">All Metrics</span>
             </Button>
           </div>
         </div>
       )}
 
       {/* Canvas */}
-      <div className="  h-full overflow-auto bg-gray-200">
+      <div className="  h-full overflow-auto bg-gray-200 dark:bg-gray-800">
         {widgets.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <button
@@ -240,18 +245,21 @@ export function WidgetCanvas({
                     </div>
                     {!readOnly && (
                       <div className="flex items-center gap-1">
-                        <button
-                          className="p-1 hover:bg-gray-200 rounded transition-colors"
-                          title="Settings"
-                        >
-                          <Settings className="h-4 w-4 text-gray-600" />
-                        </button>
+                        {['temperature', 'humidity', 'battery', 'power', 'signal', 'telemetry'].includes(widget.type) && (
+                          <button
+                            onClick={() => setSettingsWidgetId(widget.id)}
+                            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                            title="Settings"
+                          >
+                            <Settings className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleRemoveWidget(widget.id)}
-                          className="p-1 hover:bg-red-100 rounded transition-colors"
+                          className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
                           title="Delete"
                         >
-                          <Trash2 className="h-4 w-4 text-red-600" />
+                          <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                         </button>
                       </div>
                     )}
@@ -267,6 +275,32 @@ export function WidgetCanvas({
           </GridLayout>
         )}
       </div>
+
+      {/* Telemetry Widget Settings Dialog */}
+      {settingsWidgetId && (
+        <TelemetryWidgetSettings
+          open={!!settingsWidgetId}
+          onOpenChange={(open) => !open && setSettingsWidgetId(null)}
+          config={widgets.find((w) => w.id === settingsWidgetId)?.config as TelemetryWidgetConfig || {}}
+          onSave={(newConfig) => {
+            setWidgets((prev) =>
+              prev.map((w) =>
+                w.id === settingsWidgetId
+                  ? { ...w, config: { ...w.config, ...newConfig } }
+                  : w
+              )
+            );
+            if (onSaveLayout) {
+              const updatedWidgets = widgets.map((w) =>
+                w.id === settingsWidgetId
+                  ? { ...w, config: { ...w.config, ...newConfig } }
+                  : w
+              );
+              onSaveLayout(layout, updatedWidgets);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -168,7 +168,7 @@ export const DashboardPage = () => {
           </div>
           <Settings className="h-6 w-6" />
         </div>
-        <div className="border dark:border-gray-700 p-4 rounded-lg  border-secondary shadow-xl">
+        <div className="border dark:border-gray-700 p-4 rounded-3xl  border-secondary shadow-xl">
           {/* Solution Category Selection Bar */}
           <div className="relative">
             <div className="flex items-center gap-4 pb-4">

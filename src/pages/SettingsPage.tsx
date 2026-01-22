@@ -38,7 +38,7 @@ export default function SettingsPage() {
             {t('settings.title')}
           </h1>
           <p className="text-slate-500 mt-2 dark:text-white">
-            Manage your application preferences
+            {t('settings.description')}
           </p>
         </div>
 
@@ -46,19 +46,19 @@ export default function SettingsPage() {
           <TabsList className="dark:bg-gray-800 dark:text-white">
             <TabsTrigger value="general" className="dark:text-white">
               <Settings className="h-4 w-4 mr-2" />
-              General
+              {t('settings.tabs.general')}
             </TabsTrigger>
             <TabsTrigger value="notifications" className="dark:text-white">
               <Bell className="h-4 w-4 mr-2" />
-              Notifications
+              {t('settings.tabs.notifications')}
             </TabsTrigger>
             <TabsTrigger value="security" className="dark:text-white">
               <Shield className="h-4 w-4 mr-2" />
-              Security
+              {t('settings.tabs.security')}
             </TabsTrigger>
             <TabsTrigger value="account" className="dark:text-white">
               <User className="h-4 w-4 mr-2" />
-              Account
+              {t('settings.tabs.account')}
             </TabsTrigger>
           </TabsList>
 

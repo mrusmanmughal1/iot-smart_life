@@ -36,15 +36,19 @@ export default function DashboardsPage() {
     handleAction,
     handleRefresh,
     handleTabChange,
+    pagination,
     handleCreateDashboard,
     handleShowCustomerDashboards,
+    handleNextPage,
+    handlePreviousPage,
+    handleFirstPage,
+    handleLastPage,
   } = useDashboardsPage();
-
   // Handle opening import modal
   const handleOpenImportModal = () => {
     setIsImportModalOpen(true);
   };
-
+console.log(dashboards , 'dashboards')
   // Handle importing dashboard from modal
   const handleImportFromModal = async (file: File) => {
     setIsImporting(true);
@@ -174,6 +178,11 @@ export default function DashboardsPage() {
               data={dashboards}
               onStatusToggle={handleStatusToggle}
               onAction={handleAction}
+              pagination={pagination}  
+              handleNextPage={handleNextPage}
+              handlePreviousPage={handlePreviousPage}
+              handleFirstPage={handleFirstPage}
+              handleLastPage={handleLastPage}
             />
             )}
           </CardContent>

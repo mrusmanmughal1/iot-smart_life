@@ -7,13 +7,18 @@ import { dashboardsApi } from '@/services/api';
 import type {
   Dashboard,
   DashboardQuery,
-  PaginatedResponse,
 } from '@/services/api/dashboards.api';
 import type { DashboardTableItem } from '@/components/common/DashboardTable';
 
-// API response wrapper structure: { data: PaginatedResponse<T> }
+// API response structure: { json: { data: T[], total: number, page: number, limit: number, totalPages: number } }
 interface ApiResponseWrapper<T> {
-  data: PaginatedResponse<T>;
+  data: {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 export type DashboardTab = 'all' | 'group';
@@ -33,11 +38,12 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
 
   const [selectedTab, setSelectedTab] = useState<DashboardTab>(initialTab);
   const [search, setSearch] = useState(searchQuery);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Build query params based on tab and search
   const queryParams = useMemo((): DashboardQuery => {
     const params: DashboardQuery = {
-      page: 1,
+      page: currentPage,
       limit: 10,
     };
 
@@ -51,7 +57,7 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
     }
 
     return params;
-  }, [selectedTab, search]);
+  }, [selectedTab, search, currentPage]);
 
   // Fetch dashboards
   const {
@@ -61,9 +67,29 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
     error,
     refetch,
   } = useDashboards(queryParams);
+  // Extract pagination info from response
+  const paginationInfo = useMemo(() => {
+    const responseData = dashboardsResponse?.data as
+      | ApiResponseWrapper<Dashboard>
+      | undefined;
+    if (!responseData?.data) {
+      return {
+        currentPage: 1,
+        totalPages: 0,
+        totalItems: 0,
+        itemsPerPage: 10,
+      };
+    }
+    return {
+      currentPage: responseData.data.page || 1,
+      totalPages: responseData.data.totalPages || 0,
+      totalItems: responseData.data.total || 0,
+      itemsPerPage: responseData.data.limit || 10,
+    };
+  }, [dashboardsResponse]);
 
   // Transform API Dashboard data to DashboardTableItem format
-  // API response structure: { data: { data: [...], meta: {...} } }
+  // API response structure: { data: { data: [...], total, page, limit, totalPages } }
   const dashboards: DashboardTableItem[] = useMemo(() => {
     // Type assertion for nested response structure
     const responseData = dashboardsResponse?.data as
@@ -229,11 +255,18 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
   // Handle search
   const handleSearch = (query: string) => {
     setSearch(query);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   // Handle tab change
   const handleTabChange = (tab: DashboardTab) => {
     setSelectedTab(tab);
+    setCurrentPage(1); // Reset to first page when changing tabs
+  };
+
+  // Handle page change for pagination
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   // Handle create new dashboard
@@ -283,6 +316,18 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
     });
     // You could add a filter state here
   };
+  const handleNextPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
+  const handlePreviousPage = () => {
+    setCurrentPage(currentPage - 1);
+  };
+  const handleFirstPage = () => {
+    setCurrentPage(1);
+  };
+  const handleLastPage = () => {
+    setCurrentPage(paginationInfo.totalPages);
+  };
 
   return {
     // State
@@ -292,6 +337,7 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
     isLoading,
     isError,
     error,
+    pagination: paginationInfo,
 
     // Actions
     handleStatusToggle,
@@ -299,10 +345,14 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
     handleRefresh,
     handleSearch,
     handleTabChange,
+    handlePageChange,
     handleCreateDashboard,
     handleImportDashboard,
     handleShowCustomerDashboards,
-
+    handleNextPage,
+    handlePreviousPage,
+    handleFirstPage,
+    handleLastPage,
     // Direct access to refetch
     refetch,
   };

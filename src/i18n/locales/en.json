@@ -35,6 +35,17 @@
     "logout": "Logout",
     "signup": "Signup"
   },
+  "pagination": {
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
+    "page": "Page",
+    "firstPage": "First page",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "lastPage": "Last page"
+  },
   "nav": {
     "overview": "Overview",
     "dashboard": "Dashboard",
@@ -216,7 +227,14 @@
     "ownerRequired": "Owner is required",
     "invalidImageType": "Please select an image file",
     "success": "Dashboard created successfully",
-    "error": "Failed to create dashboard"
+    "error": "Failed to create dashboard",
+    "existingDashboards": "Existing Dashboards",
+    "noDashboards": "No dashboards found",
+    "showing": "Showing",
+    "to": "to",
+    "of": "of",
+    "results": "results",
+    "page": "Page"
   },
   "createGroup": {
     "title": "Create New Group",
@@ -1021,8 +1039,20 @@
   "settings": {
     "title": "Settings",
     "general": "General Settings",
+    "description": "Manage your application preferences",
+    "generalDescription": "Manage your general application settings",
     "language": "Language",
     "theme": "Theme",
+    "themeOptions": {
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Auto"
+    },
+    "autoRefreshDashboard": "Auto-refresh Dashboard",
+    "autoRefreshDashboardDescription": "Automatically refresh dashboard data",
+    "compactMode": "Compact Mode",
+    "compactModeDescription": "Display more information in less space",
+    "applyAndSave": "Apply & Save Preferences",
     "notifications": "Notification Settings",
     "security": "Security",
     "account": "Account Settings",
@@ -1044,6 +1074,12 @@
       "failedToUpdatePassword": "Failed to update password",
       "oldPasswordIncorrect": "Current password is incorrect",
       "newPasswordSameAsOld": "New password must be different from current password"
+    },
+    "tabs": {
+      "general": "General",
+      "notifications": "Notifications",
+      "security": "Security",
+      "account": "Account"
     }
   },
   "errors": {

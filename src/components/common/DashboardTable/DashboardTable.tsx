@@ -5,7 +5,6 @@ import {
   Eye,
   Trash2,
   Download,
-  Share2,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -83,6 +82,10 @@ export function DashboardTable({
   translationKeys = {},
   emptyMessage,
   pagination,
+  handleNextPage,
+  handlePreviousPage,
+  handleFirstPage,
+  handleLastPage,
 }: DashboardTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -386,7 +389,7 @@ export function DashboardTable({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handlePageChange(1)}
+              onClick={handleFirstPage}
               disabled={pagination.currentPage === 1}
               className="h-8 w-8"
               aria-label="First page"
@@ -396,7 +399,7 @@ export function DashboardTable({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handlePageChange(pagination.currentPage - 1)}
+              onClick={handlePreviousPage}
               disabled={pagination.currentPage === 1}
               className="h-8 w-8"
               aria-label="Previous page"
@@ -411,7 +414,7 @@ export function DashboardTable({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handlePageChange(pagination.currentPage + 1)}
+              onClick={handleNextPage}
               disabled={pagination.currentPage === pagination.totalPages}
               className="h-8 w-8"
               aria-label="Next page"
@@ -421,7 +424,7 @@ export function DashboardTable({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => handlePageChange(pagination.totalPages)}
+              onClick={handleLastPage}
               disabled={pagination.currentPage === pagination.totalPages}
               className="h-8 w-8"
               aria-label="Last page"

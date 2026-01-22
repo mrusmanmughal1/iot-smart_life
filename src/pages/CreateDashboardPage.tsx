@@ -11,6 +11,7 @@ import { TagInput } from '@/components/common/TagInput';
 import { dashboardsApi } from '@/services/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+ 
 
 // Zod validation schema
 const createDashboardSchema = z.object({
@@ -54,6 +55,8 @@ export default function CreateDashboardPage() {
     mode: 'onChange',
   });
 
+  
+
   const onSubmit = async (data: CreateDashboardFormData) => {
     try {
       // Prepare dashboard data
@@ -88,18 +91,20 @@ export default function CreateDashboardPage() {
   return (
       <div className="space-y-6">
         {/* Header */}
-        <h1 className="text-2xl font-semibold text-gray-900">
+        <h1 className="text-2xl font-semibold dark:text-white text-gray-900">
           {t('createDashboard.title') || 'Create New Dashboard'}
         </h1>
-        {/* Form Card */}
-        <Card className="shadow-lg rounded-xl border-gray-200">
+        
+        <div className="grid   gap-6">
+          {/* Form Card */}
+          <Card className="shadow-lg rounded-xl border-gray-200">
           <CardContent className="p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Dashboard Title */}
               <div>
                 <label
                   htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium dark:text-white text-gray-700 mb-2"
                 >
                   {t('createDashboard.dashboardTitle') || 'Dashboard Title'} *
                 </label>
@@ -118,7 +123,7 @@ export default function CreateDashboardPage() {
               <div>
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium dark:text-white text-gray-700 mb-2"
                 >
                   {t('createDashboard.description') || 'Description'}
                 </label>
@@ -135,13 +140,13 @@ export default function CreateDashboardPage() {
 
               {/* Owner and Groups Section */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-lg font-semibold dark:text-white text-gray-900">
                   {t('createDashboard.ownerAndGroups') || 'Owner and Groups'}
                 </h2>
 
                 {/* Owner Field */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium dark:text-white text-gray-700 mb-2">
                     {t('createDashboard.owner') || 'Owner'} *
                   </label>
                   <Controller
@@ -163,7 +168,7 @@ export default function CreateDashboardPage() {
 
                 {/* Groups Field */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium dark:text-white text-gray-700 mb-2">
                     {t('createDashboard.groups') || 'Groups'}
                   </label>
                   <Controller
@@ -190,14 +195,14 @@ export default function CreateDashboardPage() {
                   variant="outline"
                   onClick={handleCancel}
                   disabled={isSubmitting}
-                  className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
+                  className="bg-white border-gray-300 dark:text-white text-gray-700 hover:bg-gray-50"
                 >
                   {t('createDashboard.cancel') || 'Cancel'}
                 </Button>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-secondary hover:bg-secondary/90 text-white"
+                  className="bg-secondary hover:bg-secondary/90 dark:text-white text-white"
                   isLoading={isSubmitting}
                 >
                   {t('createDashboard.save') || 'Save'}
@@ -206,6 +211,9 @@ export default function CreateDashboardPage() {
             </form>
           </CardContent>
         </Card>
+
+       
+        </div>
       </div>
   );
 }
