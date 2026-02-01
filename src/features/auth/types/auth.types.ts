@@ -6,6 +6,7 @@ export interface User {
   role: string;
   createdAt?: string;
   updatedAt?: string;
+  companyName?:string;
 }
 
 export interface LoginCredentials {

@@ -139,17 +139,16 @@ export default function SolutionTemplates() {
                   <button
                     key={category.key}
                     onClick={() => handleCategoryChange(category.key)}
-                    className={`  flex-shrink-0 p-4  rounded-xl transition-all flex flex-col items-center dark:bg-gray-800 dark:text-white gap-3 ${
-                      selectedCategory === category.key
-                        ? 'bg-primary text-white shadow-md hover:bg-gray-50 border border-gray-200'
+                    className={`  flex-shrink-0 p-4  rounded-xl transition-all flex flex-col items-center dark:bg-gray-800 dark:text-white gap-3 ${selectedCategory === category.key
+                        ? 'bg-primary text-white shadow-md hover:bg-gray-400 border border-gray-200'
                         : 'bg-white text-gray-700 '
-                    }`}
+                      }`}
                   >
                     {/* <category.icon className="h-10 w-10" /> */}
                     <span className="text-sm font-medium dark:text-white">
                       {t(
                         category.translationKey ||
-                          `solutionTemplates.categories.${category.key}`
+                        `solutionTemplates.categories.${category.key}`
                       )}
                     </span>
                   </button>
@@ -239,11 +238,10 @@ export default function SolutionTemplates() {
                         {t('solutionTemplates.preview')}
                       </Button>
                       <Button
-                        className={`flex-1 ${
-                          template.isActivated
+                        className={`flex-1 ${template.isActivated
                             ? 'bg-secondary hover:bg-secondary/90 text-white'
                             : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
-                        }`}
+                          }`}
                       >
                         {template.isActivated
                           ? t('solutionTemplates.activated')

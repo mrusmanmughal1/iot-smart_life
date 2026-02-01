@@ -18,6 +18,7 @@ export interface User {
   name: string;
   role: UserRole;
   status: UserStatus;
+  companyName:string;
   tenantId?: string;
   customerId?: string;
   phone?: string;
@@ -104,11 +105,11 @@ export const usersApi = {
   delete: (id: string) => apiClient.delete(`/users/${id}`),
 
   // Get current user
-  getCurrentUser: () => apiClient.get<ApiResponse<User>>('/users/me'),
+  getCurrentUser: () => apiClient.get < ApiResponse<User>>('/auth/me'),
 
   // Update current user profile
   updateProfile: (data: Partial<User>) =>
-    apiClient.patch<ApiResponse<User>>('/users/me', data),
+    apiClient.patch<ApiResponse<User>>('/auth/profile', data),
 
   // Change password
   changePassword: (oldPassword: string, newPassword: string) =>

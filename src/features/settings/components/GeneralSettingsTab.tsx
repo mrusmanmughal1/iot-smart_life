@@ -27,28 +27,29 @@ import { useThemeStore } from '@/stores/useThemeStore';
 export function GeneralSettingsTab({ settings, isLoading, handleSaveAll, isSaving }
   : { settings: GeneralSettings | undefined, isLoading: boolean, handleSaveAll: (settings: Partial<GeneralSettings>) => void, isSaving: boolean }) {
   const { t, i18n } = useTranslation();
-  const { theme, setTheme } = useThemeStore();
+  const { theme, setTheme, language, setLanguage } = useThemeStore();
 
 
   const [localSettings, setLocalSettings] = useState<Partial<GeneralSettings>>({
-    language: settings?.language ?? '',
+    language: settings?.language ?? language,
     theme: settings?.theme ?? theme,
     autoRefreshDashboard: settings?.autoRefreshDashboard ?? false,
     compactMode: settings?.compactMode ?? false,
   });
-
+   
   // Track previous settings values to only sync when settings prop actually changes from API
   const prevSettingsRef = useRef<{ theme?: string; language?: string } | null>(null);
-  
+
   useEffect(() => {
     // Only sync when settings prop changes (from API), not when theme store changes
     // Compare theme and language values to detect actual API updates
     if (settings) {
+     
       const currentKey = `${settings.theme}-${settings.language}`;
-      const prevKey = prevSettingsRef.current 
+      const prevKey = prevSettingsRef.current
         ? `${prevSettingsRef.current.theme}-${prevSettingsRef.current.language}`
         : null;
-      
+
       if (currentKey !== prevKey) {
         setLocalSettings({
           language: settings.language ?? '',
@@ -69,6 +70,7 @@ export function GeneralSettingsTab({ settings, isLoading, handleSaveAll, isSavin
     setLocalSettings({ ...localSettings, language: value });
     // Update i18n language immediately for display
     i18n.changeLanguage(value);
+    setLanguage(value);
   };
 
   // Handle theme change - update UI immediately but don't call API
@@ -82,6 +84,7 @@ export function GeneralSettingsTab({ settings, isLoading, handleSaveAll, isSavin
   const handleAllSettingsSave = () => {
     handleSaveAll(localSettings);
   };
+
   if (isLoading || !settings) {
     return (
       <Card>
@@ -93,6 +96,7 @@ export function GeneralSettingsTab({ settings, isLoading, handleSaveAll, isSavin
       </Card>
     );
   }
+
   return (
     <Card>
       <CardHeader>
@@ -103,6 +107,7 @@ export function GeneralSettingsTab({ settings, isLoading, handleSaveAll, isSavin
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
+          
           <Label
             htmlFor="language"
             className="flex text-gray-600 dark:text-white items-center gap-2"
@@ -110,13 +115,16 @@ export function GeneralSettingsTab({ settings, isLoading, handleSaveAll, isSavin
             <Globe className="h-4 w-4" />
             {t('settings.language')}
           </Label>
-          <Select value={localSettings.language || 'en'} onValueChange={handleLanguageChange}>
+          <Select 
+            key={`lang-${localSettings.language ?? language}`}
+            value={localSettings.language ?? language} 
+            onValueChange={handleLanguageChange}>
             <SelectTrigger className="dark:bg-gray-800 dark:text-white">
-              <SelectValue />
+              <SelectValue placeholder={language} />
             </SelectTrigger>
             <SelectContent className="dark:bg-gray-800 dark:text-white">
               {languages.map((lang) => (
-                <SelectItem key={lang.code} value={lang.code} >
+                <SelectItem key={lang.code} value={lang.code} textValue={`${lang.name} (${lang.nativeName})`}>
                   {lang.flag} {lang.name} ({lang.nativeName})
                 </SelectItem>
               ))}
@@ -132,16 +140,17 @@ export function GeneralSettingsTab({ settings, isLoading, handleSaveAll, isSavin
             {t('settings.theme')}
           </Label>
           <Select
+            key={`theme-${localSettings.theme ?? theme}`}
             value={localSettings.theme ?? theme}
             onValueChange={handleThemeChange}
           >
             <SelectTrigger className="dark:bg-gray-800 dark:text-white">
-              <SelectValue />
+              <SelectValue placeholder={theme} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="light" >{t('settings.themeOptions.light')}</SelectItem>
-              <SelectItem value="dark" >{t('settings.themeOptions.dark')}</SelectItem>
-              <SelectItem value="auto" >{t('settings.themeOptions.auto')}</SelectItem>
+              <SelectItem value="light" textValue={t('settings.themeOptions.light')}>{t('settings.themeOptions.light')}</SelectItem>
+              <SelectItem value="dark" textValue={t('settings.themeOptions.dark')}>{t('settings.themeOptions.dark')}</SelectItem>
+              <SelectItem value="auto" textValue={t('settings.themeOptions.auto')}>{t('settings.themeOptions.auto')}</SelectItem>
             </SelectContent>
           </Select>
         </div>

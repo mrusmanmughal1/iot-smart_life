@@ -33,7 +33,23 @@
     "nextBilling": "Next Billing",
     "settings": "Settings",
     "logout": "Logout",
-    "signup": "Signup"
+    "profile": "Profile",
+    "updateYourProfile": "Update your profile information",
+    "phoneNumber": "Phone Number",
+    "invalidPhone": "Invalid phone number",
+    "invalidEmail": "Invalid email",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "email": "Email",
+    "emailNotEditable": "Email cannot be changed.",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email",
+    "phone": "Phone",
+    "phonePlaceholder": "Enter your phone number",
+    "phoneRequired": "Phone number is required",
+    "phoneInvalid": "Invalid phone number",
+    "signup": "Signup",
+    "companyName": "Company Name"
   },
   "pagination": {
     "showing": "Showing",
@@ -63,7 +79,7 @@
     "multiFloorBuildingView": "Multi Floor Building  ",
     "alerts": "Alerts",
     "alarms": "Alarms",
-    "analytics": "Analytics",   
+    "analytics": "Analytics",
     "alertConfiguration": "Alert Configuration",
     "users": "Users & Roles",
     "history": "History",
@@ -509,18 +525,17 @@
   "assetProfiles": {
     "title": "Asset Profiles",
     "subtitle": "Manage your asset hierarchy and relationships.",
-      "totalProfiles": "Total Profiles",
-      "assetConfigurations": "Asset configurations",
-      "totalAssets": "Total Assets",
-      "usingTheseProfiles": "Using these profiles",
-      "industrial": "Industrial",
-      "facilities": "Facilities",
-      "commercial": "Commercial",
-      "buildings": "Buildings",
-      "createProfile": "Create Profile"
-    },
+    "totalProfiles": "Total Profiles",
+    "assetConfigurations": "Asset configurations",
+    "totalAssets": "Total Assets",
+    "usingTheseProfiles": "Using these profiles",
+    "industrial": "Industrial",
+    "facilities": "Facilities",
+    "commercial": "Commercial",
+    "buildings": "Buildings",
+    "createProfile": "Create Profile"
+  },
   "assets": {
-    
     "title": "Assets",
     "subtitle": "Manage your asset hierarchy and relationships.",
     "addAsset": "Add Asset",
@@ -578,26 +593,21 @@
       "customer": "Customer",
       "created": "Created",
       "lastActivity": "Last activity",
-
       "connectedDevices": "Connected Devices",
       "activeDevices": "Active Devices",
       "offline": "offline",
       "warning": "warning",
-
       "recentActivity": "Recent Activity",
       "deviceAdded": "Device added",
       "alarmTriggered": "Alarm triggered",
       "configUpdated": "Configuration updated",
       "ago": "ago",
-
       "assetHierarchy": "Asset Hierarchy",
-
       "floors": {
         "floor1": "Floor 1",
         "floor2": "Floor 2",
         "basement": "Basement"
       },
-
       "devices": {
         "temperatureSensor": "Temperature Sensor",
         "hvacController": "HVAC Controller"
@@ -631,9 +641,10 @@
     "remove": "Remove",
     "cancel": "Cancel",
     "save": "Save",
+    "noProfiles": "No profiles",
+    "noParents": "No parent assets",
     "nameRequired": "Asset name is required",
     "typeRequired": "Asset type is required",
-
     "status": {
       "active": "Active",
       "warning": "Warning",
@@ -703,6 +714,7 @@
     "editPlan": "Edit Plan",
     "close": "Close",
     "view": "View",
+    "name": "Name",
     "edit": "Edit",
     "devices": "Devices",
     "zones": "Zones",
@@ -1114,7 +1126,6 @@
       "loginWithGoogle": "Sign in with Google",
       "loginWithGithub": "Sign in with GitHub",
       "donthaveaccount": "Don't have an account?"
-      
     },
     "register": {
       "title": "Create Account",
@@ -1149,7 +1160,8 @@
       "signIn": "Login",
       "signUpWithGoogle": "Sign up with Google",
       "signUpWithApple": "Sign up with Apple",
-      "signUpWithGithub": "Sign up with Github"
+      "signUpWithGithub": "Sign up with Github",
+      "companyName": "Company Name (Optional)"
     },
     "forgotPassword": {
       "title": "Forgot Password",
@@ -1238,5 +1250,9 @@
       "roleSelectedSuccessfully": "Role selected successfully",
       "failedToSelectRole": "Failed to select role"
     }
+  },
+  "CommonPrifleSchema": {
+    "name": "Name Must have atleast 2 characters",
+    "invalidPhone": "Invalid phone number"
   }
 }

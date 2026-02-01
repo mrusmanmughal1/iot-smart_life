@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm, type Resolver, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,37 +13,74 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { useAccountSettings } from '../hooks';
 import { userService } from '@/features/users/services/usersService';
-
+import { usersApi } from '@/services/api';
+import { useGetCurrentUser } from '../hooks/useAccountSettings';
+import { createChangePasswordSchema, createProfileSchema } from "../Schema";
 type ChangePasswordFormData = z.infer<ReturnType<typeof createChangePasswordSchema>>;
-
-const createChangePasswordSchema = (t: (key: string) => string) => z.object({
-  currentPassword: z.string().min(1, t('settings.changePassword.passwordRequired')),
-  newPassword: z.string().min(8, t('settings.changePassword.passwordMinLength')),
-  confirmPassword: z.string().min(1, t('settings.changePassword.confirmPasswordRequired')),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: t('settings.changePassword.passwordsDoNotMatch'),
-  path: ['confirmPassword'],
-}).refine((data) => data.currentPassword !== data.newPassword, {
-  message: t('settings.changePassword.newPasswordSameAsOld'),
-  path: ['newPassword'],
-});
+type ProfileFormData = z.input<ReturnType<typeof createProfileSchema>>;
 
 export function AccountTab() {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { settings, isLoading } = useAccountSettings();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const changePasswordSchema = createChangePasswordSchema(t);
+  const profileSchema = createProfileSchema(t);
 
+  //  change password  api call 
   const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
+    register: registerPassword,
+    handleSubmit: handleSubmitPassword,
+    formState: { errors: passwordErrors },
+    reset: resetPassword,
   } = useForm<ChangePasswordFormData>({
     resolver: zodResolver(changePasswordSchema),
+  });
+
+  const { data: currentUser, isLoading: isLoadingUser } = useGetCurrentUser()
+  // update profile
+  const {
+    register: registerProfile,
+    handleSubmit: handleSubmitProfile,
+    formState: { errors: profileErrors, isDirty: isProfileDirty },
+    reset: resetProfile,
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema) as unknown as Resolver<ProfileFormData>,
+    defaultValues: {
+      name: currentUser?.name ?? '',
+      email: currentUser?.email ?? '',
+      phone: currentUser?.phone ?? '',
+      companyName: currentUser?.companyName ?? ''
+    },
+  });
+
+  useEffect(() => {
+    if (!currentUser) return;
+    resetProfile({
+      name: currentUser.name ?? '',
+      email: currentUser.email ?? '',
+      phone: currentUser.phone ?? '',
+    });
+  }, [currentUser, resetProfile]);
+
+  const { mutate: updateProfile, isPending: isUpdatingProfile } = useMutation({
+    mutationFn: async (data: { name: string; phone?: string }) => usersApi.updateProfile(data),
+    onSuccess: () => {
+      toast.success(t('common.saved') || 'Saved');
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    },
+    onError: (error: unknown) => {
+      const errorMessage =
+        (error && typeof error === 'object' && 'response' in error &&
+          error.response && typeof error.response === 'object' && 'data' in error.response &&
+          error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data &&
+          typeof error.response.data.message === 'string')
+          ? error.response.data.message
+          : (t('common.somethingWentWrong') || 'Something went wrong');
+      toast.error(errorMessage);
+    },
   });
 
   const { mutate: changePassword, isPending } = useMutation({
@@ -51,7 +88,7 @@ export function AccountTab() {
       userService.changePassword(currentPassword, newPassword),
     onSuccess: () => {
       toast.success(t('settings.changePassword.passwordUpdatedSuccessfully'));
-      reset();
+      resetPassword();
     },
     onError: (error: unknown) => {
       const errorMessage =
@@ -75,10 +112,17 @@ export function AccountTab() {
     },
   });
 
-  const onSubmit = (data: ChangePasswordFormData) => {
+  const onSubmitPassword = (data: ChangePasswordFormData) => {
     changePassword({
       currentPassword: data.currentPassword,
       newPassword: data.newPassword,
+    });
+  };
+
+  const onSubmitProfile = (data: ProfileFormData) => {
+    updateProfile({
+      name: data.name.trim(),
+      phone: data.phone ? data.phone.trim() : undefined,
     });
   };
 
@@ -87,7 +131,7 @@ export function AccountTab() {
   const storageTotal = settings?.storageTotal || 10;
   const storagePercentage = (storageUsed / storageTotal) * 100;
 
-  if (isLoading) {
+  if (isLoading || isLoadingUser) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -101,6 +145,94 @@ export function AccountTab() {
 
   return (
     <>
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>{t('common.profile') || 'Profile'}</CardTitle>
+          <CardDescription>
+            {t('common.updateYourProfile') || 'Update your account information'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmitProfile(onSubmitProfile as unknown as SubmitHandler<ProfileFormData>)} className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="profileName">{t('common.name') || 'Name'}</Label>
+                <Input
+                  id="profileName"
+                  placeholder={t('common.name') || 'Name'}
+                  {...registerProfile('name')}
+                  error={profileErrors.name?.message}
+                  className="border rounded-md"
+                />
+              </div>
+
+              <div className="space-y-2 relative">
+                <Label htmlFor="profileEmail">{t('common.email') || 'Email'}</Label>
+                <Input
+                  id="profileEmail"
+                  placeholder={t('common.email') || 'Email'}
+                  {...registerProfile('email')}
+                  disabled
+                  className="border rounded-md opacity-80 disabled:opacity-100  disabled:cursor-not-allowed disabled:text-gray-500 disabled:bg-gray-100"
+                />
+                <div
+                  className="absolute bottom-full left-1/2 mb-2 w-max
+           -translate-x-1/2 scale-0
+           rounded bg-gray-900 px-2 py-1 text-xs text-white
+           transition-all group-hover:scale-100">
+                  Tooltip text
+                </div>
+
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="companyName">{t('common.companyName') || 'Company Name'}</Label>
+              <Input
+                type="tel"
+                id="companyName"
+                placeholder={t('common.companyName') || 'Phone Number'}
+                {...registerProfile('companyName')}
+                error={profileErrors.phone?.message}
+                className="border rounded-md"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="profilePhone">{t('common.phoneNumber') || 'Phone Number'}</Label>
+              <Input
+                type="tel"
+                id="profilePhone"
+                placeholder={t('common.phoneNumber') || 'Phone Number'}
+                {...registerProfile('phone')}
+                error={profileErrors.phone?.message}
+                className="border rounded-md"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="submit" disabled={isUpdatingProfile || !isProfileDirty}>
+                {isUpdatingProfile ? (t('common.saving') || 'Saving...') : (t('common.save') || 'Save')}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  if (!currentUser) return;
+                  resetProfile({
+                    name: currentUser.name ?? '',
+                    email: currentUser.email ?? '',
+                    phone: currentUser.phone ?? '',
+                  });
+                }}
+                disabled={isUpdatingProfile || !isProfileDirty}
+              >
+                {t('common.cancel') || 'Cancel'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Account Settings</CardTitle>
@@ -114,11 +246,6 @@ export function AccountTab() {
               <p className="text-sm text-purple-700 dark:text-white">Full access to all features</p>
             </div>
           </div>
-
-
-
-
-
 
           <div className="space-y-2">
             <Label>Storage Used</Label>
@@ -138,7 +265,7 @@ export function AccountTab() {
             </div>
           </div>
 
-
+          <Separator />
 
           <div className="space-y-2">
             <Label className="text-red-600 dark:text-white">Danger Zone</Label>
@@ -163,7 +290,7 @@ export function AccountTab() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleSubmitPassword(onSubmitPassword)} className="space-y-4">
               {/* Current Password */}
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">{t('settings.changePassword.currentPassword')}</Label>
@@ -171,8 +298,8 @@ export function AccountTab() {
                   id="currentPassword"
                   type={showCurrentPassword ? 'text' : 'password'}
                   placeholder={t('settings.changePassword.currentPasswordPlaceholder')}
-                  {...register('currentPassword')}
-                  error={errors.currentPassword?.message}
+                  {...registerPassword('currentPassword')}
+                  error={passwordErrors.currentPassword?.message}
                   className="border rounded-md"
                   icon={
                     <button
@@ -194,9 +321,9 @@ export function AccountTab() {
                   id="newPassword"
                   type={showNewPassword ? 'text' : 'password'}
                   placeholder={t('settings.changePassword.newPasswordPlaceholder')}
-                  {...register('newPassword')}
+                  {...registerPassword('newPassword')}
                   className="border rounded-md"
-                  error={errors.newPassword?.message}
+                  error={passwordErrors.newPassword?.message}
                   icon={
                     <button
                       type="button"
@@ -217,8 +344,8 @@ export function AccountTab() {
                   id="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder={t('settings.changePassword.confirmPasswordPlaceholder')}
-                  {...register('confirmPassword')}
-                  error={errors.confirmPassword?.message}
+                  {...registerPassword('confirmPassword')}
+                  error={passwordErrors.confirmPassword?.message}
                   className="border rounded-md"
                   icon={
                     <button

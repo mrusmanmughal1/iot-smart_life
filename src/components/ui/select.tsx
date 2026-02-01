@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
 interface SelectContextValue {
@@ -6,6 +6,8 @@ interface SelectContextValue {
   onValueChange: (value: string) => void;
   open: boolean;
   setOpen: (open: boolean) => void;
+  registerItem: (value: string, label: string) => void;
+  getItemLabel: (value: string) => string | undefined;
 }
 
 const SelectContext = createContext<SelectContextValue | undefined>(undefined);
@@ -21,6 +23,7 @@ interface SelectProps {
 export function Select({ value: controlledValue, onValueChange, defaultValue = '', children, className = '' }: SelectProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [open, setOpen] = useState(false);
+  const [itemLabels, setItemLabels] = useState<Record<string, string>>({});
 
   const value = controlledValue !== undefined ? controlledValue : internalValue;
   
@@ -32,8 +35,24 @@ export function Select({ value: controlledValue, onValueChange, defaultValue = '
     setOpen(false);
   };
 
+  const registerItem = useCallback((itemValue: string, label: string) => {
+    if (!label) return;
+    setItemLabels((prev) => (prev[itemValue] === label ? prev : { ...prev, [itemValue]: label }));
+  }, []);
+
+  const getItemLabel = useCallback((itemValue: string) => itemLabels[itemValue], [itemLabels]);
+
   return (
-    <SelectContext.Provider value={{ value, onValueChange: handleValueChange, open, setOpen }}>
+    <SelectContext.Provider
+      value={{
+        value,
+        onValueChange: handleValueChange,
+        open,
+        setOpen,
+        registerItem,
+        getItemLabel,
+      }}
+    >
       <div className={`relative ${className}`}>
         {children}
       </div>
@@ -45,6 +64,7 @@ interface SelectTriggerProps {
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
+  
   id?: string;
 }
 
@@ -80,10 +100,12 @@ export function SelectValue({ placeholder = 'Select...', className = '' }: Selec
   if (!context) {
     throw new Error('SelectValue must be used within Select');
   }
+   
+  const label = context.value ? context.getItemLabel(context.value) : undefined;
 
   return (
     <span className={`dark:text-white ${className}`}>
-      {context.value || placeholder}
+      {label || placeholder}
     </span>
   );
 }
@@ -101,23 +123,25 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
     throw new Error('SelectContent must be used within Select');
   }
 
+  const { open, setOpen } = context;
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (contentRef.current && !contentRef.current.contains(event.target as Node)) {
-        context.setOpen(false);
+        setOpen(false);
       }
     };
 
-    if (context.open) {
+    if (open) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [context.open]);
+  }, [open, setOpen]);
 
-  if (!context.open) {
+  if (!open) {
     return null;
   }
 
@@ -134,11 +158,12 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
 interface SelectItemProps {
   value: string;
   children: React.ReactNode;
+  textValue?: string;
   className?: string;
   disabled?: boolean;
 }
 
-export function SelectItem({ value, children, className = '', disabled = false }: SelectItemProps) {
+export function SelectItem({ value, children, textValue, className = '', disabled = false }: SelectItemProps) {
   const context = useContext(SelectContext);
   
   if (!context) {
@@ -146,6 +171,12 @@ export function SelectItem({ value, children, className = '', disabled = false }
   }
 
   const isSelected = context.value === value;
+
+  useEffect(() => {
+    const inferred =
+      typeof children === 'string' || typeof children === 'number' ? String(children) : '';
+    context.registerItem(value, textValue ?? inferred);
+  }, [children, context, textValue, value]);
 
   return (
     <div

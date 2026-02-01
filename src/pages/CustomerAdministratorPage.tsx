@@ -175,11 +175,10 @@ const permissions: Permission[] = [
 const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
   return (
     <div
-      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-        granted
+      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${granted
           ? 'bg-green-500 border-green-500'
           : 'bg-gray-200 border-gray-300'
-      }`}
+        }`}
     >
       {granted && (
         <svg
@@ -353,11 +352,8 @@ export default function CustomerAdministratorPage() {
                     ([category, categoryPermissions]) => (
                       <Card
                         key={category}
-                        className={`${
-                          category === 'Report Generation'
-                            ? 'bg-green-50 border-green-200'
-                            : 'bg-white dark:bg-gray-900 dark:border-gray-700'
-                        }`}
+                        className={`${'bg-white hover:bg-green-50 dark:bg-gray-900 dark:border-gray-700'
+                          }`}
                       >
                         <CardHeader>
                           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">

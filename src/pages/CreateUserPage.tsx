@@ -16,11 +16,12 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { useCreateUser, useRoles } from '@/features/users/hooks';
 import { useCustomers } from '@/features/customer/hooks';
+import type { Role } from '@/services/api/users.api';
+import type { Customer } from '@/features/customer/types';
 import { UserRole, UserStatus } from '@/services/api/users.api';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 
-// Zod validation schema
 const createUserSchema = z.object({
   contactEmail: z.string().min(1, 'Contact email is required'),
   email: z.string().email('Email must be valid').min(1, 'Email is required'),
@@ -43,6 +44,14 @@ export default function CreateUserPage() {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const roles: Role[] = Array.isArray(rolesData?.data)
+    ? rolesData.data
+    : (rolesData?.data as { data?: Role[] })?.data ?? [];
+
+  const customersList: Customer[] =
+
+    [];
+
   const {
     register,
     handleSubmit,
@@ -63,18 +72,11 @@ export default function CreateUserPage() {
     },
     mode: 'onChange',
   });
-  // Extract roles from API response
-  const roles = rolesData?.data?.data || rolesData?.data || [];
-  
-  // Extract customers from API response
-  const customersResponse = customersData?.data;
-  const customers : Array<string> =   [];
 
   const onSubmit = async (data: CreateUserFormData) => {
-    // Transform form data to API format
     const userData = {
       email: data.email,
-      name: data.contactEmail, // Using contactEmail as name/display name
+      name: data.contactEmail,
       phone: data.phoneNumber || data.phone,
       password: data.password,
       role: data.role as UserRole,
@@ -85,16 +87,12 @@ export default function CreateUserPage() {
         : undefined,
     };
 
-    // Use the createUser mutation
     createUserMutation.mutate(
-      {
-        userData,
-        roleId: data.role,
-      },
+      { userData, roleId: data.role },
       {
         onSuccess: () => {
           toast.success('User created successfully');
-          navigate('/users');
+          navigate('/users-management');
         },
         onError: (error: unknown) => {
           console.error('Failed to create user:', error);
@@ -108,19 +106,17 @@ export default function CreateUserPage() {
   };
 
   const handleCancel = () => {
-    navigate('/users');
+    navigate('/users-management');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
+    <div className="min-h-screen bg-white  ">
+      <div className="  mx-auto">
         <h1 className="text-2xl font-semibold text-gray-900 mb-6">
           Add New User
         </h1>
 
-        {/* Form Card */}
-        <Card className="shadow-lg rounded-xl border-gray-200">
+        <Card className="shadow-sm rounded-xl border border-gray-200">
           <CardContent className="p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">
               User Details
@@ -128,9 +124,8 @@ export default function CreateUserPage() {
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Left Column */}
+                {/* Left column */}
                 <div className="space-y-4">
-                  {/* Contact Email */}
                   <div>
                     <label
                       htmlFor="contactEmail"
@@ -140,9 +135,9 @@ export default function CreateUserPage() {
                     </label>
                     <Input
                       id="contactEmail"
-                      type="email"
+                      type="text"
                       {...register('contactEmail')}
-                      placeholder="Enter contact email"
+                      placeholder="Enter customer name"
                       className="w-full border border-gray-300 rounded-md"
                     />
                     {errors.contactEmail && (
@@ -152,7 +147,26 @@ export default function CreateUserPage() {
                     )}
                   </div>
 
-                  {/* Email */}
+                  <div>
+                    <label
+                      htmlFor="phoneNumber"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Phone Number <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      id="phoneNumber"
+                      {...register('phoneNumber')}
+                      placeholder="Enter phone number"
+                      className="w-full border border-gray-300 rounded-md"
+                    />
+                    {errors.phoneNumber && (
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.phoneNumber.message}
+                      </p>
+                    )}
+                  </div>
+
                   <div>
                     <label
                       htmlFor="email"
@@ -174,7 +188,6 @@ export default function CreateUserPage() {
                     )}
                   </div>
 
-                  {/* Password */}
                   <div>
                     <label
                       htmlFor="password"
@@ -193,7 +206,7 @@ export default function CreateUserPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700"
                       >
                         {showPassword ? 'Hide' : 'Show'}
                       </button>
@@ -205,7 +218,6 @@ export default function CreateUserPage() {
                     )}
                   </div>
 
-                  {/* Role */}
                   <div>
                     <label
                       htmlFor="role"
@@ -218,16 +230,23 @@ export default function CreateUserPage() {
                       control={control}
                       render={({ field }) => (
                         <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger id="role" className="w-full border border-gray-300 rounded-md">
+                          <SelectTrigger
+                            id="role"
+                            className="w-full border border-gray-300 rounded-md"
+                          >
                             <SelectValue placeholder="Select role" />
                           </SelectTrigger>
-                          {/* <SelectContent>
-                            {roles?.data?.data?.map((role: any) => (
-                              <SelectItem key={role.id} value={role.id}>
-                                {role.name || role.title}
+                          <SelectContent>
+                            {roles.map((role) => (
+                              <SelectItem
+                                key={role.id}
+                                value={role.id}
+                                textValue={role.name}
+                              >
+                                {role.name}
                               </SelectItem>
                             ))}
-                          </SelectContent> */}
+                          </SelectContent>
                         </Select>
                       )}
                     />
@@ -237,64 +256,10 @@ export default function CreateUserPage() {
                       </p>
                     )}
                   </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label
-                      htmlFor="phone"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Phone
-                    </label>
-                    <Input
-                      id="phone"
-                      {...register('phone')}
-                      placeholder="Enter phone number"
-                      className="w-full border border-gray-300 rounded-md"
-                    />
-                  </div>
-
-                  {/* Additional Information */}
-                  <div>
-                    <label
-                      htmlFor="additionalInfo"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Additional Information
-                    </label>
-                    <Textarea
-                      id="additionalInfo"
-                      {...register('additionalInfo')}
-                      placeholder="Enter additional information..."
-                      className="min-h-[100px] w-full border border-gray-300 rounded-md"
-                    />
-                  </div>
                 </div>
 
-                {/* Right Column */}
+                {/* Right column */}
                 <div className="space-y-4">
-                  {/* Phone Number */}
-                  <div>
-                    <label
-                      htmlFor="phoneNumber"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Phone Number <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      id="phoneNumber"
-                      {...register('phoneNumber')}
-                      placeholder="Enter phone number"
-                      className="w-full border border-gray-300 rounded-md"
-                    />
-                    {errors.phoneNumber && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.phoneNumber.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Customer */}
                   <div>
                     <label
                       htmlFor="customerId"
@@ -316,33 +281,47 @@ export default function CreateUserPage() {
                           >
                             <SelectValue placeholder="Select customer" />
                           </SelectTrigger>
-                          {/* <SelectContent> */}
-                            {/* {customers?.map((customer: any) => (
+                          <SelectContent>
+                            {customersList.map((customer) => (
                               <SelectItem
                                 key={customer.id}
                                 value={customer.id}
+                                textValue={customer.customerName}
                               >
-                                {customer.customerName || customer.name}
+                                {customer.customerName}
                               </SelectItem>
-                            ))} */}
-                          {/* </SelectContent> */}
+                            ))}
+                          </SelectContent>
                         </Select>
                       )}
                     />
                   </div>
 
-                  {/* Status */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Status
+                    <label
+                      htmlFor="phone"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Phone
                     </label>
+                    <Input
+                      id="phone"
+                      {...register('phone')}
+                      placeholder="Enter phone number"
+                      className="w-full border border-gray-300 rounded-md"
+                    />
+                  </div>
+
+                  <div className="pt-2">
                     <Controller
                       name="status"
                       control={control}
                       render={({ field }) => (
                         <Checkbox
                           checked={field.value}
-                          onChange={(e) => field.onChange(e.target.checked)}
+                          onChange={(e) =>
+                            field.onChange((e.target as HTMLInputElement).checked)
+                          }
                           label="Active"
                         />
                       )}
@@ -351,28 +330,35 @@ export default function CreateUserPage() {
                 </div>
               </div>
 
-              {/* Required fields note */}
-              <p className="text-xs text-gray-500 mt-6">
-                <span className="text-red-500">*</span> Required fields
-              </p>
+              {/* Additional Information - full width */}
+              <div className="mt-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  Additional Information
+                </h2>
+                <Textarea
+                  id="additionalInfo"
+                  {...register('additionalInfo')}
+                  placeholder="Enter additional information..."
+                  className="min-h-[100px] w-full border border-gray-300 rounded-md"
+                />
+              </div>
 
-              {/* Action Buttons */}
+              {/* Action buttons */}
               <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleCancel}
                   disabled={isSubmitting || createUserMutation.isPending}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300 rounded-md"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  variant="secondary"
                   disabled={isSubmitting || createUserMutation.isPending}
                   isLoading={createUserMutation.isPending}
-                  className="bg-[#43489C] hover:bg-[#43489C]/90 text-white"
+                  className="bg-[#43489C] hover:bg-[#43489C]/90 text-white rounded-md"
                 >
                   Save
                 </Button>
@@ -380,8 +366,11 @@ export default function CreateUserPage() {
             </form>
           </CardContent>
         </Card>
+
+        <p className="text-xs text-gray-500 mt-4">
+          <span className="text-red-500">*</span> Required fields
+        </p>
       </div>
     </div>
   );
 }
-

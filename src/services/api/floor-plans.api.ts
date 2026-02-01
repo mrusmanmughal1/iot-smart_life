@@ -62,6 +62,40 @@ export interface DeviceMarker {
   position?: DevicePosition;
 }
 
+export interface ParsedGeometry {
+  doors?: Array<{
+    id: string;
+    type: string;
+    width: number;
+    height: number;
+    position: { x: number; y: number; z: number };
+    rotation: number;
+  }>;
+  rooms?: Array<{
+    id: string;
+    area: number;
+    name: string;
+    floor: string;
+    boundaries: Array<{ x: number; y: number }>;
+  }>;
+  walls?: Array<{
+    id: string;
+    height: number;
+    points: Array<{ x: number; y: number; z: number }>;
+    material: string;
+    thickness: number;
+  }>;
+  stairs?: Array<unknown>;
+  windows?: Array<{
+    id: string;
+    width: number;
+    height: number;
+    position: { x: number; y: number; z: number };
+    rotation: number;
+  }>;
+  furniture?: Array<unknown>;
+}
+
 export interface FloorPlan {
   id: string;
   createdAt: string;
@@ -85,6 +119,7 @@ export interface FloorPlan {
   userId: string;
   tenantId?: string | null;
   settings?: FloorPlanSettings;
+  parsedGeometry?: ParsedGeometry;
 }
 
 export interface FloorPlanQuery {
@@ -177,4 +212,23 @@ export const floorPlansApi = {
     apiClient.post<ApiResponse<FloorPlan>>(`/floor-plans/${id}/clone`, {
       name: newName,
     }),
+
+  // Upload DWG file
+  uploadDwg: (id: string, file: File, floor?: string) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (floor) {
+      formData.append('floor', floor);
+    }
+    return apiClient.post<ApiResponse<{ fileUrl: string; floor?: string }>>(
+      `/floor-plans/${id}/dwg-upload`,
+      formData,
+      { 
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          // Progress tracking can be handled in the component
+        },
+      }
+    );
+  },
 };

@@ -1,10 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Navigation } from 'lucide-react';
 
 interface LocationMapProps {
   latitude: number | null;
   longitude: number | null;
   height?: string;
   className?: string;
+  onLocationChange?: (latitude: number, longitude: number) => void;
 }
 
 // Google Maps types
@@ -51,10 +53,12 @@ export const LocationMap: React.FC<LocationMapProps> = ({
   longitude,
   height = '300px',
   className = '',
+  onLocationChange,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<GoogleMap | null>(null);
   const markerRef = useRef<GoogleMarker | null>(null);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -78,9 +82,7 @@ export const LocationMap: React.FC<LocationMapProps> = ({
 
         // Get API key from environment variable or use a placeholder
         // You should set REACT_APP_GOOGLE_MAPS_API_KEY in your .env file
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 
-                       window.REACT_APP_GOOGLE_MAPS_API_KEY || 
-                       '';
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||'';
 
         // Load Google Maps JavaScript API
         const script = document.createElement('script');
@@ -170,11 +172,53 @@ export const LocationMap: React.FC<LocationMapProps> = ({
     };
   }, [latitude, longitude]);
 
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setIsGettingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        if (onLocationChange) {
+          onLocationChange(lat, lng);
+        }
+        setIsGettingLocation(false);
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        alert('Unable to retrieve your location. Please check your browser permissions.');
+        setIsGettingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  };
+
   return (
-    <div
-      ref={mapRef}
-      className={`w-full rounded-lg border border-gray-300 overflow-hidden ${className}`}
-      style={{ height }}
-    />
+    <div className={`relative w-full rounded-lg border border-gray-300 overflow-hidden ${className}`}>
+      <div
+        ref={mapRef}
+        style={{ height }}
+      />
+      {onLocationChange && (
+        <button
+          type="button"
+          onClick={handleGetCurrentLocation}
+          disabled={isGettingLocation}
+          className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-3 py-2 rounded-md shadow-md border border-gray-300 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
+          title="Get current location"
+        >
+          <Navigation className={`h-4 w-4 ${isGettingLocation ? 'animate-spin' : ''}`} />
+          {isGettingLocation ? 'Getting location...' : 'Use current location'}
+        </button>
+      )}
+    </div>
   );
 };

@@ -139,7 +139,7 @@ export default function CreateCustomerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50  ">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <h1 className="text-2xl font-semibold text-gray-900 mb-6">
@@ -427,11 +427,10 @@ export default function CreateCustomerPage() {
                                       className="flex items-center gap-2"
                                     >
                                       <div
-                                        className={`w-3 h-3 rounded-sm ${
-                                          isChecked
+                                        className={`w-3 h-3 rounded-sm ${isChecked
                                             ? 'bg-green-500'
                                             : 'bg-gray-900'
-                                        }`}
+                                          }`}
                                       />
                                       <Checkbox
                                         checked={isChecked}

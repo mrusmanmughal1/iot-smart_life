@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Plus,
   Upload,
   Download,
   Search,
@@ -31,7 +30,6 @@ export default function AssetsPage() {
     totalPages,
     itemsPerPage,
     handleSearchChange,
-    handlePageChange,
     handleAction,
     handleExport,
     handleImport,
@@ -57,7 +55,7 @@ export default function AssetsPage() {
   }) => {
     setIsSavingAsset(true);
     try {
-      const response = await createAssetMutation.mutateAsync(assetData);
+      await createAssetMutation.mutateAsync(assetData);
       // TODO: Replace with actual API call
       // await assetsApi.create(assetData);
       console.log('Creating asset:', assetData);

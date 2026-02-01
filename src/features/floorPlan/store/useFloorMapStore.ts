@@ -6,18 +6,10 @@ import type {
   Zone,
   Device,
   Room,
+  UploadedFile,
 } from '@/features/floorPlan/types';
 
 export type StepId = 1 | 2 | 3 | 4 | 5;
-
-export interface UploadedFile {
-  id: string;
-  file: File;
-  floor: string;
-  progress: number;
-  status: 'pending' | 'uploading' | 'completed' | 'error';
-  previewUrl?: string;
-}
 
 interface FloorMapStore {
   // Step management
@@ -32,17 +24,16 @@ interface FloorMapStore {
   filteredAssets: AssetOption[];
   setFilteredAssets: (assets: AssetOption[]) => void;
 
+  // Floor plan ID (created after asset selection)
+  floorPlanId: string | null;
+  setFloorPlanId: (id: string | null) => void;
+
   // Form values
   formValues: FilterFormValues;
   setFormValues: (values: Partial<FilterFormValues>) => void;
   resetFormValues: () => void;
 
   // DWG Import step
-  uploadedFiles: UploadedFile[];
-  addUploadedFile: (file: UploadedFile) => void;
-  removeUploadedFile: (fileId: string) => void;
-  updateUploadedFile: (fileId: string, updates: Partial<UploadedFile>) => void;
-  clearUploadedFiles: () => void;
   selectedFloor: string;
   setSelectedFloor: (floor: string) => void;
 
@@ -73,6 +64,10 @@ interface FloorMapStore {
 
   // Reset all data
   reset: () => void;
+
+  // Uploaded files
+  uploadedFiles: UploadedFile[];
+ 
 }
 
 const defaultFormValues: FilterFormValues = {
@@ -91,8 +86,9 @@ const defaultState = {
   currentStep: 1 as StepId,
   selectedAssetId: null as string | null,
   filteredAssets: [] as AssetOption[],
-  formValues: defaultFormValues,
+  floorPlanId: null as string | null,
   uploadedFiles: [] as UploadedFile[],
+  formValues: defaultFormValues,
   selectedFloor: 'Ground',
   zones: [] as Zone[],
   selectedZoneId: null as string | null,
@@ -106,7 +102,6 @@ export const useFloorMapStore = create<FloorMapStore>()(
   persist(
     (set, get) => ({
       ...defaultState,
-
       // Step management
       setCurrentStep: (step: StepId) => {
         set({ currentStep: step });
@@ -135,6 +130,11 @@ export const useFloorMapStore = create<FloorMapStore>()(
         set({ filteredAssets: assets });
       },
 
+      // Floor plan ID
+      setFloorPlanId: (id: string | null) => {
+        set({ floorPlanId: id });
+      },
+
       // Form values
       setFormValues: (values: Partial<FilterFormValues>) => {
         set((state) => ({
@@ -147,44 +147,6 @@ export const useFloorMapStore = create<FloorMapStore>()(
       },
 
       // DWG Import step
-      addUploadedFile: (file: UploadedFile) => {
-        set((state) => ({
-          uploadedFiles: [...state.uploadedFiles, file],
-        }));
-      },
-
-      removeUploadedFile: (fileId: string) => {
-        set((state) => {
-          const fileToRemove = state.uploadedFiles.find((f) => f.id === fileId);
-          if (fileToRemove?.previewUrl) {
-            URL.revokeObjectURL(fileToRemove.previewUrl);
-          }
-          return {
-            uploadedFiles: state.uploadedFiles.filter((f) => f.id !== fileId),
-          };
-        });
-      },
-
-      updateUploadedFile: (fileId: string, updates: Partial<UploadedFile>) => {
-        set((state) => ({
-          uploadedFiles: state.uploadedFiles.map((file) =>
-            file.id === fileId ? { ...file, ...updates } : file
-          ),
-        }));
-      },
-
-      clearUploadedFiles: () => {
-        set((state) => {
-          // Clean up preview URLs
-          state.uploadedFiles.forEach((file) => {
-            if (file.previewUrl) {
-              URL.revokeObjectURL(file.previewUrl);
-            }
-          });
-          return { uploadedFiles: [] };
-        });
-      },
-
       setSelectedFloor: (floor: string) => {
         set({ selectedFloor: floor });
       },
@@ -317,13 +279,6 @@ export const useFloorMapStore = create<FloorMapStore>()(
 
       // Reset all data
       reset: () => {
-        const state = get();
-        // Clean up preview URLs
-        state.uploadedFiles.forEach((file) => {
-          if (file.previewUrl) {
-            URL.revokeObjectURL(file.previewUrl);
-          }
-        });
         set({ ...defaultState });
       },
     }),
@@ -333,14 +288,14 @@ export const useFloorMapStore = create<FloorMapStore>()(
       partialize: (state) => ({
         currentStep: state.currentStep,
         selectedAssetId: state.selectedAssetId,
+        floorPlanId: state.floorPlanId,
         formValues: state.formValues,
         selectedFloor: state.selectedFloor,
         zones: state.zones,
         selectedZoneId: state.selectedZoneId,
         zoomLevel: state.zoomLevel,
         rooms: state.rooms,
-        // Note: uploadedFiles and filteredAssets are not persisted
-        // as they contain File objects which can't be serialized
+        // Note: filteredAssets are not persisted as they may contain non-serializable data
         assignedDevices: state.assignedDevices,
         devicePositions: state.devicePositions,
       }),

@@ -430,7 +430,6 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
 
   // Get devices from API
   const { data: devicesData, isLoading, isError } = useDevices();
-  console.log(devicesData);
   // Handle nested API response structure: response.data.data.data
   const apiDevices = useMemo(() => {
     const apiResponse = devicesData?.data as unknown as {

@@ -37,6 +37,7 @@ const createRegisterSchema = (t: (key: string) => string) =>
           message: t('auth.register.mobileInvalid'),
         }
       ),
+    companyName: z.string(),
     password: z
       .string()
       .min(1, t('auth.register.passwordRequired'))
@@ -170,6 +171,14 @@ export const RegisterForm: React.FC = () => {
             }}
             error={errors.phone?.message}
             defaultCountry="SA"
+          />
+        </div>
+        <div>
+          <Input
+            type="text"
+            placeholder={t('auth.register.companyName')}
+            {...formRegister('companyName')}
+            error={errors.companyName?.message}
           />
         </div>
 

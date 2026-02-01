@@ -53,4 +53,13 @@ export interface Room {
   name: string;
   devices: Device[];
 }
- 
+
+export interface UploadedFile {
+  id: string;
+  file: File;
+  floor: string;
+  progress: number;
+  status: 'pending' | 'uploading' | 'completed' | 'error';
+  previewUrl?: string;
+  fileUrl?: string;
+}

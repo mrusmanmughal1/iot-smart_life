@@ -15,7 +15,6 @@ import { DashboardPage } from '../pages/DashboardPage.tsx';
 import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
 
-
 import MainDashboardPage from '@/pages/MainDashboardPage.tsx';
 import MainControlPanelPage from '@/pages/MainControlPanelPage.tsx';
 import DevicesPage from '@/pages/DevicesPage.tsx';
@@ -86,7 +85,6 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Navigate to="/login" replace />,
   },
-
   //  --------------------public routes--------------------c=
   {
     element: <PublicRoute />,
@@ -202,7 +200,7 @@ export const router = createBrowserRouter([
           </AppLayout>
         ),
         children: [
-          {                             
+          {
             index: true,
             element: <AnalyticsPage />,
           },
@@ -445,8 +443,17 @@ export const router = createBrowserRouter([
             path: 'search-results',
             element: <SearchResultsPage />,
           },
+          {
+            path: 'create-customer',
+            element: <CreateCustomerPage />
+          },
+          {
+            path: 'add-new-user',
+            element: <CreateUserPage />
+          }
         ],
       },
+
       // --------------------Customer Management Routes--------------------
       {
         path: '/customer-management',
@@ -462,6 +469,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      // ------------------ automation ------------------------
       {
         path: '/automation',
         element: (

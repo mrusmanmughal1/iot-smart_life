@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Control, Controller, UseFormRegister } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -35,6 +36,7 @@ import type { FilterFormValues, Zone } from '@/features/floorPlan/types';
 
 import type { Stage as KonvaStage } from 'konva/lib/Stage';
 import { useFloorMapStore } from '@/features/floorPlan/store';
+import { floorPlansApi } from '@/services/api/floor-plans.api';
 import FloorPlanCanvas from './FloorPlanCanvas';
 
 interface ZoneSetupStepProps {
@@ -58,14 +60,29 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
     zones,
     addZone,
     updateZone,
+    setZones,
     selectedZoneId,
     setSelectedZoneId,
     zoomLevel,
     setZoomLevel,
-    uploadedFiles,
     selectedFloor,
+    floorPlanId,
   } = useFloorMapStore();
 
+  // Fetch floor plan data
+  const { data: floorPlanResponse, isLoading: isLoadingFloorPlan } = useQuery({
+    queryKey: ['floor-plan', floorPlanId],
+    queryFn: () => {
+      if (!floorPlanId) throw new Error('Floor plan ID is missing');
+      return floorPlansApi.getById(floorPlanId);
+    },
+    enabled: !!floorPlanId,
+  });
+
+  const floorPlan = floorPlanResponse?.data?.data;
+  const parsedGeometry = floorPlan?.parsedGeometry;
+console.log(parsedGeometry)
+console.log(floorPlan)
   // Local state
   const [isAddZoneMode, setIsAddZoneMode] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -82,23 +99,89 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
     h: number;
   } | null>(null);
   const [activeFloorTab, setActiveFloorTab] = useState(selectedFloor);
-  const [dwgError, setDwgError] = useState(false);
   const stageRef = useRef<KonvaStage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Get current floor's DWG file
-  const currentDwgFile = useMemo(() => {
-    const file = uploadedFiles.find(
-      (f) => f.floor === activeFloorTab && f.status === 'completed'
-    );
-    console.log('Current floor tab:', activeFloorTab);
-    console.log('Files for this floor:', uploadedFiles.filter(f => f.floor === activeFloorTab));
-    console.log('Current DWG file:', file);
-    return file;
-  }, [uploadedFiles, activeFloorTab]);
+  // Transform parsedGeometry rooms into Zone format
+  useEffect(() => {
+    if (parsedGeometry?.rooms && parsedGeometry.rooms.length > 0) {
+      const transformedZones: Zone[] = parsedGeometry.rooms.map((room) => {
+        // Calculate bounding box from boundaries
+        const boundaries = room.boundaries;
+        if (boundaries.length < 2) {
+          // Fallback if boundaries are invalid
+          return {
+            id: room.id,
+            name: room.name || 'Unnamed Room',
+            type: 'Room',
+            area: room.area || 0,
+            capacity: 0,
+            status: 'Draft',
+            floor: room.floor || selectedFloor,
+            description: '',
+            color: 'bg-gray-200',
+            x: 0,
+            y: 0,
+            w: 0,
+            h: 0,
+            isDefined: true,
+          };
+        }
 
-  const dwgImageUrl = currentDwgFile?.previewUrl;
-  const dwgFile = currentDwgFile?.file;
+        const xCoords = boundaries.map((b) => b.x);
+        const yCoords = boundaries.map((b) => b.y);
+        const minX = Math.min(...xCoords);
+        const minY = Math.min(...yCoords);
+        const maxX = Math.max(...xCoords);
+        const maxY = Math.max(...yCoords);
+
+        return {
+          id: room.id,
+          name: room.name || 'Unnamed Room',
+          type: 'Room',
+          area: room.area || 0,
+          capacity: 0,
+          status: 'Draft',
+          floor: room.floor || selectedFloor,
+          description: '',
+          color: 'bg-gray-200',
+          x: minX,
+          y: minY,
+          w: maxX - minX,
+          h: maxY - minY,
+          isDefined: true,
+        };
+      });
+
+      // Only update zones if they haven't been set yet or if parsed geometry has new rooms
+      if (zones.length === 0 || transformedZones.length > zones.length) {
+        setZones(transformedZones);
+      }
+    }
+  }, [parsedGeometry, selectedFloor, setZones, zones.length]);
+
+  // Get available floors from parsed geometry
+  const availableFloors = useMemo(() => {
+    if (parsedGeometry?.rooms && parsedGeometry.rooms.length > 0) {
+      const floors = parsedGeometry.rooms
+        .map((room) => room.floor)
+        .filter((floor, index, self) => self.indexOf(floor) === index)
+        .sort((a, b) => {
+          const floorOrder = ['ground', 'Ground', '1st', '2nd', '3rd', '4th', '5th'];
+          const indexA = floorOrder.indexOf(a);
+          const indexB = floorOrder.indexOf(b);
+          if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+          if (indexA === -1) return 1;
+          if (indexB === -1) return -1;
+          return indexA - indexB;
+        });
+      return floors.length > 0 ? floors : [selectedFloor];
+    }
+    return [selectedFloor];
+  }, [parsedGeometry, selectedFloor]);
+
+  // Get image URL from floor plan
+  const dwgImageUrl = floorPlan?.imageUrl;
 
   // Get zones for current floor
   const currentFloorZones = useMemo(() => {
@@ -108,30 +191,6 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
   const selectedZone =
     currentFloorZones.find((z) => z.id === selectedZoneId) ||
     currentFloorZones[0];
-
-  // Get available floors from uploaded files
-  const availableFloors = useMemo(() => {
-    // Include all files (completed, uploading, pending) to show all floors
-    const floors = uploadedFiles
-      .map((f) => f.floor)
-      .filter((floor, index, self) => self.indexOf(floor) === index)
-      .sort((a, b) => {
-        // Sort floors in order: Ground, 1st, 2nd, 3rd, etc.
-        const floorOrder = ['Ground', '1st', '2nd', '3rd', '4th', '5th'];
-        const indexA = floorOrder.indexOf(a);
-        const indexB = floorOrder.indexOf(b);
-        if (indexA === -1 && indexB === -1) return a.localeCompare(b);
-        if (indexA === -1) return 1;
-        if (indexB === -1) return -1;
-        return indexA - indexB;
-      });
-    
-    // Debug: Log uploaded files and floors
-    console.log('Uploaded files:', uploadedFiles);
-    console.log('Available floors:', floors);
-    
-    return floors.length > 0 ? floors : [selectedFloor];
-  }, [uploadedFiles, selectedFloor]);
 
   useEffect(() => {
     if (
@@ -258,6 +317,28 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
   const coverage = totalArea > 0 ? (definedArea / totalArea) * 100 : 0;
   const undefinedArea = 100 - coverage;
 
+  // Show loading state
+  if (isLoadingFloorPlan) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-sm text-muted-foreground">Loading floor plan...</span>
+      </div>
+    );
+  }
+
+  // Show error if floor plan ID is missing
+  if (!floorPlanId) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <AlertTriangle className="h-8 w-8 text-amber-500" />
+        <span className="ml-2 text-sm text-amber-600">
+          Floor plan ID is missing. Please go back and create a floor plan first.
+        </span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
@@ -269,7 +350,7 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
             </div>
 
             {/* Floor Tabs */}
-            {uploadedFiles.length > 0 && availableFloors.length > 0 && (
+            {availableFloors.length > 1 && (
               <Tabs
                 value={activeFloorTab}
                 onValueChange={setActiveFloorTab}
@@ -285,9 +366,8 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
                 >
                   <TabsList className="w-full">
                     {availableFloors.map((floor) => {
-                      const floorFiles = uploadedFiles.filter((f) => f.floor === floor);
-                      const hasCompletedFile = floorFiles.some((f) => f.status === 'completed');
-                      const isUploading = floorFiles.some((f) => f.status === 'uploading');
+                      const floorRooms = parsedGeometry?.rooms?.filter((r) => r.floor === floor) || [];
+                      const hasRooms = floorRooms.length > 0;
                       
                       return (
                         <TabsTrigger
@@ -297,10 +377,7 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
                         >
                           <Layers className="h-3 w-3" />
                           {floor}
-                          {isUploading && (
-                            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
-                          )}
-                          {hasCompletedFile && (
+                          {hasRooms && (
                             <CheckCircle2 className="h-3 w-3 text-green-500" />
                           )}
                         </TabsTrigger>
@@ -403,35 +480,35 @@ export const ZoneSetupStep: React.FC<ZoneSetupStepProps> = ({
             >
               <FloorPlanCanvas
                 zones={currentFloorZones}
+                
                 selectedZoneId={selectedZoneId}
                 zoomLevel={zoomLevel}
                 dwgImageUrl={dwgImageUrl}
-                dwgFile={dwgFile}
+                dwgFile={undefined}
                 onZoneClick={handleZoneClick}
                 onStageClick={handleStageClick}
                 stageRef={stageRef as React.RefObject<KonvaStage>}
                 isDrawing={isDrawing}
                 selectionPoints={selectionPoints}
-                onDwgError={setDwgError}
+                onDwgError={() => {}}
               />
             </div>
 
-            {/* DWG File Info */}
-            {currentDwgFile && (
+            {/* Floor Plan Info */}
+            {floorPlan && (
               <div className="mt-2 text-xs text-muted-foreground flex items-center gap-2">
                 <Eye className="h-3 w-3" />
                 <span>
-                  {dwgError
-                    ? `DWG file loaded: ${currentDwgFile.file.name} (requires conversion for preview)`
-                    : `Displaying: ${currentDwgFile.file.name}`}
+                  {parsedGeometry?.rooms && parsedGeometry.rooms.length > 0
+                    ? `Displaying: ${floorPlan.name} (${parsedGeometry.rooms.length} rooms parsed)`
+                    : `Displaying: ${floorPlan.name} (parsing in progress...)`}
                 </span>
               </div>
             )}
-            {!currentDwgFile && uploadedFiles.length > 0 && (
+            {parsedGeometry && (!parsedGeometry.rooms || parsedGeometry.rooms.length === 0) && (
               <div className="mt-2 text-xs text-amber-600 flex items-center gap-2">
                 <AlertTriangle className="h-3 w-3" />
-                No DWG file found for {activeFloorTab} floor. Upload a file in
-                the DWG Import step.
+                No rooms found in parsed geometry for {activeFloorTab} floor. The DWG file may still be processing.
               </div>
             )}
           </div>

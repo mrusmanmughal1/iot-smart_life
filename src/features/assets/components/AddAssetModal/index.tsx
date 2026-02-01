@@ -1,6 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Plus, Trash2, MapPin } from 'lucide-react';
+import {
+  useForm,
+  Controller,
+  useFieldArray,
+  type Resolver,
+  type SubmitHandler
+} from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
   DialogContent,
@@ -29,6 +38,15 @@ export interface AdditionalAttribute {
   value: string;
 }
 
+export interface BuildingDetails {
+  name: string;
+  floors: number;
+  dimensions: {
+    width: number;
+    height: number;
+  };
+}
+
 export interface AddAssetModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -36,16 +54,153 @@ export interface AddAssetModalProps {
     name: string;
     type: string;
     description: string;
-    assetProfileId: string;
-    parentAssetId: string;
-    location: {
+    assetProfileId?: string;
+    parentAssetId?: string;
+    location?: {
       latitude: number;
       longitude: number;
     };
     attributes: AdditionalAttribute[];
+    building?: BuildingDetails;
   }) => void;
   isLoading?: boolean;
 }
+
+const optionalNumber = z.preprocess((v) => {
+  if (v === '' || v === null || v === undefined) return undefined;
+  const n = typeof v === 'string' ? Number(v) : (v as number);
+  return Number.isFinite(n) ? n : undefined;
+}, z.number().positive().optional());
+
+const optionalPositiveInt = z.preprocess((v) => {
+  if (v === '' || v === null || v === undefined) return undefined;
+  const n = typeof v === 'string' ? Number(v) : (v as number);
+  if (!Number.isFinite(n)) return undefined;
+  return n;
+}, z.number().int().positive().optional());
+
+const createSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      name: z.string().min(1, t('addAsset.nameRequired') || 'Asset name is required'),
+      type: z.string().min(1, t('addAsset.typeRequired') || 'Asset type is required'),
+      description: z.string().optional().default(''),
+      assetProfileId: z.string().optional().default(''),
+      parentAssetId: z.string().optional().default(''),
+      location: z
+        .object({
+          latitude: z.string().optional().default(''),
+          longitude: z.string().optional().default(''),
+        })
+        .default({ latitude: '', longitude: '' }),
+      building: z
+        .object({
+          name: z.string().optional().default(''),
+          floors: optionalPositiveInt,
+          dimensions: z
+            .object({
+              width: optionalNumber,
+              height: optionalNumber,
+            })
+            .default({}),
+        })
+        .default({ name: '', floors: undefined, dimensions: {} }),
+      attributes: z
+        .array(
+          z.object({
+            key: z.string().optional().default(''),
+            value: z.string().optional().default(''),
+          })
+        )
+        .default([{ key: '', value: '' }]),
+    })
+    .superRefine((values, ctx) => {
+      const latStr = (values.location.latitude ?? '').trim();
+      const lngStr = (values.location.longitude ?? '').trim();
+      const hasLat = latStr !== '';
+      const hasLng = lngStr !== '';
+
+      if (hasLat !== hasLng) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['location', 'latitude'],
+          message:
+            t('addAsset.bothCoordinatesRequired') ||
+            'Both latitude and longitude are required',
+        });
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['location', 'longitude'],
+          message:
+            t('addAsset.bothCoordinatesRequired') ||
+            'Both latitude and longitude are required',
+        });
+      }
+
+      if (hasLat && hasLng) {
+        const lat = Number(latStr);
+        const lng = Number(lngStr);
+
+        if (!Number.isFinite(lat) || lat < -90 || lat > 90) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['location', 'latitude'],
+            message:
+              t('addAsset.invalidLatitude') ||
+              'Latitude must be between -90 and 90',
+          });
+        }
+
+        if (!Number.isFinite(lng) || lng < -180 || lng > 180) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['location', 'longitude'],
+            message:
+              t('addAsset.invalidLongitude') ||
+              'Longitude must be between -180 and 180',
+          });
+        }
+      }
+
+      if (values.type === 'building') {
+        const buildingName = (values.building?.name ?? '').trim();
+        if (!buildingName) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['building', 'name'],
+            message: 'Building name is required',
+          });
+        }
+
+        const floors = values.building?.floors;
+        if (!floors || floors < 1) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['building', 'floors'],
+            message: 'Floors must be at least 1',
+          });
+        }
+
+        const width = values.building?.dimensions?.width;
+        const height = values.building?.dimensions?.height;
+        if (!width || width <= 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['building', 'dimensions', 'width'],
+            message: 'Width is required',
+          });
+        }
+        if (!height || height <= 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['building', 'dimensions', 'height'],
+            message: 'Height is required',
+          });
+        }
+      }
+    });
+
+type AddAssetFormValues = z.input<ReturnType<typeof createSchema>>;
 
 export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   open,
@@ -54,25 +209,46 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   isLoading = false,
 }) => {
   const { t } = useTranslation();
+  const schema = useMemo(() => createSchema(t), [t]);
 
-  const getInitialFormData = () => ({
-    name: '',
-    type: '',
-    description: '',
-    assetProfileId: '',
-    parentAssetId: '',
-    location: {
-      latitude: '0',
-      longitude: '0',
+  const form = useForm<AddAssetFormValues>({
+    // NOTE: Some repos end up with duplicate `react-hook-form` type copies via dependencies.
+    // Casting keeps types stable while still validating at runtime.
+    resolver: zodResolver(schema) as unknown as Resolver<AddAssetFormValues>,
+    defaultValues: {
+      name: '',
+      type: '',
+      description: '',
+      assetProfileId: '',
+      parentAssetId: '',
+      location: { latitude: '', longitude: '' },
+      building: { name: '', floors: undefined, dimensions: {} },
+      attributes: [{ key: '', value: '' }],
     },
+    mode: 'onSubmit',
   });
 
-  const [formData, setFormData] = useState(getInitialFormData());
+  const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    reset,
+    formState: { errors },
+    setValue,
+    trigger,
+  } = form;
+
+  const assetType = watch('type');
+
+  const { fields: attributeFields, append, remove } = useFieldArray({
+    control,
+    name: 'attributes',
+  });
+
   const { data: assetProfilesData } = useAssetProfiles();
   const { data: assetsData } = useAssets({ limit: 200 });
 
-  // assetProfilesData comes from axios response -> response.data (PaginatedResponse)
-  // normalize nested structure safely
   const assetProfilesResponse = assetProfilesData?.data as
     | { data?: { data?: ApiAssetProfile[] } }
     | undefined;
@@ -83,12 +259,6 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     | { data?: { data?: ApiAsset[] } }
     | undefined;
   const parentAssetsList = assetsResponse?.data?.data ?? [];
-  const [additionalAttributes, setAdditionalAttributes] = useState<
-    AdditionalAttribute[]
-  >([{ key: '', value: '' }]);
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
   // Mock data for selects - keep assetTypes mocked
   const assetTypes = [
     'building',
@@ -100,176 +270,74 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     'zone',
   ];
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
+  // Clear building fields when not building
+  useEffect(() => {
+    if (assetType !== 'building') {
+      setValue('building.name', '');
+      setValue('building.floors', undefined);
+      setValue('building.dimensions.width', undefined);
+      setValue('building.dimensions.height', undefined);
     }
-  };
+  }, [assetType, setValue]);
 
-  const handleCoordinateChange = (
-    name: 'latitude' | 'longitude',
-    value: string
-  ) => {
-    // Allow empty, numbers, decimals, and negative sign
-    if (value === '' || /^-?\d*\.?\d*$/.test(value)) {
-      setFormData((prev) => ({
-        ...prev,
-        location: {
-          ...prev.location,
-          [name]: value,
-        },
-      }));
-      // Clear error when user starts typing
-      if (errors[name]) {
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[name];
-          return newErrors;
-        });
-      }
-    }
-  };
+  const latitudeStr = watch('location.latitude');
+  const longitudeStr = watch('location.longitude');
 
-  const handleSelectChange = (name: string, value: string) => {
-    // store select values on top-level keys (e.g. assetProfileId, parentAssetId, type)
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user selects
-    if (errors[name]) {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name];
-        return newErrors;
-      });
-    }
-  };
+  const { latitudeNum, longitudeNum } = useMemo(() => {
+    const lat = String(latitudeStr ?? '').trim();
+    const lng = String(longitudeStr ?? '').trim();
+    const latNum = lat ? Number(lat) : null;
+    const lngNum = lng ? Number(lng) : null;
+    return { latitudeNum: latNum, longitudeNum: lngNum };
+  }, [latitudeStr, longitudeStr]);
 
-  const handleAttributeChange = (
-    index: number,
-    field: 'key' | 'value',
-    value: string
-  ) => {
-    const updated = [...additionalAttributes];
-    updated[index] = { ...updated[index], [field]: value };
-    setAdditionalAttributes(updated);
-  };
-
-  const handleAddAttribute = () => {
-    setAdditionalAttributes([...additionalAttributes, { key: '', value: '' }]);
-  };
-
-  const handleRemoveAttribute = (index: number) => {
-    if (additionalAttributes.length > 1) {
-      setAdditionalAttributes(
-        additionalAttributes.filter((_, i) => i !== index)
-      );
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      newErrors.name = t('addAsset.nameRequired') || 'Asset name is required';
-    }
-
-    if (!formData.type) {
-      newErrors.type = t('addAsset.typeRequired') || 'Asset type is required';
-    }
-
-    // Validate latitude/longitude strings safely
-    const latStr = String(formData.location.latitude || '').trim();
-    const lngStr = String(formData.location.longitude || '').trim();
-
-    if (latStr) {
-      const lat = parseFloat(latStr);
-      if (isNaN(lat) || lat < -90 || lat > 90) {
-        newErrors.latitude =
-          t('addAsset.invalidLatitude') ||
-          'Latitude must be between -90 and 90';
-      }
-    }
-
-    if (lngStr) {
-      const lng = parseFloat(lngStr);
-      if (isNaN(lng) || lng < -180 || lng > 180) {
-        newErrors.longitude =
-          t('addAsset.invalidLongitude') ||
-          'Longitude must be between -180 and 180';
-      }
-    }
-
-    // If one coordinate is provided, the other should also be provided
-    if ((latStr && !lngStr) || (!latStr && lngStr)) {
-      newErrors.latitude =
-        t('addAsset.bothCoordinatesRequired') ||
-        'Both latitude and longitude are required';
-      newErrors.longitude =
-        t('addAsset.bothCoordinatesRequired') ||
-        'Both latitude and longitude are required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const resetForm = () => {
-    setFormData(getInitialFormData());
-    setAdditionalAttributes([{ key: '', value: '' }]);
-    setErrors({});
-  };
-
-  const handleSave = async () => {
-    if (!validateForm()) {
-      return;
-    }
-
-    // Filter out empty additional attributes
-    const validAttributes = additionalAttributes.filter(
-      (attr) => attr.key.trim() && attr.value.trim()
-    );
-
-    await onSave({
-      ...formData,
-      location: {
-        latitude: parseFloat(formData.location.latitude),
-        longitude: parseFloat(formData.location.longitude),
-      },
-      attributes: validAttributes,
-    });
-
-    resetForm();
+  const handleLocationChange = async (lat: number, lng: number) => {
+    setValue('location.latitude', lat.toString());
+    setValue('location.longitude', lng.toString());
+    // Trigger validation after both values are set to clear any errors
+    await trigger(['location.latitude', 'location.longitude']);
   };
 
   const handleCancel = () => {
-    resetForm();
+    reset();
     onOpenChange(false);
   };
 
-  // Parse coordinates for map display
-  const latitudeNum = String(formData.location.latitude || '').trim()
-    ? parseFloat(String(formData.location.latitude))
-    : null;
-  const longitudeNum = String(formData.location.longitude || '').trim()
-    ? parseFloat(String(formData.location.longitude))
-    : null;
-  const hasValidCoordinates =
-    latitudeNum !== null &&
-    longitudeNum !== null &&
-    !isNaN(latitudeNum) &&
-    !isNaN(longitudeNum) &&
-    latitudeNum >= -90 &&
-    latitudeNum <= 90 &&
-    longitudeNum >= -180 &&
-    longitudeNum <= 180;
+  const onSubmit = async (values: AddAssetFormValues) => {
+    const validAttributes = (values.attributes ?? []).filter(
+      (attr) => (attr.key ?? '').trim() && (attr.value ?? '').trim()
+    ) as AdditionalAttribute[];
+
+    const lat = String(values.location?.latitude ?? '').trim();
+    const lng = String(values.location?.longitude ?? '').trim();
+    const location =
+      lat && lng ? { latitude: Number(lat), longitude: Number(lng) } : undefined;
+
+    const building =
+      values.type === 'building'
+        ? ({
+          name: String(values.building?.name ?? '').trim(),
+          floors: Number(values.building?.floors ?? 1) || 1,
+          dimensions: {
+            width: Number(values.building?.dimensions?.width ?? 0) || 0,
+            height: Number(values.building?.dimensions?.height ?? 0) || 0,
+          },
+        } satisfies BuildingDetails)
+        : undefined;
+
+    await onSave({
+      name: values.name,
+      type: values.type,
+      description: values.description ?? '',
+      assetProfileId: values.assetProfileId || undefined,
+      parentAssetId: values.parentAssetId || undefined,
+      location,
+      attributes: validAttributes,
+      ...(building ? { building } : {}),
+    });
+
+    reset();
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -292,25 +360,23 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
 
         {/* Body */}
         <div className="p-6 bg-white max-h-[70vh] overflow-y-auto dark:bg-gray-950 dark:border-gray-700">
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit as unknown as SubmitHandler<AddAssetFormValues>)}>
             {/* Asset Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t('addAsset.assetName') || 'Asset Name'} *
               </label>
               <Input
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
+                {...register('name')}
                 placeholder={
                   t('addAsset.assetNamePlaceholder') || 'Asset Name *'
                 }
                 className={
-                  errors.name ? '  border-2 rounded-md' : ' border-2 rounded-md'
+                  errors.name ? 'border-red-500 border-2 rounded-md' : 'border-2 rounded-md'
                 }
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
               )}
             </div>
 
@@ -319,30 +385,124 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t('addAsset.assetType') || 'Asset Type'} *
               </label>
-              <Select
-                value={formData.type}
-                onValueChange={(value) => handleSelectChange('type', value)}
-              >
-                <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
-                  <SelectValue
-                    placeholder={
-                      t('addAsset.assetTypePlaceholder') ||
-                      'Select asset type...'
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {assetTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={control}
+                name="type"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
+                      <SelectValue
+                        placeholder={
+                          t('addAsset.assetTypePlaceholder') ||
+                          'Select asset type...'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {assetTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.type && (
-                <p className="mt-1 text-sm text-red-500">{errors.type}</p>
+                <p className="mt-1 text-sm text-red-500">{errors.type.message}</p>
               )}
             </div>
+
+            {/* Building Details */}
+            {assetType === 'building' && (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-4">
+                <h3 className="text-sm font-semibold text-gray-800">Building Details</h3>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Building Name *
+                  </label>
+                  <Input
+                    {...register('building.name')}
+                    placeholder="e.g., HQ Building"
+                    className={
+                      errors.building?.name ? 'border-red-500 border-2 rounded-md' : 'border-2 rounded-md'
+                    }
+                  />
+                  {errors.building?.name && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.building.name.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Floors *
+                    </label>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      {...register('building.floors')}
+                      placeholder="e.g., 5"
+                      className={
+                        errors.building?.floors ? 'border-red-500 border-2 rounded-md' : 'border-2 rounded-md'
+                      }
+                    />
+                    {errors.building?.floors && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.building.floors.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Width (m) *
+                    </label>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      {...register('building.dimensions.width')}
+                      placeholder="e.g., 120"
+                      className={
+                        errors.building?.dimensions?.width
+                          ? 'border-red-500 border-2 rounded-md'
+                          : 'border-2 rounded-md'
+                      }
+                    />
+                    {errors.building?.dimensions?.width && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.building.dimensions.width.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Height (m) *
+                    </label>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      {...register('building.dimensions.height')}
+                      placeholder="e.g., 60"
+                      className={
+                        errors.building?.dimensions?.height
+                          ? 'border-red-500 border-2 rounded-md'
+                          : 'border-2 rounded-md'
+                      }
+                    />
+                    {errors.building?.dimensions?.height && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.building.dimensions.height.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Description */}
             <div>
@@ -350,9 +510,7 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 {t('addAsset.description') || 'Description'}
               </label>
               <Textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
+                {...register('description')}
                 placeholder={
                   t('addAsset.descriptionPlaceholder') || 'Enter description'
                 }
@@ -367,74 +525,68 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('addAsset.assetProfile') || 'Asset Profile'}
                 </label>
-
-                <Select
-                  value={formData.assetProfileId}
-                  onValueChange={(value) =>
-                    handleSelectChange('assetProfileId', value)
-                  }
-                >
-                  <SelectTrigger>
-                    <span className="text-sm">
-                      {formData.assetProfileId
-                        ? assetProfilesList.find(
-                            (p: any) => p.id === formData.assetProfileId
-                          )?.name || formData.assetProfileId
-                        : t('addAsset.assetProfilePlaceholder') ||
-                          'Select profile...'}
-                    </span>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {assetProfilesList.length === 0 ? (
-                      <SelectItem value="">
-                        {t('addAsset.noProfiles') || 'No profiles'}
-                      </SelectItem>
-                    ) : (
-                      assetProfilesList.map((profile: any) => (
-                        <SelectItem key={profile.id} value={profile.id}>
-                          {profile.name}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  control={control}
+                  name="assetProfileId"
+                  render={({ field }) => (
+                    <Select value={field.value || ''} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            t('addAsset.assetProfilePlaceholder') || 'Select profile...'
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {assetProfilesList.length === 0 ? (
+                          <SelectItem value="">
+                            {t('addAsset.noProfiles') || 'No profiles found'}
+                          </SelectItem>
+                        ) : (
+                          assetProfilesList.map((profile: ApiAssetProfile) => (
+                            <SelectItem key={profile.id} value={profile.id}>
+                              {profile.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
-
               {/* Parent Asset */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('addAsset.parentAsset') || 'Parent Asset'}
                 </label>
-                <Select
-                  value={formData.parentAssetId}
-                  onValueChange={(value) =>
-                    handleSelectChange('parentAssetId', value)
-                  }
-                >
-                  <SelectTrigger>
-                    <span className="text-sm">
-                      {formData.parentAssetId
-                        ? parentAssetsList.find(
-                            (a: any) => a.id === formData.parentAssetId
-                          )?.name || formData.parentAssetId
-                        : t('addAsset.parentAssetPlaceholder') ||
-                          'Select parent...'}
-                    </span>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {parentAssetsList.length === 0 ? (
-                      <SelectItem value="">
-                        {t('addAsset.noParents') || 'No parent assets'}
-                      </SelectItem>
-                    ) : (
-                      parentAssetsList.map((parent: any) => (
-                        <SelectItem key={parent.id} value={parent.id}>
-                          {parent.name}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  control={control}
+                  name="parentAssetId"
+                  render={({ field }) => (
+                    <Select value={field.value || ''} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={
+                            t('addAsset.parentAssetPlaceholder') || 'Select parent...'
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {parentAssetsList.length === 0 ? (
+                          <SelectItem value="">
+                            {t('addAsset.noParents') || 'No parent assets'}
+                          </SelectItem>
+                        ) : (
+                          parentAssetsList.map((parent: ApiAsset) => (
+                            <SelectItem key={parent.id} value={parent.id}>
+                              {parent.name}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
             </div>
 
@@ -451,24 +603,20 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                     {t('addAsset.latitude') || 'Latitude'}
                   </label>
                   <Input
-                    name="latitude"
                     type="text"
-                    value={formData.location.latitude}
-                    onChange={(e) =>
-                      handleCoordinateChange('latitude', e.target.value)
-                    }
+                    {...register('location.latitude')}
                     placeholder={
                       t('addAsset.latitudePlaceholder') || 'e.g., 40.7128'
                     }
                     className={
-                      errors.latitude
-                        ? 'border-red-500'
-                        : '' + ' border-2 rounded-md'
+                      errors.location?.latitude
+                        ? 'border-red-500 border-2 rounded-md'
+                        : 'border-2 rounded-md'
                     }
                   />
-                  {errors.latitude && (
+                  {errors.location?.latitude && (
                     <p className="mt-1 text-xs text-red-500">
-                      {errors.latitude}
+                      {errors.location.latitude.message}
                     </p>
                   )}
                 </div>
@@ -479,49 +627,34 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                     {t('addAsset.longitude') || 'Longitude'}
                   </label>
                   <Input
-                    name="longitude"
                     type="text"
-                    value={formData.location.longitude}
-                    onChange={(e) =>
-                      handleCoordinateChange('longitude', e.target.value)
-                    }
+                    {...register('location.longitude')}
                     placeholder={
                       t('addAsset.longitudePlaceholder') || 'e.g., -74.0060'
                     }
                     className={
-                      errors.longitude
-                        ? 'border-red-500'
-                        : '' + ' border-2 rounded-md'
+                      errors.location?.longitude
+                        ? 'border-red-500 border-2 rounded-md'
+                        : 'border-2 rounded-md'
                     }
                   />
-                  {errors.longitude && (
+                  {errors.location?.longitude && (
                     <p className="mt-1 text-xs text-red-500">
-                      {errors.longitude}
+                      {errors.location.longitude.message}
                     </p>
                   )}
                 </div>
               </div>
 
               {/* Map Display */}
-              {hasValidCoordinates ? (
-                <div className="mt-2">
-                  <LocationMap
-                    latitude={latitudeNum}
-                    longitude={longitudeNum}
-                    height="250px"
-                  />
-                </div>
-              ) : (
-                <div className="mt-2 h-[250px] rounded-lg border border-gray-300 bg-gray-50 flex items-center justify-center">
-                  <div className="text-center text-gray-400">
-                    <MapPin className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">
-                      {t('addAsset.enterCoordinates') ||
-                        'Enter latitude and longitude to view map'}
-                    </p>
-                  </div>
-                </div>
-              )}
+              <div className="mt-2">
+                <LocationMap
+                  latitude={latitudeNum}
+                  longitude={longitudeNum}
+                  height="250px"
+                  onLocationChange={handleLocationChange}
+                />
+              </div>
             </div>
 
             {/* Additional Attributes */}
@@ -530,32 +663,26 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 {t('addAsset.additionalAttributes') || 'Additional Attributes'}
               </label>
               <div className="space-y-2">
-                {additionalAttributes.map((attr, index) => (
+                {attributeFields.map((_field, index) => (
                   <div key={index} className="flex gap-2 items-center">
                     <Input
                       placeholder={
                         t('addAsset.additionalAttributes') ||
                         'Additional Attributes'
                       }
-                      value={attr.key}
-                      onChange={(e) =>
-                        handleAttributeChange(index, 'key', e.target.value)
-                      }
+                      {...register(`attributes.${index}.key` as const)}
                       className="flex-1"
                     />
                     <Input
                       placeholder={t('addAsset.value') || 'Value'}
-                      value={attr.value}
-                      onChange={(e) =>
-                        handleAttributeChange(index, 'value', e.target.value)
-                      }
+                      {...register(`attributes.${index}.value` as const)}
                       className="flex-1"
                     />
                     <div className="flex gap-2">
-                      {index === additionalAttributes.length - 1 && (
+                      {index === attributeFields.length - 1 && (
                         <Button
                           type="button"
-                          onClick={handleAddAttribute}
+                          onClick={() => append({ key: '', value: '' })}
                           className="bg-secondary hover:bg-secondary/90 text-white px-3"
                           size="sm"
                         >
@@ -563,10 +690,10 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                           {t('addAsset.add') || 'Add'}
                         </Button>
                       )}
-                      {additionalAttributes.length > 1 && (
+                      {attributeFields.length > 1 && (
                         <Button
                           type="button"
-                          onClick={() => handleRemoveAttribute(index)}
+                          onClick={() => remove(index)}
                           variant="outline"
                           className="px-3"
                           size="sm"
@@ -582,7 +709,6 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
             </div>
           </form>
         </div>
-
         {/* Footer */}
         <DialogFooter className="bg-gray-50 p-4 rounded-b-lg flex justify-end gap-2">
           <Button
@@ -594,7 +720,8 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
             {t('addAsset.cancel') || 'Cancel'}
           </Button>
           <Button
-            onClick={handleSave}
+            type="submit"
+            onClick={handleSubmit(onSubmit as unknown as SubmitHandler<AddAssetFormValues>)}
             disabled={isLoading}
             className="bg-black hover:bg-black/90 text-white"
             isLoading={isLoading}
