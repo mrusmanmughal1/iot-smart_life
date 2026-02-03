@@ -33,7 +33,7 @@ export interface Customer {
 
 export interface CreateCustomerData {
   name: string;
-  contactEmail: string;
+  email: string;
   phone: string;
   address?: string;
   city?: string;

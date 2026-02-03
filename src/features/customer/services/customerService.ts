@@ -14,13 +14,13 @@ export const customerService = {
    */
   async createCustomer(data: CreateCustomerData) {
     // Validate required fields
-    if (!data.customerName || !data.contactEmail || !data.phoneNumber) {
+    if (!data.name || !data.email || !data.phone) {
       throw new Error('Customer name, email, and phone number are required');
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.contactEmail)) {
+    if (!emailRegex.test(data.email)) {
       throw new Error('Invalid email format');
     }
 
@@ -49,9 +49,9 @@ export const customerService = {
     data: Partial<CreateCustomerData>
   ) {
     // If email is being updated, validate it
-    if (data.contactEmail) {
+    if (data.email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(data.contactEmail)) {
+      if (!emailRegex.test(data.email)) {
         throw new Error('Invalid email format');
       }
     }
