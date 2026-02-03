@@ -32,13 +32,13 @@ export interface Customer {
 }
 
 export interface CreateCustomerData {
-  customerName: string;
+  name: string;
   contactEmail: string;
-  phoneNumber: string;
+  phone: string;
   address?: string;
   city?: string;
-  stateProvince?: string;
-  zipPostalCode?: string;
+  state?: string;
+  zip?: string;
   country: string;
   status: CustomerStatus;
   maxUsers: number;

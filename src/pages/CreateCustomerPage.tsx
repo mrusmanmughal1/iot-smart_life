@@ -20,16 +20,16 @@ import { CustomerStatus, CustomerPlan } from '@/features/customer/types';
 
 // Zod validation schema
 const createCustomerSchema = z.object({
-  customerName: z.string().min(1, 'Customer name is required').trim(),
-  contactEmail: z
+  name: z.string().min(1, 'Customer name is required').trim(),
+  email: z
     .string()
     .email('Contact email must be valid')
     .min(1, 'Contact email is required'),
-  phoneNumber: z.string().min(1, 'Phone number is required').trim(),
+  phone: z.string().min(1, 'Phone number is required').trim(),
   address: z.string().optional(),
   city: z.string().optional(),
-  stateProvince: z.string().optional(),
-  zipPostalCode: z.string().optional(),
+  state: z.string().optional(),
+  zip: z.string().optional(),
   country: z.string(),
   status: z.string(),
   maxUsers: z.string(),
@@ -48,18 +48,7 @@ const availableFeatures = [
   { id: 'white-labeling', label: 'White Labeling', enabled: true },
 ];
 
-const countries = [
-  'United States',
-  'Canada',
-  'United Kingdom',
-  'Australia',
-  'Germany',
-  'France',
-  'Spain',
-  'Italy',
-  'Japan',
-  'China',
-];
+
 
 const statusOptions = ['Active', 'Inactive', 'Suspended', 'Pending'];
 
@@ -78,14 +67,14 @@ export default function CreateCustomerPage() {
   } = useForm<CreateCustomerFormData>({
     resolver: zodResolver(createCustomerSchema),
     defaultValues: {
-      customerName: '',
-      contactEmail: '',
-      phoneNumber: '',
+      name: '',
+      email: '',
+      phone: '',
       address: '',
       city: '',
-      stateProvince: '',
-      zipPostalCode: '',
-      country: 'United States',
+      state: '',
+      zip: '',
+      country: '',
       status: 'Active',
       maxUsers: '50',
       plan: 'Standard',
@@ -105,13 +94,13 @@ export default function CreateCustomerPage() {
   const onSubmit = async (data: CreateCustomerFormData) => {
     // Transform form data to API format
     const customerData: CreateCustomerData = {
-      customerName: data.customerName,
-      contactEmail: data.contactEmail,
-      phoneNumber: data.phoneNumber,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
       address: data.address || undefined,
       city: data.city || undefined,
-      stateProvince: data.stateProvince || undefined,
-      zipPostalCode: data.zipPostalCode || undefined,
+      state: data.state || undefined,
+      zip: data.zip || undefined,
       country: data.country,
       status: data.status as CustomerStatus,
       maxUsers: parseInt(data.maxUsers, 10),
@@ -161,20 +150,20 @@ export default function CreateCustomerPage() {
                     {/* Customer Name */}
                     <div>
                       <label
-                        htmlFor="customerName"
+                        htmlFor="name"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
                         Customer Name <span className="text-red-500">*</span>
                       </label>
                       <Input
-                        id="customerName"
-                        {...register('customerName')}
+                        id="name"
+                        {...register('name')}
                         placeholder="Enter customer name"
                         className="w-full border border-gray-300 rounded-md "
                       />
-                      {errors.customerName && (
+                      {errors.name && (
                         <p className="mt-1 text-sm text-red-600">
-                          {errors.customerName.message}
+                          {errors.name.message}
                         </p>
                       )}
                     </div>
@@ -182,21 +171,21 @@ export default function CreateCustomerPage() {
                     {/* Contact Email */}
                     <div>
                       <label
-                        htmlFor="contactEmail"
+                        htmlFor="email"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
                         Contact Email <span className="text-red-500">*</span>
                       </label>
                       <Input
-                        id="contactEmail"
+                        id="email"
                         type="email"
-                        {...register('contactEmail')}
+                        {...register('email')}
                         placeholder="Enter contact email"
                         className="w-full border border-gray-300 rounded-md"
                       />
-                      {errors.contactEmail && (
+                      {errors.email && (
                         <p className="mt-1 text-sm text-red-600">
-                          {errors.contactEmail.message}
+                          {errors.email.message}
                         </p>
                       )}
                     </div>
@@ -204,20 +193,20 @@ export default function CreateCustomerPage() {
                     {/* Phone Number */}
                     <div>
                       <label
-                        htmlFor="phoneNumber"
+                        htmlFor="phone"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
                         Phone Number <span className="text-red-500">*</span>
                       </label>
                       <Input
-                        id="phoneNumber"
-                        {...register('phoneNumber')}
+                        id="phone"
+                        {...register('phone')}
                         placeholder="Enter phone number"
                         className="w-full border border-gray-300 rounded-md"
                       />
-                      {errors.phoneNumber && (
+                      {errors.phone && (
                         <p className="mt-1 text-sm text-red-600">
-                          {errors.phoneNumber.message}
+                          {errors.phone.message}
                         </p>
                       )}
                     </div>
@@ -256,14 +245,14 @@ export default function CreateCustomerPage() {
                       </div>
                       <div>
                         <label
-                          htmlFor="stateProvince"
+                          htmlFor="state"
                           className="block text-sm font-medium text-gray-700 mb-2"
                         >
                           State/Province
                         </label>
                         <Input
-                          id="stateProvince"
-                          {...register('stateProvince')}
+                          id="state"
+                          {...register('state')}
                           placeholder="Enter state/province"
                           className="w-full border border-gray-300 rounded-md"
                         />
@@ -274,14 +263,14 @@ export default function CreateCustomerPage() {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <label
-                          htmlFor="zipPostalCode"
+                          htmlFor="zip"
                           className="block text-sm font-medium text-gray-700 mb-2"
                         >
                           Zip/Postal Code
                         </label>
                         <Input
-                          id="zipPostalCode"
-                          {...register('zipPostalCode')}
+                          id="zip"
+                          {...register('zip')}
                           placeholder="Enter zip/postal code"
                           className="w-full border border-gray-300 rounded-md"
                         />
@@ -293,27 +282,13 @@ export default function CreateCustomerPage() {
                         >
                           Country
                         </label>
-                        <Controller
-                          name="country"
-                          control={control}
-                          render={({ field }) => (
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
-                              <SelectTrigger id="country" className="w-full">
-                                <SelectValue placeholder="Select country" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {countries.map((country) => (
-                                  <SelectItem key={country} value={country}>
-                                    {country}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
+                        <Input
+                          id="country"
+                          {...register('country')}
+                          placeholder="Enter country"
+                          className="w-full border border-gray-300 rounded-md"
                         />
+
                       </div>
                     </div>
 
@@ -428,8 +403,8 @@ export default function CreateCustomerPage() {
                                     >
                                       <div
                                         className={`w-3 h-3 rounded-sm ${isChecked
-                                            ? 'bg-green-500'
-                                            : 'bg-gray-900'
+                                          ? 'bg-green-500'
+                                          : 'bg-gray-900'
                                           }`}
                                       />
                                       <Checkbox

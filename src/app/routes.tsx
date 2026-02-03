@@ -162,32 +162,7 @@ export const router = createBrowserRouter([
         path: '/alarms',
         element: <AlarmsPage />,
       },
-      {
-        path: '/users',
-        element: (
-          <AppLayout>
-            <Outlet />
-          </AppLayout>
-        ),
-        children: [
-          {
-            index: true,
-            element: <UsersPage />,
-          },
-          {
-            path: 'create',
-            element: <CreateUserPage />,
-          },
-          {
-            path: 'bulk-management',
-            element: <BulkUserManagementPage />,
-          },
-          {
-            path: ':id/permissions',
-            element: <UserDetailsPermissionsPage />,
-          },
-        ],
-      },
+    
       {
         path: '/notifications',
         element: <NotificationsPage />,
@@ -226,7 +201,6 @@ export const router = createBrowserRouter([
           },
         ],
       },
-
       {
         path: '/settings',
         element: <SettingsPage />,
@@ -453,7 +427,32 @@ export const router = createBrowserRouter([
           }
         ],
       },
-
+      {
+        path: '/users',
+        element: (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <UsersPage />,
+          },
+          {
+            path: 'create',
+            element: <CreateUserPage />,
+          },
+          {
+            path: 'bulk-management',
+            element: <BulkUserManagementPage />,
+          },
+          {
+            path: ':id/permissions',
+            element: <UserDetailsPermissionsPage />,
+          },
+        ],
+      },
       // --------------------Customer Management Routes--------------------
       {
         path: '/customer-management',

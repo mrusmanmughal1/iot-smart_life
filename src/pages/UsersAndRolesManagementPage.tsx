@@ -15,108 +15,15 @@ import { Input } from '@/components/ui/input';
 import { Plus, Search, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { DeleteRoleModal } from '@/components/users/DeleteRoleModal';
-
-interface SystemRole {
-  id: string;
-  title: string;
-  description: string;
-  features: string[];
-}
-
-interface Role {
-  id: string;
-  roleName: string;
-  description: string;
-  usersCount: number;
-}
-
-const systemRoles: SystemRole[] = [
-  {
-    id: 'system-admin',
-    title: 'System Administrator',
-    description: 'Full system access and control',
-    features: [
-      'Manage all tenants and customers',
-      'System configuration',
-      'User management',
-    ],
-  },
-  {
-    id: 'tenant-admin',
-    title: 'Tenant Administrator',
-    description: 'Manage tenant resources',
-    features: ['Manage customers', 'Device management', 'Dashboard creation'],
-  },
-  {
-    id: 'customer-user',
-    title: 'Customer User',
-    description: 'Customer-level access',
-    features: [
-      'View assigned devices',
-      'Access dashboards',
-      'Limited configuration',
-    ],
-  },
-];
-
-const roles: Role[] = [
-  {
-    id: 'device-manager',
-    roleName: 'Device Manager',
-    description: 'Manage devices and telemetry',
-    usersCount: 8,
-  },
-  {
-    id: 'dashboard-viewer',
-    roleName: 'Dashboard Viewer',
-    description: 'Read-only dashboard access',
-    usersCount: 15,
-  },
-  {
-    id: 'report-generator',
-    roleName: 'Report Generator',
-    description: 'Generate and export reports',
-    usersCount: 3,
-  },
-];
+import Roles from '@/features/users/components/Roles';
+import Users from '@/features/users/components/Users';
 
 export default function UsersAndRolesManagementPage() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Users');
   const [searchQuery, setSearchQuery] = useState('');
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-
   const handleAddUser = () => {
-    toast.success('Add user functionality');  
+    toast.success('Add user functionality');
   };
-
-  const handleEdit = (roleId: string) => {
-    navigate(`/users-management/edit-role/${roleId}`);
-  };
-
-  const handleDelete = (roleId: string) => {
-    const role = roles.find((r) => r.id === roleId);
-    if (role) {
-      setSelectedRole(role);
-      setDeleteModalOpen(true);
-    }
-  };
-
-  const handleDeleteConfirm = () => {
-    if (selectedRole) {
-      // TODO: Implement actual delete API call
-      toast.success(`Role "${selectedRole.roleName}" deleted successfully`);
-      setSelectedRole(null);
-    }
-  };
-
-  const filteredRoles = roles.filter(
-    (role) =>
-      role.roleName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      role.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <div className="mx-auto space-y-4">
@@ -128,7 +35,7 @@ export default function UsersAndRolesManagementPage() {
                 Users and Roles Management
               </h1>
               <p className="text-gray-600 text-sm dark:text-white">
-                Role: Customer Administrator
+                Manage users and their roles
               </p>
             </div>
             <Button onClick={handleAddUser} variant="secondary">
@@ -151,12 +58,12 @@ export default function UsersAndRolesManagementPage() {
                 >
                   Users
                 </TabsTrigger>
-                <TabsTrigger
+                {/* <TabsTrigger
                   value="Customers"
                   className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
                 >
                   Customers
-                </TabsTrigger>
+                </TabsTrigger> */}
                 <TabsTrigger
                   value="Roles"
                   className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
@@ -180,116 +87,8 @@ export default function UsersAndRolesManagementPage() {
           </div>
         </div>
 
-        {/* Users and Roles Management Table */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Users and Roles Management
-          </h2>
-          <Card className="bg-white p-8 shadow-sm dark:bg-gray-900 dark:border-gray-700">
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-primary hover:bg-primary">
-                      <TableHead className="text-white font-semibold">
-                        ROLE NAME
-                      </TableHead>
-                      <TableHead className="text-white font-semibold">
-                        DESCRIPTION
-                      </TableHead>
-                      <TableHead className="text-white font-semibold text-center">
-                        USERS COUNT
-                      </TableHead>
-                      <TableHead className="text-white font-semibold text-right">
-                        ACTIONS
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRoles.map((role) => (
-                      <TableRow key={role.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            {role.roleName}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-gray-600">
-                          {role.description}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span className="text-gray-900 font-medium">
-                            {role.usersCount.toString().padStart(2, '0')}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              onClick={() => handleEdit(role.id)}
-                              variant="outline"
-                              size="sm"
-                              className="bg-gray-200 hover:bg-gray-300 text-gray-700"
-                            >
-                              <Edit className="h-4 w-4  " />
-                            </Button>
-                            <Button
-                              onClick={() => handleDelete(role.id)}
-                              variant="secondary"
-                              size="sm"
-                            >
-                              <Trash2 className="h-4 w-4  " />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-secondary-main/20 text-white border-2 border-secondary-main shadow-sm dark:bg-gray-900 dark:border-gray-700">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
-                  Total Roles
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">12</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-success/20 text-white border-2 border-success shadow-sm dark:bg-gray-900 dark:border-gray-700">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
-                  Active Roles
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">10</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-yellow-500/20 text-white border-2 border-yellow-500 shadow-sm dark:bg-gray-900 dark:border-gray-700">
-            <CardContent className="p-6">
-              <div className="text-center">
-                <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
-                  Custom Roles
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">09</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Delete Role Modal */}
-        <DeleteRoleModal
-          open={deleteModalOpen}
-          onOpenChange={setDeleteModalOpen}
-          role={selectedRole}
-          onConfirm={handleDeleteConfirm}
-        />
+        {activeTab === 'Users' && <Users />}
+        {activeTab === 'Roles' && <Roles />}
       </div>
     </div>
   );
