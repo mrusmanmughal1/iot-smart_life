@@ -138,7 +138,7 @@ const CustomerPage = () => {
                 open={deleteModalOpen}
                 onOpenChange={setDeleteModalOpen}
                 customer={selectedCustomer || undefined}
-                user={selectedCustomer || null}
+                user={null}
                 onConfirm={handleDeleteConfirm}
             />
         </div>

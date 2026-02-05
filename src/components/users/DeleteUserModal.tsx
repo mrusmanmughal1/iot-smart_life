@@ -13,7 +13,7 @@ import { Customer } from '@/features/customer/types';
 interface DeleteUserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: Customer | null;
+  user: User | null;
   onConfirm: () => void;
   role?: string;
   customer?: Customer | undefined;
@@ -79,7 +79,7 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
                 <p className="font-bold text-gray-900">{user.name || 'Unknown User'}</p>
                 <p className="text-sm text-gray-600">{user.email}</p>
                 <p className="text-sm text-gray-600">Role: {role}</p>
-                <p className="text-sm text-gray-600">Customer: {customer}</p>
+                {/* <p className="text-sm text-gray-600">Customer: {customer}</p> */}
               </div>
             </div>
           </div>
