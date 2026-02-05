@@ -79,7 +79,7 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
                 <p className="font-bold text-gray-900">{user.name || 'Unknown User'}</p>
                 <p className="text-sm text-gray-600">{user.email}</p>
                 <p className="text-sm text-gray-600">Role: {role}</p>
-                {/* <p className="text-sm text-gray-600">Customer: {customer}</p> */}
+                {/* <sssp className="text-sm text-gray-600">Customer: {customer}</sssp> */}
               </div>
             </div>
           </div>
