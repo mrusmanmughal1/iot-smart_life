@@ -28,7 +28,6 @@ const createRoleSchema = z.object({
     status: z.boolean(),
     permissions: z.array(z.string()),
 });
-
 type CreateRoleFormData = z.infer<typeof createRoleSchema>;
 
 // Permission categories structure

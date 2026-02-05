@@ -66,16 +66,16 @@ export default function CreateCustomerPage() {
       state: '',
       zip: '',
       country: '',
-      // status: 'Active',
-      // maxUsers: '50',
-      // plan: 'Standard',
-      // features: [
-      //   'device-management',
-      //   'advanced-reports',
-      //   'api-access',
-      //   'data-analytics',
-      //   'white-labeling',
-      // ],
+      status: 'Active',
+      maxUsers: '50',
+      plan: 'Standard',
+      features: [
+        'device-management',
+        'advanced-reports',
+        'api-access',
+        'data-analytics',
+        'white-labeling',
+      ],
     },
     mode: 'onChange',
   });
@@ -85,7 +85,7 @@ export default function CreateCustomerPage() {
   const onSubmit = async (data: CreateCustomerFormData) => {
     // Transform form data to API format
     const customerData: CreateCustomerData = {
-      tenantId: "cb077395-1f42-486e-8a6f-72551c1e3022",
+      // tenantId: "cb077395-1f42-486e-8a6f-72551c1e3022",
       name: data.name,
       email: data.email,
       phone: data.phone,
@@ -94,10 +94,10 @@ export default function CreateCustomerPage() {
       state: data.state || undefined,
       zip: data.zip || undefined,
       country: data.country,
-      // status: data.status as CustomerStatus,
-      // maxUsers: parseInt(data.maxUsers, 10),
-      // plan: data.plan as CustomerPlan,
-      // features: data.features,
+      status: data.status as CustomerStatus,
+      maxUsers: parseInt(data.maxUsers, 10),
+      plan: data.plan as CustomerPlan,
+      features: data.features,
     };
     createCustomerMutation.mutate(customerData);
   };

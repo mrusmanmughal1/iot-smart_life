@@ -8,14 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User } from '@/services/api/users.api';
 import { X } from 'lucide-react';
+import { Customer } from '@/features/customer/types';
 
 interface DeleteUserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: User | null;
+  user: Customer | null;
   onConfirm: () => void;
   role?: string;
-  customer?: string;
+  customer?: Customer | undefined;
 }
 
 export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
