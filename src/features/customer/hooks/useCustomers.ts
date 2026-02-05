@@ -8,8 +8,10 @@ import type { CustomerQuery } from '../types';
 export const useCustomers = (params?: CustomerQuery) => {
   return useQuery({
     queryKey: ['customers', params],
-    queryFn: () => customersApi.getAll(params),
-    retry: 2,
+    queryFn: async () => {
+      const res = await customersApi.getAll(params);
+      return res.data.data;
+    },
   });
 };
 
@@ -21,7 +23,7 @@ export const useCustomer = (customerId: string | undefined) => {
     queryKey: ['customers', customerId],
     queryFn: () => customersApi.getById(customerId!),
     enabled: !!customerId,
-    retry: 2,
+
   });
 };
 

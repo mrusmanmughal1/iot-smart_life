@@ -49,7 +49,6 @@ const Roles = () => {
 
 
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState('Users');
     const [searchQuery, setSearchQuery] = useState('');
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -89,7 +88,7 @@ const Roles = () => {
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                     Users and Roles Management
                 </h2>
-                <Card className="bg-white p-8 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+                <Card className="bg-white p-6 shadow-sm dark:bg-gray-900 dark:border-gray-700">
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
                             <Table>
@@ -154,7 +153,7 @@ const Roles = () => {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 mt-8 gap-4">
                 <Card className="bg-secondary-main/20 text-white border-2 border-secondary-main shadow-sm dark:bg-gray-900 dark:border-gray-700">
                     <CardContent className="p-6">
                         <div className="text-center">

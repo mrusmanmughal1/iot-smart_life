@@ -6,19 +6,20 @@
 body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 button {
   cursor: pointer !important;
 }
+
 /* gradient colors for bg  */
 .bg-gradient-primary {
   background: #44489d;
-  background: linear-gradient(
-    215deg,
-    rgba(68, 72, 157, 1) 5%,
-    rgba(195, 107, 169, 1) 47%,
-    rgba(29, 23, 76, 1) 100%
-  );
+  background: linear-gradient(215deg,
+      rgba(68, 72, 157, 1) 5%,
+      rgba(195, 107, 169, 1) 47%,
+      rgba(29, 23, 76, 1) 100%);
 }
+
 /* Tailwind CSS v4 Theme Configuration */
 /* 
  * Using @theme directive to customize Tailwind CSS v4 theme
@@ -68,7 +69,8 @@ button {
   /* Border & Input Colors */
   --color-border: 214.3 31.8% 91.4%;
   --color-input: 214.3 31.8% 91.4%;
-  --color-ring: 237 40% 44%; /* Using primary color for ring */
+  --color-ring: 237 40% 44%;
+  /* Using primary color for ring */
 
   /* Border Radius - Available as rounded-{name} */
   --radius-sm: 0.25rem;
@@ -139,7 +141,8 @@ button {
     /* Border & Input */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 237 40% 44%; /* Using primary color */
+    --ring: 237 40% 44%;
+    /* Using primary color */
 
     /* Radius */
     --radius: 0.5rem;
@@ -186,7 +189,8 @@ button {
     /* Border & Input - Dark theme */
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 237 45% 55%; /* Using primary color for dark mode */
+    --ring: 237 45% 55%;
+    /* Using primary color for dark mode */
 
     /* Success Color - Dark theme */
     --success: 142 71% 45%;
@@ -389,14 +393,17 @@ button {
 
   /* Hide scrollbar but keep functionality */
   .sidebar-scroll {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* Internet Explorer 10+ */
   }
 
   .sidebar-scroll::-webkit-scrollbar {
     width: 0;
     height: 0;
-    display: none; /* Chrome, Safari, Edge */
+    display: none;
+    /* Chrome, Safari, Edge */
   }
 
   @keyframes spin {
@@ -412,6 +419,7 @@ button {
       opacity: 0;
       transform: translateY(10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -419,8 +427,7 @@ button {
   }
 
   /* Responsive utilities */
-  @media (max-width: 768px) {
-  }
+  @media (max-width: 768px) {}
 }
 
 /* Print Styles */

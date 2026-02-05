@@ -265,7 +265,7 @@ export default function CreateUserPage() {
                       htmlFor="customerId"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      Customer
+                      Customers List
                     </label>
                     <Controller
                       name="customerId"

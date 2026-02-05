@@ -1,22 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { DeleteRoleModal } from '@/components/users/DeleteRoleModal';
 import Roles from '@/features/users/components/Roles';
 import Users from '@/features/users/components/Users';
+import CustomerPage from '@/features/users/components/Customer';
 
 export default function UsersAndRolesManagementPage() {
   const [activeTab, setActiveTab] = useState('Users');
@@ -39,7 +29,7 @@ export default function UsersAndRolesManagementPage() {
               </p>
             </div>
             <Button onClick={handleAddUser} variant="secondary">
-              <Plus className="h-4 w-4  " />
+              <Plus className="h-4 w-4" />
               Add User
             </Button>
           </div>
@@ -58,12 +48,12 @@ export default function UsersAndRolesManagementPage() {
                 >
                   Users
                 </TabsTrigger>
-                {/* <TabsTrigger
+                <TabsTrigger
                   value="Customers"
                   className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
                 >
                   Customers
-                </TabsTrigger> */}
+                </TabsTrigger>
                 <TabsTrigger
                   value="Roles"
                   className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
@@ -89,6 +79,10 @@ export default function UsersAndRolesManagementPage() {
 
         {activeTab === 'Users' && <Users />}
         {activeTab === 'Roles' && <Roles />}
+        {activeTab === 'Customers' && <CustomerPage />}
+
+
+
       </div>
     </div>
   );

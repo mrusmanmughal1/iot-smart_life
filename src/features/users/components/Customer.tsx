@@ -1,4 +1,4 @@
-import { MoreVertical, Edit, Trash2, Eye, UserPlus, Users2, } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Users2, } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,12 +16,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useUsers } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, UserRole } from '@/services/api/users.api';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { DeleteUserModal } from '@/components/users/DeleteUserModal';
 import {
@@ -29,36 +26,30 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-const Users = () => {
-    const navigate = useNavigate();
-    const { data: usersData, isLoading } = useUsers();
-    const users = usersData || [];
+import { useCustomers } from '@/features/customer/hooks';
+import { Customer } from '@/features/customer/types';
+const CustomerPage = () => {
+    const { data: customersData, isLoading } = useCustomers();
+    const customers = customersData?.data || [];
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
-    const handleManageUsersClick = (user: User) => {
-        if (user.role === UserRole.CUSTOMER_USER) {
-            navigate('/users-management/customer-users');
-        } else {
-            navigate('/users-management/customer');
-        }
-    };
-
-    const handleDeleteClick = (user: User) => {
-        setSelectedUser(user);
+    const handleDeleteClick = (customer: Customer) => {
+        setSelectedCustomer(customer);
         setDeleteModalOpen(true);
     };
     const handleDeleteConfirm = () => {
-        if (selectedUser) {
-            toast.success(`User ${selectedUser.name || selectedUser.email} deleted successfully`);
-            setSelectedUser(null);
+        if (selectedCustomer) {
+            toast.success(`Customer ${selectedCustomer.customerName || selectedCustomer.contactEmail} deleted successfully`);
+            setSelectedCustomer(null);
         }
     };
 
     return (
         <div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">All Users</h2>
-            <Card className='pt-6'>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">All Customers</h2>
+            <Card>
+
                 <CardContent>
                     {isLoading ? (
                         <div className="space-y-3">
@@ -67,11 +58,10 @@ const Users = () => {
                             ))}
                         </div>
                     ) : (
-                        <Table >
-                            <TableHeader className='bg-primary    text-white'>
+                        <Table className='mt-6'>
+                            <TableHeader className='bg-primary text-white '>
                                 <TableRow>
-                                    <TableHead>User</TableHead>
-                                    <TableHead>Email</TableHead>
+                                    <TableHead>Customer </TableHead>
                                     <TableHead>Role</TableHead>
                                     <TableHead>Status</TableHead>
                                     <TableHead>Created</TableHead>
@@ -79,22 +69,21 @@ const Users = () => {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {users?.map((user: User) => (
-                                    <TableRow key={user.id}>
+                                {customers?.map((customer: Customer) => (
+                                    <TableRow key={customer.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
                                                 <Avatar>
                                                     <AvatarFallback className="bg-purple-100 text-purple-700">
-                                                        {user.name?.[0]?.toUpperCase() || 'U'}
+                                                        {customer.customerName?.[0]?.toUpperCase() || 'C'}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div>
-                                                    <p className="font-medium">{user.name}</p>
-                                                    <p className="text-sm text-slate-500">{user.email}</p>
+                                                    <p className="font-medium">{customer.customerName}</p>
+                                                    <p className="text-sm text-slate-500">{customer.contactEmail}</p>
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell>{user.email}</TableCell>
                                         <TableCell>
                                             <Badge variant="outline">Administrator</Badge>
                                         </TableCell>
@@ -102,20 +91,16 @@ const Users = () => {
                                             <Badge variant="success">Active</Badge>
                                         </TableCell>
                                         <TableCell>
-                                            {new Date(user.createdAt).toLocaleDateString()}
+                                            {new Date(customer.createdAt).toLocaleDateString()}
                                         </TableCell>
                                         <TableCell className="text-right flex items-center  relative justify-end gap-1">
-                                            <Tooltip>
+                                            <Tooltip  >
                                                 <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon-sm"
-                                                        onClick={() => handleManageUsersClick(user)}
-                                                    >
+                                                    <Button variant="ghost" size="icon-sm">
                                                         <Users2 className="h-4 w-4" />
                                                     </Button>
                                                 </TooltipTrigger>
-                                                <TooltipContent className="absolute shadow-md">
+                                                <TooltipContent className="absolute   shadow-md "  >
                                                     Manage users
                                                 </TooltipContent>
                                             </Tooltip>
@@ -132,7 +117,7 @@ const Users = () => {
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         className="text-red-600"
-                                                        onClick={() => handleDeleteClick(user)}
+                                                        onClick={() => handleDeleteClick(customer)}
                                                     >
                                                         <Trash2 className="h-4 w-4 mr-2" />
                                                         Delete
@@ -152,11 +137,11 @@ const Users = () => {
             <DeleteUserModal
                 open={deleteModalOpen}
                 onOpenChange={setDeleteModalOpen}
-                user={selectedUser}
+                customer={selectedCustomer}
                 onConfirm={handleDeleteConfirm}
             />
         </div>
     )
 }
 
-export default Users
+export default CustomerPage

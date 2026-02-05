@@ -228,7 +228,7 @@ export default function RolePermissionManagementPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
-      <PageHeader title="" />
+ 
       <div className="mx-auto space-y-6">
         <PageHeader
           title="Role Permission Management"

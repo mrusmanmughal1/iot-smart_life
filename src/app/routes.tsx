@@ -14,14 +14,12 @@ import { OAuthCallbackPage } from '../pages/OAuthCallbackPage.tsx';
 import { DashboardPage } from '../pages/DashboardPage.tsx';
 import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
 import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
-
 import MainDashboardPage from '@/pages/MainDashboardPage.tsx';
 import MainControlPanelPage from '@/pages/MainControlPanelPage.tsx';
 import DevicesPage from '@/pages/DevicesPage.tsx';
 import DeviceDetailsPage from '@/pages/DeviceDetailsPage.tsx';
 import AssetsPage from '@/pages/AssetsPage.tsx';
 import AlarmsPage from '@/pages/AlarmsPage.tsx';
-import UsersPage from '@/pages/UsersPage.tsx';
 import UserDetailsPermissionsPage from '@/pages/UserDetailsPermissionsPage.tsx';
 import CreateUserPage from '@/pages/CreateUserPage.tsx';
 import BulkUserManagementPage from '@/pages/BulkUserManagementPage.tsx';
@@ -79,6 +77,8 @@ import SearchResultsPage from '@/pages/SearchResultsPage.tsx';
 import AssignPermissionsPage from '@/pages/AssignPermissionsPage.tsx';
 import CreateCustomerPage from '@/pages/CreateCustomerPage.tsx';
 import CreateRolePage from '@/pages/CreateRolePage.tsx';
+import CustomerPage from '@/features/users/components/Customer.tsx';
+import CustomerDetails from '@/features/users/components/CustomerDetails.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -162,7 +162,7 @@ export const router = createBrowserRouter([
         path: '/alarms',
         element: <AlarmsPage />,
       },
-    
+
       {
         path: '/notifications',
         element: <NotificationsPage />,
@@ -402,6 +402,10 @@ export const router = createBrowserRouter([
             element: <EditRolePage />,
           },
           {
+            path: 'customer-details/:id',
+            element: <CustomerDetails />,
+          },
+          {
             path: 'customer-Administrator',
             element: <CustomerAdministratorPage />,
           },
@@ -423,24 +427,6 @@ export const router = createBrowserRouter([
           },
           {
             path: 'add-new-user',
-            element: <CreateUserPage />
-          }
-        ],
-      },
-      {
-        path: '/users',
-        element: (
-          <AppLayout>
-            <Outlet />
-          </AppLayout>
-        ),
-        children: [
-          {
-            index: true,
-            element: <UsersPage />,
-          },
-          {
-            path: 'create',
             element: <CreateUserPage />,
           },
           {
@@ -451,8 +437,34 @@ export const router = createBrowserRouter([
             path: ':id/permissions',
             element: <UserDetailsPermissionsPage />,
           },
+          {
+            path: 'customers',
+            element: <CustomerPage />,
+          },
+          {
+            path: 'customer-users',
+            element: <UserDetailsPermissionsPage />,
+          },
         ],
       },
+      // {
+      //   path: '/users',
+      //   element: (
+      //     <AppLayout>
+      //     <Outlet />
+      //     </AppLayout>
+      //   ),
+      //   children: [
+      //     {
+      //       index: true,
+      //       element: <UsersPage />,
+      //     },
+      //     {
+      //       path: 'create',
+      //       element: <CreateUserPage />,
+      //     },
+      //   ],
+      // },
       // --------------------Customer Management Routes--------------------
       {
         path: '/customer-management',

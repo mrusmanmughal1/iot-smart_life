@@ -203,13 +203,13 @@ export default function FloorPlans() {
       icon: <PlusSquare className="h-5 w-5 text-primary" />,
       onClick: () => navigate('/floor-plans/create'),
     },
-    {
-      label: t('floorplans.importDWG'),
-      title: 'Files',
-      description: t('floorplans.uploadBuildingPlans'),
-      icon: <FileInput className="h-5 w-5 text-primary" />,
-      onClick: () => setIsCreateOpen(true),
-    },
+    // {
+    //   label: t('floorplans.importDWG'),
+    //   title: 'Files',
+    //   description: t('floorplans.uploadBuildingPlans'),
+    //   icon: <FileInput className="h-5 w-5 text-primary" />,
+    //   onClick: () => setIsCreateOpen(true),
+    // },
     {
       label: t('floorplans.device'),
       title: t('floorplans.deviceManagement'),
@@ -241,7 +241,7 @@ export default function FloorPlans() {
     },
     {
       accessorKey: 'category',
-        header: t('floorplans.category'),
+      header: t('floorplans.category'),
       cell: ({ row }: { row: FloorPlanRow }) => {
         const category = row.getValue('category') as string;
         const icons: Record<string, React.ReactNode> = {
@@ -303,16 +303,16 @@ export default function FloorPlans() {
         },
         icon: <Eye className="h-4 w-4" />,
       },
-      { label: t('floorplans.edit'), onClick: () => {}, icon: <Edit className="h-4 w-4" /> },
-      { label: t('floorplans.copy'), onClick: () => {}, icon: <Copy className="h-4 w-4" /> },
+      { label: t('floorplans.edit'), onClick: () => { }, icon: <Edit className="h-4 w-4" /> },
+      { label: t('floorplans.copy'), onClick: () => { }, icon: <Copy className="h-4 w-4" /> },
       {
         label: t('floorplans.export'),
-        onClick: () => {},
+        onClick: () => { },
         icon: <Download className="h-4 w-4" />,
       },
       {
-          label: t('floorplans.delete'),
-        onClick: () => {},
+        label: t('floorplans.delete'),
+        onClick: () => { },
         icon: <Trash2 className="h-4 w-4" />,
         variant: 'destructive' as const,
       },
@@ -386,7 +386,7 @@ export default function FloorPlans() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{t('floorplans.totalZones')}</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('floorplans.totalZones')}</CardTitle>
             <Layers className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -556,7 +556,7 @@ export default function FloorPlans() {
 
           <div className="space-y-4">
             <div className="space-y-2">
-                  <Label htmlFor="plan-name">{t('floorplans.floorPlanName')} <span className="text-red-500">*</span></Label>
+              <Label htmlFor="plan-name">{t('floorplans.floorPlanName')} <span className="text-red-500">*</span></Label>
               <Input
                 id="plan-name"
                 placeholder={t('floorplans.floorPlanNamePlaceholder')}
@@ -816,7 +816,7 @@ export default function FloorPlans() {
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-3 w-3 rounded-full bg-gray-500" />
-                    <span className="text-sm">{t('floorplans.offline')}</span>
+                <span className="text-sm">{t('floorplans.offline')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Thermometer className="h-4 w-4" />

@@ -13,7 +13,7 @@ interface TooltipProviderProps {
   delayDuration?: number;
 }
 
-const TooltipProvider = ({ children,   }: TooltipProviderProps) => {
+const TooltipProvider = ({ children, }: TooltipProviderProps) => {
   return <>{children}</>;
 };
 
@@ -25,10 +25,10 @@ interface TooltipProps {
   delayDuration?: number;
 }
 
-const Tooltip = ({ open: controlledOpen, onOpenChange, defaultOpen = false, children,  }: TooltipProps) => {
+const Tooltip = ({ open: controlledOpen, onOpenChange, defaultOpen = false, children, }: TooltipProps) => {
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const timeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
-  
+
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const handleOpenChange = React.useCallback((newOpen: boolean) => {
     if (controlledOpen === undefined) {
@@ -60,7 +60,7 @@ const TooltipTrigger = React.forwardRef<HTMLDivElement, TooltipTriggerProps>(
   ({ children, asChild, className, onMouseEnter, onMouseLeave, ...props }, ref) => {
     const context = React.useContext(TooltipContext);
     const timeoutRef = React.useRef<NodeJS.Timeout | undefined>(undefined);
-    
+
     if (!context) {
       throw new Error('TooltipTrigger must be used within Tooltip');
     }
@@ -140,7 +140,7 @@ const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
       <div
         ref={ref}
         className={cn(
-          'z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95',
+          'z-50 overflow-hidden rounded-md   bg-white px-3 py-1.5 text-sm text-gray-900 shadow-md animate-in fade-in-0 zoom-in-95',
           sideClasses[side],
           alignClasses[align],
           className

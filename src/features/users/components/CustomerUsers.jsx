@@ -19,9 +19,8 @@ import {
 import { useUsers } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, UserRole } from '@/services/api/users.api';
+import { User } from '@/services/api/users.api';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { DeleteUserModal } from '@/components/users/DeleteUserModal';
 import {
@@ -29,20 +28,11 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-const Users = () => {
-    const navigate = useNavigate();
+const CustomerUsers = () => {
     const { data: usersData, isLoading } = useUsers();
     const users = usersData || [];
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
-    const handleManageUsersClick = (user: User) => {
-        if (user.role === UserRole.CUSTOMER_USER) {
-            navigate('/users-management/customer-users');
-        } else {
-            navigate('/users-management/customer');
-        }
-    };
+    const [selectedUser, setSelectedUser] = useState < User | null > (null);
 
     const handleDeleteClick = (user: User) => {
         setSelectedUser(user);
@@ -58,7 +48,8 @@ const Users = () => {
     return (
         <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">All Users</h2>
-            <Card className='pt-6'>
+            <Card>
+
                 <CardContent>
                     {isLoading ? (
                         <div className="space-y-3">
@@ -67,8 +58,8 @@ const Users = () => {
                             ))}
                         </div>
                     ) : (
-                        <Table >
-                            <TableHeader className='bg-primary    text-white'>
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
                                     <TableHead>User</TableHead>
                                     <TableHead>Email</TableHead>
@@ -105,17 +96,13 @@ const Users = () => {
                                             {new Date(user.createdAt).toLocaleDateString()}
                                         </TableCell>
                                         <TableCell className="text-right flex items-center  relative justify-end gap-1">
-                                            <Tooltip>
+                                            <Tooltip  >
                                                 <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon-sm"
-                                                        onClick={() => handleManageUsersClick(user)}
-                                                    >
+                                                    <Button variant="ghost" size="icon-sm">
                                                         <Users2 className="h-4 w-4" />
                                                     </Button>
                                                 </TooltipTrigger>
-                                                <TooltipContent className="absolute shadow-md">
+                                                <TooltipContent className="absolute   shadow-md "  >
                                                     Manage users
                                                 </TooltipContent>
                                             </Tooltip>
@@ -159,4 +146,4 @@ const Users = () => {
     )
 }
 
-export default Users
+export default CustomerUsers

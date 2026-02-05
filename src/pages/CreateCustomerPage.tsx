@@ -17,7 +17,6 @@ import { HelpCircle } from 'lucide-react';
 import { useCreateCustomer } from '@/features/customer/hooks';
 import type { CreateCustomerData } from '@/features/customer/types';
 import { CustomerStatus, CustomerPlan } from '@/features/customer/types';
-
 // Zod validation schema
 const createCustomerSchema = z.object({
   name: z.string().min(1, 'Customer name is required').trim(),
@@ -36,9 +35,7 @@ const createCustomerSchema = z.object({
   plan: z.string(),
   features: z.array(z.string()),
 });
-
 type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
-
 const availableFeatures = [
   { id: 'device-management', label: 'Device Management', enabled: true },
   { id: 'advanced-reports', label: 'Advanced Reports', enabled: true },
@@ -47,17 +44,11 @@ const availableFeatures = [
   { id: 'user-management', label: 'User Management', enabled: false },
   { id: 'white-labeling', label: 'White Labeling', enabled: true },
 ];
-
-
-
 const statusOptions = ['Active', 'Inactive', 'Suspended', 'Pending'];
-
 const planOptions = ['Standard', 'Premium', 'Enterprise', 'Basic'];
-
 export default function CreateCustomerPage() {
   const navigate = useNavigate();
   const createCustomerMutation = useCreateCustomer();
-
   const {
     register,
     handleSubmit,
@@ -75,16 +66,16 @@ export default function CreateCustomerPage() {
       state: '',
       zip: '',
       country: '',
-      status: 'Active',
-      maxUsers: '50',
-      plan: 'Standard',
-      features: [
-        'device-management',
-        'advanced-reports',
-        'api-access',
-        'data-analytics',
-        'white-labeling',
-      ],
+      // status: 'Active',
+      // maxUsers: '50',
+      // plan: 'Standard',
+      // features: [
+      //   'device-management',
+      //   'advanced-reports',
+      //   'api-access',
+      //   'data-analytics',
+      //   'white-labeling',
+      // ],
     },
     mode: 'onChange',
   });
@@ -94,6 +85,7 @@ export default function CreateCustomerPage() {
   const onSubmit = async (data: CreateCustomerFormData) => {
     // Transform form data to API format
     const customerData: CreateCustomerData = {
+      tenantId: "cb077395-1f42-486e-8a6f-72551c1e3022",
       name: data.name,
       email: data.email,
       phone: data.phone,
@@ -102,12 +94,11 @@ export default function CreateCustomerPage() {
       state: data.state || undefined,
       zip: data.zip || undefined,
       country: data.country,
-      status: data.status as CustomerStatus,
-      maxUsers: parseInt(data.maxUsers, 10),
-      plan: data.plan as CustomerPlan,
-      features: data.features,
+      // status: data.status as CustomerStatus,
+      // maxUsers: parseInt(data.maxUsers, 10),
+      // plan: data.plan as CustomerPlan,
+      // features: data.features,
     };
-
     createCustomerMutation.mutate(customerData);
   };
 
@@ -147,6 +138,7 @@ export default function CreateCustomerPage() {
                     Customer Information
                   </h2>
                   <div className="space-y-4">
+
                     {/* Customer Name */}
                     <div>
                       <label
