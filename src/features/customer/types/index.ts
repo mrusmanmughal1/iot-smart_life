@@ -14,8 +14,8 @@ export enum CustomerPlan {
 
 export interface Customer {
   id: string;
-  customerName: string;
-  contactEmail: string;
+  name: string;
+  email: string;
   phoneNumber: string;
   address?: string;
   city?: string;

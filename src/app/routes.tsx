@@ -76,6 +76,8 @@ import UsersAndRolesManagementPage from '@/pages/UsersAndRolesManagementPage.tsx
 import SearchResultsPage from '@/pages/SearchResultsPage.tsx';
 import AssignPermissionsPage from '@/pages/AssignPermissionsPage.tsx';
 import CreateCustomerPage from '@/pages/CreateCustomerPage.tsx';
+import ProfileSettingsPage from '@/pages/ProfileSettingsPage.tsx';
+import CompanyProfilePage from '@/pages/CompanyProfilePage.tsx';
 import CreateRolePage from '@/pages/CreateRolePage.tsx';
 import CustomerPage from '@/features/users/components/Customer.tsx';
 import CustomerDetails from '@/features/users/components/CustomerDetails.tsx';
@@ -430,6 +432,14 @@ export const router = createBrowserRouter([
             element: <CreateUserPage />,
           },
           {
+            path: 'profile-settings',
+            element: <ProfileSettingsPage />,
+          },
+          {
+            path: 'company-profile',
+            element: <CompanyProfilePage />,
+          },
+          {
             path: 'bulk-management',
             element: <BulkUserManagementPage />,
           },
@@ -439,7 +449,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'customers',
-            element: <CustomerPage />,
+            element: <CustomerPage searchQuery='' />,
           },
           {
             path: 'customer-users',

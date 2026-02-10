@@ -23,7 +23,7 @@ import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 
 const createUserSchema = z.object({
-  contactEmail: z.string().min(1, 'Contact email is required'),
+  name: z.string().min(1, 'Contact email is required'),
   email: z.string().email('Email must be valid').min(1, 'Email is required'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   role: z.string().min(1, 'Role is required'),
@@ -41,17 +41,12 @@ export default function CreateUserPage() {
   const createUserMutation = useCreateUser();
   const { data: rolesData } = useRoles();
   const { data: customersData } = useCustomers();
-
   const [showPassword, setShowPassword] = useState(false);
 
-  const roles: Role[] = Array.isArray(rolesData?.data)
-    ? rolesData.data
-    : (rolesData?.data as { data?: Role[] })?.data ?? [];
+  const roles: Role[] = rolesData?.data || []
 
-  const customersList: Customer[] =
 
-    [];
-
+  const customersList: Customer[] = customersData?.data || [];
   const {
     register,
     handleSubmit,
@@ -60,7 +55,7 @@ export default function CreateUserPage() {
   } = useForm<CreateUserFormData>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      contactEmail: '',
+      name: '',
       email: '',
       password: '',
       role: '',
@@ -76,7 +71,7 @@ export default function CreateUserPage() {
   const onSubmit = async (data: CreateUserFormData) => {
     const userData = {
       email: data.email,
-      name: data.contactEmail,
+      name: data.name,
       phone: data.phoneNumber || data.phone,
       password: data.password,
       role: data.role as UserRole,
@@ -128,21 +123,21 @@ export default function CreateUserPage() {
                 <div className="space-y-4">
                   <div>
                     <label
-                      htmlFor="contactEmail"
+                      htmlFor="name"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      Contact Email <span className="text-red-500">*</span>
+                      Name <span className="text-red-500">*</span>
                     </label>
                     <Input
-                      id="contactEmail"
+                      id="name"
                       type="text"
-                      {...register('contactEmail')}
+                      {...register('name')}
                       placeholder="Enter customer name"
                       className="w-full border border-gray-300 rounded-md"
                     />
-                    {errors.contactEmail && (
+                    {errors.name && (
                       <p className="mt-1 text-sm text-red-600">
-                        {errors.contactEmail.message}
+                        {errors.name.message}
                       </p>
                     )}
                   </div>
@@ -286,9 +281,13 @@ export default function CreateUserPage() {
                               <SelectItem
                                 key={customer.id}
                                 value={customer.id}
-                                textValue={customer.customerName}
+                                textValue={customer.name}
                               >
-                                {customer.customerName}
+                                <div className="flex flex-col">
+                                  {customer.name}
+                                  <span className="text-xs text-gray-500">{customer.email}</span>
+                                </div>
+
                               </SelectItem>
                             ))}
                           </SelectContent>

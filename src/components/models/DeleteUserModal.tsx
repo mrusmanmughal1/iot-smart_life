@@ -5,29 +5,28 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { User } from '@/services/api/users.api';
 import { X } from 'lucide-react';
+import { Customer } from '@/features/customer/types';
 
-interface Role {
-  id: string;
-  roleName: string;
-  description: string;
-  usersCount: number;
-}
-
-interface DeleteRoleModalProps {
+interface DeleteUserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  role: Role | null;
+  user: User | null;
   onConfirm: () => void;
+  role?: string;
+  customer?: Customer | null;
 }
 
-export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
+export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   open,
   onOpenChange,
-  role,
+  user,
   onConfirm,
+  role = 'Customer Administrator',
 }) => {
-  if (!role) return null;
+  if (!user) return null;
 
   const handleDelete = () => {
     onConfirm();
@@ -38,6 +37,15 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
     onOpenChange(false);
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl p-0 bg-white">
@@ -45,14 +53,14 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
           {/* Header */}
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-gray-900">
-              Delete Role
+              Delete User Account
             </h2>
             <p className="text-base text-gray-700">
-              Are you sure you want to delete the following role?
+              Are you sure you want to delete the following user?
             </p>
           </div>
 
-          {/* Role Information Card */}
+          {/* User Information Card */}
           <div className="relative bg-gray-50 rounded-lg p-4 border border-gray-200">
             <button
               onClick={handleCancel}
@@ -61,17 +69,16 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
               <X className="h-4 w-4" />
             </button>
             <div className="flex items-start gap-4 pr-8">
-              <div className="h-12 w-12 bg-gray-700 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-lg">
-                  {role.roleName.charAt(0).toUpperCase()}
-                </span>
-              </div>
+              <Avatar className="h-12 w-12 bg-gray-700">
+                <AvatarFallback className="text-white font-semibold">
+                  {getInitials(user.name || user.email)}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1 space-y-1">
-                <p className="font-bold text-gray-900">{role.roleName}</p>
-                <p className="text-sm text-gray-600">{role.description}</p>
-                <p className="text-sm text-gray-600">
-                  Users Count: {role.usersCount.toString().padStart(2, '0')}
-                </p>
+                <p className="font-bold text-gray-900">{user.name || 'Unknown User'}</p>
+                <p className="text-sm text-gray-600">{user.email}</p>
+                <p className="text-sm text-gray-600">Role: {role}</p>
+                {/* <p className="text-sm text-gray-600">Customer: {customer}</ p> */}
               </div>
             </div>
           </div>
@@ -80,11 +87,11 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
           <div className="space-y-2">
             <p className="font-bold text-red-600 text-sm">Warning</p>
             <p className="text-sm text-gray-700">
-              This action cannot be undone. The role will be removed and users assigned to this role will lose access to:
+              This action cannot be undone. The user will lose access to:
             </p>
             <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-4">
-              <li>All role-based permissions and access</li>
-              <li>Associated configurations and settings</li>
+              <li>All assigned devices and dashboards</li>
+              <li>Customer data and configurations</li>
             </ul>
           </div>
 

@@ -3,17 +3,36 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Plus, Search } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import Roles from '@/features/users/components/Roles';
 import Users from '@/features/users/components/Users';
 import CustomerPage from '@/features/users/components/Customer';
+import { useNavigate } from 'react-router-dom';
 
 export default function UsersAndRolesManagementPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Users');
   const [searchQuery, setSearchQuery] = useState('');
-  const handleAddUser = () => {
-    toast.success('Add user functionality');
+  const handleAddAction = () => {
+    if (activeTab === 'Users') {
+      navigate('/users-management/add-new-user');
+      return;
+    }
+    if (activeTab === 'Customers') {
+      navigate('/users-management/create-customer');
+      return;
+    }
+    if (activeTab === 'Roles') {
+      navigate('/users-management/create-role');
+    }
   };
+
+  const addButtonLabel =
+    activeTab === 'Users'
+      ? 'Add User'
+      : activeTab === 'Customers'
+        ? 'Add Customer'
+        : 'Add Role';
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <div className="mx-auto space-y-4">
@@ -28,9 +47,9 @@ export default function UsersAndRolesManagementPage() {
                 Manage users and their roles
               </p>
             </div>
-            <Button onClick={handleAddUser} variant="secondary">
+            <Button onClick={handleAddAction} variant="secondary">
               <Plus className="h-4 w-4" />
-              Add User
+              {addButtonLabel}
             </Button>
           </div>
 
@@ -77,9 +96,9 @@ export default function UsersAndRolesManagementPage() {
           </div>
         </div>
 
-        {activeTab === 'Users' && <Users />}
-        {activeTab === 'Roles' && <Roles />}
-        {activeTab === 'Customers' && <CustomerPage />}
+        {activeTab === 'Users' && <Users searchQuery={searchQuery} />}
+        {activeTab === 'Roles' && <Roles searchQuery={searchQuery} />}
+        {activeTab === 'Customers' && <CustomerPage searchQuery={searchQuery} />}
 
 
 

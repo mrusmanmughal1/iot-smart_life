@@ -23,13 +23,13 @@ import { User, UserRole } from '@/services/api/users.api';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import { DeleteUserModal } from '@/components/users/DeleteUserModal';
+import { DeleteUserModal } from '@/components/models/DeleteUserModal';
 import {
     Tooltip,
     TooltipContent,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-const Users = () => {
+const Users = ({ searchQuery }: { searchQuery: string }) => {
     const navigate = useNavigate();
     const { data: usersData, isLoading } = useUsers();
     const users = usersData || [];

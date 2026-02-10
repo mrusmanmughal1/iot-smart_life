@@ -30,7 +30,10 @@ export const useCurrentUser = () => {
 export const useRoles = () => {
   return useQuery({
     queryKey: ['roles'],
-    queryFn: () => rolesApi.getAll(),
+    queryFn: async () => {
+      const response = await rolesApi.getAll();
+      return response.data.data;
+    },
   });
 };
 

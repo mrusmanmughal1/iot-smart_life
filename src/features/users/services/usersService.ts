@@ -1,5 +1,5 @@
-import { usersApi, rolesApi, permissionsApi } from '@/services/api/index.ts';
-import type { User, UserRole, UserStatus } from '@/services/api/users.api.ts';
+import { usersApi, rolesApi, } from '@/services/api/index.ts';
+import type { User, Role } from '@/services/api/users.api.ts';
 
 /**
  * Users Feature Service
@@ -27,7 +27,7 @@ export const userService = {
     const user = await usersApi.create(userData);
 
     // Assign role
-    await rolesApi.assignToUser(roleId, user.data.data.id);
+    await rolesApi.assignToUser(user.data.data.id);
 
     return user.data.data;
   },
@@ -110,7 +110,7 @@ export const userService = {
    */
   async getUserStats() {
     const stats = await usersApi.getStatistics();
-    
+
     return {
       total: stats.data.data.total,
       active: stats.data.data.active,
@@ -170,7 +170,7 @@ export const userService = {
    */
   async enable2FA(userId: string) {
     const result = await usersApi.enable2FA(userId);
-    
+
     return {
       userId,
       enabled: true,
@@ -200,7 +200,7 @@ export const userService = {
   async transferOwnership(fromUserId: string, toUserId: string) {
     // This would transfer ownership of resources
     // Implementation depends on your business logic
-    
+
     return {
       from: fromUserId,
       to: toUserId,
@@ -211,9 +211,9 @@ export const userService = {
   /**
    * Get user activity summary
    */
-  async getUserActivity(userId: string, days: number = 7) {
+  async getUserActivity(userId: string) {
     const user = await usersApi.getById(userId);
-    
+
     return {
       userId,
       lastLogin: user.data.data.lastLogin,
@@ -227,7 +227,7 @@ export const userService = {
    */
   async resetUserPassword(userId: string) {
     const result = await usersApi.resetPassword(userId);
-    
+
     return {
       userId,
       temporaryPassword: result.data.data.temporaryPassword,
@@ -262,7 +262,7 @@ export const roleService = {
    */
   async cloneRole(roleId: string, newName: string) {
     const original = await rolesApi.getById(roleId);
-    
+
     return rolesApi.create({
       name: newName,
       description: `Cloned from ${original.data.data.name}`,
@@ -270,15 +270,5 @@ export const roleService = {
     });
   },
 
-  /**
-   * Get role hierarchy
-   */
-  async getRoleHierarchy() {
-    const roles = await rolesApi.getAll();
-    
-    // Sort by permission count (proxy for hierarchy)
-    return roles.data.data.sort((a, b) => 
-      b.permissions.length - a.permissions.length
-    );
-  },
+
 };

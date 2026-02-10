@@ -7,89 +7,26 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { rolesApi } from '@/services/api';
+import type { Permission } from '@/services/api/users.api';
 import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { useUserId } from '@/features/auth/hooks/useUserId';
+import { usePermissions } from '@/features/permissions/hooks';
 
 // Zod validation schema
 const createRoleSchema = z.object({
-  roleName: z.string().min(1, 'Role name is required').trim(),
+  name: z.string().min(1, 'Role name is required').trim(),
   description: z.string().optional(),
-  roleType: z.string().min(1, 'Role type is required'),
-  baseRoleTemplate: z.string(),
-  status: z.boolean(),
-  permissions: z.array(z.string()),
+  isSystem: z.boolean(),
+  permissionIds: z.array(z.string()),
 });
 
 type CreateRoleFormData = z.infer<typeof createRoleSchema>;
 
-// Permission categories structure
-interface PermissionCategory {
-  category: string;
-  permissions: {
-    id: string;
-    label: string;
-  }[];
-}
-
-const permissionCategories: PermissionCategory[] = [
-  {
-    category: 'Device Management',
-    permissions: [
-      { id: 'read-devices', label: 'Read Devices' },
-      { id: 'write-devices', label: 'Write Devices' },
-    ],
-  },
-  {
-    category: 'Data Management',
-    permissions: [
-      { id: 'read-telemetry', label: 'Read Telemetry' },
-      { id: 'export-data', label: 'Export Data' },
-    ],
-  },
-  {
-    category: 'Report Management',
-    permissions: [
-      { id: 'view-reports', label: 'View Reports' },
-      { id: 'generate-reports', label: 'Generate Reports' },
-      { id: 'schedule-reports', label: 'Schedule Reports' },
-      { id: 'manage-templates', label: 'Manage Templates' },
-    ],
-  },
-  {
-    category: 'Dashboard Management',
-    permissions: [
-      { id: 'view-dashboards', label: 'View Dashboards' },
-      { id: 'create-dashboards', label: 'Create Dashboards' },
-    ],
-  },
-  {
-    category: 'User Management',
-    permissions: [
-      { id: 'view-users', label: 'View Users' },
-      { id: 'create-users', label: 'Create Users' },
-    ],
-  },
-  {
-    category: 'System Configuration',
-    permissions: [
-      { id: 'system-configuration', label: 'System Configuration' },
-    ],
-  },
-];
-
-const roleTypeOptions = ['Custom Role', 'System Role', 'Tenant Role'];
-const baseRoleTemplates = ['Customer User', 'Tenant Admin', 'System Admin'];
-
 export default function CreateRolePage() {
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -104,38 +41,47 @@ export default function CreateRolePage() {
   } = useForm<CreateRoleFormData>({
     resolver: zodResolver(createRoleSchema),
     defaultValues: {
-      roleName: '',
+      name: '',
       description: '',
-      roleType: 'Custom Role',
-      baseRoleTemplate: 'Customer User',
-      status: true,
-      permissions: [
-        'write-devices',
-        'read-telemetry',
-        'export-data',
-        'view-reports',
-        'generate-reports',
-        'view-dashboards',
-      ],
+      isSystem: false,
+      permissionIds: [],
     },
     mode: 'onChange',
   });
+  const { data: permissionsData } = usePermissions();
+  const permissions = useMemo(
+    () => (permissionsData || []) as Permission[],
+    [permissionsData]
+  );
+  const selectedPermissions = watch('permissionIds') || [];
 
-  const selectedPermissions = watch('permissions') || [];
+  const permissionCategories = useMemo(() => {
+    const grouped: Record<string, Permission[]> = {};
+    permissions.forEach((permission) => {
+      const key = permission.resource || 'other';
+      if (!grouped[key]) {
+        grouped[key] = [];
+      }
+      grouped[key].push(permission);
+    });
 
-  // Get all permission IDs
+    return Object.entries(grouped).map(([resource, items]) => ({
+      category: resource,
+      permissions: items,
+    }));
+  }, [permissions]);
+
   const allPermissionIds = useMemo(
-    () =>
-      permissionCategories.flatMap((cat) => cat.permissions.map((p) => p.id)),
-    []
+    () => permissions.map((permission) => permission.id),
+    [permissions]
   );
 
   const handleSelectAll = () => {
-    setValue('permissions', allPermissionIds);
+    setValue('permissionIds', allPermissionIds);
   };
 
   const handleClearAll = () => {
-    setValue('permissions', []);
+    setValue('permissionIds', []);
   };
 
   const handlePermissionToggle = (
@@ -149,19 +95,20 @@ export default function CreateRolePage() {
       onChange([...currentPermissions, permissionId]);
     }
   };
+  const userid = useUserId()
+
 
   const onSubmit = async (data: CreateRoleFormData) => {
     setIsSubmitting(true);
     try {
       const roleData = {
-        name: data.roleName,
+        name: data.name,
         description: data.description || undefined,
-        permissions: data.permissions,
-        default: data.roleType === 'System Role',
+        permissionIds: data.permissionIds,
+        isSystem: data.isSystem,
+        tenantId: userid || undefined
       };
-
       await rolesApi.create(roleData);
-
       toast.success('Role created successfully');
       queryClient.invalidateQueries({ queryKey: ['roles'] });
       navigate('/users-management');
@@ -201,20 +148,20 @@ export default function CreateRolePage() {
                   {/* Role Name */}
                   <div>
                     <label
-                      htmlFor="roleName"
+                      htmlFor="name"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
                       Role Name <span className="text-red-500">*</span>
                     </label>
                     <Input
-                      id="roleName"
-                      {...register('roleName')}
+                      id="name"
+                      {...register('name')}
                       placeholder="Enter role name"
                       className="w-full border border-gray-300 rounded-md"
                     />
-                    {errors.roleName && (
+                    {errors.name && (
                       <p className="mt-1 text-sm text-red-600">
-                        {errors.roleName.message}
+                        {errors.name.message}
                       </p>
                     )}
                   </div>
@@ -235,84 +182,16 @@ export default function CreateRolePage() {
                     />
                   </div>
 
-                  {/* Role Type */}
-                  <div>
-                    <label
-                      htmlFor="roleType"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Role Type
-                    </label>
-                    <Controller
-                      name="roleType"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            id="roleType"
-                            className="w-full border border-gray-300 rounded-md"
-                          >
-                            <SelectValue placeholder="Select role type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {roleTypeOptions.map((type) => (
-                              <SelectItem key={type} value={type}>
-                                {type}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-
-                  {/* Base Role Template */}
-                  <div>
-                    <label
-                      htmlFor="baseRoleTemplate"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Base Role Template
-                    </label>
-                    <Controller
-                      name="baseRoleTemplate"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            id="baseRoleTemplate"
-                            className="w-full border border-gray-300 rounded-md bg-gray-50"
-                          >
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {baseRoleTemplates.map((template) => (
-                              <SelectItem key={template} value={template}>
-                                {template}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
-
                   {/* Status */}
                   <div>
                     <Controller
-                      name="status"
+                      name="isSystem"
                       control={control}
                       render={({ field }) => (
                         <Checkbox
-                          checked={field.value}
+                          checked={field.value as boolean}
                           onChange={(e) => field.onChange(e.target.checked)}
-                          label="Active"
+                          label=" System Role"
                         />
                       )}
                     />
@@ -354,7 +233,7 @@ export default function CreateRolePage() {
                 </div>
 
                 <Controller
-                  name="permissions"
+                  name="permissionIds"
                   control={control}
                   render={({ field }) => (
                     <div className="space-y-3 max-h-[600px] overflow-y-auto">
@@ -368,6 +247,13 @@ export default function CreateRolePage() {
                               const isChecked = selectedPermissions.includes(
                                 permission.id
                               );
+                              const actionText = permission.actions?.length
+                                ? permission.actions.join(', ')
+                                : '';
+                              const label =
+                                permission.description ||
+                                permission.name ||
+                                `${permission.resource}${actionText ? `: ${actionText}` : ''}`;
                               return (
                                 <div
                                   key={permission.id}
@@ -382,7 +268,7 @@ export default function CreateRolePage() {
                                         field.onChange
                                       )
                                     }
-                                    label={permission.label}
+                                    label={label}
                                   />
                                 </div>
                               );

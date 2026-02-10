@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     Table,
     TableBody,
@@ -11,58 +10,22 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { DeleteRoleModal } from '@/components/users/DeleteRoleModal';
-interface Role {
-    id: string;
-    roleName: string;
-    description: string;
-    usersCount: number;
-}
+import { Edit, Trash2 } from 'lucide-react';
+import { DeleteRoleModal } from '@/components/models/DeleteRoleModal';
+import { useRoles } from '../hooks';
+import { Role } from '@/services/api/users.api';
 
-
-const roles: Role[] = [
-    {
-        id: 'device-manager',
-        roleName: 'Device Manager',
-        description: 'Manage devices and telemetry',
-        usersCount: 8,
-    },
-    {
-        id: 'dashboard-viewer',
-        roleName: 'Dashboard Viewer',
-        description: 'Read-only dashboard access',
-        usersCount: 15,
-    },
-    {
-        id: 'report-generator',
-        roleName: 'Report Generator',
-        description: 'Generate and export reports',
-        usersCount: 3,
-    },
-];
-
-const Roles = () => {
-
-
-
+const Roles = ({searchQuery}: {searchQuery: string}) => {
     const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState('');
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-
-    const handleAddUser = () => {
-        toast.success('Add user functionality');
-    };
+    const { data: roles } = useRoles();
 
     const handleEdit = (roleId: string) => {
         navigate(`/users-management/edit-role/${roleId}`);
     };
-
     const handleDelete = (roleId: string) => {
-        const role = roles.find((r) => r.id === roleId);
+        const role = roles?.data?.find((r: Role) => r.id === roleId);
         if (role) {
             setSelectedRole(role);
             setDeleteModalOpen(true);
@@ -71,17 +34,16 @@ const Roles = () => {
 
     const handleDeleteConfirm = () => {
         if (selectedRole) {
-            // TODO: Implement actual delete API call
-            toast.success(`Role "${selectedRole.roleName}" deleted successfully`);
             setSelectedRole(null);
         }
     };
 
-    const filteredRoles = roles.filter(
-        (role) =>
-            role.roleName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            role.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredRoles = roles?.data?.filter(
+        (role: Role) =>
+            role.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            role.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    ) || [];
+
     return (
         <div>
             <div className="space-y-4">
@@ -100,30 +62,23 @@ const Roles = () => {
                                         <TableHead className="text-white font-semibold">
                                             DESCRIPTION
                                         </TableHead>
-                                        <TableHead className="text-white font-semibold text-center">
-                                            USERS COUNT
-                                        </TableHead>
                                         <TableHead className="text-white font-semibold text-right">
                                             ACTIONS
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredRoles.map((role) => (
+                                    {filteredRoles.map((role: Role) => (
                                         <TableRow key={role.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                                             <TableCell className="font-medium">
                                                 <div className="flex items-center gap-2">
-                                                    {role.roleName}
+                                                    {role.name}
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-gray-600">
                                                 {role.description}
                                             </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className="text-gray-900 font-medium">
-                                                    {role.usersCount.toString().padStart(2, '0')}
-                                                </span>
-                                            </TableCell>
+
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     <Button

@@ -18,7 +18,7 @@ export interface User {
   name: string;
   role: UserRole;
   status: UserStatus;
-  companyName:string;
+  companyName: string;
   tenantId?: string;
   customerId?: string;
   phone?: string;
@@ -105,7 +105,7 @@ export const usersApi = {
   delete: (id: string) => apiClient.delete(`/users/${id}`),
 
   // Get current user
-  getCurrentUser: () => apiClient.get < ApiResponse<User>>('/auth/me'),
+  getCurrentUser: () => apiClient.get<ApiResponse<User>>('/auth/me'),
 
   // Update current user profile
   updateProfile: (data: Partial<User>) =>
@@ -183,31 +183,32 @@ export const permissionsApi = {
 // Roles API
 export const rolesApi = {
   // Get all roles
-  getAll: () => apiClient.get<ApiResponse<Role[]>>('/roles'),
-
+  getAll: () => apiClient.get<ApiResponse<ApiResponse<Role[]>>>('/roles'),
+  // Get system roles
+  getSystemRoles: () => apiClient.get<ApiResponse<Role[]>>('/roles/system'),
   // Get role by ID
   getById: (id: string) => apiClient.get<ApiResponse<Role>>(`/roles/${id}`),
-
   // Create role
   create: (data: Partial<Role>) =>
     apiClient.post<ApiResponse<Role>>('/roles', data),
-
   // Update role
   update: (id: string, data: Partial<Role>) =>
     apiClient.patch<ApiResponse<Role>>(`/roles/${id}`, data),
-
   // Delete role
   delete: (id: string) => apiClient.delete(`/roles/${id}`),
-
   // Assign role to user
-  assignToUser: (roleId: string, userId: string) =>
-    apiClient.post<ApiResponse<any>>(`/roles/${roleId}/users/${userId}`),
-
+  assignToUser: (tenantId: string,) =>
+    apiClient.post<ApiResponse<Role[]>>(`/roles/tenant/${tenantId}`),
   // Remove role from user
   removeFromUser: (roleId: string, userId: string) =>
     apiClient.delete(`/roles/${roleId}/users/${userId}`),
-
   // Get users with role
   getUsers: (roleId: string) =>
     apiClient.get<ApiResponse<User[]>>(`/roles/${roleId}/users`),
+  //get role permissions
+  getRolePermissions: (roleId: string) =>
+    apiClient.get<ApiResponse<Permission[]>>(`/roles/${roleId}/permissions`),
+  //assign permissions to role by role id
+  assignPermissionsToRole: (roleId: string, permissions: string[]) =>
+    apiClient.post<ApiResponse<Role[]>>(`/roles/${roleId}/permissions`, { permissions }),
 };

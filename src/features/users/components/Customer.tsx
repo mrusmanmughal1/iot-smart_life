@@ -19,8 +19,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { DeleteUserModal } from '@/components/users/DeleteUserModal';
+import { DeleteUserModal } from '@/components/models/DeleteUserModal';
 import {
     Tooltip,
     TooltipContent,
@@ -28,7 +27,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useCustomers } from '@/features/customer/hooks';
 import { Customer } from '@/features/customer/types';
-const CustomerPage = () => {
+const CustomerPage = ({searchQuery}: {searchQuery: string}) => {
     const { data: customersData, isLoading } = useCustomers();
     const customers = customersData?.data || [];
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -39,10 +38,7 @@ const CustomerPage = () => {
         setDeleteModalOpen(true);
     };
     const handleDeleteConfirm = () => {
-        if (selectedCustomer) {
-            toast.success(`Customer ${selectedCustomer.customerName || selectedCustomer.contactEmail} deleted successfully`);
-            setSelectedCustomer(null);
-        }
+       
     };
 
     return (
@@ -75,12 +71,12 @@ const CustomerPage = () => {
                                             <div className="flex items-center gap-3">
                                                 <Avatar>
                                                     <AvatarFallback className="bg-purple-100 text-purple-700">
-                                                        {customer.customerName?.[0]?.toUpperCase() || 'C'}
+                                                        {customer.name?.[0]?.toUpperCase() || 'C'}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div>
-                                                    <p className="font-medium">{customer.customerName}</p>
-                                                    <p className="text-sm text-slate-500">{customer.contactEmail}</p>
+                                                    <p className="font-medium">{customer.name}</p>
+                                                    <p className="text-sm text-slate-500">{customer.email}</p>
                                                 </div>
                                             </div>
                                         </TableCell>
@@ -137,7 +133,7 @@ const CustomerPage = () => {
             <DeleteUserModal
                 open={deleteModalOpen}
                 onOpenChange={setDeleteModalOpen}
-                customer={selectedCustomer || undefined}
+                customer={selectedCustomer}
                 user={null}
                 onConfirm={handleDeleteConfirm}
             />

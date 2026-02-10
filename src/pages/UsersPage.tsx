@@ -21,7 +21,7 @@ import { useUsers } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User } from '@/services/api/users.api';
-import { DeleteUserModal } from '@/components/users/DeleteUserModal';
+import { DeleteUserModal } from '@/components/models/DeleteUserModal';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 

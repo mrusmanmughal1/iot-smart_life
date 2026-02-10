@@ -5,29 +5,23 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User } from '@/services/api/users.api';
 import { X } from 'lucide-react';
-import { Customer } from '@/features/customer/types';
+import { Role } from '@/services/api/users.api';
 
-interface DeleteUserModalProps {
+interface DeleteRoleModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: User | null;
+  role: Role | null;
   onConfirm: () => void;
-  role?: string;
-  customer?: Customer | undefined;
 }
 
-export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
+export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
   open,
   onOpenChange,
-  user,
+  role,
   onConfirm,
-  role = 'Customer Administrator',
-  customer = 'Acme Corporation',
 }) => {
-  if (!user) return null;
+  if (!role) return null;
 
   const handleDelete = () => {
     onConfirm();
@@ -38,15 +32,6 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
     onOpenChange(false);
   };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl p-0 bg-white">
@@ -54,14 +39,14 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           {/* Header */}
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-gray-900">
-              Delete User Account
+              Delete Role
             </h2>
             <p className="text-base text-gray-700">
-              Are you sure you want to delete the following user?
+              Are you sure you want to delete the following role?
             </p>
           </div>
 
-          {/* User Information Card */}
+          {/* Role Information Card */}
           <div className="relative bg-gray-50 rounded-lg p-4 border border-gray-200">
             <button
               onClick={handleCancel}
@@ -70,16 +55,17 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
               <X className="h-4 w-4" />
             </button>
             <div className="flex items-start gap-4 pr-8">
-              <Avatar className="h-12 w-12 bg-gray-700">
-                <AvatarFallback className="text-white font-semibold">
-                  {getInitials(user.name || user.email)}
-                </AvatarFallback>
-              </Avatar>
+              <div className="h-12 w-12 bg-gray-700 rounded-full flex items-center justify-center">
+                <span className="text-white font-semibold text-lg">
+                  {role.name.charAt(0).toUpperCase()}
+                </span>
+              </div>
               <div className="flex-1 space-y-1">
-                <p className="font-bold text-gray-900">{user.name || 'Unknown User'}</p>
-                <p className="text-sm text-gray-600">{user.email}</p>
-                <p className="text-sm text-gray-600">Role: {role}</p>
-                {/* <sssp className="text-sm text-gray-600">Customer: {customer}</sssp> */}
+                <p className="font-bold text-gray-900">{role.name}</p>
+                <p className="text-sm text-gray-600">{role.description}</p>
+                <p className="text-sm text-gray-600">
+                  Permissions: {role.permissions.join(', ')}
+                </p>
               </div>
             </div>
           </div>
@@ -88,14 +74,13 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           <div className="space-y-2">
             <p className="font-bold text-red-600 text-sm">Warning</p>
             <p className="text-sm text-gray-700">
-              This action cannot be undone. The user will lose access to:
+              This action cannot be undone. The role will be removed and users assigned to this role will lose access to:
             </p>
             <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-4">
-              <li>All assigned devices and dashboards</li>
-              <li>Customer data and configurations</li>
+              <li>All role-based permissions and access</li>
+              <li>Associated configurations and settings</li>
             </ul>
           </div>
-
           {/* Action Buttons */}
           <DialogFooter className="flex-row justify-end gap-3 pt-4 border-t">
             <Button
