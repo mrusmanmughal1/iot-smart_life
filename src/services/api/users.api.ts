@@ -2,8 +2,9 @@ import apiClient from '@/lib/axios.ts';
 
 export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
-  TENANT_ADMIN = 'TENANT_ADMIN',
-  CUSTOMER_USER = 'CUSTOMER_USER',
+  TENANT_ADMIN = 'tenant_admin',
+  USER = 'user',
+  CUSTOMER_USER = 'customer_user',
 }
 
 export enum UserStatus {
@@ -46,14 +47,17 @@ export interface Permission {
   name: string;
   description?: string;
   resource: string;
-  actions: string[];
+  action: string;
+  isSystem: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Role {
   id: string;
   name: string;
   description?: string;
-  permissions: string[];
+  permissions: Permission[];
   default?: boolean;
   tenantId?: string;
   createdAt: string;

@@ -4,7 +4,7 @@ import { UserRole } from '@/utils/constants/roles';
 import { ROUTES } from '@/utils/constants/routes';
 
 interface RoleBasedRouteProps {
-  allowedRoles: UserRole[] | any;
+  allowedRoles: UserRole[];
 }
 
 export const RoleBasedRoute = ({ allowedRoles }: RoleBasedRouteProps) => {

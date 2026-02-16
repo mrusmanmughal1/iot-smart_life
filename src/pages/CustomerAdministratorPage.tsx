@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { PageHeader } from '@/components/common/PageHeader';
 import { Trash2, Edit } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -176,8 +175,8 @@ const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
   return (
     <div
       className={`w-5 h-5 rounded border-2 flex items-center justify-center ${granted
-          ? 'bg-green-500 border-green-500'
-          : 'bg-gray-200 border-gray-300'
+        ? 'bg-green-500 border-green-500'
+        : 'bg-gray-200 border-gray-300'
         }`}
     >
       {granted && (
@@ -247,14 +246,14 @@ export default function CustomerAdministratorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
-       
+
       <div className="mx-auto space-y-6">
         {/* Header Section */}
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2 dark:text-white">
+                <h1 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">
                   Customer Administrator
                 </h1>
                 <p className="text-gray-600 dark:text-white">
@@ -276,33 +275,7 @@ export default function CustomerAdministratorPage() {
               </div>
             </div>
             <div className="bg-gray-50 rounded-lg p-4 w-80 space-y-3 grid grid-cols-2 w-full gap-4 dark:bg-gray-900 dark:border-gray-700">
-              {summaryPermissions.map((summary) => (
-                <div key={summary.category}>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                    {summary.category}:
-                  </h3>
-                  <div className="space-y-1">
-                    {summary.permissions.map((permName) => {
-                      const permission = permissions.find(
-                        (p) => p.label === permName
-                      );
-                      return (
-                        <div
-                          key={permName}
-                          className="flex items-center gap-2 text-sm dark:text-white"
-                        >
-                          <PermissionCheckbox
-                            granted={permission?.granted || false}
-                          />
-                          <span className="text-gray-700 dark:text-white">
-                            {permName}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+
             </div>
           </CardContent>
         </Card>
@@ -315,7 +288,7 @@ export default function CustomerAdministratorPage() {
               value={activeTab}
               onValueChange={setActiveTab}
             >
-              <TabsList className="w-full justify-start rounded-none border-b border-slate-200 bg-transparent p-0">
+              <TabsList className="w-full  ">
                 <TabsTrigger
                   value="permissions"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
@@ -337,9 +310,9 @@ export default function CustomerAdministratorPage() {
               </TabsList>
 
               {/* Permissions Tab */}
-              <TabsContent value="permissions" className="p-6 space-y-6">
+              <TabsContent value="permissions" className="p-4 space-y-4 ">
                 <div className="flex items-start justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                     Permission Matrix
                   </h2>
 

@@ -1,4 +1,4 @@
-import { MoreVertical, Edit, Trash2, Users2, } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, Users2, ShieldCheck, } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,25 +27,42 @@ import {
 } from '@/components/ui/tooltip';
 import { useCustomers } from '@/features/customer/hooks';
 import { Customer } from '@/features/customer/types';
-const CustomerPage = ({searchQuery}: {searchQuery: string}) => {
+import { useNavigate } from 'react-router-dom';
+import { useDeleteCustomer } from '@/features/customer/hooks/useCustomers';
+import { toast } from 'react-hot-toast';
+import { User } from '@/services/api/users.api';
+const CustomerPage = ({ searchQuery }: { searchQuery: string }) => {
     const { data: customersData, isLoading } = useCustomers();
     const customers = customersData?.data || [];
+    const deleteCustomerMutation = useDeleteCustomer();
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    const navigate = useNavigate();
 
     const handleDeleteClick = (customer: Customer) => {
         setSelectedCustomer(customer);
         setDeleteModalOpen(true);
     };
+
     const handleDeleteConfirm = () => {
-       
+        if (selectedCustomer) {
+            deleteCustomerMutation.mutate(selectedCustomer.id, {
+                onSuccess: () => {
+                    toast.success('Customer deleted successfully');
+                    setSelectedCustomer(null);
+                    setDeleteModalOpen(false);
+                },
+                onError: () => {
+                    toast.error('Failed to delete customer');
+                },
+            });
+        }
     };
 
     return (
         <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">All Customers</h2>
             <Card>
-
                 <CardContent>
                     {isLoading ? (
                         <div className="space-y-3">
@@ -56,7 +73,7 @@ const CustomerPage = ({searchQuery}: {searchQuery: string}) => {
                     ) : (
                         <Table className='mt-6'>
                             <TableHeader className='bg-primary text-white '>
-                                <TableRow>
+                                <TableRow className='bg-primary hover:bg-primary'>
                                     <TableHead>Customer </TableHead>
                                     <TableHead>Role</TableHead>
                                     <TableHead>Status</TableHead>
@@ -81,10 +98,10 @@ const CustomerPage = ({searchQuery}: {searchQuery: string}) => {
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant="outline">Administrator</Badge>
+                                            {/* <Badge variant="outline">{customer.role}</Badge> */}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant="success">Active</Badge>
+                                            <Badge variant="success" className='capitalize'>{customer.status}</Badge>
                                         </TableCell>
                                         <TableCell>
                                             {new Date(customer.createdAt).toLocaleDateString()}
@@ -92,12 +109,12 @@ const CustomerPage = ({searchQuery}: {searchQuery: string}) => {
                                         <TableCell className="text-right flex items-center  relative justify-end gap-1">
                                             <Tooltip  >
                                                 <TooltipTrigger asChild>
-                                                    <Button variant="ghost" size="icon-sm">
-                                                        <Users2 className="h-4 w-4" />
+                                                    <Button variant="ghost" size="icon-sm" className='hover:bg-secondary hover:text-white' onClick={() => navigate(`/users-management/customer/${customer.id}`)}>
+                                                        <ShieldCheck className="h-4 w-4" />
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent className="absolute   shadow-md "  >
-                                                    Manage users
+                                                    Manage Customers
                                                 </TooltipContent>
                                             </Tooltip>
                                             <DropdownMenu>
@@ -107,7 +124,7 @@ const CustomerPage = ({searchQuery}: {searchQuery: string}) => {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
-                                                    <DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => navigate(`/users-management/edit-customer/${customer.id}`)}>
                                                         <Edit className="h-4 w-4 mr-2" />
                                                         Edit
                                                     </DropdownMenuItem>
@@ -133,9 +150,9 @@ const CustomerPage = ({searchQuery}: {searchQuery: string}) => {
             <DeleteUserModal
                 open={deleteModalOpen}
                 onOpenChange={setDeleteModalOpen}
-                customer={selectedCustomer}
-                user={null}
+                user={selectedCustomer as User | null}
                 onConfirm={handleDeleteConfirm}
+                // role={selectedCustomer?.role}
             />
         </div>
     )

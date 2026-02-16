@@ -30,7 +30,7 @@ export const customersApi = {
 
   // Get customer by ID
   getById: (id: string) =>
-    apiClient.get<ApiResponse<Customer>>(`/customers/${id}`),
+    apiClient.get<ApiResponse<ApiResponse<Customer>>>('/customers/${id}'),
 
   // Create customer
   create: (data: CreateCustomerData) =>

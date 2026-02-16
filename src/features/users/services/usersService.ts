@@ -1,5 +1,5 @@
 import { usersApi, rolesApi, } from '@/services/api/index.ts';
-import type { User, Role } from '@/services/api/users.api.ts';
+import type { User, Role, Permission } from '@/services/api/users.api.ts';
 
 /**
  * Users Feature Service
@@ -246,7 +246,7 @@ export const roleService = {
   async createRoleWithPermissions(
     name: string,
     description: string,
-    permissionIds: string[]
+    permissionIds: Permission[]
   ) {
     const role = await rolesApi.create({
       name,

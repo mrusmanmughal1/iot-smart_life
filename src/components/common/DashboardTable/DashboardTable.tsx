@@ -152,7 +152,7 @@ export function DashboardTable({
     }
   };
 
-  
+
 
   const handleTitleClick = (id: string) => {
     if (onTitleClick) {
@@ -264,9 +264,8 @@ export function DashboardTable({
               data.map((item) => (
                 <tr
                   key={item.id}
-                  className={`border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors dark:bg-gray-800 dark:text-white ${
-                    selectedIds.includes(item.id) ? 'bg-blue-50' : ''
-                  }`}
+                  className={`border-b border-dotted border-gray-200 hover:bg-gray-50 transition-colors dark:bg-gray-800 dark:text-white ${selectedIds.includes(item.id) ? 'bg-blue-50' : ''
+                    }`}
                 >
                   <td className="py-4 px-4 w-12">
                     <Checkbox
@@ -277,11 +276,10 @@ export function DashboardTable({
                   </td>
                   {columns.title && (
                     <td
-                      className={`py-4 px-4 ${
-                        isTitleClickable
+                      className={`py-4 px-4 ${isTitleClickable
                           ? 'cursor-pointer hover:bg-gray-100 transition-colors'
                           : ''
-                      }`}
+                        }`}
                       onClick={
                         isTitleClickable
                           ? () => handleTitleClick(item.id)
@@ -311,11 +309,10 @@ export function DashboardTable({
                     <td className="py-4 px-4 flex items-center justify-center">
                       <Button
                         onClick={() => handleStatusToggle(item.id)}
-                        className={`text-xs px-5 h-8  rounded-full ${
-                          item.status === 'active'
+                        className={`text-xs px-5 h-8  rounded-full ${item.status === 'active'
                             ? 'bg-green-500 hover:bg-green-600 text-white dark:bg-green-600 dark:text-white'
                             : 'bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:text-white'
-                        }`}
+                          }`}
                       >
                         {item.status === 'active'
                           ? t(defaultTranslationKeys.active)

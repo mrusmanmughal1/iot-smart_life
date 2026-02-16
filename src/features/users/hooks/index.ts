@@ -36,12 +36,30 @@ export const useRoles = () => {
     },
   });
 };
-
+export const useDeleteRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (roleId: string) => rolesApi.delete(roleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
+    },
+  });
+};
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ userData, roleId }: { userData: any; roleId: string }) =>
       userService.createUserWithRole(userData, roleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => usersApi.delete(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },

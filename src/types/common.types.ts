@@ -25,7 +25,7 @@ export interface PaginationParams {
 
 export interface SearchParams extends PaginationParams {
   search?: string;
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
 }
 
 export type Status = 'active' | 'inactive' | 'pending' | 'error';

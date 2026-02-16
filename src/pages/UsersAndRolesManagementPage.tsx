@@ -59,29 +59,26 @@ export default function UsersAndRolesManagementPage() {
               defaultValue="Users"
               value={activeTab}
               onValueChange={setActiveTab}
+
             >
-              <TabsList className="bg-transparent p-0 h-auto">
+              <TabsList className="p-1">
                 <TabsTrigger
                   value="Users"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
                 >
                   Users
                 </TabsTrigger>
                 <TabsTrigger
                   value="Customers"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
                 >
                   Customers
                 </TabsTrigger>
                 <TabsTrigger
                   value="Roles"
-                  className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-600 dark:text-white"
                 >
                   Roles
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-
             <div className="flex-1 max-w-md">
               <Input
                 type="text"
@@ -99,9 +96,6 @@ export default function UsersAndRolesManagementPage() {
         {activeTab === 'Users' && <Users searchQuery={searchQuery} />}
         {activeTab === 'Roles' && <Roles searchQuery={searchQuery} />}
         {activeTab === 'Customers' && <CustomerPage searchQuery={searchQuery} />}
-
-
-
       </div>
     </div>
   );

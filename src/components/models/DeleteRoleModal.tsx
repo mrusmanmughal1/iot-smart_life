@@ -6,13 +6,17 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { Role } from '@/services/api/users.api';
+import type { Role } from '@/services/api/users.api';
+ 
+
+ 
 
 interface DeleteRoleModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   role: Role | null;
   onConfirm: () => void;
+  loading?: boolean;
 }
 
 export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
@@ -20,6 +24,7 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
   onOpenChange,
   role,
   onConfirm,
+  loading = false,
 }) => {
   if (!role) return null;
 
@@ -31,7 +36,6 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
   const handleCancel = () => {
     onOpenChange(false);
   };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl p-0 bg-white">
@@ -63,9 +67,39 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
               <div className="flex-1 space-y-1">
                 <p className="font-bold text-gray-900">{role.name}</p>
                 <p className="text-sm text-gray-600">{role.description}</p>
-                <p className="text-sm text-gray-600">
-                  Permissions: {role.permissions.join(', ')}
-                </p>
+                <div>
+                  <span className="font-bold">Permissions</span>:
+                  <div className="mt-2 border border-gray-200  p-2 rounded text-xs">
+                    <div className="grid grid-cols-12 gap-2 bg-gray-50 px-2 py-1 font-semibold text-gray-700">
+                      <div className="col-span-3">Resource</div>
+                      <div className="col-span-7">Permission</div>
+                      <div className="col-span-2">Action</div>
+                    </div>
+                    <div className=" max-h-[200px] overflow-y-auto ">
+                      {role.permissions.map((permission  ) => {
+                        
+                        return (
+                          <div
+                            key={permission.id}
+                            className="grid grid-cols-12 gap-2 px-2 py-1 items-center"
+                          >
+                            <div className="col-span-3 font-semibold capitalize text-gray-700">
+                              {permission.resource || 'other'}
+                            </div>
+                            <div className="col-span-7 text-gray-600">
+                              {permission.description || '—'}
+                            </div>
+                            <div className="col-span-2">
+                              <span className="inline-flex items-center rounded bg-yellow-100 px-2 py-0.5 text-[10px] font-medium capitalize text-yellow-900">
+                                {permission.action  }
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -86,12 +120,13 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
             <Button
               onClick={handleDelete}
               className="bg-secondary hover:bg-secondary/90 text-white"
+              disabled={loading}
             >
-              Delete
+              {loading ? 'Deleting...' : 'Delete'}
             </Button>
             <Button
               onClick={handleCancel}
-              className="bg-gray-600 hover:bg-gray-700 text-white"
+              className="bg-gray-200 hover:bg-gray-300 text-black"
             >
               Cancel
             </Button>

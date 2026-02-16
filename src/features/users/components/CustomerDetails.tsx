@@ -151,28 +151,7 @@ export default function CustomerDetails() {
 
     const onSubmit = async (data: CreateRoleFormData) => {
         setIsSubmitting(true);
-        try {
-            const roleData = {
-                name: data.roleName,
-                description: data.description || undefined,
-                permissions: data.permissions,
-                default: data.roleType === 'System Role',
-            };
-
-            await rolesApi.create(roleData);
-
-            toast.success('Role created successfully');
-            queryClient.invalidateQueries({ queryKey: ['roles'] });
-            navigate('/users-management');
-        } catch (error: unknown) {
-            console.error('Failed to create role:', error);
-            const errorMessage =
-                (error as { response?: { data?: { message?: string } } })?.response
-                    ?.data?.message || 'Failed to create role';
-            toast.error(errorMessage);
-        } finally {
-            setIsSubmitting(false);
-        }
+        
     };
 
     const handleCancel = () => {

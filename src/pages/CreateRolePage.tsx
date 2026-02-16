@@ -14,6 +14,7 @@ import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUserId } from '@/features/auth/hooks/useUserId';
 import { usePermissions } from '@/features/permissions/hooks';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 // Zod validation schema
 const createRoleSchema = z.object({
@@ -22,14 +23,12 @@ const createRoleSchema = z.object({
   isSystem: z.boolean(),
   permissionIds: z.array(z.string()),
 });
-
 type CreateRoleFormData = z.infer<typeof createRoleSchema>;
-
 export default function CreateRolePage() {
-
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
 
   const {
     register,
@@ -75,6 +74,13 @@ export default function CreateRolePage() {
     () => permissions.map((permission) => permission.id),
     [permissions]
   );
+
+  const toggleCategory = (category: string) => {
+    setOpenCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
+  };
 
   const handleSelectAll = () => {
     setValue('permissionIds', allPermissionIds);
@@ -131,8 +137,8 @@ export default function CreateRolePage() {
     <div className="min-h-screen bg-gray-50 ">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-          Create New Role
+        <h1 className="text-xl font-semibold text-gray-900 mb-6">
+          Create Role
         </h1>
 
         {/* Two Column Layout */}
@@ -142,7 +148,7 @@ export default function CreateRolePage() {
             <Card className="shadow-lg rounded-xl border-gray-200">
               <CardContent className="p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Role Details
+                  Role Information
                 </h2>
                 <div className="space-y-4">
                   {/* Role Name */}
@@ -208,24 +214,24 @@ export default function CreateRolePage() {
             {/* Right Column - Permissions */}
             <Card className="shadow-lg rounded-xl border-gray-200">
               <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-1">
                   <h2 className="text-lg font-semibold text-gray-900">
                     Permissions
                   </h2>
-                  <div className="flex gap-2">
+                  <div className="flex mb-2 gap-2">
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="secondary"
                       onClick={handleSelectAll}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1 h-8"
+                      className="bg-secondary hover:bg-secondary/10 text-white text-xs px-3 py-1 h-8"
                     >
                       Select All
                     </Button>
                     <Button
                       type="button"
-                      variant="primary"
+                      variant="secondary"
                       onClick={handleClearAll}
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 h-8"
+                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1 h-8"
                     >
                       Clear All
                     </Button>
@@ -237,48 +243,58 @@ export default function CreateRolePage() {
                   control={control}
                   render={({ field }) => (
                     <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                      {permissionCategories.map((category) => (
-                        <div key={category.category} className="space-y-2">
-                          <h3 className="text-sm font-semibold text-gray-800">
-                            {category.category}:
-                          </h3>
-                          <div className="space-y-2 pl-2">
-                            {category.permissions.map((permission) => {
-                              const isChecked = selectedPermissions.includes(
-                                permission.id
-                              );
-                              const actionText = permission.actions?.length
-                                ? permission.actions.join(', ')
-                                : '';
-                              const label =
-                                permission.description ||
-                                permission.name ||
-                                `${permission.resource}${actionText ? `: ${actionText}` : ''}`;
-                              return (
-                                <div
-                                  key={permission.id}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Checkbox
-                                    checked={isChecked}
-                                    onChange={() =>
-                                      handlePermissionToggle(
-                                        permission.id,
-                                        selectedPermissions,
-                                        field.onChange
-                                      )
-                                    }
-                                    label={label}
-                                  />
-                                </div>
-                              );
-                            })}
+                      {permissionCategories.map((category) => {
+                        const isOpen = openCategories[category.category] ?? false;
+                        return (
+                          <div key={category.category} className="">
+                            <button
+                              type="button"
+                              onClick={() => toggleCategory(category.category)}
+                              className="flex w-full items-center justify-between rounded p-2   text-left text-sm font-semibold text-gray-800 bg-secondary text-white"
+                            >
+                              <span className='first-letter:uppercase '>{category.category}</span>
+                              {isOpen ? (
+                                <ChevronDown className="h-4 w-4" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4" />
+                              )}
+                            </button>
+                            {isOpen && (
+                              <div className="space-y-2  bg-secondary/10 p-2">
+                                {category.permissions.map((permission) => {
+                                  const isChecked = selectedPermissions.includes(
+                                    permission.id
+                                  );
+                                  const actionText = permission.action;
+                                  
+                                  return (
+                                    <div
+                                      key={permission.id}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Checkbox
+                                        checked={isChecked}
+                                        onChange={() =>
+                                          handlePermissionToggle(
+                                            permission.id,
+                                            selectedPermissions,
+                                            field.onChange
+                                          )
+                                        }
+                                        label={permission.description || permission.name || `${permission.resource}${actionText ? `: ${actionText}` : ''}`}
+                                      />
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   )}
                 />
+
               </CardContent>
             </Card>
           </div>
@@ -299,7 +315,7 @@ export default function CreateRolePage() {
               variant="default"
               disabled={isSubmitting}
               isLoading={isSubmitting}
-              className="bg-gray-700 hover:bg-gray-800 text-white"
+              className="bg-secondary hover:bg-secondary/90 text-white"
             >
               Save
             </Button>

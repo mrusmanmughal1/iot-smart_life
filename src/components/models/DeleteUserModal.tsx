@@ -13,10 +13,11 @@ import { Customer } from '@/features/customer/types';
 interface DeleteUserModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: User | null;
+  user: User | Customer | null;
   onConfirm: () => void;
   role?: string;
   customer?: Customer | null;
+  loading?: boolean;
 }
 
 export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
@@ -24,7 +25,8 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
   onOpenChange,
   user,
   onConfirm,
-  role = 'Customer Administrator',
+  role,
+  loading = false,
 }) => {
   if (!user) return null;
 
@@ -100,8 +102,9 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
             <Button
               onClick={handleDelete}
               className="bg-secondary hover:bg-secondary/90 text-white"
+              disabled={loading}
             >
-              Delete
+              {loading ? 'Deleting...' : 'Delete'}
             </Button>
             <Button
               onClick={handleCancel}

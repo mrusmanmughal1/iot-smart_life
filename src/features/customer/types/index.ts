@@ -1,3 +1,5 @@
+import { UserRole } from "@/services/api/users.api";
+
 export enum CustomerStatus {
   ACTIVE = 'Active',
   INACTIVE = 'Inactive',
@@ -13,11 +15,16 @@ export enum CustomerPlan {
 }
 
 export interface Customer {
+  zip: string;
+  state: string;
+  phone: string;
   id: string;
   name: string;
   email: string;
   phoneNumber: string;
   address?: string;
+  role?: UserRole;
+  companyName?: string;
   city?: string;
   stateProvince?: string;
   zipPostalCode?: string;

@@ -81,6 +81,7 @@ import CompanyProfilePage from '@/pages/CompanyProfilePage.tsx';
 import CreateRolePage from '@/pages/CreateRolePage.tsx';
 import CustomerPage from '@/features/users/components/Customer.tsx';
 import CustomerDetails from '@/features/users/components/CustomerDetails.tsx';
+import EditCustomerPage from '@/features/users/components/EditCustomerPage.tsx';
 
 export const router = createBrowserRouter([
   {
@@ -408,15 +409,15 @@ export const router = createBrowserRouter([
             element: <CustomerDetails />,
           },
           {
-            path: 'customer-Administrator',
+            path: 'customer/:id',
             element: <CustomerAdministratorPage />,
           },
           {
-            path: 'role-permission-management',
+            path: 'role-permission-management/:id',
             element: <RolePermissionManagementPage />,
           },
           {
-            path: 'assign-permissions',
+            path: 'customer-user-permissions/:id',
             element: <AssignPermissionsPage />,
           },
           {
@@ -426,6 +427,10 @@ export const router = createBrowserRouter([
           {
             path: 'create-customer',
             element: <CreateCustomerPage />
+          },
+          {
+            path: 'edit-customer/:id',
+            element: <EditCustomerPage />
           },
           {
             path: 'add-new-user',
@@ -457,24 +462,7 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      // {
-      //   path: '/users',
-      //   element: (
-      //     <AppLayout>
-      //     <Outlet />
-      //     </AppLayout>
-      //   ),
-      //   children: [
-      //     {
-      //       index: true,
-      //       element: <UsersPage />,
-      //     },
-      //     {
-      //       path: 'create',
-      //       element: <CreateUserPage />,
-      //     },
-      //   ],
-      // },
+
       // --------------------Customer Management Routes--------------------
       {
         path: '/customer-management',

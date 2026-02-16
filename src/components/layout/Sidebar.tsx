@@ -163,11 +163,11 @@ const getNavItems = (): NavItem[] => [
         icon: <Users className="h-4 w-4" />,
       },
 
-      {
-        titleKey: 'nav.customerAdministrator',
-        href: '/users-management/customer-administrator',
-        icon: <Users className="h-4 w-4" />,
-      },
+      // {
+      //   titleKey: 'nav.customerAdministrator',
+      //   href: '/users-management/customer-administrator',
+      //   icon: <Users className="h-4 w-4" />,
+      // },
       {
         titleKey: 'nav.rolePermissionManagement',
         href: '/users-management/role-permission-management',

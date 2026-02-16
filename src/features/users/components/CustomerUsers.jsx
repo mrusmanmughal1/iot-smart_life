@@ -34,7 +34,7 @@ const CustomerUsers = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState < User | null > (null);
 
-    const handleDeleteClick = (user: User) => {
+    const handleDeleteClick = (user) => {
         setSelectedUser(user);
         setDeleteModalOpen(true);
     };
@@ -49,7 +49,6 @@ const CustomerUsers = () => {
         <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">All Users</h2>
             <Card>
-
                 <CardContent>
                     {isLoading ? (
                         <div className="space-y-3">
@@ -70,7 +69,7 @@ const CustomerUsers = () => {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {users?.map((user: User) => (
+                                {users?.map((user) => (
                                     <TableRow key={user.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
@@ -12,8 +13,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Check, X, HelpCircle, ChevronRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useRoleById } from '@/features/roles/hooks';
+import type { Permission } from '@/services/api/users.api';
 
 type PermissionStatus = 'allowed' | 'denied' | 'conditional';
 
@@ -29,165 +31,94 @@ interface PermissionRow {
   category: string;
 }
 
-// Device category permissions
-const devicePermissions: PermissionRow[] = [
-  {
-    id: 'device-management',
-    permission: 'Device Management',
-    description: 'Manage IoT devices and their properties',
-    access: 'allowed',
-    create: 'allowed',
-    read: 'allowed',
-    update: 'allowed',
-    delete: 'denied',
-    category: 'Device',
-  },
-  {
-    id: 'device-profiles',
-    permission: 'Device Profiles',
-    description: 'Configure device profile templates',
-    access: 'allowed',
-    create: 'denied',
-    read: 'allowed',
-    update: 'conditional',
-    delete: 'denied',
-    category: 'Device',
-  },
-  {
-    id: 'device-telemetry',
-    permission: 'Device Telemetry',
-    description: 'Access device telemetry data',
-    access: 'allowed',
-    create: 'denied',
-    read: 'allowed',
-    update: 'denied',
-    delete: 'denied',
-    category: 'Device',
-  },
-  {
-    id: 'device-credentials',
-    permission: 'Device Credentials',
-    description: 'Manage device authentication credentials',
-    access: 'conditional',
-    create: 'denied',
-    read: 'allowed',
-    update: 'conditional',
-    delete: 'denied',
-    category: 'Device',
-  },
-];
+const normalizeCategory = (resource: string) =>
+  resource
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 
-// Dashboard category permissions
-const dashboardPermissions: PermissionRow[] = [
-  {
-    id: 'dashboard-management',
-    permission: 'Dashboard Management',
-    description: 'Create and manage dashboards',
-    access: 'allowed',
-    create: 'allowed',
-    read: 'allowed',
-    update: 'allowed',
-    delete: 'allowed',
-    category: 'Dashboard',
-  },
-];
-
-// Asset category permissions
-const assetPermissions: PermissionRow[] = [
-  {
-    id: 'asset-management',
-    permission: 'Asset Management',
-    description: 'Manage assets and their properties',
-    access: 'allowed',
-    create: 'allowed',
-    read: 'allowed',
-    update: 'allowed',
-    delete: 'denied',
-    category: 'Asset',
-  },
-];
-
-// User category permissions
-const userPermissions: PermissionRow[] = [
-  {
-    id: 'user-management',
-    permission: 'User Management',
-    description: 'Manage users and their roles',
-    access: 'allowed',
-    create: 'allowed',
-    read: 'allowed',
-    update: 'allowed',
-    delete: 'denied',
-    category: 'User',
-  },
-];
-
-// System category permissions
-const systemPermissions: PermissionRow[] = [
-  {
-    id: 'system-settings',
-    permission: 'System Settings',
-    description: 'Manage system-wide settings',
-    access: 'denied',
-    create: 'denied',
-    read: 'allowed',
-    update: 'denied',
-    delete: 'denied',
-    category: 'System',
-  },
-];
-
-const PermissionStatusIcon: React.FC<{ status: PermissionStatus }> = ({
-  status,
-}) => {
-  if (status === 'allowed') {
-    return (
-      <div className="w-6 h-6 rounded bg-green-500 flex items-center justify-center">
-        <Check className="w-4 h-4 text-white" />
-      </div>
-    );
-  } else if (status === 'denied') {
-    return (
-      <div className="w-6 h-6 rounded bg-red-500 flex items-center justify-center">
-        <X className="w-4 h-4 text-white" />
-      </div>
-    );
-  } else {
-    return (
-      <div className="w-6 h-6 rounded bg-yellow-500 flex items-center justify-center">
-        <HelpCircle className="w-4 h-4 text-white" />
-      </div>
-    );
-  }
+type RolePermission = Permission & {
+  action?: string;
 };
 
+const toPermissionRows = (permissions: RolePermission[]): PermissionRow[] => {
+  const grouped: Record<string, PermissionRow> = {};
+
+  permissions.forEach((permission) => {
+    const resource = permission.resource || 'other';
+    const category = normalizeCategory(resource);
+    const key = resource;
+
+    if (!grouped[key]) {
+      grouped[key] = {
+        id: key,
+        permission: category,
+        description: permission.description || '',
+        access: 'denied',
+        create: 'denied',
+        read: 'denied',
+        update: 'denied',
+        delete: 'denied',
+        category,
+      };
+    }
+
+    const action = permission.action;
+    if (action === 'access') {
+      grouped[key].access = 'allowed';
+    } else if (action === 'create') {
+      grouped[key].create = 'allowed';
+    } else if (action === 'read' || action === 'list') {
+      grouped[key].read = 'allowed';
+    } else if (action === 'update') {
+      grouped[key].update = 'allowed';
+    } else if (action === 'delete') {
+      grouped[key].delete = 'allowed';
+    }
+
+    if (!grouped[key].description && permission.description) {
+      grouped[key].description = permission.description;
+    }
+  });
+
+  return Object.values(grouped);
+};
+
+const isChecked = (status: PermissionStatus) => status === 'allowed';
+
 export default function RolePermissionManagementPage() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [permissionCategory, setPermissionCategory] = useState('Device');
-  const [permissions, setPermissions] =
-    useState<PermissionRow[]>(devicePermissions);
+  const { data } = useRoleById(id);
+  const [permissionCategory, setPermissionCategory] = useState('');
+  const [permissions, setPermissions] = useState<PermissionRow[]>([]);
+
+  const role = data as { permissions?: RolePermission[]; name?: string } | undefined;
+
+  const allPermissions = useMemo(
+    () => role?.permissions ?? [],
+    [role]
+  );
+
+  const permissionRows = useMemo(
+    () => toPermissionRows(allPermissions),
+    [allPermissions]
+  );
+
+  const categories = useMemo(
+    () => Array.from(new Set(permissionRows.map((row) => row.category))),
+    [permissionRows]
+  );
+
+  useEffect(() => {
+    setPermissions(permissionRows);
+    if (!permissionCategory && categories.length > 0) {
+      setPermissionCategory(categories[0]);
+    }
+  }, [permissionRows, categories, permissionCategory]);
 
   const handleCategoryChange = (category: string) => {
     setPermissionCategory(category);
-    switch (category) {
-      case 'Device':
-        setPermissions(devicePermissions);
-        break;
-      case 'Dashboard':
-        setPermissions(dashboardPermissions);
-        break;
-      case 'Asset':
-        setPermissions(assetPermissions);
-        break;
-      case 'User':
-        setPermissions(userPermissions);
-        break;
-      case 'System':
-        setPermissions(systemPermissions);
-        break;
-      default:
-        setPermissions(devicePermissions);
-    }
   };
 
   const handleGrantAll = () => {
@@ -226,13 +157,32 @@ export default function RolePermissionManagementPage() {
     navigate('/users');
   };
 
+  const togglePermission = (
+    permissionId: string,
+    field: keyof Pick<
+      PermissionRow,
+      'access' | 'create' | 'read' | 'update' | 'delete'
+    >
+  ) => {
+    setPermissions((prev) =>
+      prev.map((perm) =>
+        perm.id === permissionId
+          ? {
+            ...perm,
+            [field]: perm[field] === 'allowed' ? 'denied' : 'allowed',
+          }
+          : perm
+      )
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
- 
+
       <div className="mx-auto space-y-6">
         <PageHeader
           title="Role Permission Management"
-          description="Role: Customer Administrator"
+          description={`Role: ${role?.name || ''}`}
         />
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6 space-y-6">
@@ -240,39 +190,18 @@ export default function RolePermissionManagementPage() {
             <Tabs
               value={permissionCategory}
               onValueChange={handleCategoryChange}
-              defaultValue="Device"
+              defaultValue={categories[0]}
             >
               <TabsList className="w-full justify-start rounded-none border-b border-gray-200  bg-transparent p-0 h-auto">
-                <TabsTrigger
-                  value="Device"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                >
-                  Device
-                </TabsTrigger>
-                <TabsTrigger
-                  value="Dashboard"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                >
-                  Dashboard
-                </TabsTrigger>
-                <TabsTrigger
-                  value="Asset"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                >
-                  Asset
-                </TabsTrigger>
-                <TabsTrigger
-                  value="User"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                >
-                  User
-                </TabsTrigger>
-                <TabsTrigger
-                  value="System"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600 px-4 py-2"
-                >
-                  System
-                </TabsTrigger>
+                {categories.map((category) => (
+                  <TabsTrigger
+                    key={category}
+                    value={category}
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
+                  >
+                    {category}
+                  </TabsTrigger>
+                ))}
               </TabsList>
             </Tabs>
 
@@ -305,33 +234,52 @@ export default function RolePermissionManagementPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {permissions.map((permission) => (
-                    <TableRow key={permission.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          {permission.permission}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-gray-600">
-                        {permission.description}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <PermissionStatusIcon status={permission.access} />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <PermissionStatusIcon status={permission.create} />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <PermissionStatusIcon status={permission.read} />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <PermissionStatusIcon status={permission.update} />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <PermissionStatusIcon status={permission.delete} />
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {permissions
+                    .filter((permission) =>
+                      permissionCategory ? permission.category === permissionCategory : true
+                    )
+                    .map((permission) => (
+                      <TableRow key={permission.id} className="hover:bg-gray-50">
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            {permission.permission}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-gray-600">
+                          {permission.description}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            checked={isChecked(permission.access)}
+                            onChange={() => togglePermission(permission.id, 'access')}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            checked={isChecked(permission.create)}
+                            onChange={() => togglePermission(permission.id, 'create')}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            checked={isChecked(permission.read)}
+                            onChange={() => togglePermission(permission.id, 'read')}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            checked={isChecked(permission.update)}
+                            onChange={() => togglePermission(permission.id, 'update')}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            checked={isChecked(permission.delete)}
+                            onChange={() => togglePermission(permission.id, 'delete')}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </div>
@@ -375,20 +323,7 @@ export default function RolePermissionManagementPage() {
             </div>
           </CardContent>
         </Card>
-        <div className="bg-gray-100 rounded-lg p-4 space-y-2 dark:bg-gray-800 dark:border-gray-700">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-green-500"></div>
-            <span className="text-sm text-gray-700 dark:text-white">Allowed</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-red-500"></div>
-            <span className="text-sm text-gray-700 dark:text-white">Denied</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-yellow-500"></div>
-            <span className="text-sm text-gray-700 dark:text-white">Conditional</span>
-          </div>
-        </div>
+
       </div>
     </div>
   );
