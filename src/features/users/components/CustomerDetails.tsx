@@ -149,7 +149,7 @@ export default function CustomerDetails() {
         }
     };
 
-    const onSubmit = async (data: CreateRoleFormData) => {
+    const onSubmit = async ( ) => {
         setIsSubmitting(true);
         
     };
