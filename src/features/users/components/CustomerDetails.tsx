@@ -155,7 +155,8 @@ export default function CustomerDetails() {
     };
 
     const handleCancel = () => {
-        navigate('/users-management');
+        navigate('/users-management'); 
+        // usman 
     };
 
     return (
