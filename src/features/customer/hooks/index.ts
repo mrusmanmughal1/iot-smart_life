@@ -1,3 +1,8 @@
 export { useCreateCustomer } from './useCreateCustomer';
-export { useCustomers, useCustomer } from './useCustomers';
+export {
+  useCustomers,
+  useCustomerById,
+  useCustomerUsers,
+  useUpdateCustomer,
+} from './useCustomers';
 

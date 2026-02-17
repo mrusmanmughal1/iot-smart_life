@@ -4,6 +4,7 @@ import type {
   CreateCustomerData,
   CustomerQuery,
 } from '@/features/customer/types';
+import type { User } from '@/services/api/users.api';
 
 export interface PaginatedResponse<T> {
   message: string;
@@ -30,7 +31,7 @@ export const customersApi = {
 
   // Get customer by ID
   getById: (id: string) =>
-    apiClient.get<ApiResponse<ApiResponse<Customer>>>('/customers/${id}'),
+    apiClient.get<ApiResponse<Customer>>(`/customers/${id}`),
 
   // Create customer
   create: (data: CreateCustomerData) =>
@@ -63,6 +64,16 @@ export const customersApi = {
   getByTenant: (tenantId: string, params?: CustomerQuery) =>
     apiClient.get<ApiResponse<PaginatedResponse<Customer>>>(
       `/tenants/${tenantId}/customers`,
+      { params }
+    ),
+
+  // Get users by customer
+  getUsersByCustomer: (
+    customerId: string,
+    params?: { page?: number; limit?: number; search?: string }
+  ) =>
+    apiClient.get<ApiResponse<PaginatedResponse<User>>>(
+      `/customer-users/customer/${customerId}`,
       { params }
     ),
 

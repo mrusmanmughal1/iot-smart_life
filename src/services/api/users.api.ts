@@ -27,7 +27,7 @@ export interface User {
   permissions?: string[];
   twoFactorEnabled?: boolean;
   lastLogin?: string;
-  additionalInfo?: Record<string, any>;
+  additionalInfo?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
 }
@@ -117,14 +117,14 @@ export const usersApi = {
 
   // Change password
   changePassword: (oldPassword: string, newPassword: string) =>
-    apiClient.post<ApiResponse<any>>('/auth/change-password', {
+    apiClient.post<ApiResponse<unknown>>('/auth/change-password', {
       oldPassword,
       newPassword,
     }),
 
   // Reset password
   resetPassword: (userId: string) =>
-    apiClient.post<ApiResponse<any>>(`/users/${userId}/reset-password`),
+    apiClient.post<ApiResponse<unknown>>(`/users/${userId}/reset-password`),
 
   // Activate user
   activate: (id: string) =>
@@ -149,23 +149,30 @@ export const usersApi = {
     }),
 
   // Get user statistics
-  getStatistics: () => apiClient.get<ApiResponse<any>>('/users/statistics'),
+  getStatistics: () => apiClient.get<ApiResponse<unknown>>('/users/statistics'),
 
   // Enable 2FA
   enable2FA: (id: string) =>
-    apiClient.post<ApiResponse<any>>(`/users/${id}/2fa/enable`),
+    apiClient.post<ApiResponse<unknown>>(`/users/${id}/2fa/enable`),
 
   // Disable 2FA
   disable2FA: (id: string) =>
-    apiClient.post<ApiResponse<any>>(`/users/${id}/2fa/disable`),
+    apiClient.post<ApiResponse<unknown>>(`/users/${id}/2fa/disable`),
 
   // Bulk delete users
   bulkDelete: (userIds: string[]) =>
-    apiClient.post<ApiResponse<any>>('/users/bulk/delete', { userIds }),
+    apiClient.post<ApiResponse<unknown>>('/users/bulk/delete', { userIds }),
 
   // Bulk update users
   bulkUpdate: (userIds: string[], data: Partial<User>) =>
-    apiClient.patch<ApiResponse<any>>('/users/bulk/update', { userIds, data }),
+    apiClient.patch<ApiResponse<unknown>>('/users/bulk/update', { userIds, data }),
+
+  // Bulk update user status
+  bulkUpdateStatus: (userIds: string[], status: UserStatus) =>
+    apiClient.patch<ApiResponse<unknown>>('/users/bulk/status', {
+      userIds,
+      status,
+    }),
 };
 
 // Permissions API
@@ -187,7 +194,8 @@ export const permissionsApi = {
 // Roles API
 export const rolesApi = {
   // Get all roles
-  getAll: () => apiClient.get<ApiResponse<ApiResponse<Role[]>>>('/roles'),
+  getAll: (params?: Record<string, unknown>) =>
+    apiClient.get<ApiResponse<PaginatedResponse<Role>>>('/roles', { params }),
   // Get system roles
   getSystemRoles: () => apiClient.get<ApiResponse<Role[]>>('/roles/system'),
   // Get role by ID

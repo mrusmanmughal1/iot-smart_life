@@ -13,7 +13,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { HelpCircle } from 'lucide-react';
-import { useCreateCustomer, useCustomer } from '@/features/customer/hooks';
+import { useCreateCustomer,   } from '@/features/customer/hooks';
 import type { CreateCustomerData } from '@/features/customer/types';
 import { CustomerStatus, CustomerPlan } from '@/features/customer/types';
 import { useEffect } from 'react';

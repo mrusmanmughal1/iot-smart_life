@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Trash2, Edit } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useCustomerById } from '@/features/customer/hooks';
+import CustomerUsersList from '@/features/customer/components/CustomerUsersList';
+import CustomerActivityLog from '@/features/customer/components/CustomerActivityLog';
 
 interface Permission {
   id: string;
@@ -198,6 +201,74 @@ const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
 
 export default function CustomerAdministratorPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const { data: customerData } = useCustomerById(id);
+  const customer = customerData;
+  const contractStart = customer?.additionalInfo?.contractStartDate
+    ? new Date(customer.additionalInfo.contractStartDate).toLocaleDateString()
+    : undefined;
+  const contractEnd = customer?.additionalInfo?.contractEndDate
+    ? new Date(customer.additionalInfo.contractEndDate).toLocaleDateString()
+    : undefined;
+  const activityLogItems = React.useMemo(() => {
+    if (!customer) {
+      return [];
+    }
+
+    const items = [];
+
+    if (customer.createdAt) {
+      items.push({
+        id: 'created',
+        title: 'Customer created',
+        description: `Customer ${customer.name || ''} was created.`,
+        timestamp: customer.createdAt,
+        status: 'success' as const,
+      });
+    }
+
+    if (customer.updatedAt && customer.updatedAt !== customer.createdAt) {
+      items.push({
+        id: 'updated',
+        title: 'Profile updated',
+        description: 'Customer profile information was updated.',
+        timestamp: customer.updatedAt,
+        status: 'info' as const,
+      });
+    }
+
+    if (customer.additionalInfo?.contractStartDate) {
+      items.push({
+        id: 'contract-start',
+        title: 'Contract started',
+        description: 'Customer contract start date recorded.',
+        timestamp: customer.additionalInfo.contractStartDate,
+        status: 'success' as const,
+      });
+    }
+
+    if (customer.additionalInfo?.contractEndDate) {
+      items.push({
+        id: 'contract-end',
+        title: 'Contract end date',
+        description: 'Customer contract end date recorded.',
+        timestamp: customer.additionalInfo.contractEndDate,
+        status: 'warning' as const,
+      });
+    }
+
+    if (customer.status) {
+      items.push({
+        id: 'status',
+        title: 'Status updated',
+        description: `Status set to ${customer.status}.`,
+        timestamp: customer.updatedAt || customer.createdAt,
+        status: 'info' as const,
+      });
+    }
+
+    return items;
+  }, [customer]);
   const [activeTab, setActiveTab] = useState('permissions');
 
   const handleEditRole = () => {
@@ -220,30 +291,6 @@ export default function CustomerAdministratorPage() {
     return acc;
   }, {} as Record<string, Permission[]>);
 
-  // Summary permissions (top right)
-  const summaryPermissions = [
-    {
-      category: 'Dashboard Management',
-      permissions: [
-        'View Dashboards',
-        'Create Dashboards',
-        'Delete Dashboards',
-      ],
-    },
-    {
-      category: 'Device Management',
-      permissions: ['View Devices', 'Manage Devices', 'Delete Devices'],
-    },
-    {
-      category: 'User Management',
-      permissions: ['View Users', 'Create Users', 'Edit Users'],
-    },
-    {
-      category: 'Data Access',
-      permissions: ['View Telemetry', 'Export Data', 'Delete Telemetr'],
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
 
@@ -254,10 +301,11 @@ export default function CustomerAdministratorPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">
-                  Customer Administrator
+                  {customer?.name || 'Customer '}
                 </h1>
                 <p className="text-gray-600 dark:text-white">
-                  Full access to customer resources and user management
+                  {customer?.description ||
+                    'Full access to customer resources and user management'}
                 </p>
               </div>
               <div className="flex gap-3">
@@ -274,8 +322,108 @@ export default function CustomerAdministratorPage() {
                 </Button>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 w-80 space-y-3 grid grid-cols-2 w-full gap-4 dark:bg-gray-900 dark:border-gray-700">
+            <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full dark:bg-gray-900 dark:border-gray-700">
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Status
+                </p>
+                <span className="inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-medium bg-success/10 text-success">
+                  {customer?.status || 'Unknown'}
+                </span>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Email
+                </p>
+                <p className="text-sm truncate max-w-[200px] font-medium text-gray-900 dark:text-white">
+                  {customer?.email || '-'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Phone
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {customer?.phone || '-'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Tenant
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {customer?.tenant?.name || '-'}
+                </p>
+              </div>
 
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Location
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {[customer?.city, customer?.state, customer?.country]
+                    .filter(Boolean)
+                    .join(', ') || '-'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Address
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {[customer?.address, customer?.address2].filter(Boolean).join(', ') ||
+                    '-'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Zip Code
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {customer?.zip || '-'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Customer Type
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {customer?.additionalInfo?.customerType || '-'}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Tax ID
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {customer?.additionalInfo?.taxId || '-'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Account Manager
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {customer?.additionalInfo?.accountManager || '-'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Contract Start
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {contractStart || '-'}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Contract End
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {contractEnd || '-'}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -372,28 +520,19 @@ export default function CustomerAdministratorPage() {
 
               {/* Assigned Users Tab */}
               <TabsContent value="assigned-users" className="p-6">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Assigned Users
-                  </h2>
-                  <p className="text-gray-600 dark:text-white">
-                    List of users assigned to this role will appear here.
-                  </p>
-                </div>
+                <CustomerUsersList
+                  customerId={id}
+                  searchQuery=""
+                  title="Assigned Users"
+                />
               </TabsContent>
-
               {/* Activity Log Tab */}
-              <TabsContent value="activity-log" className="p-6">
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Activity Log
-                  </h2>
-                  <p className="text-gray-600 dark:text-white">
-                    Activity log for this role will appear here.
-                  </p>
-                </div>
+              <TabsContent value="activity-log" className="p-6 space-y-4">
+
+                <CustomerActivityLog items={activityLogItems} />
               </TabsContent>
             </Tabs>
+
           </CardContent>
         </Card>
       </div>

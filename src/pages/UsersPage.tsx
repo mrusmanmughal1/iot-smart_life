@@ -28,7 +28,7 @@ import { toast } from 'react-hot-toast';
 export default function UsersPage() {
   const { t } = useTranslation();
   const { data: usersData, isLoading } = useUsers();
-  const users = usersData || [];
+  const users = usersData?.data || [];
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 

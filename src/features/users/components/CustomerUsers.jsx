@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/tooltip';
 const CustomerUsers = () => {
     const { data: usersData, isLoading } = useUsers();
-    const users = usersData || [];
+    const users = usersData?.data || [];
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState < User | null > (null);
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, Minus, Download } from 'lucide-react';
+import { Search, Plus, Minus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -284,19 +284,18 @@ export default function CustomerUserAssociationPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3 max-h-[500px] overflow-y-auto">
-              {users?.length === 0 ? (
+              {users?.data?.length === 0 ? (
                 <p className="text-sm text-slate-500 text-center py-8">
                   No available users
                 </p>
               ) : (
-                users?.map((user) => (
+                users?.data?.map((user: User) => (
                   <div
                     key={user.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border ${
-                      selectedAvailableUsers.has(user.id)
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-slate-200 hover:border-slate-300'
-                    } transition-colors cursor-pointer`}
+                    className={`flex items-center gap-3 p-3 rounded-lg border ${selectedAvailableUsers.has(user.id)
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-slate-200 hover:border-slate-300'
+                      } transition-colors cursor-pointer`}
                     onClick={() => toggleAvailableUserSelection(user.id)}
                   >
                     <Avatar>
@@ -366,11 +365,10 @@ export default function CustomerUserAssociationPage() {
                 filteredAssignedUsers.map((user) => (
                   <div
                     key={user.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border ${
-                      selectedAssignedUsers.has(user.id)
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-slate-200 hover:border-slate-300'
-                    } transition-colors cursor-pointer`}
+                    className={`flex items-center gap-3 p-3 rounded-lg border ${selectedAssignedUsers.has(user.id)
+                      ? 'border-purple-500 bg-purple-50'
+                      : 'border-slate-200 hover:border-slate-300'
+                      } transition-colors cursor-pointer`}
                     onClick={() => toggleAssignedUserSelection(user.id)}
                   >
                     <Avatar>

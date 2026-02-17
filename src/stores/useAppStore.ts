@@ -45,27 +45,22 @@ export const useAppStore = create<AppState>()(
         setUser: (user) => set({ user, isAuthenticated: !!user }),
         logout: () => {
           localStorageService.removeToken();
-
           set({
             user: null,
             isAuthenticated: false,
           });
         },
-
         // UI State
         sidebarOpen: true,
         setSidebarOpen: (open) => set({ sidebarOpen: open }),
         toggleSidebar: () =>
           set((state) => ({ sidebarOpen: !state.sidebarOpen })),
-
         // Loading
         isLoading: false,
         setLoading: (loading) => set({ isLoading: loading }),
-
         // Modal
         activeModal: null,
         setActiveModal: (modal) => set({ activeModal: modal }),
-
         // Search
         searchQuery: '',
         setSearchQuery: (query) => set({ searchQuery: query }),

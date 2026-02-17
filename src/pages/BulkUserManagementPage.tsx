@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-
+import { useBulkUpdateUserStatus } from '@/features/users/hooks';
+import { UserStatus } from '@/services/api/users.api';
 interface SelectedUser {
   id: string;
   email: string;
@@ -18,23 +19,29 @@ export default function BulkUserManagementPage() {
   const [selectedActions, setSelectedActions] = useState<Set<string>>(
     new Set()
   );
-
+  const { mutate: bulkUpdateUserStatus } = useBulkUpdateUserStatus();
   const selectedUsers: SelectedUser[] =
     (location.state as { users?: SelectedUser[] } | null)?.users || [];
 
   const selectedCount = selectedUsers.length;
-   
 
-  const handleActionClick = (actionId: string) => {
-    setSelectedActions((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(actionId)) {
-        newSet.delete(actionId);
-      } else {
-        newSet.add(actionId);
+
+  const handleActionClick = (action: UserStatus) => {
+    bulkUpdateUserStatus({ userIds: selectedUsers.map((user) => user.id), status: action },
+      {
+        onSuccess: () => {
+          toast.success(`${action} users status updated successfully`);
+        },
+        onError: (error: unknown) => {
+          console.error('Failed to update users status:', error);
+          const errorMessage =
+            (error as { response?: { data?: { message?: string } } })?.response
+              ?.data?.message || 'Failed to update users status';
+          toast.error(errorMessage);
+        },
       }
-      return newSet;
-    });
+    );
+
   };
 
   const handleExecute = () => {
@@ -61,18 +68,20 @@ export default function BulkUserManagementPage() {
     label,
     variant = 'outline',
     className = '',
+    onClick,
   }: {
     id: string;
     label: string;
     variant?: 'outline' | 'destructive';
     className?: string;
+    onClick?: () => void;
   }) => {
     const isSelected = selectedActions.has(id);
     return (
       <Button
         type="button"
         variant={isSelected ? 'default' : variant}
-        onClick={() => handleActionClick(id)}
+        onClick={onClick}
         className={`w-full ${isSelected
           ? 'bg-[#43489C] text-white hover:bg-[#43489C]/90'
           : className
@@ -139,22 +148,21 @@ export default function BulkUserManagementPage() {
                       id="activate"
                       label="Activate Users"
                       className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
+                      onClick={() => handleActionClick(UserStatus.ACTIVE)}
                     />
                     <ActionButton
                       id="deactivate"
                       label="Deactivate Users"
                       className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+                      onClick={() => handleActionClick(UserStatus.INACTIVE)}
                     />
                     <ActionButton
                       id="suspend"
                       label="Suspend Users"
                       className="bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-200"
+                      onClick={() => handleActionClick(UserStatus.SUSPENDED)}
                     />
-                    <ActionButton
-                      id="reset-password"
-                      label="Reset Password"
-                      className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
-                    />
+
                   </div>
                 </CardContent>
               </Card>
@@ -181,11 +189,7 @@ export default function BulkUserManagementPage() {
                       label="Update Permissions"
                       className="bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-200"
                     />
-                    <ActionButton
-                      id="bulk-import"
-                      label="Bulk Import"
-                      className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200"
-                    />
+
                   </div>
                 </CardContent>
               </Card>
@@ -232,6 +236,10 @@ export default function BulkUserManagementPage() {
                         label="Delete Users"
                         variant="destructive"
                         className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+                      /><ActionButton
+                        id="bulk-import"
+                        label="Bulk Import"
+                        className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200"
                       />
                     </div>
 

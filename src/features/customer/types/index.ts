@@ -23,6 +23,8 @@ export interface Customer {
   email: string;
   phoneNumber: string;
   address?: string;
+  address2?: string;
+  description?: string;
   role?: UserRole;
   companyName?: string;
   city?: string;
@@ -34,6 +36,33 @@ export interface Customer {
   plan: CustomerPlan;
   features: string[];
   tenantId?: string;
+  tenant?: {
+    id: string;
+    name: string;
+    email?: string;
+    phone?: string | null;
+    status?: string;
+    configuration?: Record<string, unknown>;
+  } | null;
+  additionalInfo?: {
+    notes?: string;
+    taxId?: string;
+    slaLevel?: string;
+    billingCycle?: string;
+    contractType?: string;
+    customerType?: string;
+    paymentTerms?: string;
+    annualRevenue?: string;
+    employeeCount?: string;
+    priorityLevel?: string;
+    accountManager?: string;
+    contractEndDate?: string;
+    industrySegment?: string;
+    contractStartDate?: string;
+    preferredLanguage?: string;
+    commercialRegistration?: string;
+    [key: string]: unknown;
+  };
   createdAt: string;
   updatedAt: string;
 }

@@ -2,6 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { customersApi } from '@/services/api/customers.api.ts';
 import type { CreateCustomerData, CustomerQuery } from '../types';
 
+type CustomerUsersQuery = {
+  page?: number;
+  limit?: number;
+  search?: string;
+};
+
 /**
  * Hook to fetch all customers
  */
@@ -15,10 +21,9 @@ export const useCustomers = (params?: CustomerQuery) => {
   });
 };
 
-/**
- * Hook to fetch a single customer by ID
- */
-export const useCustomer = (customerId: string | undefined) => {
+ 
+// get customer by id
+export const useCustomerById = (customerId: string | undefined) => {
   return useQuery({
     queryKey: ['customers', customerId],
     queryFn: async () => {
@@ -26,7 +31,20 @@ export const useCustomer = (customerId: string | undefined) => {
       return res.data.data;
     },
     enabled: !!customerId,
+  });
+};
 
+export const useCustomerUsers = (
+  customerId: string | undefined,
+  params?: CustomerUsersQuery
+) => {
+  return useQuery({
+    queryKey: ['customer-users', customerId, params],
+    queryFn: async () => {
+      const res = await customersApi.getUsersByCustomer(customerId!, params);
+      return res.data.data;
+    },
+    enabled: !!customerId,
   });
 };
 

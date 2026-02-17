@@ -20,10 +20,11 @@ import { useDeleteUser, useUsers } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, UserRole, UserStatus } from '@/services/api/users.api';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { DeleteUserModal } from '@/components/models/DeleteUserModal';
+import { Pagination } from '@/components/common/Pagination';
 import {
     Tooltip,
     TooltipContent,
@@ -31,20 +32,25 @@ import {
 } from '@/components/ui/tooltip';
 const Users = ({ searchQuery }: { searchQuery: string }) => {
     const navigate = useNavigate();
-    const { data: usersData, isLoading } = useUsers();
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+    const { data: usersData, isLoading } = useUsers({
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery || undefined,
+    });
     const deleteUserMutation = useDeleteUser();
-    const users = useMemo(() => usersData || [], [usersData]);
-    const normalizedQuery = searchQuery.trim().toLowerCase();
-    const filteredUsers = useMemo(() => {
-        if (!normalizedQuery) {
-            return users;
-        }
-        return users.filter((user: User) => {
-            const name = (user.name || '').toLowerCase();
-            const email = (user.email || '').toLowerCase();
-            return name.includes(normalizedQuery) || email.includes(normalizedQuery);
-        });
-    }, [users, normalizedQuery]);
+    const users = useMemo(() => usersData?.data || [], [usersData]);
+    const totalPages = usersData?.meta?.totalPages || 1;
+    const totalItems = usersData?.meta?.total || users.length;
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [selectedUsers, setSelectedUsers] = useState<
@@ -133,13 +139,12 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                                         <TableHead>Role</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead>Created</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead className="text-center">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredUsers?.map((user: User) => (
+                                    {users.map((user: User) => (
                                         <TableRow key={user.id}>
-
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <input
@@ -185,7 +190,7 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                                                             <ShieldCheck className="h-4 w-4" />
                                                         </Button>
                                                     </TooltipTrigger>
-                                                    <TooltipContent className="">
+                                                    <TooltipContent className="bottom-[70%] w-32">
                                                         Manage users
                                                     </TooltipContent>
                                                 </Tooltip>
@@ -214,6 +219,13 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                                     ))}
                                 </TableBody>
                             </Table>
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                totalItems={totalItems}
+                                itemsPerPage={itemsPerPage}
+                                onPageChange={handlePageChange}
+                            />
                         </>
                     )}
                 </CardContent>

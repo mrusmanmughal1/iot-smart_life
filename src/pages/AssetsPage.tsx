@@ -56,18 +56,8 @@ export default function AssetsPage() {
     setIsSavingAsset(true);
     try {
       await createAssetMutation.mutateAsync(assetData);
-      // TODO: Replace with actual API call
-      // await assetsApi.create(assetData);
-      console.log('Creating asset:', assetData);
-      
-      // Simulate API call
-      
-
       // Close modal and show success
       setIsAddAssetModalOpen(false);
-      
-      // Refresh assets list
-      // queryClient.invalidateQueries({ queryKey: ['assets'] });
     } catch (error: unknown) {
       console.error('Failed to create asset:', error);
     } finally {
