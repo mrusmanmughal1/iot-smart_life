@@ -44,6 +44,7 @@ export interface PaginatedResponse<T> {
     page: number;
     limit: number;
     totalPages: number;
+    totalItems: number;
   };
 }
 
@@ -58,8 +59,7 @@ export const assetsApi = {
     apiClient.get<PaginatedResponse<Asset>>('/assets', { params }),
 
   // Get asset by ID
-  getById: (id: string) =>
-    apiClient.get<ApiResponse<Asset>>(`/assets/${id}`),
+  getById: (id: string) => apiClient.get<ApiResponse<Asset>>(`/assets/${id}`),
 
   // Create asset
   create: (data: Partial<Asset>) =>
@@ -70,16 +70,13 @@ export const assetsApi = {
     apiClient.patch<ApiResponse<Asset>>(`/assets/${id}`, data),
 
   // Delete asset
-  delete: (id: string) =>
-    apiClient.delete(`/assets/${id}`),
+  delete: (id: string) => apiClient.delete(`/assets/${id}`),
 
   // Get statistics
-  getStatistics: () =>
-    apiClient.get<ApiResponse<any>>('/assets/statistics'),
+  getStatistics: () => apiClient.get<ApiResponse<any>>('/assets/statistics'),
 
   // Get root assets (no parent)
-  getRoots: () =>
-    apiClient.get<ApiResponse<Asset[]>>('/assets/roots'),
+  getRoots: () => apiClient.get<ApiResponse<Asset[]>>('/assets/roots'),
 
   // Get asset hierarchy
   getHierarchy: (id: string) =>
@@ -117,5 +114,7 @@ export const assetsApi = {
 
   // Update attributes
   updateAttributes: (id: string, attributes: Record<string, any>) =>
-    apiClient.patch<ApiResponse<Asset>>(`/assets/${id}/attributes`, { attributes }),
+    apiClient.patch<ApiResponse<Asset>>(`/assets/${id}/attributes`, {
+      attributes,
+    }),
 };

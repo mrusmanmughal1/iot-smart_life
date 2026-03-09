@@ -106,6 +106,7 @@ export default function DevicesPage() {
       page: 1,
       limit: 10,
       totalPages: 0,
+      totalItems: 0,
     };
     return {
       devices: deviceList,

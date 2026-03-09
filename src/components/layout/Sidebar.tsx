@@ -209,7 +209,7 @@ const getNavItems = (): NavItem[] => [
 
   {
     titleKey: 'nav.subscription',
-
+    feature: 'subscription',
     children: [
       {
         titleKey: 'nav.plans',

@@ -1,12 +1,4 @@
-// Public Routes
-export const PUBLIC_ROUTES = {
-  HOME: '/',
-  LOGIN: '/login',
-  REGISTER: '/register',
-  FORGOT_PASSWORD: '/forgot-password',
-  RESET_PASSWORD: '/reset-password',
-  VERIFY_EMAIL: '/verify-email',
-} as const;
+import { PUBLIC_ROUTES } from '@/routes/RouteGuards/PublicRoute';
 
 // Dashboard Routes
 export const DASHBOARD_ROUTES = {
@@ -58,7 +50,10 @@ export const ROUTES = {
 } as const;
 
 // Route Builder Helpers
-export const buildRoute = (route: string, params: Record<string, string>): string => {
+export const buildRoute = (
+  route: string,
+  params: Record<string, string>
+): string => {
   let builtRoute = route;
   Object.entries(params).forEach(([key, value]) => {
     builtRoute = builtRoute.replace(`:${key}`, value);

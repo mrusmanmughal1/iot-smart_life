@@ -67,134 +67,132 @@ export default function AlarmsPage() {
   ] as const;
 
   return (
-    <AppLayout>
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900">
-            {t('alarms.title')}
-          </h1>
-          <p className="text-slate-500 text-sm mt-2">
-            Monitor and manage system alarms
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-bold text-slate-900">
+          {t('alarms.title')}
+        </h1>
+        <p className="text-slate-500 text-sm mt-2">
+          Monitor and manage system alarms
+        </p>
+      </div>
 
-        <div className="grid gap-6 md:grid-cols-4">
-          {statusCards.map((card) => (
-            <Card key={card.key} className={card.cardClassName}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {card.label}
-                </CardTitle>
-                {card.icon}
-              </CardHeader>
-              <CardContent>
-                {loadingstats ? (
-                  <div className="p-6 space-y-3">
-                    <Skeleton className="h-8 w-full" />
-                  </div>
-                ) : (
-                  <div className="text-2xl font-bold">
-                    {statsDataByStatus?.[card.key]}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="grid gap-6 md:grid-cols-4">
+        {statusCards.map((card) => (
+          <Card key={card.key} className={card.cardClassName}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {card.label}
+              </CardTitle>
+              {card.icon}
+            </CardHeader>
+            <CardContent>
+              {loadingstats ? (
+                <div className="p-6 space-y-3">
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              ) : (
+                <div className="text-2xl font-bold">
+                  {statsDataByStatus?.[card.key]}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-        <Card>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-16 w-full" />
-                ))}
-              </div>
-            ) : (
-              <Table>
-                <TableHeader className="bg-primary text-white">
+      <Card>
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-primary text-white">
+                <TableRow>
+                  <TableHead>Severity</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Originator</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {alarms.length === 0 ? (
                   <TableRow>
-                    <TableHead>Severity</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Originator</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center py-10 text-slate-500"
+                    >
+                      No data available
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {alarms.length === 0 ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={6}
-                        className="text-center py-10 text-slate-500"
-                      >
-                        No data available
+                ) : (
+                  alarms.map((alarm: any) => (
+                    <TableRow key={alarm.id}>
+                      <TableCell>
+                        <Badge
+                          variant={getSeverityColor(alarm.severity) as any}
+                        >
+                          {alarm.severity}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{alarm.type}</TableCell>
+                      <TableCell>{alarm.originatorName}</TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            alarm.status === 'ACTIVE'
+                              ? 'destructive'
+                              : 'secondary'
+                          }
+                        >
+                          {alarm.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {formatDistanceToNow(new Date(alarm.createdTime), {
+                          addSuffix: true,
+                        })}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          {alarm.status === 'ACTIVE' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                acknowledgeAlarm.mutate({ alarmId: alarm.id })
+                              }
+                            >
+                              Acknowledge
+                            </Button>
+                          )}
+                          {alarm.status === 'ACKNOWLEDGED' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                clearAlarm.mutate({ alarmId: alarm.id })
+                              }
+                            >
+                              Clear
+                            </Button>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    alarms.map((alarm: any) => (
-                      <TableRow key={alarm.id}>
-                        <TableCell>
-                          <Badge
-                            variant={getSeverityColor(alarm.severity) as any}
-                          >
-                            {alarm.severity}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{alarm.type}</TableCell>
-                        <TableCell>{alarm.originatorName}</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              alarm.status === 'ACTIVE'
-                                ? 'destructive'
-                                : 'secondary'
-                            }
-                          >
-                            {alarm.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {formatDistanceToNow(new Date(alarm.createdTime), {
-                            addSuffix: true,
-                          })}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            {alarm.status === 'ACTIVE' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                  acknowledgeAlarm.mutate({ alarmId: alarm.id })
-                                }
-                              >
-                                Acknowledge
-                              </Button>
-                            )}
-                            {alarm.status === 'ACKNOWLEDGED' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() =>
-                                  clearAlarm.mutate({ alarmId: alarm.id })
-                                }
-                              >
-                                Clear
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </AppLayout>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
