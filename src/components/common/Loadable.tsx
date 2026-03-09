@@ -8,7 +8,7 @@ import { LoadingPage } from './LoadingSpinner';
  * @returns A component wrapped in Suspense with a loading fallback.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Loadable = (Component: ElementType) => (props: any) => (
+export const Loadable = (Component: any) => (props: any) => (
   <Suspense fallback={<LoadingPage />}>
     <Component {...props} />
   </Suspense>
