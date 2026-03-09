@@ -1,3 +1,4 @@
+import { PaginationMeta } from '@/features/Subscription/hooks';
 import apiClient from '@/lib/axios';
 
 export enum SubscriptionPlan {
@@ -124,10 +125,20 @@ export const subscriptionsApi = {
   // Get billing history
   getBillingHistory: () =>
     apiClient.get<ApiResponse<any[]>>('/subscriptions/billing-history'),
+  getSubscriptionInvoices: (page: number = 1, limit: number = 10) =>
+    apiClient.get<ApiResponse<any>>('/subscriptions/invoices', {
+      params: { page, limit },
+    }),
 
   // Get invoice
   getInvoice: (invoiceId: string) =>
     apiClient.get<ApiResponse<any>>(`/subscriptions/invoices/${invoiceId}`),
+
+  // Download invoice PDF
+  getInvoicePdf: (invoiceId: string) =>
+    apiClient.get(`/subscriptions/invoices/${invoiceId}/pdf`, {
+      responseType: 'blob',
+    }),
 
   // Toggle auto-renew
   toggleAutoRenew: () =>

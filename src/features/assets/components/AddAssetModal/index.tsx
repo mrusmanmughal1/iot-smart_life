@@ -6,7 +6,7 @@ import {
   Controller,
   useFieldArray,
   type Resolver,
-  type SubmitHandler
+  type SubmitHandler,
 } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -82,8 +82,12 @@ const optionalPositiveInt = z.preprocess((v) => {
 const createSchema = (t: (key: string) => string) =>
   z
     .object({
-      name: z.string().min(1, t('addAsset.nameRequired') || 'Asset name is required'),
-      type: z.string().min(1, t('addAsset.typeRequired') || 'Asset type is required'),
+      name: z
+        .string()
+        .min(1, t('addAsset.nameRequired') || 'Asset name is required'),
+      type: z
+        .string()
+        .min(1, t('addAsset.typeRequired') || 'Asset type is required'),
       description: z.string().optional().default(''),
       assetProfileId: z.string().optional().default(''),
       parentAssetId: z.string().optional().default(''),
@@ -241,7 +245,11 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
 
   const assetType = watch('type');
 
-  const { fields: attributeFields, append, remove } = useFieldArray({
+  const {
+    fields: attributeFields,
+    append,
+    remove,
+  } = useFieldArray({
     control,
     name: 'attributes',
   });
@@ -311,18 +319,20 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     const lat = String(values.location?.latitude ?? '').trim();
     const lng = String(values.location?.longitude ?? '').trim();
     const location =
-      lat && lng ? { latitude: Number(lat), longitude: Number(lng) } : undefined;
+      lat && lng
+        ? { latitude: Number(lat), longitude: Number(lng) }
+        : undefined;
 
     const building =
       values.type === 'building'
         ? ({
-          name: String(values.building?.name ?? '').trim(),
-          floors: Number(values.building?.floors ?? 1) || 1,
-          dimensions: {
-            width: Number(values.building?.dimensions?.width ?? 0) || 0,
-            height: Number(values.building?.dimensions?.height ?? 0) || 0,
-          },
-        } satisfies BuildingDetails)
+            name: String(values.building?.name ?? '').trim(),
+            floors: Number(values.building?.floors ?? 1) || 1,
+            dimensions: {
+              width: Number(values.building?.dimensions?.width ?? 0) || 0,
+              height: Number(values.building?.dimensions?.height ?? 0) || 0,
+            },
+          } satisfies BuildingDetails)
         : undefined;
 
     await onSave({
@@ -360,7 +370,12 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
 
         {/* Body */}
         <div className="p-6 bg-white max-h-[70vh] overflow-y-auto dark:bg-gray-950 dark:border-gray-700">
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit as unknown as SubmitHandler<AddAssetFormValues>)}>
+          <form
+            className="space-y-4"
+            onSubmit={handleSubmit(
+              onSubmit as unknown as SubmitHandler<AddAssetFormValues>
+            )}
+          >
             {/* Asset Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -372,11 +387,15 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                   t('addAsset.assetNamePlaceholder') || 'Asset Name *'
                 }
                 className={
-                  errors.name ? 'border-red-500 border-2 rounded-md' : 'border-2 rounded-md'
+                  errors.name
+                    ? 'border-red-500 border-2 rounded-md'
+                    : 'border-2 rounded-md'
                 }
               />
               {errors.name && (
-                <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -390,7 +409,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 name="type"
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className={errors.type ? 'border-red-500' : ''}>
+                    <SelectTrigger
+                      className={errors.type ? 'border-red-500' : ''}
+                    >
                       <SelectValue
                         placeholder={
                           t('addAsset.assetTypePlaceholder') ||
@@ -409,14 +430,18 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                 )}
               />
               {errors.type && (
-                <p className="mt-1 text-sm text-red-500">{errors.type.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.type.message}
+                </p>
               )}
             </div>
 
             {/* Building Details */}
             {assetType === 'building' && (
               <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-4">
-                <h3 className="text-sm font-semibold text-gray-800">Building Details</h3>
+                <h3 className="text-sm font-semibold text-gray-800">
+                  Building Details
+                </h3>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -426,7 +451,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                     {...register('building.name')}
                     placeholder="e.g., HQ Building"
                     className={
-                      errors.building?.name ? 'border-red-500 border-2 rounded-md' : 'border-2 rounded-md'
+                      errors.building?.name
+                        ? 'border-red-500 border-2 rounded-md'
+                        : 'border-2 rounded-md'
                     }
                   />
                   {errors.building?.name && (
@@ -447,7 +474,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                       {...register('building.floors')}
                       placeholder="e.g., 5"
                       className={
-                        errors.building?.floors ? 'border-red-500 border-2 rounded-md' : 'border-2 rounded-md'
+                        errors.building?.floors
+                          ? 'border-red-500 border-2 rounded-md'
+                          : 'border-2 rounded-md'
                       }
                     />
                     {errors.building?.floors && (
@@ -529,11 +558,15 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                   control={control}
                   name="assetProfileId"
                   render={({ field }) => (
-                    <Select value={field.value || ''} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value || ''}
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger>
                         <SelectValue
                           placeholder={
-                            t('addAsset.assetProfilePlaceholder') || 'Select profile...'
+                            t('addAsset.assetProfilePlaceholder') ||
+                            'Select profile...'
                           }
                         />
                       </SelectTrigger>
@@ -563,11 +596,15 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
                   control={control}
                   name="parentAssetId"
                   render={({ field }) => (
-                    <Select value={field.value || ''} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value || ''}
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger>
                         <SelectValue
                           placeholder={
-                            t('addAsset.parentAssetPlaceholder') || 'Select parent...'
+                            t('addAsset.parentAssetPlaceholder') ||
+                            'Select parent...'
                           }
                         />
                       </SelectTrigger>
@@ -721,7 +758,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
           </Button>
           <Button
             type="submit"
-            onClick={handleSubmit(onSubmit as unknown as SubmitHandler<AddAssetFormValues>)}
+            onClick={handleSubmit(
+              onSubmit as unknown as SubmitHandler<AddAssetFormValues>
+            )}
             disabled={isLoading}
             className="bg-black hover:bg-black/90 text-white"
             isLoading={isLoading}

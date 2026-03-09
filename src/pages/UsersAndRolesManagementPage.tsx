@@ -7,11 +7,14 @@ import Roles from '@/features/users/components/Roles';
 import Users from '@/features/users/components/Users';
 import CustomerPage from '@/features/users/components/Customer';
 import { useNavigate } from 'react-router-dom';
+import { useDebouncedValue } from '@/utils/helpers/Debounce';
 
 export default function UsersAndRolesManagementPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Users');
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 300);
+
   const handleAddAction = () => {
     if (activeTab === 'Users') {
       navigate('/users-management/add-new-user');
@@ -58,25 +61,15 @@ export default function UsersAndRolesManagementPage() {
             <Tabs
               defaultValue="Users"
               value={activeTab}
-              onValueChange={setActiveTab}
-
+              onValueChange={(value) => {
+                setActiveTab(value);
+                setSearchQuery('');
+              }}
             >
               <TabsList className="p-1">
-                <TabsTrigger
-                  value="Users"
-                >
-                  Users
-                </TabsTrigger>
-                <TabsTrigger
-                  value="Customers"
-                >
-                  Customers
-                </TabsTrigger>
-                <TabsTrigger
-                  value="Roles"
-                >
-                  Roles
-                </TabsTrigger>
+                <TabsTrigger value="Users">Users</TabsTrigger>
+                <TabsTrigger value="Customers">Customers</TabsTrigger>
+                <TabsTrigger value="Roles">Roles</TabsTrigger>
               </TabsList>
             </Tabs>
             <div className="flex-1 max-w-md">
@@ -93,9 +86,11 @@ export default function UsersAndRolesManagementPage() {
           </div>
         </div>
 
-        {activeTab === 'Users' && <Users searchQuery={searchQuery} />}
-        {activeTab === 'Roles' && <Roles searchQuery={searchQuery} />}
-        {activeTab === 'Customers' && <CustomerPage searchQuery={searchQuery} />}
+        {activeTab === 'Users' && <Users searchQuery={debouncedSearchQuery} />}
+        {activeTab === 'Roles' && <Roles searchQuery={debouncedSearchQuery} />}
+        {activeTab === 'Customers' && (
+          <CustomerPage searchQuery={debouncedSearchQuery} />
+        )}
       </div>
     </div>
   );

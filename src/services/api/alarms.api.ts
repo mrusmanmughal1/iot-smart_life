@@ -13,7 +13,42 @@ export enum AlarmStatus {
   ACKNOWLEDGED = 'ACKNOWLEDGED',
   CLEARED = 'CLEARED',
 }
+export type AlertStatus = 'active' | 'acknowledged' | 'cleared' | 'resolved';
+export type AlertSeverity = 'critical' | 'error' | 'warning';
+export type AlarmStats = {
+  active: number;
+  acknowledged: number;
+  cleared: number;
+  resolved: number;
+};
+export interface AlertsSummaryResponse {
+  byType: any;
+  bySeverity: any;
+  cleared: any;
+  acknowledged: any;
+  total: any;
+  success: boolean;
+  data: {
+    byType: any;
+    cleared: any;
+    acknowledged: any;
+    total: number;
+    byStatus: AlarmStats;
+    bySeverity: Record<AlertSeverity, number>;
+    mostTriggered: AlertItem[];
+    recent: AlertItem[];
+  };
+  timestamp: string;
+}
 
+export interface AlertItem {
+  id: string;
+  title: string;
+  status: AlertStatus;
+  severity: AlertSeverity;
+  triggeredAt: string;
+  deviceId?: string;
+}
 export interface Alarm {
   id: string;
   type: string;
@@ -67,11 +102,10 @@ export interface ApiResponse<T> {
 export const alarmsApi = {
   // Get all alarms
   getAll: (params?: AlarmQuery) =>
-    apiClient.get<PaginatedResponse<Alarm>>('/alarms', { params }),
+    apiClient.get<ApiResponse<PaginatedResponse<Alarm>>>('/alarms', { params }),
 
   // Get alarm by ID
-  getById: (id: string) =>
-    apiClient.get<ApiResponse<Alarm>>(`/alarms/${id}`),
+  getById: (id: string) => apiClient.get<ApiResponse<Alarm>>(`/alarms/${id}`),
 
   // Create alarm
   create: (data: Partial<Alarm>) =>
@@ -82,8 +116,7 @@ export const alarmsApi = {
     apiClient.patch<ApiResponse<Alarm>>(`/alarms/${id}`, data),
 
   // Delete alarm
-  delete: (id: string) =>
-    apiClient.delete(`/alarms/${id}`),
+  delete: (id: string) => apiClient.delete(`/alarms/${id}`),
 
   // Acknowledge alarm
   acknowledge: (id: string) =>
@@ -103,7 +136,7 @@ export const alarmsApi = {
 
   // Get statistics
   getStatistics: () =>
-    apiClient.get<ApiResponse<any>>('/alarms/statistics'),
+    apiClient.get<AlertsSummaryResponse>('/alarms/statistics'),
 
   // Get alarm history
   getHistory: (id: string) =>

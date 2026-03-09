@@ -1,4 +1,4 @@
-import { usersApi, rolesApi, } from '@/services/api/index.ts';
+import { usersApi, rolesApi } from '@/services/api/index.ts';
 import type { User, Role, Permission } from '@/services/api/users.api.ts';
 
 /**
@@ -108,26 +108,22 @@ export const userService = {
   /**
    * Get user statistics
    */
-  async getUserStats() {
-    const stats = await usersApi.getStatistics();
-
-    return {
-      total: stats.data.data.total,
-      active: stats.data.data.active,
-      inactive: stats.data.data.inactive,
-      suspended: stats.data.data.suspended,
-      byRole: stats.data.data.byRole,
-      recentLogins: stats.data.data.recentLogins,
-    };
-  },
+  // async getUserStats() {
+  //   const stats = await usersApi.getStatistics();
+  //   return {
+  //     total: stats.data.data.total,
+  //     active: stats.data.data.active,
+  //     inactive: stats.data.data.inactive,
+  //     suspended: stats.data.data.suspended,
+  //     byRole: stats.data.data.byRole,
+  //     recentLogins: stats.data.data.recentLogins,
+  //   };
+  // },
 
   /**
    * Bulk user operations
    */
-  async bulkUpdateUsers(
-    userIds: string[],
-    updates: Partial<User>
-  ) {
+  async bulkUpdateUsers(userIds: string[], updates: Partial<User>) {
     return usersApi.bulkUpdate(userIds, updates);
   },
 
@@ -168,16 +164,15 @@ export const userService = {
   /**
    * Enable 2FA for user
    */
-  async enable2FA(userId: string) {
-    const result = await usersApi.enable2FA(userId);
-
-    return {
-      userId,
-      enabled: true,
-      qrCode: result.data.data.qrCode,
-      secret: result.data.data.secret,
-    };
-  },
+  // async enable2FA(userId: string) {
+  //   const result = await usersApi.enable2FA(userId);
+  //   return {
+  //     userId,
+  //     enabled: true,
+  //     qrCode: result.data.data.qrCode,
+  //     secret: result.data.data.secret,
+  //   };
+  // },
 
   /**
    * Check user permissions
@@ -225,15 +220,6 @@ export const userService = {
   /**
    * Reset user password (admin)
    */
-  async resetUserPassword(userId: string) {
-    const result = await usersApi.resetPassword(userId);
-
-    return {
-      userId,
-      temporaryPassword: result.data.data.temporaryPassword,
-      mustChangePassword: true,
-    };
-  },
 };
 
 /**
@@ -269,6 +255,4 @@ export const roleService = {
       permissions: original.data.data.permissions,
     });
   },
-
-
 };

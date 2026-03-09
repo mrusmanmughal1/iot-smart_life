@@ -4,5 +4,6 @@ export {
   useCustomerById,
   useCustomerUsers,
   useUpdateCustomer,
+  useDeleteCustomer,
 } from './useCustomers';
 

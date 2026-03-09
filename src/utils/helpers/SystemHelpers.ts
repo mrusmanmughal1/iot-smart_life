@@ -9,4 +9,3 @@ export const getSystemTheme = (): 'light' | 'dark' | 'auto' => {
     ? 'dark'
     : 'light';
 };
-console.log(getSystemTheme()  )

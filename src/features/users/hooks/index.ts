@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { usersApi, rolesApi } from '@/services/api';
+import { usersApi, rolesApi, devicesApi } from '@/services/api';
 import { userService } from '../services/usersService';
 import type { User, UserQuery } from '@/services/api/users.api';
 
@@ -19,7 +19,20 @@ export const useUsers = (params?: UserQuery) => {
     },
   });
 };
-
+//search users
+export const useSearchUsers = (
+  query: string,
+  page?: number,
+  limit?: number
+) => {
+  return useQuery({
+    queryKey: ['users', 'search', query, page, limit],
+    queryFn: async () => {
+      const response = await usersApi.search(query, page, limit);
+      return response.data.data;
+    },
+  });
+};
 export const useUser = (userId: string) => {
   return useQuery({
     queryKey: ['users', userId],
@@ -44,6 +57,7 @@ export const useRoles = (params?: RoleQuery) => {
     },
   });
 };
+
 export const useDeleteRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -53,11 +67,17 @@ export const useDeleteRole = () => {
     },
   });
 };
+
 export const useCreateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userData, roleId }: { userData: Partial<User> & { password: string }; roleId: string }) =>
-      userService.createUserWithRole(userData, roleId),
+    mutationFn: ({
+      userData,
+      roleId,
+    }: {
+      userData: Partial<User> & { password: string };
+      roleId: string;
+    }) => userService.createUserWithRole(userData, roleId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
@@ -77,10 +97,25 @@ export const useDeleteUser = () => {
 export const useBulkUpdateUserStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userIds, status }: { userIds: string[]; status: User['status'] }) =>
-      usersApi.bulkUpdateStatus(userIds, status),
+    mutationFn: ({
+      userIds,
+      status,
+    }: {
+      userIds: string[];
+      status: User['status'];
+    }) => usersApi.bulkUpdateStatus(userIds, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+//get devices by customer id
+export const useDevicesByCustomerId = (customerId: string) => {
+  return useQuery({
+    queryKey: ['devices', 'customer', customerId],
+    queryFn: async () => {
+      const response = await devicesApi.getByCustomerId(customerId);
+      return response.data.data;
     },
   });
 };

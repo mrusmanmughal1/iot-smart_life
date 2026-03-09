@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { useAuditLogsByCustomerId } from '@/features/audit/hooks';
 
 export type CustomerActivityLogItem = {
   id: string;
@@ -6,10 +7,6 @@ export type CustomerActivityLogItem = {
   description?: string;
   timestamp?: string;
   status?: 'info' | 'success' | 'warning';
-};
-
-type CustomerActivityLogProps = {
-  items: CustomerActivityLogItem[];
 };
 
 const statusStyles: Record<
@@ -21,8 +18,10 @@ const statusStyles: Record<
   warning: 'bg-yellow-100 text-yellow-700',
 };
 
-const CustomerActivityLog = ({ items }: CustomerActivityLogProps) => {
-  if (items.length === 0) {
+const CustomerActivityLog = ({ customerId, title }: { customerId: string, title: string }) => {
+  const { data: auditLogsData } = useAuditLogsByCustomerId(customerId, 1, 10);
+  const auditLogs = auditLogsData?.data;
+  if (auditLogs?.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-gray-200 p-6 text-sm text-gray-600 dark:text-white">
         No activity available.
@@ -32,7 +31,8 @@ const CustomerActivityLog = ({ items }: CustomerActivityLogProps) => {
 
   return (
     <div className="space-y-4">
-      {items.map((item) => (
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
+      {auditLogs?.map((item) => (
         <div
           key={item.id}
           className="flex items-start justify-between gap-4 rounded-lg border border-gray-100 bg-white p-4 shadow-sm dark:bg-gray-900 dark:border-gray-700"
@@ -44,7 +44,7 @@ const CustomerActivityLog = ({ items }: CustomerActivityLogProps) => {
               </p>
               {item.status && (
                 <Badge
-                  className={`border-0 ${statusStyles[item.status]}`}
+                  // className={`border-0 ${statusStyles[item.status]}`}
                   variant="secondary"
                 >
                   {item.status}

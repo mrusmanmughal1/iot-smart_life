@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Trash2, Edit } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { useCustomerById } from '@/features/customer/hooks';
+import { useCustomerById, useDeleteCustomer } from '@/features/customer/hooks';
+import type { Customer } from '@/features/customer/types';
 import CustomerUsersList from '@/features/customer/components/CustomerUsersList';
 import CustomerActivityLog from '@/features/customer/components/CustomerActivityLog';
+import { usePermissions } from '@/features/permissions/hooks';
+import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
+import DevicesListCustomers from '@/features/users/components/DevicesListCustomers';
 
 interface Permission {
   id: string;
@@ -15,164 +19,6 @@ interface Permission {
   granted: boolean;
   category: string;
 }
-
-const permissions: Permission[] = [
-  // Dashboard Management
-  {
-    id: 'view-dashboards',
-    label: 'View Dashboards',
-    granted: true,
-    category: 'Dashboard Management',
-  },
-  {
-    id: 'create-dashboards',
-    label: 'Create Dashboards',
-    granted: true,
-    category: 'Dashboard Management',
-  },
-  {
-    id: 'edit-dashboards',
-    label: 'Edit Dashboards',
-    granted: true,
-    category: 'Dashboard Management',
-  },
-  {
-    id: 'delete-dashboards',
-    label: 'Delete Dashboards',
-    granted: true,
-    category: 'Dashboard Management',
-  },
-
-  // Device Management
-  {
-    id: 'view-devices',
-    label: 'View Devices',
-    granted: true,
-    category: 'Device Management',
-  },
-  {
-    id: 'manage-devices',
-    label: 'Manage Devices',
-    granted: true,
-    category: 'Device Management',
-  },
-  {
-    id: 'configure-devices',
-    label: 'Configure Devices',
-    granted: true,
-    category: 'Device Management',
-  },
-  {
-    id: 'delete-devices',
-    label: 'Delete Devices',
-    granted: false,
-    category: 'Device Management',
-  },
-
-  // User Management
-  {
-    id: 'view-users',
-    label: 'View Users',
-    granted: true,
-    category: 'User Management',
-  },
-  {
-    id: 'create-users',
-    label: 'Create Users',
-    granted: true,
-    category: 'User Management',
-  },
-  {
-    id: 'edit-users',
-    label: 'Edit Users',
-    granted: true,
-    category: 'User Management',
-  },
-  {
-    id: 'assign-roles',
-    label: 'Assign Roles',
-    granted: true,
-    category: 'User Management',
-  },
-
-  // Data Access
-  {
-    id: 'view-telemetry',
-    label: 'View Telemetry',
-    granted: true,
-    category: 'Data Access',
-  },
-  {
-    id: 'view-attributes',
-    label: 'View Attributes',
-    granted: true,
-    category: 'Data Access',
-  },
-  {
-    id: 'export-data',
-    label: 'Export Data',
-    granted: false,
-    category: 'Data Access',
-  },
-  {
-    id: 'delete-telemetry',
-    label: 'Delete Telemetry',
-    granted: false,
-    category: 'Data Access',
-  },
-
-  // Report Generation
-  {
-    id: 'create-reports',
-    label: 'Create Reports',
-    granted: true,
-    category: 'Report Generation',
-  },
-  {
-    id: 'schedule-reports',
-    label: 'Schedule Reports',
-    granted: true,
-    category: 'Report Generation',
-  },
-  {
-    id: 'export-reports',
-    label: 'Export Reports',
-    granted: false,
-    category: 'Report Generation',
-  },
-  {
-    id: 'share-reports',
-    label: 'Share Reports',
-    granted: true,
-    category: 'Report Generation',
-  },
-
-  // System Access
-  {
-    id: 'system-admin',
-    label: 'System Admin',
-    granted: false,
-    category: 'System Access',
-  },
-  {
-    id: 'view-audit-logs',
-    label: 'View Audit Logs',
-    granted: true,
-    category: 'System Access',
-  },
-  {
-    id: 'manage-settings',
-    label: 'Manage Settings',
-    granted: false,
-    category: 'System Access',
-  },
-  {
-    id: 'system-backup',
-    label: 'System Backup',
-    granted: false,
-    category: 'System Access',
-  },
-];
 
 const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
   return (
@@ -202,94 +48,61 @@ const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
 export default function CustomerAdministratorPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { data: customerData } = useCustomerById(id);
-  const customer = customerData;
+  const { data } = useCustomerById(id);
+  const customer = data?.data as Customer | undefined;
+  const deleteCustomerMutation = useDeleteCustomer();
+
+  // get permissions for the customer
+  const { data: permissionsData } = usePermissions();
+  const UserPermissionsdata = permissionsData;
+
   const contractStart = customer?.additionalInfo?.contractStartDate
     ? new Date(customer.additionalInfo.contractStartDate).toLocaleDateString()
     : undefined;
   const contractEnd = customer?.additionalInfo?.contractEndDate
     ? new Date(customer.additionalInfo.contractEndDate).toLocaleDateString()
     : undefined;
-  const activityLogItems = React.useMemo(() => {
-    if (!customer) {
-      return [];
-    }
 
-    const items = [];
-
-    if (customer.createdAt) {
-      items.push({
-        id: 'created',
-        title: 'Customer created',
-        description: `Customer ${customer.name || ''} was created.`,
-        timestamp: customer.createdAt,
-        status: 'success' as const,
-      });
-    }
-
-    if (customer.updatedAt && customer.updatedAt !== customer.createdAt) {
-      items.push({
-        id: 'updated',
-        title: 'Profile updated',
-        description: 'Customer profile information was updated.',
-        timestamp: customer.updatedAt,
-        status: 'info' as const,
-      });
-    }
-
-    if (customer.additionalInfo?.contractStartDate) {
-      items.push({
-        id: 'contract-start',
-        title: 'Contract started',
-        description: 'Customer contract start date recorded.',
-        timestamp: customer.additionalInfo.contractStartDate,
-        status: 'success' as const,
-      });
-    }
-
-    if (customer.additionalInfo?.contractEndDate) {
-      items.push({
-        id: 'contract-end',
-        title: 'Contract end date',
-        description: 'Customer contract end date recorded.',
-        timestamp: customer.additionalInfo.contractEndDate,
-        status: 'warning' as const,
-      });
-    }
-
-    if (customer.status) {
-      items.push({
-        id: 'status',
-        title: 'Status updated',
-        description: `Status set to ${customer.status}.`,
-        timestamp: customer.updatedAt || customer.createdAt,
-        status: 'info' as const,
-      });
-    }
-
-    return items;
-  }, [customer]);
   const [activeTab, setActiveTab] = useState('permissions');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleEditRole = () => {
-    navigate('/users/edit-role/customer-administrator');
+    navigate('/users-management-');
   };
 
   const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this role?')) {
-      toast.success('Role deleted successfully');
-      navigate('/users');
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!id) return;
+    try {
+      await deleteCustomerMutation.mutateAsync(id);
+      toast.success('Customer deleted successfully');
+      navigate('/users-management/customers');
+    } catch (error) {
+      console.error('Failed to delete customer:', error);
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || 'Failed to delete customer';
+      toast.error(errorMessage);
+      throw error;
     }
   };
 
   // Group permissions by category
-  const permissionsByCategory = permissions.reduce((acc, permission) => {
-    if (!acc[permission.category]) {
-      acc[permission.category] = [];
+  const permissionsByCategory = useMemo(() => UserPermissionsdata?.reduce((acc, permission) => {
+    if (!acc[permission.resource]) {
+      acc[permission.resource] = [];
     }
-    acc[permission.category].push(permission);
+    acc[permission.resource].push({
+      id: permission.id,
+      label: permission.action,
+      granted: true,
+      category: permission.resource,
+    });
     return acc;
-  }, {} as Record<string, Permission[]>);
+  }, {} as Record<string, Permission[]>), [UserPermissionsdata]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
@@ -298,12 +111,12 @@ export default function CustomerAdministratorPage() {
         {/* Header Section */}
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6">
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between mb-4">
               <div>
                 <h1 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">
                   {customer?.name || 'Customer '}
                 </h1>
-                <p className="text-gray-600 dark:text-white">
+                <p className="text-gray-600 text-sm dark:text-white">
                   {customer?.description ||
                     'Full access to customer resources and user management'}
                 </p>
@@ -314,7 +127,7 @@ export default function CustomerAdministratorPage() {
                   className="bg-primary hover:bg-primary/90 text-white"
                 >
                   <Edit className="h-4 w-4  " />
-                  Edit Role
+                  Edit Customer
                 </Button>
                 <Button onClick={handleDelete} variant="secondary">
                   <Trash2 className="h-4 w-4  " />
@@ -450,13 +263,23 @@ export default function CustomerAdministratorPage() {
                   Assigned Users (8)
                 </TabsTrigger>
                 <TabsTrigger
-                  value="activity-log"
+                  value="devices"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
+                >
+                  Devices (8)
+                </TabsTrigger>
+                <TabsTrigger
+                  value="assigned-devices"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
                 >
                   Activity Log
                 </TabsTrigger>
               </TabsList>
 
+              {/* Devices Tab */}
+              <TabsContent value="devices" className="p-4 space-y-4 ">
+                 <DevicesListCustomers customerId={id || ''} />
+              </TabsContent>
               {/* Permissions Tab */}
               <TabsContent value="permissions" className="p-4 space-y-4 ">
                 <div className="flex items-start justify-between">
@@ -469,7 +292,7 @@ export default function CustomerAdministratorPage() {
 
                 {/* Permission Categories */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.entries(permissionsByCategory).map(
+                  {Object.entries(permissionsByCategory || {}).map(
                     ([category, categoryPermissions]) => (
                       <Card
                         key={category}
@@ -477,7 +300,7 @@ export default function CustomerAdministratorPage() {
                           }`}
                       >
                         <CardHeader>
-                          <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <CardTitle className="text-lg capitalize font-semibold text-gray-900 dark:text-white">
                             {category}
                           </CardTitle>
                         </CardHeader>
@@ -490,8 +313,8 @@ export default function CustomerAdministratorPage() {
                               <PermissionCheckbox
                                 granted={permission.granted}
                               />
-                              <span className="text-sm text-gray-900 flex-1 dark:text-white">
-                                {permission.label}
+                              <span className="text-sm capitalize text-gray-900 flex-1 dark:text-white">
+                                {permission.label} {category.replace('-', ' ')}
                               </span>
                             </div>
                           ))}
@@ -526,15 +349,25 @@ export default function CustomerAdministratorPage() {
                   title="Assigned Users"
                 />
               </TabsContent>
+
               {/* Activity Log Tab */}
               <TabsContent value="activity-log" className="p-6 space-y-4">
-
-                <CustomerActivityLog items={activityLogItems} />
+                <CustomerActivityLog customerId={id || ''} title="Activity Log" />
               </TabsContent>
+
             </Tabs>
 
           </CardContent>
         </Card>
+
+        <DeleteConfirmationDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Customer"
+          itemName={customer?.name}
+          isLoading={deleteCustomerMutation.isPending}
+        />
       </div>
     </div>
   );

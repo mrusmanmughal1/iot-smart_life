@@ -52,7 +52,7 @@ export interface DeviceListItem extends Device {
   telemetry?: Record<string, any>;
 }
 
-export type DeviceAction = 
+export type DeviceAction =
   | 'view'
   | 'edit'
   | 'delete'
@@ -60,3 +60,15 @@ export type DeviceAction =
   | 'deactivate'
   | 'clone'
   | 'export';
+
+export interface DeviceProfileApiResponse {
+  id: string;
+  name: string;
+  description?: string;
+  type?: string;
+  transportType?: string;
+  provisionType?: string;
+  default?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

@@ -18,6 +18,7 @@ import {
   FormMessage,
   FormDescription,
 } from '@/components/ui/form';
+import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
@@ -25,7 +26,7 @@ import { assetProfileFormSchema } from '../types/asset-profile-form.schema';
 import type { AssetProfileFormData } from '../types/asset-profile-form.types';
 import { DEFAULT_ASSET_PROFILE_FORM_DATA } from '../types/asset-profile-form.types';
 import { useUpdateAssetProfile } from '../hooks';
-import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface AssetsProfileDetailsTabProps {
   profileId: string;
@@ -43,11 +44,10 @@ interface AssetsProfileDetailsTabProps {
 
 const AssetsProfileDetailsTab: React.FC<AssetsProfileDetailsTabProps> = ({
   profileId,
-  profileData,
-  onSuccess,
+  profileData
 }) => {
   const updateAssetProfileMutation = useUpdateAssetProfile();
-
+  const navigate = useNavigate();
   const form = useForm<AssetProfileFormData>({
     resolver: zodResolver(assetProfileFormSchema),
     defaultValues: DEFAULT_ASSET_PROFILE_FORM_DATA,
@@ -75,9 +75,8 @@ const AssetsProfileDetailsTab: React.FC<AssetsProfileDetailsTabProps> = ({
         data,
       });
       toast.success('Asset profile updated successfully');
-      onSuccess?.();
+      navigate(`/asset-profiles`);
     } catch (error) {
-      console.error('Error updating asset profile:', error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
           ?.data?.message ||

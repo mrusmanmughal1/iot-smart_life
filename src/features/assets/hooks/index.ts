@@ -93,8 +93,13 @@ export const useMoveAsset = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ assetId, newParentId }: { assetId: string; newParentId: string | null }) =>
-      assetService.moveAsset(assetId, newParentId),
+    mutationFn: ({
+      assetId,
+      newParentId,
+    }: {
+      assetId: string;
+      newParentId: string | null;
+    }) => assetService.moveAsset(assetId, newParentId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assets'] });
     },
@@ -105,10 +110,17 @@ export const useAssignDevices = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ assetId, deviceIds }: { assetId: string; deviceIds: string[] }) =>
-      assetService.assignDevicesInBulk(assetId, deviceIds),
+    mutationFn: ({
+      assetId,
+      deviceIds,
+    }: {
+      assetId: string;
+      deviceIds: string[];
+    }) => assetService.assignDevicesInBulk(assetId, deviceIds),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['assets', variables.assetId] });
+      queryClient.invalidateQueries({
+        queryKey: ['assets', variables.assetId],
+      });
     },
   });
 };

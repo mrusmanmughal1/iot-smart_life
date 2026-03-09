@@ -21,15 +21,20 @@ export default function SettingsPage() {
     handleGeneralSettingsSave,
     handleSaveNotificationSettings,
     isSavingNotifications,
-    isError
+    isError,
   } = useGeneralSettings();
+
   if (isLoading) {
     return <LoadingPage />;
   }
- 
 
   if (isError) {
-    return <ErrorMessage title="Failed to load settings" onRetry={() => window.location.reload()} />;
+    return (
+      <ErrorMessage
+        title="Failed to load settings"
+        onRetry={() => window.location.reload()}
+      />
+    );
   }
   return (
     <AppLayout>

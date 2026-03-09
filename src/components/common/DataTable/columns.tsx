@@ -95,10 +95,12 @@ export function createSortableDateColumn<T>(
 
 export function createActionsColumn<T>(
   onEdit?: (row: T) => void,
-  onDelete?: (row: T) => void
+  onDelete?: (row: T) => void,
+  headerLabel = 'Actions'
 ): ColumnDef<T> {
   return {
     id: 'actions',
+    header: () => <span className=" font-semibold w-full block">{headerLabel}</span>,
     cell: ({ row }) => {
       return (
         <DropdownMenu>
@@ -110,8 +112,6 @@ export function createActionsColumn<T>(
           </DropdownMenuTrigger>
           <div className="relative">
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
               {onEdit && (
                 <DropdownMenuItem
                   className="text-success"

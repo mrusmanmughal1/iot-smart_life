@@ -81,7 +81,7 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                                 <TableHeader>
                                     <TableRow className="bg-primary hover:bg-primary">
                                         <TableHead className="text-white font-semibold">
-                                            ROLE NAME
+                                            ROLES
                                         </TableHead>
                                         <TableHead className="text-white font-semibold">
                                             DESCRIPTION

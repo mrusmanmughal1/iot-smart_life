@@ -21,7 +21,12 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   text,
 }) => {
   return (
-    <div className={cn('flex flex-col items-center justify-center gap-3', className)}>
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center gap-3',
+        className
+      )}
+    >
       <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
       {text && <p className="text-sm text-muted-foreground">{text}</p>}
     </div>
@@ -29,7 +34,9 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 };
 
 // Full page loading spinner
-export const LoadingPage: React.FC<{ text?: string }> = ({ text = 'Loading...' }) => {
+export const LoadingPage: React.FC<{ text?: string }> = ({
+  text = 'Loading...',
+}) => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <LoadingSpinner size="xl" text={text} />

@@ -110,7 +110,34 @@
     "subscriptionPlans": "Subscription Plans",
     "settings": "Settings",
     "smartLifeIoTPlatform": "Smart Life IoT Platform",
-    "version": "v1.0.0"
+    "version": "v1.0.0",
+    "subscription": "Subscription",
+    "plans": "Plans",
+    "invoices": "Invoices",
+    "subscriptions": {
+      "invoices": {
+        "title": "Billing History",
+        "subtitle": "View and download your past invoices and receipts.",
+        "table": {
+          "number": "Invoice Number",
+          "date": "Date",
+          "amount": "Amount",
+          "status": "Status",
+          "plan": "Plan",
+          "billingPeriod": "Period",
+          "actions": "Actions"
+        },
+        "status": {
+          "paid": "Paid",
+          "pending": "Pending",
+          "failed": "Failed"
+        },
+        "actions": {
+          "downloadInvoice": "Invoice",
+          "downloadReceipt": "Receipt"
+        }
+      }
+    }
   },
   "mainDashboard": {
     "title": "Main Dashboard",
@@ -489,6 +516,7 @@
     "lastActivity": "Last Activity",
     "telemetry": "Telemetry",
     "attributes": "Attributes",
+    "connectionType": "Connection",
     "noDevices": "No devices found",
     "searchDevices": "Search devices...",
     "totalDevices": "Total Devices",

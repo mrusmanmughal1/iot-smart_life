@@ -1,3 +1,4 @@
+import { AssetProfilesResponse } from '@/features/assets/types';
 import apiClient from '@/lib/axios.ts';
 
 // Device Profile Types
@@ -7,7 +8,10 @@ export interface DeviceProfile {
   description?: string;
   type: 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP';
   transportType: 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP';
-  provisionType?: 'DISABLED' | 'ALLOW_CREATE_NEW_DEVICES' | 'CHECK_PRE_PROVISIONED_DEVICES';
+  provisionType?:
+    | 'DISABLED'
+    | 'ALLOW_CREATE_NEW_DEVICES'
+    | 'CHECK_PRE_PROVISIONED_DEVICES';
   default?: boolean;
   transportConfiguration?: Record<string, any>;
   telemetryKeys?: Array<{
@@ -76,6 +80,7 @@ export interface PaginatedResponse<T> {
     page: number;
     limit: number;
     totalPages: number;
+    totalItems: number;
   };
 }
 
@@ -88,7 +93,12 @@ export interface ApiResponse<T> {
 export const deviceProfilesApi = {
   // Get all device profiles
   getAll: (params?: ProfileQuery) =>
-    apiClient.get<PaginatedResponse<DeviceProfile>>('/profiles/device', { params }),
+    apiClient.get<ApiResponse<PaginatedResponse<DeviceProfile>>>(
+      '/profiles/device',
+      {
+        params,
+      }
+    ),
 
   // Get device profile by ID
   getById: (id: string) =>
@@ -103,8 +113,7 @@ export const deviceProfilesApi = {
     apiClient.patch<ApiResponse<DeviceProfile>>(`/profiles/device/${id}`, data),
 
   // Delete device profile
-  delete: (id: string) =>
-    apiClient.delete(`/profiles/device/${id}`),
+  delete: (id: string) => apiClient.delete(`/profiles/device/${id}`),
 
   // Get statistics
   getStatistics: () =>
@@ -116,7 +125,9 @@ export const deviceProfilesApi = {
 
   // Set as default
   setDefault: (id: string) =>
-    apiClient.patch<ApiResponse<DeviceProfile>>(`/profiles/device/${id}/default`),
+    apiClient.patch<ApiResponse<DeviceProfile>>(
+      `/profiles/device/${id}/default`
+    ),
 
   // Get devices using this profile
   getDevices: (id: string) =>
@@ -124,18 +135,24 @@ export const deviceProfilesApi = {
 
   // Validate telemetry data
   validateTelemetry: (id: string, telemetry: Record<string, any>) =>
-    apiClient.post<ApiResponse<any>>(`/profiles/device/${id}/validate`, { telemetry }),
+    apiClient.post<ApiResponse<any>>(`/profiles/device/${id}/validate`, {
+      telemetry,
+    }),
 
   // Clone profile
   clone: (id: string, newName: string) =>
-    apiClient.post<ApiResponse<DeviceProfile>>(`/profiles/device/${id}/clone`, { name: newName }),
+    apiClient.post<ApiResponse<DeviceProfile>>(`/profiles/device/${id}/clone`, {
+      name: newName,
+    }),
 };
 
 // Asset Profiles API
 export const assetProfilesApi = {
   // Get all asset profiles
   getAll: (params?: ProfileQuery) =>
-    apiClient.get<PaginatedResponse<AssetProfile>>('/profiles/asset', { params }),
+    apiClient.get<ApiResponse<AssetProfilesResponse>>('/profiles/asset', {
+      params,
+    }),
 
   // Get asset profile by ID
   getById: (id: string) =>
@@ -150,8 +167,7 @@ export const assetProfilesApi = {
     apiClient.patch<ApiResponse<AssetProfile>>(`/profiles/asset/${id}`, data),
 
   // Delete asset profile
-  delete: (id: string) =>
-    apiClient.delete(`/profiles/asset/${id}`),
+  delete: (id: string) => apiClient.delete(`/profiles/asset/${id}`),
 
   // Get statistics
   getStatistics: () =>
@@ -171,11 +187,15 @@ export const assetProfilesApi = {
 
   // Validate asset data
   validateAssetData: (id: string, data: Record<string, any>) =>
-    apiClient.post<ApiResponse<any>>(`/profiles/asset/${id}/validate`, { data }),
+    apiClient.post<ApiResponse<any>>(`/profiles/asset/${id}/validate`, {
+      data,
+    }),
 
   // Clone profile
   clone: (id: string, newName: string) =>
-    apiClient.post<ApiResponse<AssetProfile>>(`/profiles/asset/${id}/clone`, { name: newName }),
+    apiClient.post<ApiResponse<AssetProfile>>(`/profiles/asset/${id}/clone`, {
+      name: newName,
+    }),
 };
 
 export const profilesApi = {

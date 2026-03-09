@@ -1,16 +1,38 @@
 import React, { useState } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { DataTable } from '@/components/common/DataTable/DataTable';
-import { createSortableColumn, createActionsColumn } from '@/components/common/DataTable/columns';
+import {
+  createSortableColumn,
+  createActionsColumn,
+} from '@/components/common/DataTable/columns';
 import {
   Zap,
   Plus,
@@ -158,7 +180,9 @@ export default function Automation() {
       cell: ({ row }: any) => (
         <div>
           <div className="font-medium">{row.getValue('name')}</div>
-          <div className="text-sm text-muted-foreground">{row.original.description}</div>
+          <div className="text-sm text-muted-foreground">
+            {row.original.description}
+          </div>
         </div>
       ),
     },
@@ -166,7 +190,11 @@ export default function Automation() {
       accessorKey: 'trigger',
       header: 'Trigger',
       cell: ({ row }: any) => {
-        const trigger = row.getValue('trigger') as { type: string; device: string; condition: string };
+        const trigger = row.getValue('trigger') as {
+          type: string;
+          device: string;
+          condition: string;
+        };
         return (
           <div className="space-y-1">
             <Badge variant="outline">{trigger.type}</Badge>
@@ -180,15 +208,17 @@ export default function Automation() {
     {
       id: 'arrow',
       header: '',
-      cell: () => (
-        <ArrowRight className="h-4 w-4 text-muted-foreground" />
-      ),
+      cell: () => <ArrowRight className="h-4 w-4 text-muted-foreground" />,
     },
     {
       accessorKey: 'action',
       header: 'Action',
       cell: ({ row }: any) => {
-        const action = row.getValue('action') as { type: string; target: string; value: string };
+        const action = row.getValue('action') as {
+          type: string;
+          target: string;
+          value: string;
+        };
         return (
           <div className="space-y-1">
             <Badge variant="secondary">{action.type}</Badge>
@@ -203,25 +233,37 @@ export default function Automation() {
     {
       accessorKey: 'enabled',
       header: 'Status',
-      cell: ({ row }: any) => (
-        <Switch checked={row.getValue('enabled')} />
-      ),
+      cell: ({ row }: any) => <Switch checked={row.getValue('enabled')} />,
     },
     createActionsColumn((row: any) => [
       {
         label: row.original.enabled ? 'Disable' : 'Enable',
         onClick: () => {},
-        icon: row.original.enabled ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />,
+        icon: row.original.enabled ? (
+          <Pause className="h-4 w-4" />
+        ) : (
+          <Play className="h-4 w-4" />
+        ),
       },
       { label: 'Edit', onClick: () => {}, icon: <Edit className="h-4 w-4" /> },
-      { label: 'Duplicate', onClick: () => {}, icon: <Copy className="h-4 w-4" /> },
-      { label: 'Delete', onClick: () => {}, icon: <Trash2 className="h-4 w-4" />, variant: 'destructive' as const },
+      {
+        label: 'Duplicate',
+        onClick: () => {},
+        icon: <Copy className="h-4 w-4" />,
+      },
+      {
+        label: 'Delete',
+        onClick: () => {},
+        icon: <Trash2 className="h-4 w-4" />,
+        variant: 'destructive' as const,
+      },
     ]),
   ];
 
-  const filteredAutomations = automations.filter((automation) =>
-    automation.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    automation.description.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredAutomations = automations.filter(
+    (automation) =>
+      automation.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      automation.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -242,8 +284,10 @@ export default function Automation() {
       <div className="grid gap-6 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Automations</CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">
+              Total Automations
+            </CardTitle>
+            <Zap className="h-8 w-8 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{automations.length}</div>
@@ -258,7 +302,7 @@ export default function Automation() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-500">
-              {automations.filter(a => a.enabled).length}
+              {automations.filter((a) => a.enabled).length}
             </div>
             <p className="text-xs text-muted-foreground">Currently running</p>
           </CardContent>
@@ -266,7 +310,9 @@ export default function Automation() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Executions</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Executions
+            </CardTitle>
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -284,7 +330,7 @@ export default function Automation() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {automations.filter(a => a.status === 'error').length}
+              {automations.filter((a) => a.status === 'error').length}
             </div>
             <p className="text-xs text-muted-foreground">Need attention</p>
           </CardContent>
@@ -295,11 +341,13 @@ export default function Automation() {
       <Card>
         <CardHeader>
           <CardTitle>Automation Templates</CardTitle>
-          <CardDescription>Quick start with common automation scenarios</CardDescription>
+          <CardDescription>
+            Quick start with common automation scenarios
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
+            <Card className="p-4">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-orange-500/10 rounded-lg">
                   <Thermometer className="h-5 w-5 text-orange-500" />
@@ -309,9 +357,9 @@ export default function Automation() {
               <p className="text-sm text-muted-foreground">
                 Automatically adjust climate based on temperature readings
               </p>
-            </div>
+            </Card>
 
-            <div className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
+            <Card className="p-4">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-yellow-500/10 rounded-lg">
                   <Lightbulb className="h-5 w-5 text-yellow-500" />
@@ -321,9 +369,9 @@ export default function Automation() {
               <p className="text-sm text-muted-foreground">
                 Control lights based on motion, time, or occupancy
               </p>
-            </div>
+            </Card>
 
-            <div className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors">
+            <Card className="p-4">
               <div className="flex items-center gap-3 mb-3">
                 <div className="p-2 bg-red-500/10 rounded-lg">
                   <Bell className="h-5 w-5 text-red-500" />
@@ -333,34 +381,19 @@ export default function Automation() {
               <p className="text-sm text-muted-foreground">
                 Send notifications on critical events or thresholds
               </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Search */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search automations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+            </Card>
           </div>
         </CardContent>
       </Card>
 
       {/* Table */}
       <Card>
-        <CardHeader>
-          <CardTitle>Automation Rules</CardTitle>
-          <CardDescription>Manage your automation workflows</CardDescription>
-        </CardHeader>
         <CardContent>
-          <DataTable columns={columns} data={filteredAutomations} searchKey="name" />
+          <DataTable
+            columns={columns}
+            data={filteredAutomations}
+            searchKey="name"
+          />
         </CardContent>
       </Card>
 
@@ -369,10 +402,12 @@ export default function Automation() {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create Automation</DialogTitle>
-            <DialogDescription>Define triggers and actions for your automation</DialogDescription>
+            <DialogDescription>
+              Define triggers and actions for your automation
+            </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div className="space-y-6 p-4">
             {/* Basic Info */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Basic Information</h3>
@@ -383,7 +418,11 @@ export default function Automation() {
 
               <div className="space-y-2">
                 <Label htmlFor="auto-description">Description</Label>
-                <Textarea id="auto-description" placeholder="Describe what this automation does..." rows={2} />
+                <Textarea
+                  id="auto-description"
+                  placeholder="Describe what this automation does..."
+                  rows={2}
+                />
               </div>
             </div>
 
@@ -396,7 +435,10 @@ export default function Automation() {
 
               <div className="space-y-2">
                 <Label htmlFor="trigger-type">Trigger Type *</Label>
-                <Select value={selectedTriggerType} onValueChange={setSelectedTriggerType}>
+                <Select
+                  value={selectedTriggerType}
+                  onValueChange={setSelectedTriggerType}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -418,9 +460,15 @@ export default function Automation() {
                         <SelectValue placeholder="Choose device" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="temp-1">Temperature Sensor #1</SelectItem>
-                        <SelectItem value="temp-2">Temperature Sensor #2</SelectItem>
-                        <SelectItem value="humidity-1">Humidity Sensor #1</SelectItem>
+                        <SelectItem value="temp-1">
+                          Temperature Sensor #1
+                        </SelectItem>
+                        <SelectItem value="temp-2">
+                          Temperature Sensor #2
+                        </SelectItem>
+                        <SelectItem value="humidity-1">
+                          Humidity Sensor #1
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -433,7 +481,9 @@ export default function Automation() {
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="temperature">Temperature</SelectItem>
+                          <SelectItem value="temperature">
+                            Temperature
+                          </SelectItem>
                           <SelectItem value="humidity">Humidity</SelectItem>
                           <SelectItem value="battery">Battery</SelectItem>
                         </SelectContent>
@@ -457,7 +507,11 @@ export default function Automation() {
 
                     <div className="space-y-2">
                       <Label htmlFor="trigger-value">Value</Label>
-                      <Input id="trigger-value" type="number" placeholder="25" />
+                      <Input
+                        id="trigger-value"
+                        type="number"
+                        placeholder="25"
+                      />
                     </div>
                   </div>
                 </>
@@ -479,8 +533,12 @@ export default function Automation() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="control">Control Device</SelectItem>
-                    <SelectItem value="set-value">Set Attribute Value</SelectItem>
-                    <SelectItem value="notification">Send Notification</SelectItem>
+                    <SelectItem value="set-value">
+                      Set Attribute Value
+                    </SelectItem>
+                    <SelectItem value="notification">
+                      Send Notification
+                    </SelectItem>
                     <SelectItem value="webhook">Call Webhook</SelectItem>
                   </SelectContent>
                 </Select>
@@ -494,7 +552,9 @@ export default function Automation() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ac-1">AC Unit #1</SelectItem>
-                    <SelectItem value="lights-1">Smart Lights - Hallway</SelectItem>
+                    <SelectItem value="lights-1">
+                      Smart Lights - Hallway
+                    </SelectItem>
                     <SelectItem value="valve-1">Water Valve #1</SelectItem>
                   </SelectContent>
                 </Select>
@@ -519,11 +579,13 @@ export default function Automation() {
             {/* Options */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Options</h3>
-              
+
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <Label htmlFor="enable">Enable Automation</Label>
-                  <p className="text-sm text-muted-foreground">Start automation immediately</p>
+                  <p className="text-sm text-muted-foreground">
+                    Start automation immediately
+                  </p>
                 </div>
                 <Switch id="enable" defaultChecked />
               </div>
@@ -531,7 +593,9 @@ export default function Automation() {
               <div className="flex items-center justify-between p-3 border rounded-lg">
                 <div>
                   <Label htmlFor="log">Enable Logging</Label>
-                  <p className="text-sm text-muted-foreground">Log all executions</p>
+                  <p className="text-sm text-muted-foreground">
+                    Log all executions
+                  </p>
                 </div>
                 <Switch id="log" defaultChecked />
               </div>

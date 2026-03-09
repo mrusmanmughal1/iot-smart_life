@@ -45,12 +45,15 @@ import SolutionTemplates from '@/pages/SolutionTemplatesPage.tsx';
 import CreateTemplatePage from '@/pages/CreateTemplatePage.tsx';
 import TemplatePreviewPage from '@/pages/TemplatePreviewPage.tsx';
 import SubscriptionPlans from '@/pages/SubscriptionPlans.tsx';
+import Subscriptioninvoices from '@/pages/Subscriptioninvoices.tsx';
 import SharingCenter from '@/pages/SharingCenterPage.tsx';
 import APIMonitoring from '@/pages/APIMonitoringPage.tsx';
 import AssetProfiles from '@/pages/AssetProfilesPage.tsx';
 import DeviceProfiles from '@/pages/DeviceProfilesPage.tsx';
 import Automation from '@/pages/AutomationPage.tsx';
 import Integrations from '@/pages/IntegrationsPage.tsx';
+import IntegrationDetailsPage from '@/pages/IntegrationDetailsPage.tsx';
+import AddIntegrationPage from '@/pages/AddIntegrationPage.tsx';
 import EdgeManagement from '@/pages/EdgeManagementPage.tsx';
 import WidgetsBundle from '@/pages/WidgetsBundle.tsx';
 import Widgets from '@/pages/WidgetsPage.tsx';
@@ -145,6 +148,7 @@ export const router = createBrowserRouter([
   },
 
   //  --------------------protected routes--------------------
+
   {
     element: <ProtectedRoute />,
     errorElement: <RouteErrorPage />,
@@ -153,19 +157,11 @@ export const router = createBrowserRouter([
         path: '/dashboard',
         element: <DashboardPage />,
       },
-      {
-        path: '/devices',
-        element: <DevicesPage />,
-      },
-      {
-        path: '/devices/:id',
-        element: <DeviceDetailsPage />,
-      },
+
       {
         path: '/alarms',
         element: <AlarmsPage />,
       },
-
       {
         path: '/notifications',
         element: <NotificationsPage />,
@@ -180,11 +176,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <AnalyticsPage />,
+            element: <DeviceAnalyticsPage />,
           },
           {
             path: 'device-analytics',
-            element: <DeviceAnalyticsPage />,
+            element: <AnalyticsPage />,
           },
           {
             path: 'device-analytics/:id',
@@ -207,6 +203,30 @@ export const router = createBrowserRouter([
       {
         path: '/settings',
         element: <SettingsPage />,
+      },
+
+      //--------devices routes--------
+      {
+        path: '/devices',
+        element: (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <DevicesPage />,
+          },
+          {
+            path: ':id',
+            element: <DeviceDetailsPage />,
+          },
+        ],
+      },
+      {
+        path: '/devices/:id',
+        element: <DeviceDetailsPage />,
       },
       //  ----------------------- routes for assets -----------------------
       {
@@ -233,34 +253,39 @@ export const router = createBrowserRouter([
         path: '/asset-profiles',
         element: (
           <AppLayout>
-            <AssetProfiles />
+            <Outlet />
           </AppLayout>
         ),
+        children: [
+          {
+            index: true,
+            element: <AssetProfiles />,
+          },
+          {
+            path: ':id',
+            element: <AssetProfileDetails />,
+          },
+        ],
       },
-      {
-        path: '/asset-profiles/:id',
-        element: (
-          <AppLayout>
-            <AssetProfileDetails />
-          </AppLayout>
-        ),
-      },
+
       // ------------------ Device-profiles routes ------------------
       {
         path: '/device-profiles',
         element: (
           <AppLayout>
-            <DeviceProfiles />
+            <Outlet />
           </AppLayout>
         ),
-      },
-      {
-        path: '/device-profiles/:id',
-        element: (
-          <AppLayout>
-            <DeviceProfileDetails />
-          </AppLayout>
-        ),
+        children: [
+          {
+            index: true,
+            element: <DeviceProfiles />,
+          },
+          {
+            path: ':id',
+            element: <DeviceProfileDetails />,
+          },
+        ],
       },
 
       // --------------------Solutions dashboards Routes --------------------
@@ -275,7 +300,6 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <DashboardsPage />,
-
           },
           {
             path: 'create',
@@ -426,11 +450,11 @@ export const router = createBrowserRouter([
           },
           {
             path: 'create-customer',
-            element: <CreateCustomerPage />
+            element: <CreateCustomerPage />,
           },
           {
             path: 'edit-customer/:id',
-            element: <EditCustomerPage />
+            element: <EditCustomerPage />,
           },
           {
             path: 'add-new-user',
@@ -454,7 +478,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'customers',
-            element: <CustomerPage searchQuery='' />,
+            element: <CustomerPage searchQuery="" />,
           },
           {
             path: 'customer-users',
@@ -488,16 +512,44 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/subscription-plans',
-        element: <SubscriptionPlans />,
+        path: '/subscription',
+        element: (
+          <AppLayout>
+            <Outlet />
+          </AppLayout>
+        ),
+        children: [
+          {
+            index: true,
+            element: <SubscriptionPlans />,
+          },
+          {
+            path: 'invoices',
+            element: <Subscriptioninvoices />,
+          },
+        ],
       },
       {
         path: '/integrations',
         element: (
           <AppLayout>
-            <Integrations />
+            <Outlet />
           </AppLayout>
         ),
+        children: [
+          {
+            index: true,
+            element: <Integrations />,
+          },
+          {
+            path: ':id',
+            element: <IntegrationDetailsPage />,
+          },
+          {
+            path: 'add-integration',
+            element: <AddIntegrationPage />,
+          },
+        ],
       },
       {
         path: '/edge-management',
@@ -563,14 +615,7 @@ export const router = createBrowserRouter([
           </AppLayout>
         ),
       },
-      {
-        path: '/subscription-plans',
-        element: (
-          <AppLayout>
-            <SubscriptionPlans />
-          </AppLayout>
-        ),
-      },
+
       {
         path: '/dashboards/:id',
         element: <WidgetEditorPage />,

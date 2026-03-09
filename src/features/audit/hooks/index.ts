@@ -23,3 +23,15 @@ export const useSecurityAudit = (startDate?: string, endDate?: string) => {
     queryFn: () => auditService.getSecurityAuditReport(startDate, endDate),
   });
 };
+
+//get audit logs by customer id
+export const useAuditLogsByCustomerId = (customerId: string, page?: number, limit?: number) => {
+  return useQuery({
+    queryKey: ['audit', 'logs', 'customer', customerId, page, limit],
+    queryFn: async () => {
+      const response = await auditApi.getByCustomerId(customerId, page, limit);
+      return response.data.data;
+    },
+    enabled: !!customerId,
+  });
+};

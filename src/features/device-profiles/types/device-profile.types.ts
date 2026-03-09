@@ -2,9 +2,9 @@ export type DeviceType = 'Sensor' | 'Gateway' | 'Meter' | 'Actuator';
 
 export type TransportType = 'MQTT' | 'HTTP' | 'CoAP' | 'Modbus' | 'LoRaWAN';
 
-export type ProvisionType = 
-  | 'Allow creating new devices' 
-  | 'Check pre-provisioned devices' 
+export type ProvisionType =
+  | 'Allow creating new devices'
+  | 'Check pre-provisioned devices'
   | 'Disabled';
 
 export interface DeviceProfile {
@@ -37,4 +37,3 @@ export const DEFAULT_DEVICE_PROFILE_FORM_DATA: DeviceProfileFormData = {
   provisionType: 'Allow creating new devices',
   defaultRuleChain: 'Root Rule Chain',
 };
-

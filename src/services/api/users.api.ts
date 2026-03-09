@@ -100,7 +100,11 @@ export const usersApi = {
   // Create user
   create: (data: Partial<User> & { password: string }) =>
     apiClient.post<ApiResponse<User>>('/users', data),
-
+  //search users
+  search: (query: string, page?: number, limit?: number) =>
+    apiClient.get<ApiResponse<ApiResponse<User[]>>>('/users/search', {
+      params: { q: query, limit },
+    }),
   // Update user
   update: (id: string, data: Partial<User>) =>
     apiClient.patch<ApiResponse<User>>(`/users/${id}`, data),
@@ -165,7 +169,10 @@ export const usersApi = {
 
   // Bulk update users
   bulkUpdate: (userIds: string[], data: Partial<User>) =>
-    apiClient.patch<ApiResponse<unknown>>('/users/bulk/update', { userIds, data }),
+    apiClient.patch<ApiResponse<unknown>>('/users/bulk/update', {
+      userIds,
+      data,
+    }),
 
   // Bulk update user status
   bulkUpdateStatus: (userIds: string[], status: UserStatus) =>
@@ -209,7 +216,7 @@ export const rolesApi = {
   // Delete role
   delete: (id: string) => apiClient.delete(`/roles/${id}`),
   // Assign role to user
-  assignToUser: (tenantId: string,) =>
+  assignToUser: (tenantId: string) =>
     apiClient.post<ApiResponse<Role[]>>(`/roles/tenant/${tenantId}`),
   // Remove role from user
   removeFromUser: (roleId: string, userId: string) =>
@@ -222,5 +229,7 @@ export const rolesApi = {
     apiClient.get<ApiResponse<Permission[]>>(`/roles/${roleId}/permissions`),
   //assign permissions to role by role id
   assignPermissionsToRole: (roleId: string, permissions: string[]) =>
-    apiClient.post<ApiResponse<Role[]>>(`/roles/${roleId}/permissions`, { permissions }),
+    apiClient.post<ApiResponse<Role[]>>(`/roles/${roleId}/permissions`, {
+      permissions,
+    }),
 };

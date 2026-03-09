@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { settingsService } from '../services/settingsService';
 import { usersApi } from '@/services/api';
 
-
 export const useAccountSettings = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['accountSettings'],
@@ -15,8 +14,8 @@ export const useAccountSettings = () => {
     isLoading,
   };
 };
-export const useGetCurrentUser = () =>{
-  const { data , isLoading } = useQuery({
+export const useGetCurrentUser = () => {
+  const { data, isLoading } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
       const res = await usersApi.getCurrentUser();
@@ -24,7 +23,7 @@ export const useGetCurrentUser = () =>{
     },
   });
   return {
-     data,
+    data,
     isLoading,
   };
-}
+};

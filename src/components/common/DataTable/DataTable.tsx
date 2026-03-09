@@ -84,9 +84,9 @@ export function DataTable<TData, TValue>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -103,7 +103,7 @@ export function DataTable<TData, TValue>({
                     const isNameColumn = cell.column.id === 'name' || cell.column.id === searchKey;
                     const rowData = row.original as Record<string, unknown>;
                     const rowId = rowData[idKey] as string | undefined;
-                    
+
                     const handleCellClick = () => {
                       if (isNameColumn && detailRoute && rowId) {
                         navigate(`${detailRoute}/${rowId}`);

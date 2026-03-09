@@ -39,16 +39,16 @@ export default function AssetProfileDetails() {
   // API response structure: response.data.data.data
   const apiResponse = assetData?.data as
     | {
+      data?: {
         data?: {
-          data?: {
-            name?: string;
-            description?: string;
-            defaultQueueName?: string;
-            defaultRuleChain?: string;
-            defaultEdgeRuleChain?: string;
-          };
+          name?: string;
+          description?: string;
+          defaultQueueName?: string;
+          defaultRuleChain?: string;
+          defaultEdgeRuleChain?: string;
         };
-      }
+      };
+    }
     | undefined;
   const asset = apiResponse?.data?.data;
 

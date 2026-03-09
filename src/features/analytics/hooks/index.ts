@@ -16,10 +16,25 @@ export const useTimeSeries = (query: any) => {
   });
 };
 
-export const useDeviceAnalytics = (deviceId: string, startTime: number, endTime: number) => {
+export const useDeviceAnalytics = (
+  deviceId: string,
+  startTime: number,
+  endTime: number
+) => {
   return useQuery({
     queryKey: ['analytics', 'device', deviceId, startTime, endTime],
-    queryFn: () => analyticsApi.getDeviceAnalytics(deviceId, startTime, endTime),
+    queryFn: () =>
+      analyticsApi.getDeviceAnalytics(deviceId, startTime, endTime),
     enabled: !!deviceId,
+  });
+};
+
+export const useAnalyticsOverview = () => {
+  return useQuery({
+    queryKey: ['analytics', 'overview'],
+    queryFn: async () => {
+      const ApiResponse = await analyticsApi.getAnalyticsOverview();
+      return ApiResponse.data.data;
+    },
   });
 };

@@ -16,42 +16,19 @@ import { useAppStore } from '@/stores/useAppStore';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { cn } from '@/lib/util';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
-import { useQuery } from '@tanstack/react-query';
-import { subscriptionsApi } from '@/services/api/subscriptions.api';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
-import { useMarkAllAsRead, useMarkAsRead, useNotifications } from '@/features/notifications/hooks';
-import type { Notification, PaginatedNotificationsResponse } from '@/services/api/notifications.api';
+import {
+  useMarkAllAsRead,
+  useMarkAsRead,
+  useNotifications,
+} from '@/features/notifications/hooks';
+import type {
+  Notification,
+  PaginatedNotificationsResponse,
+} from '@/services/api/notifications.api';
 import { useThemeStore } from '@/stores/useThemeStore';
-
-interface SubscriptionResponse {
-  id: string;
-  plan: string;
-  status: string;
-  billingPeriod: string;
-  price: string;
-  nextBillingDate: string;
-  limits: {
-    users: number;
-    devices: number;
-    storage: number;
-    apiCalls: number;
-    dataRetention: number;
-  };
-  usage?: {
-    users: number;
-    devices: number;
-    storage: number;
-    apiCalls: number;
-  };
-  features: {
-    support: string;
-    analytics: boolean;
-    automation: boolean;
-    whiteLabel: boolean;
-    integrations: boolean;
-  };
-}
+import { useCurrentSubscription } from '@/features/Subscription/hooks';
 
 export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const navigate = useNavigate();
@@ -80,7 +57,8 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const handleThemeChange = (newTheme: 'light' | 'dark' | 'auto') => {
     setTheme(newTheme);
   };
-  const notificationsDataResponse = notificationsData as unknown as PaginatedNotificationsResponse;
+  const notificationsDataResponse =
+    notificationsData as unknown as PaginatedNotificationsResponse;
   const notificationsArray = (notificationsData?.data || []) as Notification[];
 
   // Get recent notifications (last 5, prioritizing unread)
@@ -127,25 +105,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
     setIsThemeOpen(false);
   };
 
-  const { data: currentSubscription } = useQuery({
-    queryKey: ['current-subscription'],
-    queryFn: async () => {
-      const response = await subscriptionsApi.getCurrent();
-      // Handle nested API response structure: { data: { data: {...} } }
-      const apiResponse = response.data as unknown as
-        | { data?: SubscriptionResponse }
-        | undefined;
-      return apiResponse?.data;
-    },
-    staleTime: Infinity, // Data never becomes stale - only refetch when explicitly invalidated
-    gcTime: 1000 * 60 * 60 * 24, // 24 hours - keep in cache for 24 hours
-    refetchOnMount: false, // Don't refetch on component mount
-    refetchOnWindowFocus: false, // Don't refetch when window regains focus
-    refetchOnReconnect: false, // Don't refetch on network reconnect
-    refetchInterval: false, // Don't refetch on interval
-  });
-
-  // Format plan name for display
+  const { data: currentSubscription } = useCurrentSubscription();
 
   const getPlanDisplayName = (plan?: string): string => {
     if (!plan) return 'No Plan';
@@ -154,8 +114,6 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
-
-  // Format next billing date
 
   const getNextBillingDate = (): string => {
     if (!currentSubscription?.nextBillingDate) return 'N/A';
@@ -229,9 +187,9 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         )}
       >
         {/* Language Switcher */}
-        <LanguageSwitcher 
-          settings={{ language: i18n.language }} 
-          handleLanguageChange={handleLanguageChange} 
+        <LanguageSwitcher
+          settings={{ language: i18n.language }}
+          handleLanguageChange={handleLanguageChange}
         />
         {/* Theme Switcher */}
         <div className="relative" ref={themeRef}>
@@ -272,7 +230,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'light' &&
-                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Sun className="h-4 w-4" />
@@ -288,7 +246,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'dark' &&
-                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Moon className="h-4 w-4" />
@@ -304,7 +262,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'auto' &&
-                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Monitor className="h-4 w-4" />
@@ -327,10 +285,11 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <Bell className="h-5 w-5 dark:text-gray-300" />
             {notificationsDataResponse?.unreadCount > 0 && (
               <span className="absolute top-0 right-0 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-semibold rounded-full">
-                {notificationsDataResponse?.unreadCount > 9 ? '9+' : notificationsDataResponse?.unreadCount}
+                {notificationsDataResponse?.unreadCount > 9
+                  ? '9+'
+                  : notificationsDataResponse?.unreadCount}
               </span>
             )}
-
           </button>
 
           {/* Notifications Dropdown */}
@@ -351,10 +310,13 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 >
                   {t('notifications.title')}
                 </p>
-                <button className="flex items-center gap-2 text-xs underline text-primary cursor-pointer text-gray-500 dark:text-gray-400" onClick={() => {
-                  markAllAsRead.mutate();
-                  setIsNotifOpen(false);
-                }}>
+                <button
+                  className="flex items-center gap-2 text-xs underline text-primary cursor-pointer text-gray-500 dark:text-gray-400"
+                  onClick={() => {
+                    markAllAsRead.mutate();
+                    setIsNotifOpen(false);
+                  }}
+                >
                   Mark all as read
                 </button>
               </div>
@@ -392,10 +354,12 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                           <span className="mt-1.5 w-2 h-2 bg-purple-600 rounded-full flex-shrink-0"></span>
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className={cn(
-                            "font-medium text-gray-900 dark:text-white",
-                            !notif.isRead && "font-semibold"
-                          )}>
+                          <p
+                            className={cn(
+                              'font-medium text-gray-900 dark:text-white',
+                              !notif.isRead && 'font-semibold'
+                            )}
+                          >
                             {notif.title}
                           </p>
                           {notif.message && (
@@ -405,7 +369,10 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                           )}
                           {notif.createdAt && (
                             <p className="text-gray-400 dark:text-gray-500 text-[10px] mt-1">
-                              {format(new Date(notif.createdAt), 'MMM dd, HH:mm')}
+                              {format(
+                                new Date(notif.createdAt),
+                                'MMM dd, HH:mm'
+                              )}
                             </p>
                           )}
                         </div>

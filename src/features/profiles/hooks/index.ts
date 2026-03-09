@@ -1,5 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { deviceProfilesApi, assetProfilesApi } from '@/services/api/profiles.api';
+import {
+  deviceProfilesApi,
+  assetProfilesApi,
+} from '@/services/api/profiles.api';
 import type { DeviceProfileMultiStepFormData } from '../types/device-profile-form.types';
 import type { AssetProfileFormData } from '../types/asset-profile-form.types';
 
@@ -55,6 +58,27 @@ export const useAssetProfiles = (params?: {
 };
 
 /**
+ * Hook to fetch assets by asset profile ids
+ */
+
+export const useAssetProfileAssets = (profileIds?: string[]) => {
+  return useQuery({
+    queryKey: ['profiles', 'asset', 'assets', profileIds],
+    queryFn: async () => {
+      const ids = profileIds || [];
+      const results = await Promise.all(
+        ids.map((id) => assetProfilesApi.getAssets(id))
+      );
+      return results.reduce<Record<string, unknown[]>>((acc, res, index) => {
+        acc[ids[index]] = res.data.data || [];
+        return acc;
+      }, {});
+    },
+    enabled: !!profileIds?.length,
+  });
+};
+
+/**
  * Hook to fetch a single asset profile by ID
  */
 export const useAssetProfile = (profileId: string) => {
@@ -72,35 +96,53 @@ function transformFormDataToApiFormat(
   formData: DeviceProfileMultiStepFormData
 ): Partial<import('@/services/api/profiles.api').DeviceProfile> {
   // Transform device type
-  const transformType = (type: string): 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP' => {
-    const typeMap: Record<string, 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP'> = {
-      'Sensor': 'DEFAULT',
-      'Gateway': 'DEFAULT',
-      'Meter': 'DEFAULT',
-      'Actuator': 'DEFAULT',
+  const transformType = (
+    type: string
+  ): 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP' => {
+    const typeMap: Record<
+      string,
+      'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP'
+    > = {
+      Sensor: 'DEFAULT',
+      Gateway: 'DEFAULT',
+      Meter: 'DEFAULT',
+      Actuator: 'DEFAULT',
     };
     return typeMap[type] || 'DEFAULT';
   };
 
   // Transform transport type
-  const transformTransportType = (type?: string): 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP' => {
+  const transformTransportType = (
+    type?: string
+  ): 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP' => {
     if (!type) return 'DEFAULT';
-    const transportMap: Record<string, 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP'> = {
-      'MQTT': 'MQTT',
-      'HTTP': 'HTTP',
-      'COAP': 'COAP',
-      'LWM2M': 'LWM2M',
-      'SNMP': 'SNMP',
+    const transportMap: Record<
+      string,
+      'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP'
+    > = {
+      MQTT: 'MQTT',
+      HTTP: 'HTTP',
+      COAP: 'COAP',
+      LWM2M: 'LWM2M',
+      SNMP: 'SNMP',
     };
     return transportMap[type] || 'DEFAULT';
   };
 
   // Transform provision type
-  const transformProvisionType = (provisionType?: string): 'DISABLED' | 'ALLOW_CREATE_NEW_DEVICES' | 'CHECK_PRE_PROVISIONED_DEVICES' | undefined => {
+  const transformProvisionType = (
+    provisionType?: string
+  ):
+    | 'DISABLED'
+    | 'ALLOW_CREATE_NEW_DEVICES'
+    | 'CHECK_PRE_PROVISIONED_DEVICES'
+    | undefined => {
     if (!provisionType) return undefined;
     if (provisionType === 'Disabled') return 'DISABLED';
-    if (provisionType === 'Allow creating new devices') return 'ALLOW_CREATE_NEW_DEVICES';
-    if (provisionType === 'Check pre-provisioned devices') return 'CHECK_PRE_PROVISIONED_DEVICES';
+    if (provisionType === 'Allow creating new devices')
+      return 'ALLOW_CREATE_NEW_DEVICES';
+    if (provisionType === 'Check pre-provisioned devices')
+      return 'CHECK_PRE_PROVISIONED_DEVICES';
     return undefined;
   };
 
@@ -124,7 +166,9 @@ function transformFormDataToApiFormat(
       condition: rule.condition,
       severity: rule.severity,
     })),
-    provisionType: transformProvisionType(formData.provisioningConfig?.provisionType),
+    provisionType: transformProvisionType(
+      formData.provisioningConfig?.provisionType
+    ),
     provisionConfiguration: formData.provisioningConfig
       ? {
           provisionType: formData.provisioningConfig.provisionType,
@@ -239,7 +283,7 @@ export const useUpdateAssetProfile = () => {
       });
     },
   });
-}
+};
 
 /**
  * Hook to delete an asset profile
@@ -256,4 +300,4 @@ export const useDeleteAssetProfile = () => {
       queryClient.invalidateQueries({ queryKey: ['profiles', 'asset'] });
     },
   });
-}
+};

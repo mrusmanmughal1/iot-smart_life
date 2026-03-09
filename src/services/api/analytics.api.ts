@@ -22,12 +22,15 @@ export interface DeviceAnalytics {
   totalMessages: number;
   activeTime: number;
   lastActivityTime?: string;
-  telemetryStats: Record<string, {
-    min: number;
-    max: number;
-    avg: number;
-    count: number;
-  }>;
+  telemetryStats: Record<
+    string,
+    {
+      min: number;
+      max: number;
+      avg: number;
+      count: number;
+    }
+  >;
 }
 
 export interface SystemAnalytics {
@@ -52,24 +55,70 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+// types/systemOverview.ts
+
+export interface SystemOverviewResponse {
+  message: string;
+  data: SystemOverviewData;
+}
+
+export interface SystemOverviewData {
+  devices: DeviceStats;
+  users: UserStats;
+  alarms: AnalyticsAlarmStats;
+  telemetry: TelemetryStats;
+  timestamp: string; // ISO date string
+}
+
+export interface DeviceStats {
+  total: number;
+  online: number;
+  offline: number;
+}
+
+export interface UserStats {
+  total: number;
+}
+
+export interface AnalyticsAlarmStats {
+  active: number;
+}
+
+export interface TelemetryStats {
+  today: number;
+}
 
 export const analyticsApi = {
+  //get analytics overview
+  getAnalyticsOverview: () =>
+    apiClient.get<ApiResponse<SystemOverviewResponse>>('/analytics/overview'),
   // Get time series data
   getTimeSeries: (query: AnalyticsQuery) =>
-    apiClient.post<ApiResponse<Record<string, TimeSeriesData[]>>>('/analytics/timeseries', query),
+    apiClient.post<ApiResponse<Record<string, TimeSeriesData[]>>>(
+      '/analytics/timeseries',
+      query
+    ),
 
   // Get device analytics
   getDeviceAnalytics: (deviceId: string, startTime: number, endTime: number) =>
-    apiClient.get<ApiResponse<DeviceAnalytics>>(`/analytics/device/${deviceId}`, {
-      params: { startTime, endTime },
-    }),
+    apiClient.get<ApiResponse<DeviceAnalytics>>(
+      `/analytics/device/${deviceId}`,
+      {
+        params: { startTime, endTime },
+      }
+    ),
 
   // Get system analytics
   getSystemAnalytics: () =>
     apiClient.get<ApiResponse<SystemAnalytics>>('/analytics/system'),
 
   // Get telemetry statistics
-  getTelemetryStats: (entityId: string, key: string, startTime: number, endTime: number) =>
+  getTelemetryStats: (
+    entityId: string,
+    key: string,
+    startTime: number,
+    endTime: number
+  ) =>
     apiClient.get<ApiResponse<any>>('/analytics/telemetry/stats', {
       params: { entityId, key, startTime, endTime },
     }),
@@ -99,14 +148,17 @@ export const analyticsApi = {
     startTime: number;
     endTime: number;
     filters?: Record<string, any>;
-  }) =>
-    apiClient.post<ApiResponse<any>>('/analytics/reports/generate', config),
+  }) => apiClient.post<ApiResponse<any>>('/analytics/reports/generate', config),
 
   // Export analytics data
   exportData: (query: AnalyticsQuery, format: 'CSV' | 'JSON' | 'EXCEL') =>
-    apiClient.post<Blob>('/analytics/export', { query, format }, {
-      responseType: 'blob',
-    }),
+    apiClient.post<Blob>(
+      '/analytics/export',
+      { query, format },
+      {
+        responseType: 'blob',
+      }
+    ),
 
   // Get real-time statistics
   getRealTimeStats: () =>
@@ -122,6 +174,13 @@ export const analyticsApi = {
     interval: number
   ) =>
     apiClient.get<ApiResponse<any>>('/analytics/aggregate', {
-      params: { entityId, keys: keys.join(','), startTime, endTime, aggregation, interval },
+      params: {
+        entityId,
+        keys: keys.join(','),
+        startTime,
+        endTime,
+        aggregation,
+        interval,
+      },
     }),
 };

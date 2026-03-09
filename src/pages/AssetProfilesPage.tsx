@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { CellContext, ColumnDef } from '@tanstack/react-table';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { DataTable } from '@/components/common/DataTable/DataTable';
 import {
-  createSortableColumn,
-  createSortableDateColumn,
-  createActionsColumn,
-} from '@/components/common/DataTable/columns';
-import { Building2, Plus, Factory, Home, MapPin } from 'lucide-react';
+  Building2,
+  Plus,
+  Factory,
+  Home,
+  MapPin,
+  MoreVertical,
+  Edit,
+  Trash2,
+} from 'lucide-react';
 import { AssetProfileForm } from '@/features/profiles/components';
 import type { AssetProfileFormData } from '@/features/profiles/types';
 import {
+  useAssetProfileAssets,
   useAssetProfiles,
   useCreateAssetProfile,
   useDeleteAssetProfile,
@@ -21,29 +23,66 @@ import {
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-interface AssetProfile {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  defaultRuleChain: string;
-  createdTime: Date;
-  assets: number;
-  isDefault: boolean;
-}
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Pagination } from '@/components/common/Pagination';
+import { Badge } from '@/components/ui/badge';
+import { LoadingOverlay } from '@/components/common/LoadingSpinner';
+import { AssetProfile } from '@/features/assets/types';
 
 export default function AssetProfiles() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: assetProfiles } = useAssetProfiles();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const { data: assetProfiles, isLoading: isAssetProfilesLoading } =
+    useAssetProfiles({
+      page: currentPage,
+      limit: itemsPerPage,
+    });
+
+  const { total, limit, totalPages } = assetProfiles?.data?.data?.meta || {};
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
   // API response structure: response.data.data.data (nested response)
-  const apiResponse = assetProfiles?.data as
-    | { data?: { data?: AssetProfile[] } }
-    | undefined;
-  const assetProfilesData: AssetProfile[] = apiResponse?.data?.data ?? [];
+  const assetProfilesData: AssetProfile[] = useMemo(() => {
+    const apiResponse = assetProfiles?.data as
+      | { data?: { data?: AssetProfile[] } }
+      | undefined;
+    return apiResponse?.data?.data ?? [];
+  }, [assetProfiles]);
+  // assets by profile ids
+  const assetProfileIds = useMemo(
+    () => assetProfilesData.map((profile) => profile.id),
+    [assetProfilesData]
+  );
+  const { data: assetsByProfile } = useAssetProfileAssets(assetProfileIds);
+  const totalAssets = useMemo(() => {
+    return assetProfileIds.reduce((sum, id) => {
+      return sum + (assetsByProfile?.[id]?.length ?? 0);
+    }, 0);
+  }, [assetProfileIds, assetsByProfile]);
+
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<AssetProfile | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<AssetProfile | null>(
+    null
+  );
   const createAssetProfileMutation = useCreateAssetProfile();
   const deleteAssetProfileMutation = useDeleteAssetProfile();
 
@@ -85,30 +124,11 @@ export default function AssetProfiles() {
     }
   };
 
-  const columns: ColumnDef<AssetProfile>[] = [
-    createSortableColumn('name', 'Name'),
+  const tableHeaders = ['Name', 'Default', 'Created'];
 
-    createSortableColumn('assets', 'Assets'),
-    {
-      accessorKey: 'isDefault',
-      header: 'Default',
-      cell: ({ row }: CellContext<AssetProfile, unknown>) =>
-        row.getValue('isDefault') ? (
-          <Badge>Default</Badge>
-        ) : (
-          <Badge variant="secondary">-</Badge>
-        ),
-    },
-    createSortableDateColumn('createdAt', 'Created'),
-    createActionsColumn<AssetProfile>(
-      (row) => {
-        // Navigate to edit page
-        navigate(`/asset-profiles/${row.id}`);
-      },
-      (row) => handleDeleteClick(row)
-    ),
-  ];
-
+  if (isAssetProfilesLoading) {
+    return <LoadingOverlay />;
+  }
   return (
     <div className="space-y-6">
       <PageHeader
@@ -134,7 +154,7 @@ export default function AssetProfiles() {
           <CardContent>
             <div className="text-2xl font-bold">{assetProfilesData.length}</div>
             <p className="text-xs text-muted-foreground">
-                {t('assetProfiles.assetConfigurations')}
+              {t('assetProfiles.assetConfigurations')}
             </p>
           </CardContent>
         </Card>
@@ -147,9 +167,7 @@ export default function AssetProfiles() {
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {/* <div className="text-2xl font-bold">
-              {assetProfilesData.reduce((sum:number, p:AssetProfile) => sum + p.assets, 0)}
-            </div> */}
+            <div className="text-2xl font-bold">{totalAssets}</div>
             <p className="text-xs text-muted-foreground">
               {t('assetProfiles.usingTheseProfiles')}
             </p>
@@ -166,38 +184,113 @@ export default function AssetProfiles() {
           <CardContent>
             <div className="text-2xl font-bold">
               {
-                assetProfilesData.filter((p:AssetProfile) => p.category === 'Industrial')
-                  .length
+                assetProfilesData.filter(
+                  (p: AssetProfile) => p.category === 'Industrial'
+                ).length
               }
             </div>
-            <p className="text-xs text-muted-foreground">{t('assetProfiles.facilities')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('assetProfiles.facilities')}
+            </p>
           </CardContent>
         </Card>
 
         <Card className="bg-white text-black">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('assetProfiles.commercial')}</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('assetProfiles.commercial')}
+            </CardTitle>
             <Home className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {
-                assetProfilesData.filter((p:AssetProfile) => p.category === 'Commercial')
-                  .length
+                assetProfilesData.filter(
+                  (p: AssetProfile) => p.category === 'Commercial'
+                ).length
               }
             </div>
-            <p className="text-xs text-muted-foreground">{t('assetProfiles.buildings')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('assetProfiles.buildings')}
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
-        <CardContent>
-          <DataTable
-            columns={columns}
-            data={assetProfilesData}
-            searchKey="name"
-            detailRoute="/asset-profiles"
+        <CardContent className="p-6">
+          <Table>
+            <TableHeader className="bg-primary    text-white">
+              <TableRow className="bg-primary hover:bg-primary">
+                {tableHeaders.map((val, i) => {
+                  return <TableHead key={i}>{val}</TableHead>;
+                })}
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {assetProfilesData.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={6}
+                    className="h-24 text-center text-muted-foreground"
+                  >
+                    {t('devices.noDevices') || 'No devices found'}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                assetProfilesData.map((assetProfile: AssetProfile) => (
+                  <TableRow key={assetProfile.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <p className="font-medium">{assetProfile.name}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <p className="capitalize">
+                        {assetProfile.default ? (
+                          <Badge>Default</Badge>
+                        ) : (
+                          <Badge variant="secondary">-</Badge>
+                        )}
+                      </p>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(assetProfile.createdAt).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right flex items-center  relative justify-end gap-1">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon-sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onClick={() => handleDeleteClick(assetProfile)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages || 0}
+            totalItems={total}
+            itemsPerPage={limit}
+            onPageChange={handlePageChange}
           />
         </CardContent>
       </Card>

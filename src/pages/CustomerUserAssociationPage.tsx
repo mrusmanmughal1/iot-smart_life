@@ -55,6 +55,13 @@ const mockAssignedUsers: User[] = [
     role: 'Manager',
     status: 'Active',
   },
+  {
+    id: '6',
+    name: 'Super Admin',
+    email: 'superadmin@email.com',
+    role: 'Admin',
+    status: 'Active',
+  },
 ];
 
 const getInitials = (name: string) => {
@@ -153,7 +160,7 @@ export default function CustomerUserAssociationPage() {
     const usersToRemove = assignedUsers.filter((u) =>
       selectedAssignedUsers.has(u.id)
     );
-    const usersWithoutRole = usersToRemove.map(({ role, ...rest }) => rest);
+    const usersWithoutRole = usersToRemove.map(({ ...rest }) => rest);
     setAvailableUsers([...availableUsers, ...usersWithoutRole]);
     setAssignedUsers(
       assignedUsers.filter((u) => !selectedAssignedUsers.has(u.id))
@@ -289,41 +296,43 @@ export default function CustomerUserAssociationPage() {
                   No available users
                 </p>
               ) : (
-                users?.data?.map((user: User) => (
-                  <div
-                    key={user.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border ${selectedAvailableUsers.has(user.id)
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-slate-200 hover:border-slate-300'
-                      } transition-colors cursor-pointer`}
-                    onClick={() => toggleAvailableUserSelection(user.id)}
-                  >
-                    <Avatar>
-                      <AvatarFallback className="bg-purple-100 text-purple-700">
-                        {getInitials(user.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">
-                        {user.name}
-                      </p>
-                      <p className="text-xs text-slate-500 truncate">
-                        {user.email}
-                      </p>
-                    </div>
-                    <Button
-                      size="icon"
-                      variant="primary"
-                      className="h-6 w-6 rounded-full  "
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddUser(user.id);
-                      }}
+                users?.data?.map((user: any) => {
+                  return (
+                    <div
+                      key={user.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg border ${selectedAvailableUsers.has(user.id)
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                        } transition-colors cursor-pointer`}
+                      onClick={() => toggleAvailableUserSelection(user.id)}
                     >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))
+                      <Avatar>
+                        <AvatarFallback className="bg-purple-100 text-purple-700">
+                          {getInitials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-slate-500 truncate">
+                          {user.email}
+                        </p>
+                      </div>
+                      <Button
+                        size="icon"
+                        variant="primary"
+                        className="h-6 w-6 rounded-full  "
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddUser(user.id);
+                        }}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )
+                })
               )}
             </div>
             <div className="flex gap-2 pt-4  ">

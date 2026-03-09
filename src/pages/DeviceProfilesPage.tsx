@@ -1,24 +1,15 @@
-import React, { useState, useMemo } from 'react';
-import type { CellContext, ColumnDef } from '@tanstack/react-table';
+import { useState, useMemo } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DataTable } from '@/components/common/DataTable/DataTable';
-import {
-  createSortableColumn,
-  createSortableDateColumn,
-  createActionsColumn,
-} from '@/components/common/DataTable/columns';
 import {
   Cpu,
   Plus,
-  Thermometer,
-  Zap,
   Activity,
   Settings,
-  Copy,
   Trash2,
   Edit,
+  MoreVertical,
 } from 'lucide-react';
 import type { DeviceProfile } from '@/features/device-profiles/types';
 import { DeviceProfileMultiStepForm } from '@/features/profiles/components';
@@ -29,119 +20,42 @@ import {
 } from '@/features/profiles/hooks';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-// API Response type for device profile
-interface DeviceProfileApiResponse {
-  id: string;
-  name: string;
-  description?: string;
-  type?: string;
-  transportType?: string;
-  provisionType?: string;
-  default?: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { LoadingOverlay } from '@/components/common/LoadingSpinner';
+import { Pagination } from '@/components/common/Pagination';
 
 export default function DeviceProfiles() {
-  const { data: deviceProfiles } = useDeviceProfiles();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const { data: deviceProfiles, isLoading: DeviceLoading } = useDeviceProfiles({
+    page: currentPage,
+    limit: itemsPerPage,
+  });
+
   const createDeviceProfileMutation = useCreateDeviceProfile();
   const { t } = useTranslation();
+
   // Transform API response to table format
-  // API structure: response.data.data.data (nested response)
-  const deviceProfilesData: DeviceProfile[] = useMemo(() => {
-    const apiResponse = deviceProfiles?.data as
-      | { data?: { data?: DeviceProfileApiResponse[] } }
-      | undefined;
-    const profiles = apiResponse?.data?.data ?? [];
-    return profiles.map((profile: DeviceProfileApiResponse) => ({
-      id: profile.id,
-      name: profile.name,
-      description: profile.description || '',
-      type: profile.type || 'Unknown',
-      transportType: profile.transportType || 'Unknown',
-      provisionType: profile.provisionType || '',
-      default: profile.default || false,
-      createdAt: profile.createdAt,
-      updatedAt: profile.updatedAt,
-      devices: 0, // TODO: Fetch device count separately if needed
-    }));
-  }, [deviceProfiles]);
+
+  const ApiResponse = deviceProfiles?.data.data.data || [];
+  const { totalItems, limit, totalPages } =
+    deviceProfiles?.data?.data?.meta || {};
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-
-  const columns: ColumnDef<DeviceProfile>[] = [
-    createSortableColumn('name', 'Name'),
-    {
-      accessorKey: 'type',
-      header: 'Type',
-      cell: ({ row }: CellContext<DeviceProfile, unknown>) => {
-        const type = row.getValue('type') as string;
-        // Format API type (e.g., "air_quality_monitor" -> "Air Quality Monitor")
-        const formatType = (t: string) => {
-          return t
-            .split('_')
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
-        };
-        const displayType = formatType(type);
-        const icons: Record<string, React.ReactNode> = {
-          sensor: <Thermometer className="h-4 w-4" />,
-          gateway: <Activity className="h-4 w-4" />,
-          meter: <Zap className="h-4 w-4" />,
-        };
-        const typeLower = type.toLowerCase();
-        return (
-          <div className="flex items-center gap-2">
-            <div className="text-primary">
-              {icons[typeLower] || <Cpu className="h-4 w-4" />}
-            </div>
-            <span>{displayType}</span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'transportType',
-      header: 'Transport',
-      cell: ({ row }: CellContext<DeviceProfile, unknown>) => {
-        const transport = row.getValue('transportType') as string;
-        // Format transport type (e.g., "mqtt" -> "MQTT")
-        const displayTransport = transport.toUpperCase();
-        return <Badge variant="outline">{displayTransport}</Badge>;
-      },
-    },
-    createSortableColumn('devices', 'Devices'),
-    {
-      accessorKey: 'default',
-      header: 'Default',
-      cell: ({ row }: CellContext<DeviceProfile, unknown>) =>
-        row.getValue('default') ? (
-          <Badge variant="default">Default</Badge>
-        ) : (
-          <Badge variant="secondary">-</Badge>
-        ),
-    },
-
-    createSortableDateColumn('createdAt', 'Created'),
-    createActionsColumn((row: DeviceProfile) => [
-      {
-        label: 'Edit',
-        onClick: () => console.log('Edit', row.id),
-        icon: <Edit className="h-4 w-4" />,
-      },
-      {
-        label: 'Copy',
-        onClick: () => console.log('Copy', row.id),
-        icon: <Copy className="h-4 w-4" />,
-      },
-      {
-        label: 'Delete',
-        onClick: () => console.log('Delete', row.id),
-        icon: <Trash2 className="h-4 w-4" />,
-        variant: 'destructive' as const,
-      },
-    ]),
-  ];
 
   const handleCreateProfile = async (data: DeviceProfileMultiStepFormData) => {
     try {
@@ -157,6 +71,19 @@ export default function DeviceProfiles() {
       toast.error(errorMessage);
     }
   };
+  const tableHeaders = [
+    'Name',
+    'Type',
+    'Transport',
+    'Devices',
+    'Created',
+    'Actions',
+  ];
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  if (DeviceLoading) return <LoadingOverlay />;
 
   return (
     <div className="space-y-6">
@@ -182,9 +109,7 @@ export default function DeviceProfiles() {
             <Settings className="h-4 w-4 text-white text-muted-foreground" />
           </CardHeader>
           <CardContent className="text-white">
-            <div className="text-2xl font-bold">
-              {deviceProfilesData.length}
-            </div>
+            <div className="text-2xl font-bold">{totalItems}</div>
             <p className="text-xs text-muted-foreground">
               {t('deviceProfiles.deviceConfigurations')}
             </p>
@@ -199,9 +124,7 @@ export default function DeviceProfiles() {
             <Cpu className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {deviceProfilesData.reduce((sum, p) => sum + (p.devices || 0), 0)}
-            </div>
+            <div className="text-2xl font-bold">{totalItems}</div>
             <p className="text-xs text-muted-foreground">
               {t('deviceProfiles.usingTheseProfiles')}
             </p>
@@ -216,23 +139,110 @@ export default function DeviceProfiles() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {deviceProfilesData.filter((p) => p.type === 'Gateway').length}
-            </div>
-            <p className="text-xs text-muted-foreground">{t('deviceProfiles.gatewayProfiles')}</p>
+            <div className="text-2xl font-bold">{totalItems}</div>
+            <p className="text-xs text-muted-foreground">
+              {t('deviceProfiles.gatewayProfiles')}
+            </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Table */}
       <Card className="">
-        <CardContent className="p-2">
+        <CardContent className="p-6">
           <div className="overflow-visible">
-            <DataTable
-              columns={columns}
-              data={deviceProfilesData}
-              searchKey="name"
-              detailRoute="/device-profiles"
+            <Table>
+              <TableHeader className="bg-primary     text-white">
+                <TableRow className="bg-primary hover:bg-primary">
+                  {tableHeaders.map((val, i) => {
+                    const isLast = i === tableHeaders.length - 1;
+                    return (
+                      <TableHead
+                        key={val}
+                        className={isLast ? 'text-right' : undefined}
+                      >
+                        {val}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {totalItems && totalItems > 0 ? (
+                  ApiResponse.map((deviceProfile: any) => (
+                    <TableRow key={deviceProfile.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <p className="font-medium">{deviceProfile.name}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <p className="capitalize">
+                          {deviceProfile.type ? (
+                            <Badge>Default</Badge>
+                          ) : (
+                            <Badge variant="secondary">-</Badge>
+                          )}
+                        </p>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <p className="font-medium">
+                            {deviceProfile.transportType}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <p className="font-medium text-start ps-4">
+                          {deviceProfile.devices || 0}
+                        </p>
+                      </TableCell>
+
+                      <TableCell>
+                        {new Date(deviceProfile.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right flex items-center  relative justify-end gap-1">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon-sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              // onClick={() => handleDeleteClick(deviceProfile)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      {t('devices.noDevices') || 'No devices found'}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages || 0}
+              totalItems={totalItems}
+              itemsPerPage={limit}
+              onPageChange={handlePageChange}
             />
           </div>
         </CardContent>

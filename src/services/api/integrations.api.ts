@@ -55,24 +55,34 @@ export interface IntegrationQuery {
 export interface PaginatedResponse<T> {
   message: string;
   data: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
+
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 }
 
 export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+export interface IntegrationStats {
+  total: number;
+  active: number;
+  inactive: number;
+  error: number;
+}
 
 export const integrationsApi = {
   // Get all integrations
   getAll: (params?: IntegrationQuery) =>
-    apiClient.get<PaginatedResponse<Integration>>('/integrations', { params }),
-
+    apiClient.get<ApiResponse<PaginatedResponse<Integration>>>(
+      '/integrations',
+      { params }
+    ),
+  //get integration stats
+  getStats: () =>
+    apiClient.get<ApiResponse<IntegrationStats>>('/integrations/statistics'),
   // Get integration by ID
   getById: (id: string) =>
     apiClient.get<ApiResponse<Integration>>(`/integrations/${id}`),

@@ -13,7 +13,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { HelpCircle } from 'lucide-react';
-import { useCreateCustomer,   } from '@/features/customer/hooks';
+import { useCreateCustomer, useCustomerById } from '@/features/customer/hooks';
 import type { CreateCustomerData } from '@/features/customer/types';
 import { CustomerStatus, CustomerPlan } from '@/features/customer/types';
 import { useEffect } from 'react';
@@ -70,7 +70,7 @@ export default function EditCustomerPage() {
         mode: 'onChange',
     });
     const { id } = useParams<{ id: string }>();
-    const { data: customerData } = useCustomer(id);
+    const { data: customerData } = useCustomerById(id);
     useEffect(() => {
         const customer = customerData?.data;
         if (!customer) return;

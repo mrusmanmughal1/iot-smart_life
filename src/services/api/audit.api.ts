@@ -27,6 +27,10 @@ export enum AuditEntityType {
 }
 
 export interface AuditLog {
+  timestamp: any;
+  description: any;
+  status: any;
+  title: any;
   id: string;
   action: AuditAction;
   entityType: AuditEntityType;
@@ -83,26 +87,20 @@ export const auditApi = {
   // Get audit log by ID
   getById: (id: string) =>
     apiClient.get<ApiResponse<AuditLog>>(`/audit/logs/${id}`),
-
-  // Get logs by entity
-  getByEntity: (entityType: AuditEntityType, entityId: string) =>
-    apiClient.get<ApiResponse<AuditLog[]>>(`/audit/logs/entity/${entityType}/${entityId}`),
-
-  // Get logs by user
-  getByUser: (userId: string) =>
-    apiClient.get<ApiResponse<AuditLog[]>>(`/audit/logs/user/${userId}`),
-
-  // Get statistics
-  getStatistics: (startDate?: string, endDate?: string) =>
-    apiClient.get<ApiResponse<any>>('/audit/statistics', {
-      params: { startDate, endDate },
+  getByCustomerId: (customerId: string, page?: number, limit?: number) =>
+    apiClient.get<ApiResponse<PaginatedResponse<AuditLog>>>(`/audit`, {
+      params: { customerId, page, limit },
     }),
 
   // Export audit logs
   export: (query: AuditQuery, format: 'CSV' | 'JSON' | 'EXCEL') =>
-    apiClient.post<Blob>('/audit/logs/export', { query, format }, {
-      responseType: 'blob',
-    }),
+    apiClient.post<Blob>(
+      '/audit/logs/export',
+      { query, format },
+      {
+        responseType: 'blob',
+      }
+    ),
 
   // Get recent activity
   getRecentActivity: (limit: number = 10) =>
@@ -124,11 +122,16 @@ export const auditApi = {
 
   // Get action count by type
   getActionCount: (startDate?: string, endDate?: string) =>
-    apiClient.get<ApiResponse<Record<AuditAction, number>>>('/audit/actions/count', {
-      params: { startDate, endDate },
-    }),
+    apiClient.get<ApiResponse<Record<AuditAction, number>>>(
+      '/audit/actions/count',
+      {
+        params: { startDate, endDate },
+      }
+    ),
 
   // Get entity access logs
   getEntityAccessLogs: (entityType: AuditEntityType, entityId: string) =>
-    apiClient.get<ApiResponse<AuditLog[]>>(`/audit/access/${entityType}/${entityId}`),
+    apiClient.get<ApiResponse<AuditLog[]>>(
+      `/audit/access/${entityType}/${entityId}`
+    ),
 };

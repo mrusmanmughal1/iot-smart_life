@@ -9,7 +9,6 @@ import { useGithubLogin } from '../features/auth/hooks/useGithubLogin.ts';
 import GoogleIcon from '../assets/icons/google.webp';
 import AppleIcon from '../assets/icons/apple.svg';
 import GithubIcon from '../assets/icons/github.svg';
- 
 
 export const LoginPage: React.FC = () => {
   const { t } = useTranslation();
@@ -17,7 +16,7 @@ export const LoginPage: React.FC = () => {
   const { handleGithubLogin } = useGithubLogin();
 
   return (
-    <AuthLayout title='Login' >
+    <AuthLayout title="Login">
       {/* Social Login Buttons */}
       <div className="flex  flex-col md:flex-row gap-3 mb-8">
         <Button
@@ -42,13 +41,12 @@ export const LoginPage: React.FC = () => {
           className="flex-1 h-12 rounded-full text-xs dark:bg-gray-800  dark:text-white dark:hover:bg-gray-700"
           type="button"
           onClick={handleGithubLogin}
-          
         >
           <img src={GithubIcon} alt="GitHub" className="w-5 h-5 mr-2" />
           {t('auth.login.loginWithGithub')}
         </Button>
       </div>
-     
+
       <LoginForm />
       {/* Forgot Password Link */}
 
@@ -60,7 +58,7 @@ export const LoginPage: React.FC = () => {
             to="/register"
             className="text-[#1976D2]   font-semibold hover:underline"
           >
-             {t('common.signup')}
+            {t('common.signup')}
           </Link>
         </p>
       </div>

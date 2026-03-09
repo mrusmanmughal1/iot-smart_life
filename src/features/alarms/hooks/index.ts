@@ -25,12 +25,13 @@ export const useAlarmSummary = () => {
   });
 };
 
-export const useAlarmMetrics = () => {
-  return useQuery({
-    queryKey: ['alarms', 'metrics'],
-    queryFn: () => alarmService.calculateAlarmMetrics(),
-  });
-};
+// export const useAlarmMetrics = () => {
+//   return useQuery({
+//     queryKey: ['alarms', 'metrics'],
+
+//     queryFn: () => alarmService.getAlarmMetrics(),
+//   });
+// };
 
 export const useAcknowledgeAlarm = () => {
   const queryClient = useQueryClient();
@@ -46,10 +47,26 @@ export const useAcknowledgeAlarm = () => {
 export const useClearAlarm = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ alarmId, resolution }: { alarmId: string; resolution?: string }) =>
-      alarmService.clearAlarm(alarmId, resolution),
+    mutationFn: ({
+      alarmId,
+      resolution,
+    }: {
+      alarmId: string;
+      resolution?: string;
+    }) => alarmService.clearAlarm(alarmId, resolution),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['alarms'] });
+    },
+  });
+};
+
+// get alarms statistics
+export const useGetStatsAlaram = () => {
+  return useQuery({
+    queryKey: ['alaram'],
+    queryFn: async () => {
+      const apiresponse = await alarmsApi.getStatistics();
+      return apiresponse.data;
     },
   });
 };

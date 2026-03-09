@@ -1,5 +1,9 @@
 import { auditApi } from '@/services/api/index.ts';
-import { AuditAction, AuditEntityType, AuditLog } from '@/services/api/audit.api.ts';
+import {
+  AuditAction,
+  AuditEntityType,
+  AuditLog,
+} from '@/services/api/audit.api.ts';
 
 /**
  * Audit Feature Service
@@ -9,29 +13,6 @@ export const auditService = {
   /**
    * Get audit trail for an entity
    */
-  async getEntityAuditTrail(entityType: AuditEntityType, entityId: string) {
-    const logs = await auditApi.getByEntity(entityType, entityId);
-    
-    // Sort by most recent first
-    const sorted = logs.data.data.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    // Group by action
-    const byAction = sorted.reduce((acc, log) => {
-      if (!acc[log.action]) acc[log.action] = [];
-      acc[log.action].push(log);
-      return acc;
-    }, {} as Record<AuditAction, AuditLog[]>);
-
-    return {
-      entityType,
-      entityId,
-      totalLogs: sorted.length,
-      logs: sorted,
-      byAction,
-    };
-  },
 
   /**
    * Get user activity report
@@ -52,8 +33,8 @@ export const auditService = {
     // Calculate statistics
     const stats = {
       totalActions: logs.length,
-      successfulActions: logs.filter(l => l.success).length,
-      failedActions: logs.filter(l => !l.success).length,
+      successfulActions: logs.filter((l) => l.success).length,
+      failedActions: logs.filter((l) => !l.success).length,
       byAction: this.groupByAction(logs),
       byEntityType: this.groupByEntityType(logs),
       mostActiveDay: this.findMostActiveDay(logs),
@@ -93,9 +74,9 @@ export const auditService = {
       },
       loginActivity: {
         total: logins.length,
-        successful: logins.filter(l => l.success).length,
-        failed: logins.filter(l => !l.success).length,
-        uniqueUsers: new Set(logins.map(l => l.userId)).size,
+        successful: logins.filter((l) => l.success).length,
+        failed: logins.filter((l) => !l.success).length,
+        uniqueUsers: new Set(logins.map((l) => l.userId)).size,
       },
       actionDistribution: actionCount.data.data,
     };
@@ -120,35 +101,6 @@ export const auditService = {
   /**
    * Get compliance report
    */
-  async getComplianceReport(startDate: string, endDate: string) {
-    const [allLogs, stats] = await Promise.all([
-      auditApi.getAll({ startDate, endDate }),
-      auditApi.getStatistics(startDate, endDate),
-    ]);
-
-    const logs = allLogs.data.data;
-
-    // Calculate compliance metrics
-    const metrics = {
-      totalActions: logs.length,
-      criticalActions: logs.filter(l => 
-        ['DELETE', 'EXPORT'].includes(l.action)
-      ).length,
-      unauthorizedAttempts: logs.filter(l => !l.success).length,
-      dataExports: logs.filter(l => l.action === 'EXPORT').length,
-      deletions: logs.filter(l => l.action === 'DELETE').length,
-      userChanges: logs.filter(l => 
-        l.entityType === 'USER' && ['CREATE', 'UPDATE', 'DELETE'].includes(l.action)
-      ).length,
-    };
-
-    return {
-      period: { startDate, endDate },
-      metrics,
-      statistics: stats.data.data,
-      flaggedActivities: this.flagSuspiciousActivities(logs),
-    };
-  },
 
   /**
    * Flag suspicious activities
@@ -162,11 +114,9 @@ export const auditService = {
     }> = [];
 
     // Multiple failed login attempts from same user
-    const failedLogins = logs.filter(l => 
-      l.action === 'LOGIN' && !l.success
-    );
+    const failedLogins = logs.filter((l) => l.action === 'LOGIN' && !l.success);
     const loginsByUser = this.groupByUser(failedLogins);
-    
+
     Object.entries(loginsByUser).forEach(([userId, userLogs]) => {
       const logsArray = userLogs as AuditLog[];
       if (logsArray.length >= 5) {
@@ -180,7 +130,7 @@ export const auditService = {
     });
 
     // Unusual delete operations
-    const deletes = logs.filter(l => l.action === 'DELETE');
+    const deletes = logs.filter((l) => l.action === 'DELETE');
     if (deletes.length > 10) {
       suspicious.push({
         type: 'EXCESSIVE_DELETES',
@@ -196,50 +146,60 @@ export const auditService = {
    * Group logs by action
    */
   groupByAction(logs: AuditLog[]) {
-    return logs.reduce((acc, log) => {
-      acc[log.action] = (acc[log.action] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return logs.reduce(
+      (acc, log) => {
+        acc[log.action] = (acc[log.action] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   },
 
   /**
    * Group logs by entity type
    */
   groupByEntityType(logs: AuditLog[]) {
-    return logs.reduce((acc, log) => {
-      acc[log.entityType] = (acc[log.entityType] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return logs.reduce(
+      (acc, log) => {
+        acc[log.entityType] = (acc[log.entityType] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   },
 
   /**
    * Group logs by user
    */
   groupByUser(logs: AuditLog[]) {
-    return logs.reduce((acc, log) => {
-      if (!log.userId) return acc;
-      if (!acc[log.userId]) acc[log.userId] = [];
-      acc[log.userId].push(log);
-      return acc;
-    }, {} as Record<string, AuditLog[]>);
+    return logs.reduce(
+      (acc, log) => {
+        if (!log.userId) return acc;
+        if (!acc[log.userId]) acc[log.userId] = [];
+        acc[log.userId].push(log);
+        return acc;
+      },
+      {} as Record<string, AuditLog[]>
+    );
   },
 
   /**
    * Find most active day
    */
   findMostActiveDay(logs: AuditLog[]) {
-    const byDay = logs.reduce((acc, log) => {
-      const day = new Date(log.createdAt).toISOString().split('T')[0];
-      acc[day] = (acc[day] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const byDay = logs.reduce(
+      (acc, log) => {
+        const day = new Date(log.createdAt).toISOString().split('T')[0];
+        acc[day] = (acc[day] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     const entries = Object.entries(byDay);
     if (entries.length === 0) return null;
 
-    return entries.reduce((max, entry) => 
-      entry[1] > max[1] ? entry : max
-    );
+    return entries.reduce((max, entry) => (entry[1] > max[1] ? entry : max));
   },
 
   /**
@@ -247,20 +207,24 @@ export const auditService = {
    */
   async getAccessTimeline(entityType: AuditEntityType, entityId: string) {
     const logs = await auditApi.getEntityAccessLogs(entityType, entityId);
-    
-    // Group by date
-    const timeline = logs.data.data.reduce((acc, log) => {
-      const date = new Date(log.createdAt).toISOString().split('T')[0];
-      if (!acc[date]) {
-        acc[date] = { date, accesses: [], count: 0 };
-      }
-      acc[date].accesses.push(log);
-      acc[date].count++;
-      return acc;
-    }, {} as Record<string, { date: string; accesses: AuditLog[]; count: number }>);
 
-    return Object.values(timeline).sort((a, b) => 
-      b.date.localeCompare(a.date)
+    // Group by date
+    const timeline = logs.data.data.reduce(
+      (acc, log) => {
+        const date = new Date(log.createdAt).toISOString().split('T')[0];
+        if (!acc[date]) {
+          acc[date] = { date, accesses: [], count: 0 };
+        }
+        acc[date].accesses.push(log);
+        acc[date].count++;
+        return acc;
+      },
+      {} as Record<
+        string,
+        { date: string; accesses: AuditLog[]; count: number }
+      >
     );
+
+    return Object.values(timeline).sort((a, b) => b.date.localeCompare(a.date));
   },
 };

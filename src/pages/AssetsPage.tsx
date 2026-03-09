@@ -1,19 +1,38 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Upload,
-  Download,
-  Search,
-} from 'lucide-react';
+import { Upload, Search } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAssetsPage, useCreateAsset } from '@/features/assets/hooks';
 import { debounce } from '@/lib/util';
-import { DashboardTable } from '@/components/common/DashboardTable/DashboardTable';
-import type { DashboardTableItem } from '@/components/common/DashboardTable/DashboardTable';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
+import {
+  MoreVertical,
+  Edit,
+  Trash2,
+  Eye,
+  Download,
+  Share2,
+} from 'lucide-react';
 import { AddAssetModal } from '@/features/assets/components/AddAssetModal';
-
+import { LoadingOverlay } from '@/components/common/LoadingSpinner';
+import { Pagination } from '@/components/common/Pagination/Pagination';
+import { format } from 'date-fns';
 
 export default function AssetsPage() {
   const { t } = useTranslation();
@@ -24,12 +43,13 @@ export default function AssetsPage() {
   const {
     searchQuery,
     isLoading,
-    assets: apiAssets,
+    assets,
     totalAssets,
     currentPage,
     totalPages,
     itemsPerPage,
     handleSearchChange,
+    handlePageChange,
     handleAction,
     handleExport,
     handleImport,
@@ -65,21 +85,6 @@ export default function AssetsPage() {
     }
   };
 
-  // Transform Asset data to DashboardTableItem format
-  const tableData: DashboardTableItem[] = useMemo(() => {
-    return apiAssets.map((asset) => ({
-      id: asset.id,
-      title: asset.name,
-      tag: asset.type,
-      tagColor: asset.statusIndicator === 'primary' 
-        ? 'bg-blue-100 text-blue-700' 
-        : 'bg-red-100 text-red-700',
-      createdTime: asset.created,
-      status: asset.status === 'active' ? 'active' : 'deactivate',
-      customerName: asset.customer,
-    }));
-  }, [apiAssets]);
-
   // Sync input value with search query
   useEffect(() => {
     setInputValue(searchQuery);
@@ -87,22 +92,24 @@ export default function AssetsPage() {
 
   // Create debounced search handler
   const debouncedSearch = useMemo(
-    () => debounce((value: string) => {
-      handleSearchChange(value);
-    }, 300),
+    () =>
+      debounce((value: string) => {
+        handleSearchChange(value);
+      }, 300),
     [handleSearchChange]
   );
 
   // Handle input change with immediate UI update and debounced search
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputValue(value);
-    debouncedSearch(value);
-  }, [debouncedSearch]);
-
-
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setInputValue(value);
+      debouncedSearch(value);
+    },
+    [debouncedSearch]
+  );
   return (
-    < >
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -110,9 +117,7 @@ export default function AssetsPage() {
             <h1 className="text-3xl font-bold text-gray-900">
               {t('assets.title')}
             </h1>
-            <p className="text-gray-500 mt-2 text-sm">
-              {t('assets.subtitle')}
-            </p>
+            <p className="text-gray-500 mt-2 text-sm">{t('assets.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -156,18 +161,10 @@ export default function AssetsPage() {
               className="w-96 pr-10"
             />
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-2"
-          >
+          <Button variant="ghost" size="sm" className="flex items-center gap-2">
             {t('assets.filters.assetType')}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-2"
-          >
+          <Button variant="ghost" size="sm" className="flex items-center gap-2">
             {t('assets.filters.customer')}
           </Button>
           <Button
@@ -181,40 +178,131 @@ export default function AssetsPage() {
 
         {/* Assets Table */}
         <Card className="shadow-md rounded-xl border-gray-200 overflow-hidden">
-          <CardContent className="p-0">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
-                      </div>
-            ) : (
-              <DashboardTable
-                data={tableData}
-                linkto="assets"
-                onAction={handleAction}
-                translationKeys={{
-                  title: 'assets.table.name',
-                  createdTime: 'assets.table.created',
-                  activateDeactivate: 'assets.table.status',
-                  customerName: 'assets.table.customer',
-                  actions: 'assets.table.actions',
-                  active: 'assets.status.active',
-                  deactivate: 'assets.status.error',
-                }}
-                emptyMessage={t('assets.noAssets')}
-                columns={{
-                  title: true,
-                  createdTime: true,
-                  status: true,
-                  customerName: true,
-                  actions: true,
-                }}
-                pagination={{
-                  currentPage,
-                  totalPages,
-                  totalItems: totalAssets,
-                  itemsPerPage,
-                }}
-              />
+          <CardContent className="p-6 relative min-h-[400px]">
+            {isLoading && <LoadingOverlay />}
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-primary text-white">
+                  <TableRow className="hover:bg-primary">
+                    <TableHead className="text-white font-semibold">
+                      {t('assets.table.name')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold">
+                      {t('common.type')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold">
+                      {t('common.status')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold">
+                      {t('assets.table.customer')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold">
+                      {t('assets.table.created')}
+                    </TableHead>
+                    <TableHead className="text-right text-white font-semibold">
+                      {t('assets.table.actions')}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {assets.length === 0 && !isLoading ? (
+                    <TableRow>
+                      <TableCell
+                        colSpan={6}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        {t('assets.noAssets') || 'No assets found'}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    assets.map((asset) => (
+                      <TableRow
+                        key={asset.id}
+                        className="cursor-pointer hover:bg-slate-50 transition-colors"
+                        onClick={() =>
+                          (window.location.href = `/assets/${asset.id}`)
+                        }
+                      >
+                        <TableCell className="font-medium">
+                          <span className="capitalize">{asset.name}</span>
+                        </TableCell>
+                        <TableCell>
+                          <p className="font-normal capitalize">{asset.type}</p>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            className={`${
+                              asset.status === 'active'
+                                ? 'bg-green-500 hover:bg-green-600'
+                                : asset.status === 'warning'
+                                  ? 'bg-amber-500 hover:bg-amber-600'
+                                  : 'bg-red-500 hover:bg-red-600'
+                            } text-white`}
+                          >
+                            {asset.status === 'active'
+                              ? t('assets.status.active') || 'Active'
+                              : asset.status === 'warning'
+                                ? t('common.warning') || 'Warning'
+                                : t('assets.status.error') || 'Error'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-slate-600">
+                          {asset.customer || 'N/A'}
+                        </TableCell>
+                        <TableCell className="text-slate-500 text-sm">
+                          {asset.created
+                            ? format(new Date(asset.created), 'yyyy-MM-dd')
+                            : 'N/A'}
+                        </TableCell>
+                        <TableCell
+                          className="text-right"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="w-[160px]"
+                            >
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  (window.location.href = `/assets/${asset.id}`)
+                                }
+                              >
+                                <Eye className="mr-2 h-4 w-4" />
+                                {t('common.view') || 'View Details'}
+                              </DropdownMenuItem>
+
+                              <DropdownMenuItem
+                                className="text-red-600 focus:text-red-700"
+                                onClick={() => handleAction('delete', asset.id)}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                {t('common.delete') || 'Delete'}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+            {totalPages > 1 && (
+              <div className="mt-4">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalAssets}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={handlePageChange}
+                />
+              </div>
             )}
           </CardContent>
         </Card>

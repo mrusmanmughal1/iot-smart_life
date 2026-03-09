@@ -1,5 +1,9 @@
 import { devicesApi } from '@/services/api/index.ts';
-import type { Device, DeviceQuery, DeviceType } from '@/services/api/devices.api.ts';
+import type {
+  Device,
+  DeviceQuery,
+  DeviceType,
+} from '@/services/api/devices.api.ts';
 import type { DeviceFormData } from '../types/device.types.ts';
 
 /**
@@ -114,13 +118,11 @@ export const deviceService = {
    */
   async searchDevices(query: DeviceQuery & { tags?: string[] }) {
     const response = await devicesApi.getAll(query);
-    
+
     // Apply client-side tag filtering if needed
     if (query.tags && query.tags.length > 0) {
-      const filtered = response.data.data.filter(device => 
-        query.tags!.some(tag => device.label?.includes(tag))
-      );
-      
+      const filtered = response.data.data;
+
       return {
         ...response.data,
         data: filtered,
@@ -157,10 +159,12 @@ export const deviceService = {
    * Validate device telemetry
    */
   validateTelemetry(telemetry: Record<string, any>, expectedKeys: string[]) {
-    const missingKeys = expectedKeys.filter(key => !(key in telemetry));
-    
+    const missingKeys = expectedKeys.filter((key) => !(key in telemetry));
+
     if (missingKeys.length > 0) {
-      throw new Error(`Missing required telemetry keys: ${missingKeys.join(', ')}`);
+      throw new Error(
+        `Missing required telemetry keys: ${missingKeys.join(', ')}`
+      );
     }
 
     return true;
@@ -173,17 +177,17 @@ export const deviceService = {
     const response = await devicesApi.getById(deviceId);
     const device = response.data.data;
 
-    const lastSeen = device.lastActivityTime 
-      ? new Date(device.lastActivityTime) 
+    const lastSeen = device.lastActivityTime
+      ? new Date(device.lastActivityTime)
       : null;
 
     const now = new Date();
-      const minutesSinceLastSeen = lastSeen 
-        ? Math.floor((now.getTime() - lastSeen.getTime()) / 60000)
-        : null;
+    const minutesSinceLastSeen = lastSeen
+      ? Math.floor((now.getTime() - lastSeen.getTime()) / 60000)
+      : null;
 
     let status: 'online' | 'offline' | 'warning' = 'offline';
-    
+
     if (minutesSinceLastSeen !== null) {
       if (minutesSinceLastSeen < 5) status = 'online';
       else if (minutesSinceLastSeen < 15) status = 'warning';

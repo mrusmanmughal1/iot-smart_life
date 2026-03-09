@@ -59,6 +59,7 @@ export interface PaginatedResponse<T> {
     page: number;
     limit: number;
     totalPages: number;
+    totalItems?: number;
   };
 }
 
@@ -78,12 +79,15 @@ export interface DeviceStatistics {
 export const devicesApi = {
   // Get all devices
   getAll: (params?: DeviceQuery) =>
-    apiClient.get<PaginatedResponse<Device>>('/devices', { params }),
+    apiClient.get<ApiResponse<PaginatedResponse<Device>>>('/devices', {
+      params,
+    }),
 
   // Get device by ID
-  getById: (id: string) =>
-    apiClient.get<ApiResponse<Device>>(`/devices/${id}`),
-
+  getById: (id: string) => apiClient.get<ApiResponse<Device>>(`/devices/${id}`),
+  // get devices by customer id
+  getByCustomerId: (customerId: string) =>
+    apiClient.get<ApiResponse<Device[]>>(`/devices/customer/${customerId}`),
   // Create device
   create: (data: Partial<Device>) =>
     apiClient.post<ApiResponse<Device>>('/devices', data),
@@ -100,7 +104,12 @@ export const devicesApi = {
     apiClient.get<ApiResponse<DeviceStatistics>>('/devices/statistics'),
 
   // Get device telemetry
-  getTelemetry: (id: string, keys?: string[], startTs?: number, endTs?: number) =>
+  getTelemetry: (
+    id: string,
+    keys?: string[],
+    startTs?: number,
+    endTs?: number
+  ) =>
     apiClient.get<ApiResponse<any>>(`/devices/${id}/telemetry`, {
       params: { keys: keys?.join(','), startTs, endTs },
     }),

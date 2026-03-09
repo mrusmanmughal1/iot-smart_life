@@ -38,10 +38,33 @@ export interface AssetStats {
   depth: number;
 }
 
-export type AssetAction = 
+export type AssetAction =
   | 'view'
   | 'edit'
   | 'delete'
   | 'move'
   | 'assign-devices'
   | 'clone';
+
+export interface AssetProfile {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  defaultRuleChain: string;
+  createdAt: Date;
+  assets: number;
+  default: boolean;
+}
+export interface AssetProfilesResponse {
+  message: string;
+  data: AssetProfile[];
+  meta: PaginationMeta;
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}

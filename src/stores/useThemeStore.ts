@@ -8,9 +8,15 @@ interface ThemeStore {
   theme: Theme;
   effectiveTheme: 'light' | 'dark' | 'auto';
   language: string;
+  features: string[];
   setTheme: (theme: Theme) => void;
   setLanguage: (language: string) => void;
-  syncFromApi: (settings: { theme?: Theme; language?: string }) => void;
+  setFeatures: (features: string[]) => void;
+  syncFromApi: (settings: {
+    theme?: Theme;
+    language?: string;
+    features?: string[];
+  }) => void;
   toggleTheme: () => void;
 }
 
@@ -19,6 +25,7 @@ export const useThemeStore = create<ThemeStore>()(
     (set, get) => ({
       theme: 'auto',
       language: 'en',
+      features: [],
       effectiveTheme: getSystemTheme(),
       setTheme: (theme: Theme) => {
         const effectiveTheme = theme === 'auto' ? getSystemTheme() : theme;
@@ -36,7 +43,15 @@ export const useThemeStore = create<ThemeStore>()(
         set({ language });
       },
 
-      syncFromApi: (settings: { theme?: Theme; language?: string }) => {
+      setFeatures: (features: string[]) => {
+        set({ features });
+      },
+
+      syncFromApi: (settings: {
+        theme?: Theme;
+        language?: string;
+        features?: string[];
+      }) => {
         const currentState = get();
 
         if (settings.theme !== undefined) {
@@ -47,8 +62,15 @@ export const useThemeStore = create<ThemeStore>()(
           }
         }
 
-        if (settings.language !== undefined && settings.language !== currentState.language) {
+        if (
+          settings.language !== undefined &&
+          settings.language !== currentState.language
+        ) {
           set({ language: settings.language });
+        }
+
+        if (settings.features !== undefined) {
+          set({ features: settings.features });
         }
       },
 

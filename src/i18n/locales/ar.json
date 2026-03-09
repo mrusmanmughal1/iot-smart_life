@@ -597,6 +597,7 @@
     "telemetry": "القياسات عن بعد",
     "attributes": "الخصائص",
     "noDevices": "لا توجد أجهزة",
+    "connectionType": "الاتصال",
     "searchDevices": "البحث عن الأجهزة...",
     "table": {
       "name": "الاسم",

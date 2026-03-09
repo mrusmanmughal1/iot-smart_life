@@ -33,14 +33,19 @@ import {
   SuperscriptIcon,
   FolderKanbanIcon,
   History,
+  SquareChartGantt,
+  Rss,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/useThemeStore';
+import { useAppStore } from '@/stores/useAppStore';
+import { SubscriptionFeatures } from '@/types/authentication';
 
 interface NavItem {
   titleKey: string;
   href?: string;
   icon: React.ReactNode;
   children?: NavItem[];
+  feature?: keyof SubscriptionFeatures;
 }
 
 const getNavItems = (): NavItem[] => [
@@ -48,52 +53,62 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.overview',
     href: '/dashboard',
     icon: <Activity className="h-5 w-5" />,
+    feature: 'overview',
   },
   {
     titleKey: 'nav.solutionTemplates',
     href: '/solution-templates',
     icon: <DamIcon className="h-5 w-5" />,
+    feature: 'solutionTemplates',
   },
   {
     titleKey: 'nav.solutionDashboards',
     href: '/solution-dashboards',
     icon: <LayoutDashboard className="h-5 w-5" />,
+    feature: 'dashboards',
   },
   {
     titleKey: 'nav.profiles',
     icon: <PiSquare className="h-5 w-5" />,
+    feature: 'profiles',
     children: [
       {
         titleKey: 'nav.deviceProfiles',
         href: '/device-profiles',
         icon: <Smartphone className="h-4 w-4" />,
+        feature: 'devices',
       },
       {
         titleKey: 'nav.assetProfiles',
         href: '/asset-profiles',
         icon: <Box className="h-4 w-4" />,
+        feature: 'assets',
       },
     ],
   },
   {
     titleKey: 'nav.objects',
     icon: <Box className="h-5 w-5" />,
+
     children: [
       {
         titleKey: 'nav.devices',
         href: '/devices',
         icon: <Smartphone className="h-4 w-4" />,
+        feature: 'devices',
       },
       {
         titleKey: 'nav.assets',
         href: '/assets',
         icon: <Box className="h-4 w-4" />,
+        feature: 'assets',
       },
     ],
   },
   {
     titleKey: 'nav.floorPlans',
     icon: <FlowerIcon className="h-5 w-5" />,
+    feature: 'floorPlans',
     children: [
       {
         titleKey: 'nav.viewFloorPlans',
@@ -142,15 +157,18 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.alerts',
     href: '/alarms',
     icon: <Bell className="h-5 w-5" />,
+    feature: 'alarms',
   },
   {
     titleKey: 'nav.analytics',
     href: '/analytics',
     icon: <BarChart3 className="h-5 w-5" />,
+    feature: 'analytics',
   },
   {
     titleKey: 'nav.usersAndRoles',
     icon: <Users className="h-5 w-5" />,
+    feature: 'usersManagement',
     children: [
       {
         titleKey: 'nav.usersAndRoles',
@@ -162,46 +180,53 @@ const getNavItems = (): NavItem[] => [
         href: '/users-management/customer-user-association',
         icon: <Users className="h-4 w-4" />,
       },
-
-      // {
-      //   titleKey: 'nav.customerAdministrator',
-      //   href: '/users-management/customer-administrator',
-      //   icon: <Users className="h-4 w-4" />,
-      // },
-      // {
-      //   titleKey: 'nav.rolePermissionManagement',
-      //   href: '/users-management/role-permission-management',
-      //   icon: <Users className="h-4 w-4" />,
-      // },
-      // {
-      //   titleKey: 'nav.assignPermissions',
-      //   href: '/users-management/assign-permissions',
-      //   icon: <Users className="h-4 w-4" />,
-      // },
     ],
   },
   {
     titleKey: 'nav.automation',
     href: '/automation',
     icon: <PiIcon className="h-5 w-5" />,
+    feature: 'automations',
   },
   {
     titleKey: 'nav.integrations',
     href: '/integrations',
     icon: <BotIcon className="h-5 w-5" />,
+    feature: 'integrations',
   },
   {
     titleKey: 'nav.edgeManagementCenter',
     href: '/edge-management',
     icon: <TvIcon className="h-5 w-5" />,
+    feature: 'edgeManagement',
   },
   {
     titleKey: 'nav.scheduleManagement',
     href: '/schedule-management',
     icon: <Calendar className="h-4 w-4" />,
+    feature: 'scheduleManagement',
+  },
+
+  {
+    titleKey: 'nav.subscription',
+
+    children: [
+      {
+        titleKey: 'nav.plans',
+        href: '/subscription',
+        icon: <SquareChartGantt className="h-5 w-5" />,
+      },
+      {
+        titleKey: 'nav.invoices',
+        href: '/subscription/invoices',
+        icon: <BarChart3 className="h-5 w-5" />,
+      },
+    ],
+    icon: <Rss className="h-5 w-5" />,
   },
   {
     titleKey: 'nav.resources',
+
     children: [
       {
         titleKey: 'nav.widgetsBundle',
@@ -230,31 +255,31 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.notifications',
     href: '/notifications',
     icon: <Bell className="h-5 w-5" />,
+    feature: 'notifications',
   },
   {
     titleKey: 'nav.sharingCenter',
     href: '/sharing-center',
     icon: <Share2 className="h-5 w-5" />,
+    feature: 'sharingCenter',
   },
   {
     titleKey: 'nav.apiMonitoring',
     href: '/api-monitoring',
     icon: <Activity className="h-5 w-5" />,
+    feature: 'apiAccess',
   },
   {
     titleKey: 'nav.auditLogs',
     href: '/audit',
     icon: <FileText className="h-5 w-5" />,
-  },
-  {
-    titleKey: 'nav.subscriptionPlans',
-    href: '/subscription-plans',
-    icon: <CreditCard className="h-5 w-5" />,
+    feature: 'auditLogs',
   },
   {
     titleKey: 'nav.settings',
     href: '/settings',
     icon: <Settings className="h-5 w-5" />,
+    feature: 'settings',
   },
 ];
 
@@ -268,9 +293,39 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const { t } = useTranslation();
   const { direction } = useRTL();
   const location = useLocation();
-  const navItems = getNavItems();
-  const isRTL = direction === 'rtl';
+  const { features } = useAppStore();
   const { effectiveTheme } = useThemeStore();
+
+  const filterNavItems = (items: NavItem[]): NavItem[] => {
+    return items
+      .filter((item) => {
+        // If item has a feature key, check if it's enabled
+        if (item.feature && features?.[item.feature] !== true) {
+          return false;
+        }
+        return true;
+      })
+      .map((item) => {
+        // Recursively filter children
+        if (item.children) {
+          return {
+            ...item,
+            children: filterNavItems(item.children),
+          };
+        }
+        return item;
+      })
+      .filter((item) => {
+        // If item had children but they were all filtered out, and it has no href, hide it
+        if (item.children && item.children.length === 0 && !item.href) {
+          return false;
+        }
+        return true;
+      });
+  };
+
+  const navItems = filterNavItems(getNavItems());
+  const isRTL = direction === 'rtl';
 
   const isActive = (href: string) => location.pathname === href;
 
@@ -366,8 +421,8 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           isOpen
             ? 'translate-x-0'
             : isRTL
-            ? 'translate-x-full'
-            : '-translate-x-full'
+              ? 'translate-x-full'
+              : '-translate-x-full'
         )}
       >
         {/* Header */}

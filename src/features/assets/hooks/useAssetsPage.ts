@@ -1,7 +1,11 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { assetsApi } from '@/services/api';
-import type { Asset as ApiAsset, AssetQuery, PaginatedResponse } from '@/services/api/assets.api';
+import type {
+  Asset as ApiAsset,
+  AssetQuery,
+  PaginatedResponse,
+} from '@/services/api/assets.api';
 import { toast } from 'react-hot-toast';
 import { debounce } from '@/lib/util';
 
@@ -34,7 +38,7 @@ interface UseAssetsPageOptions {
 export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
   const { initialSearchQuery = '', itemsPerPage = 10 } = options;
   const queryClient = useQueryClient();
-  
+
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -70,7 +74,9 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
   // Transform API Asset data to component Asset format
   const assets: Asset[] = useMemo(() => {
     // API response structure: { data: { data: [...], meta: {...} } }
-    const responseData = assetsResponse?.data as ApiResponseWrapper<ApiAsset> | undefined;
+    const responseData = assetsResponse?.data as
+      | ApiResponseWrapper<ApiAsset>
+      | undefined;
     if (!responseData?.data?.data || !Array.isArray(responseData.data.data)) {
       return [];
     }
@@ -81,19 +87,20 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
       let status: 'active' | 'warning' | 'error' = 'active';
       if (statusFromInfo === 'warning' || statusFromInfo === 'error') {
         status = statusFromInfo;
-      } else if (statusFromInfo === 'inactive' || statusFromInfo === 'deactivated') {
+      } else if (
+        statusFromInfo === 'inactive' ||
+        statusFromInfo === 'deactivated'
+      ) {
         status = 'error';
       }
 
       // Determine status indicator (primary = green, danger = red)
-      const statusIndicator: 'primary' | 'danger' = 
+      const statusIndicator: 'primary' | 'danger' =
         status === 'active' ? 'primary' : 'danger';
 
       // Get customer from customerId or additionalInfo
-      const customer = 
-        apiAsset.additionalInfo?.customer || 
-        apiAsset.customerId || 
-        'N/A';
+      const customer =
+        apiAsset.additionalInfo?.customer || apiAsset.customerId || 'N/A';
 
       // Format created date
       const created = apiAsset.createdAt
@@ -127,21 +134,25 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
 
   // Create debounced search handler (300ms delay)
   const debouncedSearch = useMemo(
-    () => debounce((value: string) => {
-      setSearchQuery(value);
-    }, 300),
+    () =>
+      debounce((value: string) => {
+        setSearchQuery(value);
+      }, 300),
     []
   );
 
   // Handle input change with immediate UI update and debounced API search
-  const handleSearchChange = useCallback((value: string) => {
-    // Update local search for immediate UI filtering
-    setLocalSearchQuery(value);
-    // Reset to first page on search
-    setCurrentPage(1);
-    // Debounce the actual API search call
-    debouncedSearch(value);
-  }, [debouncedSearch]);
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      // Update local search for immediate UI filtering
+      setLocalSearchQuery(value);
+      // Reset to first page on search
+      setCurrentPage(1);
+      // Debounce the actual API search call
+      debouncedSearch(value);
+    },
+    [debouncedSearch]
+  );
 
   // Handler functions
   const handleToggleExpand = useCallback((id: string) => {
@@ -156,52 +167,56 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
     });
   }, []);
 
-  const handleAction = useCallback(async (
-    action: 'share' | 'view' | 'delete' | 'download',
-    id: string
-  ) => {
-    try {
-      switch (action) {
-        case 'delete': {
-          await assetsApi.delete(id);
-          queryClient.invalidateQueries({ queryKey: ['assets'] });
-          toast.success('Asset deleted successfully');
-          break;
-        }
-        case 'view': {
-          // Navigate to asset detail page
-          window.location.href = `/assets/${id}`;
-          break;
-        }
-        case 'download': {
-          // Export asset data
-          const asset = assets.find((a) => a.id === id);
-          if (asset) {
-            const dataStr = JSON.stringify(asset, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `asset-${id}.json`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            toast.success('Asset exported successfully');
+  const handleAction = useCallback(
+    async (action: 'share' | 'view' | 'delete' | 'download', id: string) => {
+      try {
+        switch (action) {
+          case 'delete': {
+            await assetsApi.delete(id);
+            queryClient.invalidateQueries({ queryKey: ['assets'] });
+            toast.success('Asset deleted successfully');
+            break;
           }
-          break;
+          case 'view': {
+            // Navigate to asset detail page
+            window.location.href = `/assets/${id}`;
+            break;
+          }
+          case 'download': {
+            // Export asset data
+            const asset = assets.find((a) => a.id === id);
+            if (asset) {
+              const dataStr = JSON.stringify(asset, null, 2);
+              const blob = new Blob([dataStr], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `asset-${id}.json`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+              toast.success('Asset exported successfully');
+            }
+            break;
+          }
+          case 'share': {
+            toast('Share functionality - select users to share with', {
+              icon: 'ℹ️',
+            });
+            break;
+          }
+          default:
+            console.warn('Unknown action:', action);
         }
-        case 'share': {
-          toast('Share functionality - select users to share with', { icon: 'ℹ️' });
-          break;
-        }
-        default:
-          console.warn('Unknown action:', action);
+      } catch (error: unknown) {
+        toast.error(
+          (error as any)?.response?.data?.message || `Failed to ${action} asset`
+        );
       }
-    } catch (error: unknown) {
-      toast.error((error as any)?.response?.data?.message || `Failed to ${action} asset`);
-    }
-  }, [assets, queryClient]);
+    },
+    [assets, queryClient]
+  );
 
   const handleExport = useCallback(() => {
     try {
@@ -243,7 +258,9 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
           };
           reader.readAsText(file);
         } catch (error: unknown) {
-          toast.error((error as any)?.response?.data?.message || 'Failed to import assets');
+          toast.error(
+            (error as any)?.response?.data?.message || 'Failed to import assets'
+          );
         }
       }
     };
@@ -257,20 +274,27 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
 
   // Get total count and pages from API response
   const totalAssets = useMemo(() => {
-    const responseData = assetsResponse?.data as ApiResponseWrapper<ApiAsset> | undefined;
+    const responseData = assetsResponse?.data as
+      | ApiResponseWrapper<ApiAsset>
+      | undefined;
     return responseData?.data?.meta?.total || 0;
   }, [assetsResponse]);
 
   const totalPages = useMemo(() => {
-    const responseData = assetsResponse?.data as ApiResponseWrapper<ApiAsset> | undefined;
+    const responseData = assetsResponse?.data as
+      | ApiResponseWrapper<ApiAsset>
+      | undefined;
     return responseData?.data?.meta?.totalPages || 1;
   }, [assetsResponse]);
 
-  const handlePageChange = useCallback((page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  }, [totalPages]);
+  const handlePageChange = useCallback(
+    (page: number) => {
+      if (page >= 1 && page <= totalPages) {
+        setCurrentPage(page);
+      }
+    },
+    [totalPages]
+  );
 
   return {
     // State
@@ -299,4 +323,3 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
     refetch,
   };
 };
-

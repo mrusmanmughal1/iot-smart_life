@@ -1,4 +1,9 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 
@@ -31,12 +36,15 @@ export function Pagination({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems || 0);
 
   return (
-    <div className={`flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-700 ${className}`}>
+    <div
+      className={`flex items-center justify-between px-4 py-3 border-t border-gray-200 dark:border-gray-700 ${className}`}
+    >
       {showItemsInfo && totalItems !== undefined && (
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
           <span>
-            {t('pagination.showing') || 'Showing'} {startItem} {t('pagination.to') || 'to'} {endItem}{' '}
-            {t('pagination.of') || 'of'} {totalItems} {t('pagination.results') || 'results'}
+            {t('pagination.showing') || 'Showing'} {startItem}{' '}
+            {t('pagination.to') || 'to'} {endItem} {t('pagination.of') || 'of'}{' '}
+            {totalItems} {t('pagination.results') || 'results'}
           </span>
         </div>
       )}
@@ -63,7 +71,8 @@ export function Pagination({
         </Button>
         <div className="flex items-center gap-1 px-2">
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            {t('pagination.page') || 'Page'} {currentPage} {t('pagination.of') || 'of'} {totalPages}
+            {t('pagination.page') || 'Page'} {currentPage}{' '}
+            {t('pagination.of') || 'of'} {totalPages}
           </span>
         </div>
         <Button

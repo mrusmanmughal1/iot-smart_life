@@ -47,12 +47,7 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
   isLoading
 }) => {
 
-  const { data: ruleChains } = useRuleChains();
-  console.log('ruleChains', ruleChains);
-  const { data: queues } = useQueues();
-  console.log('queues', queues);
-  const { data: edgeRuleChains } = useEdgeRuleChain();
-  console.log('edgeRuleChains', edgeRuleChains);
+   
   const form = useForm<AssetProfileFormData>({
     resolver: zodResolver(assetProfileFormSchema),
     defaultValues: DEFAULT_ASSET_PROFILE_FORM_DATA,
