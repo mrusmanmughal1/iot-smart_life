@@ -126,7 +126,9 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
       return 'N/A';
     }
   };
-
+  const username = user?.firstName + ' ' + user?.lastName;
+  const truncatedUsername =
+    username.length > 15 ? username.slice(0, 15) + '...' : username;
   return (
     <header
       className={cn(
@@ -418,7 +420,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               )}
             >
               <span className="text-sm font-medium dark:text-white block">
-                {user ? `${user.firstName} ${user.lastName}` : 'Admin User'}
+                {user ? `${truncatedUsername} ` : 'Admin User'}
               </span>
               {user?.role && (
                 <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -440,7 +442,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               {user && (
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-sm font-medium dark:text-white">
-                    {user.firstName} {user.lastName}
+                    {truncatedUsername}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {user.email}

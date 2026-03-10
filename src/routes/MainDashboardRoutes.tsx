@@ -45,7 +45,7 @@ export const mainDashboardRoutes = [
   },
   {
     path: '/alarms',
-    element: <FeatureRoute feature="alarms" />,
+    element: <FeatureRoute feature="alerts" />,
     children: [
       {
         index: true,
