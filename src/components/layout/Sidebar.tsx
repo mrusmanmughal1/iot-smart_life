@@ -65,7 +65,7 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.solutionDashboards',
     href: '/solution-dashboards',
     icon: <LayoutDashboard className="h-5 w-5" />,
-    feature: 'dashboards',
+    feature: 'solutionDashboards',
   },
   {
     titleKey: 'nav.profiles',
@@ -157,7 +157,7 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.alerts',
     href: '/alarms',
     icon: <Bell className="h-5 w-5" />,
-    feature: 'alarms',
+    feature: 'alerts',
   },
   {
     titleKey: 'nav.analytics',
@@ -198,7 +198,7 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.edgeManagementCenter',
     href: '/edge-management',
     icon: <TvIcon className="h-5 w-5" />,
-    feature: 'edgeManagement',
+    feature: 'edge',
   },
   {
     titleKey: 'nav.scheduleManagement',

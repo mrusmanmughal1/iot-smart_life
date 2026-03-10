@@ -7,6 +7,7 @@ export interface User {
 }
 
 export interface SubscriptionFeatures {
+  alerts: boolean;
   integration: boolean;
   edge: boolean;
   solutionDashboards: boolean;

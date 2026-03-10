@@ -1,6 +1,8 @@
 import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
+import SubscriptionPlans from '@/pages/SubscriptionPlans';
+import Subscriptioninvoices from '@/pages/Subscriptioninvoices';
 
 // Import management page components lazily
 const UsersAndRolesManagementPage = Loadable(
@@ -152,6 +154,8 @@ export const managementRoutes = [
       },
     ],
   },
+
+  // -------- audit routes --------
   {
     path: '/audit',
     element: <FeatureRoute feature="auditLogs" />,
@@ -169,6 +173,22 @@ export const managementRoutes = [
       {
         index: true,
         element: <APIMonitoring />,
+      },
+    ],
+  },
+
+  // -------- subscription routes --------
+  {
+    path: '/subscription',
+    element: <FeatureRoute feature="subscription" />,
+    children: [
+      {
+        index: true,
+        element: <SubscriptionPlans />,
+      },
+      {
+        path: 'invoices',
+        element: <Subscriptioninvoices />,
       },
     ],
   },
