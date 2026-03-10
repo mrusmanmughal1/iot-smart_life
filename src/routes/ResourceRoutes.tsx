@@ -9,7 +9,7 @@ const ImageLibrary = Loadable(
   lazy(() => import('@/pages/ImageLibraryPage.tsx'))
 );
 const ScriptLibrary = Loadable(lazy(() => import('@/pages/ScriptLibrary.tsx')));
-
+// rutes for resource
 export const resourceRoutes = [
   {
     path: '/widgets-bundle',
