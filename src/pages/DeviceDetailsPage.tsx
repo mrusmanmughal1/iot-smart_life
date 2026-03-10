@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Download, Upload, Plus, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import AppLayout from '@/components/layout/AppLayout';
+
 import { useDevice } from '@/features/devices/hooks';
 import { DeviceTelemetryTab } from '@/features/devices/components/DeviceTelemetryTab';
 import { DeviceAlarmsTab } from '@/features/devices/components/DeviceAlarmsTab';

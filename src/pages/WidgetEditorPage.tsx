@@ -17,7 +17,11 @@ export default function WidgetEditorPage() {
   const [savedWidgets, setSavedWidgets] = useState<Widget[]>([]);
 
   // Fetch dashboard data
-  const { data: dashboardData, isLoading, error } = useQuery({
+  const {
+    data: dashboardData,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['dashboard', id],
     queryFn: () => {
       if (!id) throw new Error('Dashboard ID is required');
@@ -57,75 +61,67 @@ export default function WidgetEditorPage() {
 
   if (isLoading) {
     return (
-      <AppLayout>
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      </AppLayout>
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <AppLayout>
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center">
-            <p className="text-red-600 mb-2">Failed to load dashboard</p>
-            <p className="text-sm text-gray-500">
-              {(error as Error)?.message || 'An error occurred'}
-            </p>
-          </div>
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Failed to load dashboard</p>
+          <p className="text-sm text-gray-500">
+            {(error as Error)?.message || 'An error occurred'}
+          </p>
         </div>
-      </AppLayout>
+      </div>
     );
   }
 
   return (
-    <AppLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">
-              {dashboard?.name || 'Dashboard Editor'}
-            </h1>
-            <p className="text-xs text-gray-500">
-              Drag, drop, and resize widgets to create your custom dashboard
-            </p>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">
+            {dashboard?.name || 'Dashboard Editor'}
+          </h1>
+          <p className="text-xs text-gray-500">
+            Drag, drop, and resize widgets to create your custom dashboard
+          </p>
         </div>
-
-        {/* Canvas */}
-        <Card className="">
-          <CardContent
-            className="p-0"
-            style={{ height: 'calc(100vh - 280px)', minHeight: '600px' }}
-          >
-            <WidgetCanvas
-              onSaveLayout={handleSaveLayout}
-              initialLayout={savedLayout}
-              initialWidgets={savedWidgets}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Instructions */}
-        <Card className="bg-blue-50 border-blue-200">
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-blue-900 mb-2">How to use:</h3>
-            <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-              <li>Click "Add Widget" to add new widgets to your dashboard</li>
-              <li>Drag widgets from the header bar to reposition them</li>
-              <li>Resize widgets by dragging the bottom-right corner</li>
-              <li>Click the trash icon to remove a widget</li>
-              <li>
-                Click "Save Layout" to persist your dashboard configuration
-              </li>
-              <li>Your layout is automatically saved to localStorage</li>
-            </ul>
-          </CardContent>
-        </Card>
       </div>
-    </AppLayout>
+
+      {/* Canvas */}
+      <Card className="">
+        <CardContent
+          className="p-0"
+          style={{ height: 'calc(100vh - 280px)', minHeight: '600px' }}
+        >
+          <WidgetCanvas
+            onSaveLayout={handleSaveLayout}
+            initialLayout={savedLayout}
+            initialWidgets={savedWidgets}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Instructions */}
+      <Card className="bg-blue-50 border-blue-200">
+        <CardContent className="p-4">
+          <h3 className="font-semibold text-blue-900 mb-2">How to use:</h3>
+          <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+            <li>Click "Add Widget" to add new widgets to your dashboard</li>
+            <li>Drag widgets from the header bar to reposition them</li>
+            <li>Resize widgets by dragging the bottom-right corner</li>
+            <li>Click the trash icon to remove a widget</li>
+            <li>Click "Save Layout" to persist your dashboard configuration</li>
+            <li>Your layout is automatically saved to localStorage</li>
+          </ul>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

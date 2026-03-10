@@ -154,9 +154,8 @@ const FloorPlanCanvas: React.FC<{
 
         if (dwgFile) {
           console.log('Parsing DWG file:', dwgFile.name);
-          const { EnhancedCADParser } = await import(
-            '@/features/floorPlan/services/EnhancedCADParser'
-          );
+          const { EnhancedCADParser } =
+            await import('@/features/floorPlan/services/EnhancedCADParser');
 
           let dxf: {
             entities?: unknown[];
@@ -237,7 +236,6 @@ const FloorPlanCanvas: React.FC<{
     parseAndRenderDWG();
   }, [dwgFile, dwgImageUrl, onDwgError, scaledWidth, scaledHeight]);
 
-
   return (
     <div className="relative">
       <canvas
@@ -255,149 +253,149 @@ const FloorPlanCanvas: React.FC<{
         height={scaledHeight}
         style={{ cursor: 'default' }}
       >
-          <Layer>
-            {/* DWG Background Image */}
-            {dwgImage ? (
-              <KonvaImage
-                image={dwgImage}
+        <Layer>
+          {/* DWG Background Image */}
+          {dwgImage ? (
+            <KonvaImage
+              image={dwgImage}
+              x={0}
+              y={0}
+              width={scaledWidth}
+              height={scaledHeight}
+              opacity={0.7}
+            />
+          ) : dwgError ? (
+            <Group>
+              <Rect
                 x={0}
                 y={0}
                 width={scaledWidth}
                 height={scaledHeight}
-                opacity={0.7}
+                fill="#F3F4F6"
+                stroke="#D1D5DB"
+                strokeWidth={2}
+                dash={[5, 5]}
               />
-            ) : dwgError ? (
-              <Group>
+              <Text
+                x={scaledWidth / 2}
+                y={scaledHeight / 2}
+                text="DWG File Loaded"
+                fontSize={16}
+                fontStyle="bold"
+                fill="#6B7280"
+                align="center"
+                verticalAlign="middle"
+                offsetX={60}
+                offsetY={8}
+              />
+            </Group>
+          ) : null}
+
+          {/* Zones */}
+          {zones.map((zone) => {
+            const isSelected = zone.id === selectedZoneId;
+            const zoneColor = getZoneColor(zone.type);
+            const zoneDevices = assignedDevices[zone.id] || [];
+
+            return (
+              <Group
+                key={zone.id}
+                x={zone.x}
+                y={zone.y}
+                onClick={() => onZoneClick(zone.id)}
+                onTap={() => onZoneClick(zone.id)}
+              >
+                {/* Zone Rectangle */}
                 <Rect
-                  x={0}
-                  y={0}
-                  width={scaledWidth}
-                  height={scaledHeight}
-                  fill="#F3F4F6"
-                  stroke="#D1D5DB"
-                  strokeWidth={2}
-                  dash={[5, 5]}
+                  width={zone.w}
+                  height={zone.h}
+                  fill={zoneColor}
+                  opacity={isSelected ? 0.4 : 0.2}
+                  stroke={isSelected ? '#3B82F6' : zoneColor}
+                  strokeWidth={isSelected ? 3 : 2}
+                  dash={isSelected ? [] : [5, 5]}
+                  cornerRadius={8}
+                />
+                {/* Zone Title Overlay */}
+                <Rect
+                  x={zone.w / 2 - 60}
+                  y={zone.h / 2 - 12}
+                  width={120}
+                  height={24}
+                  fill="rgba(255, 255, 255, 0.95)"
+                  cornerRadius={4}
+                  shadowBlur={4}
+                  shadowColor="rgba(0, 0, 0, 0.1)"
                 />
                 <Text
-                  x={scaledWidth / 2}
-                  y={scaledHeight / 2}
-                  text="DWG File Loaded"
-                  fontSize={16}
+                  x={zone.w / 2}
+                  y={zone.h / 2}
+                  text={zone.name}
+                  fontSize={12}
                   fontStyle="bold"
-                  fill="#6B7280"
+                  fill="#1F2937"
                   align="center"
                   verticalAlign="middle"
                   offsetX={60}
-                  offsetY={8}
+                  offsetY={6}
                 />
+                {/* Zone Type (shown when selected) */}
+                {isSelected && (
+                  <>
+                    <Rect
+                      x={0}
+                      y={zone.h - 20}
+                      width={zone.w}
+                      height={20}
+                      fill="rgba(0, 0, 0, 0.6)"
+                      cornerRadius={[0, 0, 8, 8]}
+                    />
+                    <Text
+                      x={zone.w / 2}
+                      y={zone.h - 10}
+                      text={zone.type}
+                      fontSize={10}
+                      fill="#FFFFFF"
+                      align="center"
+                      verticalAlign="middle"
+                      offsetX={zone.w / 2}
+                      offsetY={5}
+                    />
+                  </>
+                )}
+                {/* Device Indicators */}
+                {zoneDevices.length > 0 && (
+                  <Group x={10} y={zone.h - (isSelected ? 50 : 30)}>
+                    {zoneDevices
+                      .filter((device) => device && device.name)
+                      .map((device, index) => (
+                        <Group key={device.id} x={index * 20} y={0}>
+                          <Rect
+                            width={15}
+                            height={15}
+                            fill={getStatusColor(device.status || 'offline')}
+                            cornerRadius={2}
+                          />
+                          <Text
+                            x={7.5}
+                            y={7.5}
+                            text={device.name?.charAt(0)?.toUpperCase() || '?'}
+                            fontSize={8}
+                            fill="white"
+                            align="center"
+                            verticalAlign="middle"
+                            offsetX={3}
+                            offsetY={4}
+                          />
+                        </Group>
+                      ))}
+                  </Group>
+                )}
               </Group>
-            ) : null}
-
-            {/* Zones */}
-            {zones.map((zone) => {
-              const isSelected = zone.id === selectedZoneId;
-              const zoneColor = getZoneColor(zone.type);
-              const zoneDevices = assignedDevices[zone.id] || [];
-
-              return (
-                <Group
-                  key={zone.id}
-                  x={zone.x}
-                  y={zone.y}
-                  onClick={() => onZoneClick(zone.id)}
-                  onTap={() => onZoneClick(zone.id)}
-                >
-                  {/* Zone Rectangle */}
-                  <Rect
-                    width={zone.w}
-                    height={zone.h}
-                    fill={zoneColor}
-                    opacity={isSelected ? 0.4 : 0.2}
-                    stroke={isSelected ? '#3B82F6' : zoneColor}
-                    strokeWidth={isSelected ? 3 : 2}
-                    dash={isSelected ? [] : [5, 5]}
-                    cornerRadius={8}
-                  />
-                  {/* Zone Title Overlay */}
-                  <Rect
-                    x={zone.w / 2 - 60}
-                    y={zone.h / 2 - 12}
-                    width={120}
-                    height={24}
-                    fill="rgba(255, 255, 255, 0.95)"
-                    cornerRadius={4}
-                    shadowBlur={4}
-                    shadowColor="rgba(0, 0, 0, 0.1)"
-                  />
-                  <Text
-                    x={zone.w / 2}
-                    y={zone.h / 2}
-                    text={zone.name}
-                    fontSize={12}
-                    fontStyle="bold"
-                    fill="#1F2937"
-                    align="center"
-                    verticalAlign="middle"
-                    offsetX={60}
-                    offsetY={6}
-                  />
-                  {/* Zone Type (shown when selected) */}
-                  {isSelected && (
-                    <>
-                      <Rect
-                        x={0}
-                        y={zone.h - 20}
-                        width={zone.w}
-                        height={20}
-                        fill="rgba(0, 0, 0, 0.6)"
-                        cornerRadius={[0, 0, 8, 8]}
-                      />
-                      <Text
-                        x={zone.w / 2}
-                        y={zone.h - 10}
-                        text={zone.type}
-                        fontSize={10}
-                        fill="#FFFFFF"
-                        align="center"
-                        verticalAlign="middle"
-                        offsetX={zone.w / 2}
-                        offsetY={5}
-                      />
-                    </>
-                  )}
-                  {/* Device Indicators */}
-                  {zoneDevices.length > 0 && (
-                    <Group x={10} y={zone.h - (isSelected ? 50 : 30)}>
-                      {zoneDevices
-                        .filter((device) => device && device.name)
-                        .map((device, index) => (
-                          <Group key={device.id} x={index * 20} y={0}>
-                            <Rect
-                              width={15}
-                              height={15}
-                              fill={getStatusColor(device.status || 'offline')}
-                              cornerRadius={2}
-                            />
-                            <Text
-                              x={7.5}
-                              y={7.5}
-                              text={device.name?.charAt(0)?.toUpperCase() || '?'}
-                              fontSize={8}
-                              fill="white"
-                              align="center"
-                              verticalAlign="middle"
-                              offsetX={3}
-                              offsetY={4}
-                            />
-                          </Group>
-                        ))}
-                    </Group>
-                  )}
-                </Group>
-              );
-            })}
-          </Layer>
-        </Stage>
+            );
+          })}
+        </Layer>
+      </Stage>
     </div>
   );
 };
@@ -517,7 +515,10 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
 
   // Filter device positions by current floor
   const currentFloorDevicePositions = useMemo(() => {
-    const filtered: Record<string, { x: number; y: number; zoneId: string | null; floor: string }> = {};
+    const filtered: Record<
+      string,
+      { x: number; y: number; zoneId: string | null; floor: string }
+    > = {};
     Object.entries(devicePositions).forEach(([deviceId, position]) => {
       if (position.floor === activeFloorTab) {
         filtered[deviceId] = position;
@@ -530,8 +531,14 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
   useEffect(() => {
     if (Object.keys(devicePositions).length > 0) {
       console.log('Device positions:', devicePositions);
-      console.log('Available devices:', availableDevices.map(d => ({ id: d.id, name: d.name })));
-      console.log('Current floor zones:', currentFloorZones.map(z => ({ id: z.id, name: z.name })));
+      console.log(
+        'Available devices:',
+        availableDevices.map((d) => ({ id: d.id, name: d.name }))
+      );
+      console.log(
+        'Current floor zones:',
+        currentFloorZones.map((z) => ({ id: z.id, name: z.name }))
+      );
     }
   }, [devicePositions, availableDevices, currentFloorZones]);
 
@@ -545,7 +552,7 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
     if (device.assignedTo && zoneId) {
       unassignDeviceFromRoom(device.id, device.assignedTo);
     }
-    
+
     // If dropped on a zone, assign to that zone
     if (zoneId) {
       assignDeviceToRoom(device, zoneId);
@@ -553,10 +560,15 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
       // If dropped outside any zone but was previously assigned, unassign it
       unassignDeviceFromRoom(device.id, device.assignedTo);
     }
-    
+
     // Store device position if drop coordinates are provided
     if (dropX !== undefined && dropY !== undefined) {
-      setDevicePosition(device.id, { x: dropX, y: dropY, zoneId: zoneId || null, floor: activeFloorTab });
+      setDevicePosition(device.id, {
+        x: dropX,
+        y: dropY,
+        zoneId: zoneId || null,
+        floor: activeFloorTab,
+      });
     }
   };
 
@@ -573,7 +585,7 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
     if (position?.zoneId) {
       unassignDeviceFromRoom(deviceId, position.zoneId);
     }
-    
+
     // Remove device position
     removeDevicePosition(deviceId);
   };
@@ -581,14 +593,20 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
   const handleRepositionDevice = (e: React.DragEvent, deviceId: string) => {
     e.dataTransfer.effectAllowed = 'move';
     // Mark this as a reposition drag (not a new device)
-    e.dataTransfer.setData('application/json', JSON.stringify({ 
-      type: 'reposition', 
-      deviceId 
-    }));
-    e.dataTransfer.setData('text/plain', JSON.stringify({ 
-      type: 'reposition', 
-      deviceId 
-    }));
+    e.dataTransfer.setData(
+      'application/json',
+      JSON.stringify({
+        type: 'reposition',
+        deviceId,
+      })
+    );
+    e.dataTransfer.setData(
+      'text/plain',
+      JSON.stringify({
+        type: 'reposition',
+        deviceId,
+      })
+    );
   };
 
   const selectedZone = currentFloorZones.find((z) => z.id === selectedZoneId);
@@ -671,221 +689,256 @@ export const DeviceLinkStep: React.FC<DeviceLinkStepProps> = ({
                 </div>
               </Tabs>
             )}
-             {/* Canvas Container - handles drops anywhere on canvas */}
-             <div 
-               className="relative rounded-lg shadow-md border border-gray-200 bg-gray-50 overflow-auto max-h-[600px]"
-               onDragOver={(e) => {
-                 e.preventDefault();
-                 e.stopPropagation();
-                 e.dataTransfer.dropEffect = 'move';
-               }}
-               onDrop={(e) => {
-                 e.preventDefault();
-                 e.stopPropagation();
-                 
-                 // Try to get data from application/json first, then text/plain as fallback
-                 let deviceData = e.dataTransfer.getData('application/json');
-                 if (!deviceData || deviceData === '[object Object]') {
-                   deviceData = e.dataTransfer.getData('text/plain');
-                 }
-                 
-                 if (deviceData && deviceData !== '[object Object]') {
-                   try {
-                     const parsed = JSON.parse(deviceData);
-                     
-                     // Get drop position relative to the container
-                     const container = e.currentTarget;
-                     const rect = container.getBoundingClientRect();
-                     const dropX = e.clientX - rect.left;
-                     const dropY = e.clientY - rect.top;
-                     
-                     // Check if this is a reposition drag
-                     if (parsed.type === 'reposition' && parsed.deviceId) {
-                       // Reposition existing device
-                       const device = availableDevices.find((d) => d.id === parsed.deviceId);
-                       if (device) {
-                         // Check if drop is within any zone
-                         let droppedZoneId: string | null = null;
-                         for (const zone of currentFloorZones) {
-                           if (
-                             dropX >= zone.x &&
-                             dropX <= zone.x + zone.w &&
-                             dropY >= zone.y &&
-                             dropY <= zone.y + zone.h
-                           ) {
-                             droppedZoneId = zone.id;
-                             break;
-                           }
-                         }
-                         
-                         // Update position and zone assignment
-                         const currentPosition = devicePositions[parsed.deviceId];
-                         
-                         // If zone changed, update assignment
-                         if (droppedZoneId && currentPosition?.zoneId !== droppedZoneId) {
-                           // Remove from old zone
-                           if (currentPosition?.zoneId) {
-                             unassignDeviceFromRoom(parsed.deviceId, currentPosition.zoneId);
-                           }
-                           // Add to new zone
-                           if (droppedZoneId) {
-                             assignDeviceToRoom(device, droppedZoneId);
-                           }
-                         } else if (!droppedZoneId && currentPosition?.zoneId) {
-                           // Removed from zone
-                           unassignDeviceFromRoom(parsed.deviceId, currentPosition.zoneId);
-                         }
-                         
-                         // Update position
-                         setDevicePosition(parsed.deviceId, { x: dropX, y: dropY, zoneId: droppedZoneId, floor: activeFloorTab });
-                       }
-                     } else {
-                       // New device drop
-                       const device = parsed as Device;
-                       
-                       // Check if drop is within any zone
-                       let droppedZoneId: string | null = null;
-                       for (const zone of currentFloorZones) {
-                         if (
-                           dropX >= zone.x &&
-                           dropX <= zone.x + zone.w &&
-                           dropY >= zone.y &&
-                           dropY <= zone.y + zone.h
-                         ) {
-                           droppedZoneId = zone.id;
-                           break;
-                         }
-                       }
-                       
-                       handleZoneDrop(droppedZoneId, device, dropX, dropY);
-                     }
-                   } catch (error) {
-                     console.error('Error parsing device data:', error, 'Raw data:', deviceData);
-                   }
-                 } else {
-                   console.error('Invalid device data received:', deviceData);
-                 }
-               }}
-             >
-               <FloorPlanCanvas
-                 zones={currentFloorZones}
-                 selectedZoneId={selectedZoneId}
-                 zoomLevel={zoomLevel}
-                 dwgImageUrl={dwgImageUrl}
-                 dwgFile={dwgFile}
-                 assignedDevices={assignedDevices}
-                 onZoneClick={setSelectedZoneId}
-                 stageRef={stageRef as React.RefObject<KonvaStage>}
-                 onDwgError={setDwgError}
-               />
-               {/* Drop Zones Overlay - positioned over Konva zones for visual feedback only */}
-               {currentFloorZones.map((zone) => {
-                 return (
-                   <div
-                     key={`drop-${zone.id}`}
-                     data-zone-id={zone.id}
-                     style={{
-                       position: 'absolute',
-                       left: `${zone.x}px`,
-                       top: `${zone.y}px`,
-                       width: `${zone.w}px`,
-                       height: `${zone.h}px`,
-                       pointerEvents: 'none', // Changed to none so parent container handles drops
-                       zIndex: 10,
-                       borderRadius: '8px',
-                     }}
-                     className="transition-colors"
-                     onDragEnter={(e) => {
-                       e.preventDefault();
-                       e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-                       e.currentTarget.style.border = '2px dashed #3B82F6';
-                     }}
-                     onDragLeave={(e) => {
-                       e.preventDefault();
-                       e.currentTarget.style.backgroundColor = '';
-                       e.currentTarget.style.border = '';
-                     }}
-                   />
-                 );
-               })}
-               {/* Device Name Labels - displayed where devices are dropped (anywhere on canvas) */}
-               {Object.entries(currentFloorDevicePositions).map(([deviceId, position]) => {
-                 // Get the device object
-                 const device = availableDevices.find((d) => d.id === deviceId);
-                 if (!device) return null;
+            {/* Canvas Container - handles drops anywhere on canvas */}
+            <div
+              className="relative rounded-lg shadow-md border border-gray-200 bg-gray-50 overflow-auto max-h-[600px]"
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.dataTransfer.dropEffect = 'move';
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
 
-                 // Check if device is in a zone (for styling)
-                 const isInZone = position.zoneId !== null;
-                 const zone = isInZone ? currentFloorZones.find((z) => z.id === position.zoneId) : null;
+                // Try to get data from application/json first, then text/plain as fallback
+                let deviceData = e.dataTransfer.getData('application/json');
+                if (!deviceData || deviceData === '[object Object]') {
+                  deviceData = e.dataTransfer.getData('text/plain');
+                }
 
-                 return (
-                   <div
-                     key={`device-label-${deviceId}`}
-                     className="group"
-                     style={{
-                       position: 'absolute',
-                       left: `${position.x}px`,
-                       top: `${position.y}px`,
-                       transform: 'translate(-50%, -50%)',
-                       pointerEvents: 'auto',
-                       zIndex: 30,
-                     }}
-                   >
-                     <div
-                       draggable={true}
-                       onDragStart={(e) => {
-                         e.stopPropagation();
-                         handleRepositionDevice(e, deviceId);
-                       }}
-                       style={{
-                         backgroundColor: isInZone ? '#ffffff' : '#f0f9ff',
-                         padding: '6px 10px',
-                         borderRadius: '6px',
-                         boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                         border: isInZone ? '1px solid #d1d5db' : '1px solid #3b82f6',
-                         fontSize: '12px',
-                         fontWeight: '600',
-                         color: '#111827',
-                         whiteSpace: 'nowrap',
-                         cursor: 'move',
-                         display: 'flex',
-                         alignItems: 'center',
-                         gap: '6px',
-                         userSelect: 'none',
-                       }}
-                       title={isInZone ? `In zone: ${zone?.name || 'Unknown'}` : 'Not assigned to any zone. Drag to move.'}
-                     >
-                       <span>{device.name}</span>
-                       {isInZone && (
-                         <span className="text-xs text-gray-500">
-                           ({zone?.name})
-                         </span>
-                       )}
-                       <button
-                         onClick={(e) => {
-                           e.stopPropagation();
-                           handleDeleteDevice(deviceId);
-                         }}
-                         onMouseDown={(e) => {
-                           // Prevent drag when clicking delete button
-                           e.stopPropagation();
-                         }}
-                         className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 p-0.5 hover:bg-red-100 rounded text-red-600 hover:text-red-700"
-                         title="Delete device"
-                         style={{
-                           display: 'flex',
-                           alignItems: 'center',
-                           justifyContent: 'center',
-                           cursor: 'pointer',
-                         }}
-                       >
-                         <X className="h-3 w-3" />
-                       </button>
-                     </div>
-                   </div>
-                 );
-               })}
-             </div>
+                if (deviceData && deviceData !== '[object Object]') {
+                  try {
+                    const parsed = JSON.parse(deviceData);
+
+                    // Get drop position relative to the container
+                    const container = e.currentTarget;
+                    const rect = container.getBoundingClientRect();
+                    const dropX = e.clientX - rect.left;
+                    const dropY = e.clientY - rect.top;
+
+                    // Check if this is a reposition drag
+                    if (parsed.type === 'reposition' && parsed.deviceId) {
+                      // Reposition existing device
+                      const device = availableDevices.find(
+                        (d) => d.id === parsed.deviceId
+                      );
+                      if (device) {
+                        // Check if drop is within any zone
+                        let droppedZoneId: string | null = null;
+                        for (const zone of currentFloorZones) {
+                          if (
+                            dropX >= zone.x &&
+                            dropX <= zone.x + zone.w &&
+                            dropY >= zone.y &&
+                            dropY <= zone.y + zone.h
+                          ) {
+                            droppedZoneId = zone.id;
+                            break;
+                          }
+                        }
+
+                        // Update position and zone assignment
+                        const currentPosition =
+                          devicePositions[parsed.deviceId];
+
+                        // If zone changed, update assignment
+                        if (
+                          droppedZoneId &&
+                          currentPosition?.zoneId !== droppedZoneId
+                        ) {
+                          // Remove from old zone
+                          if (currentPosition?.zoneId) {
+                            unassignDeviceFromRoom(
+                              parsed.deviceId,
+                              currentPosition.zoneId
+                            );
+                          }
+                          // Add to new zone
+                          if (droppedZoneId) {
+                            assignDeviceToRoom(device, droppedZoneId);
+                          }
+                        } else if (!droppedZoneId && currentPosition?.zoneId) {
+                          // Removed from zone
+                          unassignDeviceFromRoom(
+                            parsed.deviceId,
+                            currentPosition.zoneId
+                          );
+                        }
+
+                        // Update position
+                        setDevicePosition(parsed.deviceId, {
+                          x: dropX,
+                          y: dropY,
+                          zoneId: droppedZoneId,
+                          floor: activeFloorTab,
+                        });
+                      }
+                    } else {
+                      // New device drop
+                      const device = parsed as Device;
+
+                      // Check if drop is within any zone
+                      let droppedZoneId: string | null = null;
+                      for (const zone of currentFloorZones) {
+                        if (
+                          dropX >= zone.x &&
+                          dropX <= zone.x + zone.w &&
+                          dropY >= zone.y &&
+                          dropY <= zone.y + zone.h
+                        ) {
+                          droppedZoneId = zone.id;
+                          break;
+                        }
+                      }
+
+                      handleZoneDrop(droppedZoneId, device, dropX, dropY);
+                    }
+                  } catch (error) {
+                    console.error(
+                      'Error parsing device data:',
+                      error,
+                      'Raw data:',
+                      deviceData
+                    );
+                  }
+                } else {
+                  console.error('Invalid device data received:', deviceData);
+                }
+              }}
+            >
+              <FloorPlanCanvas
+                zones={currentFloorZones}
+                selectedZoneId={selectedZoneId}
+                zoomLevel={zoomLevel}
+                dwgImageUrl={dwgImageUrl}
+                dwgFile={dwgFile}
+                assignedDevices={assignedDevices}
+                onZoneClick={setSelectedZoneId}
+                stageRef={stageRef as React.RefObject<KonvaStage>}
+                onDwgError={setDwgError}
+              />
+              {/* Drop Zones Overlay - positioned over Konva zones for visual feedback only */}
+              {currentFloorZones.map((zone) => {
+                return (
+                  <div
+                    key={`drop-${zone.id}`}
+                    data-zone-id={zone.id}
+                    style={{
+                      position: 'absolute',
+                      left: `${zone.x}px`,
+                      top: `${zone.y}px`,
+                      width: `${zone.w}px`,
+                      height: `${zone.h}px`,
+                      pointerEvents: 'none', // Changed to none so parent container handles drops
+                      zIndex: 10,
+                      borderRadius: '8px',
+                    }}
+                    className="transition-colors"
+                    onDragEnter={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.style.backgroundColor =
+                        'rgba(59, 130, 246, 0.2)';
+                      e.currentTarget.style.border = '2px dashed #3B82F6';
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.style.backgroundColor = '';
+                      e.currentTarget.style.border = '';
+                    }}
+                  />
+                );
+              })}
+              {/* Device Name Labels - displayed where devices are dropped (anywhere on canvas) */}
+              {Object.entries(currentFloorDevicePositions).map(
+                ([deviceId, position]) => {
+                  // Get the device object
+                  const device = availableDevices.find(
+                    (d) => d.id === deviceId
+                  );
+                  if (!device) return null;
+
+                  // Check if device is in a zone (for styling)
+                  const isInZone = position.zoneId !== null;
+                  const zone = isInZone
+                    ? currentFloorZones.find((z) => z.id === position.zoneId)
+                    : null;
+
+                  return (
+                    <div
+                      key={`device-label-${deviceId}`}
+                      className="group"
+                      style={{
+                        position: 'absolute',
+                        left: `${position.x}px`,
+                        top: `${position.y}px`,
+                        transform: 'translate(-50%, -50%)',
+                        pointerEvents: 'auto',
+                        zIndex: 30,
+                      }}
+                    >
+                      <div
+                        draggable={true}
+                        onDragStart={(e) => {
+                          e.stopPropagation();
+                          handleRepositionDevice(e, deviceId);
+                        }}
+                        style={{
+                          backgroundColor: isInZone ? '#ffffff' : '#f0f9ff',
+                          padding: '6px 10px',
+                          borderRadius: '6px',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                          border: isInZone
+                            ? '1px solid #d1d5db'
+                            : '1px solid #3b82f6',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          color: '#111827',
+                          whiteSpace: 'nowrap',
+                          cursor: 'move',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          userSelect: 'none',
+                        }}
+                        title={
+                          isInZone
+                            ? `In zone: ${zone?.name || 'Unknown'}`
+                            : 'Not assigned to any zone. Drag to move.'
+                        }
+                      >
+                        <span>{device.name}</span>
+                        {isInZone && (
+                          <span className="text-xs text-gray-500">
+                            ({zone?.name})
+                          </span>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteDevice(deviceId);
+                          }}
+                          onMouseDown={(e) => {
+                            // Prevent drag when clicking delete button
+                            e.stopPropagation();
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity ml-1 p-0.5 hover:bg-red-100 rounded text-red-600 hover:text-red-700"
+                          title="Delete device"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+              )}
+            </div>
             {/* DWG File Info */}
             {currentDwgFile && (
               <div className="mt-2 text-xs text-muted-foreground flex items-center gap-2">

@@ -59,7 +59,7 @@ export const inventoryRoutes = [
   // ------------------ assets-profiles routes ------------------
   {
     path: '/asset-profiles',
-    element: <FeatureRoute feature="profiles" />,
+    element: <FeatureRoute feature="assetProfiles" />,
     children: [
       {
         index: true,
@@ -74,7 +74,7 @@ export const inventoryRoutes = [
   // ------------------ Device-profiles routes ------------------
   {
     path: '/device-profiles',
-    element: <FeatureRoute feature="profiles" />,
+    element: <FeatureRoute feature="deviceProfiles" />,
     children: [
       {
         index: true,

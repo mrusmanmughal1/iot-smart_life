@@ -61,7 +61,7 @@ export const solutionRoutes = [
   // --------------------Solutions dashboards Routes --------------------
   {
     path: '/solution-dashboards',
-    element: <FeatureRoute feature="dashboards" />,
+    element: <FeatureRoute feature="solutionDashboards" />,
     children: [
       {
         index: true,

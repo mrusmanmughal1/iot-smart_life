@@ -7,7 +7,7 @@ import ScriptLibrary from '@/pages/ScriptLibrary.tsx';
 export const resourceRoutes = [
   {
     path: '/widgets-bundle',
-    element: <FeatureRoute feature="widgets" />,
+    element: <FeatureRoute feature="resources" />,
     children: [
       {
         index: true,
@@ -17,7 +17,7 @@ export const resourceRoutes = [
   },
   {
     path: '/widgets',
-    element: <FeatureRoute feature="widgets" />,
+    element: <FeatureRoute feature="resources" />,
     children: [
       {
         index: true,

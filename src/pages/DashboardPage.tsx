@@ -157,309 +157,307 @@ export const DashboardPage = () => {
   ];
 
   return (
-    <AppLayout>
-      <div className="space-y-4">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold dark:text-white text-slate-900">
-              {t('dashboard.overview')}
-            </h1>
-          </div>
-          <Settings className="h-6 w-6" />
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold dark:text-white text-slate-900">
+            {t('dashboard.overview')}
+          </h1>
         </div>
-        <div className="border dark:border-gray-700 p-4 rounded-3xl  border-secondary shadow-xl">
-          {/* Solution Category Selection Bar */}
-          <div className="relative">
-            <div className="flex items-center gap-4 pb-4">
-              <button
-                onClick={scrollLeft}
-                disabled={!canScrollLeft}
-                className={`hidden sm:flex absolute left-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${canScrollLeft
-                    ? 'opacity-100 cursor-pointer'
-                    : 'opacity-50 cursor-not-allowed'
-                  }`}
-              >
-                <ChevronLeft
-                  size={26}
-                  className="text-gray-700 dark:text-white"
-                />
-              </button>
+        <Settings className="h-6 w-6" />
+      </div>
+      <div className="border dark:border-gray-700 p-4 rounded-3xl  border-secondary shadow-xl">
+        {/* Solution Category Selection Bar */}
+        <div className="relative">
+          <div className="flex items-center gap-4 pb-4">
+            <button
+              onClick={scrollLeft}
+              disabled={!canScrollLeft}
+              className={`hidden sm:flex absolute left-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${
+                canScrollLeft
+                  ? 'opacity-100 cursor-pointer'
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <ChevronLeft
+                size={26}
+                className="text-gray-700 dark:text-white"
+              />
+            </button>
 
-              <div
-                ref={scrollContainerRef}
-                className="flex flex-1 items-center gap-4 bg-[#D9D9D92B] dark:bg-gray-950  rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
-              >
-                <div className="flex gap-4 w-full  p-4">
-                  {solutions.map((solution) => (
-                    <button
-                      key={solution.key}
-                      onClick={() => setSelectedCategory(solution.key)}
-                      className={`min-w-[140px] sm:min-w-[160px] flex-shrink-0 p-4 py-8 rounded-xl dark:bg-gray-800 dark:text-white transition-all flex flex-col items-center gap-3 ${selectedCategory === solution.key
-                          ? 'bg-secondary text-white shadow-md border border-gray-200'
-                          : 'bg-white text-gray-700 hover:bg-gray-50 '
-                        }`}
-                    >
-                      <solution.icon className="h-10 w-10" />
-                      <span className="text-sm font-medium">
-                        {t(`dashboard.solutionCategories.${solution.key}`)}
-                      </span>
-                    </button>
-                  ))}
-                </div>
+            <div
+              ref={scrollContainerRef}
+              className="flex flex-1 items-center gap-4 bg-[#D9D9D92B] dark:bg-gray-950  rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
+            >
+              <div className="flex gap-4 w-full  p-4">
+                {solutions.map((solution) => (
+                  <button
+                    key={solution.key}
+                    onClick={() => setSelectedCategory(solution.key)}
+                    className={`min-w-[140px] sm:min-w-[160px] flex-shrink-0 p-4 py-8 rounded-xl dark:bg-gray-800 dark:text-white transition-all flex flex-col items-center gap-3 ${
+                      selectedCategory === solution.key
+                        ? 'bg-secondary text-white shadow-md border border-gray-200'
+                        : 'bg-white text-gray-700 hover:bg-gray-50 '
+                    }`}
+                  >
+                    <solution.icon className="h-10 w-10" />
+                    <span className="text-sm font-medium">
+                      {t(`dashboard.solutionCategories.${solution.key}`)}
+                    </span>
+                  </button>
+                ))}
               </div>
-
-              <button
-                onClick={scrollRight}
-                disabled={!canScrollRight}
-                className={`hidden sm:flex absolute right-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${canScrollRight
-                    ? 'opacity-100 cursor-pointer'
-                    : 'opacity-50 cursor-not-allowed'
-                  }`}
-              >
-                <ChevronRight size={26} className="text-gray-700" />
-              </button>
             </div>
+
+            <button
+              onClick={scrollRight}
+              disabled={!canScrollRight}
+              className={`hidden sm:flex absolute right-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${
+                canScrollRight
+                  ? 'opacity-100 cursor-pointer'
+                  : 'opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <ChevronRight size={26} className="text-gray-700" />
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content Grid - 3 Columns */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Column 1 - Left */}
+          <div className="space-y-6">
+            {/* Active Solutions Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold pt-4 text-gray-600">
+                  {t('dashboard.activeSolutions')}
+                </CardTitle>
+
+                <CardDescription>
+                  <Link
+                    to="/solution-templates"
+                    className="text-secondary dark:text-white text-xs mt-1 hover:underline"
+                  >
+                    {t('dashboard.viewAll')}
+                  </Link>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-end justify-between">
+                  <div className="h-16 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={activeSolutionsData}>
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#44489D"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Pending Tasks Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-600">
+                  {t('dashboard.pendingTasks')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {pendingTasks.map((task, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between   rounded-lg"
+                  >
+                    <span className="text-sm font-medium text-gray-500">
+                      {task.task}
+                    </span>
+                    <Badge
+                      className={`${task.color} rounded-md text-white text-xs`}
+                    >
+                      {task.priority}
+                    </Badge>
+                  </div>
+                ))}
+                <Button className="rounded-md text-xs    bg-secondary hover:bg-secondary/90 text-white">
+                  {t('dashboard.viewTasks')}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Main Content Grid - 3 Columns */}
-          <div className="grid gap-6 lg:grid-cols-3">
-            {/* Column 1 - Left */}
-            <div className="space-y-6">
-              {/* Active Solutions Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold pt-4 text-gray-600">
-                    {t('dashboard.activeSolutions')}
-                  </CardTitle>
+          {/* Column 2 - Middle */}
+          <div className="space-y-6">
+            {/* Connected Devices Card */}
+            <Card className="flex items-center  justify-between pt-2 pb-10">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-600 dark:text-white">
+                  {t('dashboard.connectedDevices')}
+                </CardTitle>
+                <CardDescription className="text-sm  text-gray-500 dark:text-white">
+                  {t('dashboard.connections', { count: 12 })}
+                </CardDescription>
+                <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
+                  {t('dashboard.addNewDevice')}
+                </Button>
+              </CardHeader>
 
-                  <CardDescription>
-                    <Link
-                      to="/solution-templates"
-                      className="text-secondary dark:text-white text-xs mt-1 hover:underline"
-                    >
-                      {t('dashboard.viewAll')}
-                    </Link>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-end justify-between">
-                    <div className="h-16 w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={activeSolutionsData}>
-                          <Line
-                            type="monotone"
-                            dataKey="value"
-                            stroke="#44489D"
-                            strokeWidth={2}
-                            dot={false}
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    </div>
+              <CardContent>
+                <div className="flex   items-center justify-between space-y-4">
+                  <div className="relative flex items-center justify-center">
+                    <ResponsiveContainer width={100} height={120}>
+                      <PieChart>
+                        <Pie
+                          data={deviceUsageData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={35}
+                          outerRadius={50}
+                          dataKey="value"
+                          startAngle={90}
+                          endAngle={-270}
+                        >
+                          {deviceUsageData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <span className="absolute text-2xl font-semibold text-gray-900 dark:text-white">
+                      20%
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </CardContent>
+            </Card>
 
-              {/* Pending Tasks Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-600">
-                    {t('dashboard.pendingTasks')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {pendingTasks.map((task, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between   rounded-lg"
-                    >
-                      <span className="text-sm font-medium text-gray-500">
-                        {task.task}
-                      </span>
-                      <Badge
-                        className={`${task.color} rounded-md text-white text-xs`}
+            {/* Billing Status Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-600">
+                  {t('dashboard.billingStatus')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-5  py-6 ">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">
+                    {t('dashboard.nextBilling', { date: 'May 15, 2025' })}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {t('dashboard.currentPlan', {
+                      plan: 'Smart City Trial',
+                    })}
+                  </p>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <Progress value={65} max={100} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Column 3 - Right */}
+          <div className="space-y-6">
+            {/* Total Users Card */}
+            <Card className="flex items-center  justify-between pt-2 pb-12">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-gray-600">
+                  {t('dashboard.totalUsers')}
+                </CardTitle>
+                <CardDescription className="text-sm  text-gray-500">
+                  {t('dashboard.users', { count: 10 })}
+                </CardDescription>
+                <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
+                  {t('dashboard.manageUsers')}
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex -space-x-2">
+                    {userAvatars.map((letter, index) => (
+                      <div
+                        key={index}
+                        className="w-10 h-10 rounded-full text-white flex items-center justify-center text-sm font-semibold border-2 border-white"
+                        style={{ backgroundColor: COLORS[index] }}
                       >
-                        {task.priority}
-                      </Badge>
-                    </div>
-                  ))}
-                  <Button className="rounded-md text-xs    bg-secondary hover:bg-secondary/90 text-white">
-                    {t('dashboard.viewTasks')}
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Column 2 - Middle */}
-            <div className="space-y-6">
-              {/* Connected Devices Card */}
-              <Card className="flex items-center  justify-between pt-2 pb-10">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-600 dark:text-white">
-                    {t('dashboard.connectedDevices')}
-                  </CardTitle>
-                  <CardDescription className="text-sm  text-gray-500 dark:text-white">
-                    {t('dashboard.connections', { count: 12 })}
-                  </CardDescription>
-                  <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
-                    {t('dashboard.addNewDevice')}
-                  </Button>
-                </CardHeader>
-
-                <CardContent>
-                  <div className="flex   items-center justify-between space-y-4">
-                    <div className="relative flex items-center justify-center">
-                      <ResponsiveContainer width={100} height={120}>
-                        <PieChart>
-                          <Pie
-                            data={deviceUsageData}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={35}
-                            outerRadius={50}
-                            dataKey="value"
-                            startAngle={90}
-                            endAngle={-270}
-                          >
-                            {deviceUsageData.map((_, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={COLORS[index]}
-                              />
-                            ))}
-                          </Pie>
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <span className="absolute text-2xl font-semibold text-gray-900 dark:text-white">
-                        20%
-                      </span>
-                    </div>
+                        {letter}
+                      </div>
+                    ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </CardContent>
+            </Card>
 
-              {/* Billing Status Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-600">
-                    {t('dashboard.billingStatus')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-5  py-6 ">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">
-                      {t('dashboard.nextBilling', { date: 'May 15, 2025' })}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {t('dashboard.currentPlan', {
-                        plan: 'Smart City Trial',
-                      })}
-                    </p>
+            {/* Usage Summary Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg   font-semibold text-gray-600">
+                  {t('dashboard.usageSummary')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pb-10">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">
+                      {t('dashboard.devices')}
+                    </span>
+                    <span className="font-semibold text-gray-900">12/30</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <Progress value={65} max={100} />
                   </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Column 3 - Right */}
-            <div className="space-y-6">
-              {/* Total Users Card */}
-              <Card className="flex items-center  justify-between pt-2 pb-12">
-                <CardHeader>
-                  <CardTitle className="text-lg font-semibold text-gray-600">
-                    {t('dashboard.totalUsers')}
-                  </CardTitle>
-                  <CardDescription className="text-sm  text-gray-500">
-                    {t('dashboard.users', { count: 10 })}
-                  </CardDescription>
-                  <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
-                    {t('dashboard.manageUsers')}
-                  </Button>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex -space-x-2">
-                      {userAvatars.map((letter, index) => (
-                        <div
-                          key={index}
-                          className="w-10 h-10 rounded-full text-white flex items-center justify-center text-sm font-semibold border-2 border-white"
-                          style={{ backgroundColor: COLORS[index] }}
-                        >
-                          {letter}
-                        </div>
-                      ))}
-                    </div>
+                </div>
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">
+                      {t('dashboard.dashboards')}
+                    </span>
+                    <span className="font-semibold text-gray-900">5/10</span>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Usage Summary Card */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg   font-semibold text-gray-600">
-                    {t('dashboard.usageSummary')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 pb-10">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">
-                        {t('dashboard.devices')}
-                      </span>
-                      <span className="font-semibold text-gray-900">12/30</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <Progress value={65} max={100} />
-                    </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <Progress value={65} max={100} />
                   </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-gray-600">
-                        {t('dashboard.dashboards')}
-                      </span>
-                      <span className="font-semibold text-gray-900">5/10</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <Progress value={65} max={100} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
+        </div>
 
-          {/* Recently Accessed Dashboards */}
-          <div className="mt-4 p-4">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              {t('dashboard.recentlyAccessedDashboards')}
-            </h2>
-            <div className="grid gap-6 md:grid-cols-3">
-              {dashboardPreviews.map((dashboard, index) => (
-                <Card
-                  key={index}
-                  className={`cursor-pointer rounded-xl overflow-hidden  hover:shadow-lg transition border-0`}
+        {/* Recently Accessed Dashboards */}
+        <div className="mt-4 p-4">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            {t('dashboard.recentlyAccessedDashboards')}
+          </h2>
+          <div className="grid gap-6 md:grid-cols-3">
+            {dashboardPreviews.map((dashboard, index) => (
+              <Card
+                key={index}
+                className={`cursor-pointer rounded-xl overflow-hidden  hover:shadow-lg transition border-0`}
+              >
+                <CardHeader
+                  className={`text-lg font-semibold mb-2 ${dashboard.textColor}  bg-gradient-to-br ${dashboard.gradient} dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
                 >
-                  <CardHeader
-                    className={`text-lg font-semibold mb-2 ${dashboard.textColor}  bg-gradient-to-br ${dashboard.gradient} dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
+                  <p>{dashboard.title}</p>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <p
+                    className={`text-sm  text-center text-gray-500 dark:text-white`}
                   >
-                    <p>{dashboard.title}</p>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <p
-                      className={`text-sm  text-center text-gray-500 dark:text-white`}
-                    >
-                      {dashboard.subtitle}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    {dashboard.subtitle}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>
-    </AppLayout>
+    </div>
   );
 };

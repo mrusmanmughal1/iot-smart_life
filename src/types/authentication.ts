@@ -7,6 +7,11 @@ export interface User {
 }
 
 export interface SubscriptionFeatures {
+  integration: boolean;
+  edge: boolean;
+  solutionDashboards: boolean;
+  assetProfiles: boolean;
+  deviceProfiles: boolean;
   subscription: boolean;
   resources: boolean;
   overview: boolean;

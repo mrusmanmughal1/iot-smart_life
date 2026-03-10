@@ -36,7 +36,7 @@ import {
   History,
 } from 'lucide-react';
 import { DeviceDialog } from '@/features/devices/components/DeviceDialog';
-import AppLayout from '@/components/layout/AppLayout';
+
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';

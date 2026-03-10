@@ -19,7 +19,6 @@ import {
 } from '@/features/alarms/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
-import { AppLayout } from '@/components/layout/AppLayout';
 
 export default function AlarmsPage() {
   const { t } = useTranslation();

@@ -21,7 +21,7 @@ export const connectivityRoutes = [
   },
   {
     path: '/integrations',
-    element: <FeatureRoute feature="integrations" />,
+    element: <FeatureRoute feature="integration" />,
     children: [
       {
         index: true,
@@ -39,7 +39,7 @@ export const connectivityRoutes = [
   },
   {
     path: '/edge-management',
-    element: <FeatureRoute feature="edgeManagement" />,
+    element: <FeatureRoute feature="edge" />,
     children: [
       {
         index: true,
