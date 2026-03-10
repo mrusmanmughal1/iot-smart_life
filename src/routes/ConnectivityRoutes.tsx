@@ -1,11 +1,27 @@
+import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
-import Automation from '@/pages/AutomationPage.tsx';
-import Integrations from '@/pages/IntegrationsPage.tsx';
-import IntegrationDetailsPage from '@/pages/IntegrationDetailsPage.tsx';
-import AddIntegrationPage from '@/pages/AddIntegrationPage.tsx';
-import EdgeManagement from '@/pages/EdgeManagementPage.tsx';
-import ScheduleManagement from '@/pages/ScheduleManagementPage.tsx';
-import SharingCenter from '@/pages/SharingCenterPage.tsx';
+import { Loadable } from '@/components/common/Loadable';
+
+// Import connectivity page components lazily
+const Automation = Loadable(lazy(() => import('@/pages/AutomationPage.tsx')));
+const Integrations = Loadable(
+  lazy(() => import('@/pages/IntegrationsPage.tsx'))
+);
+const IntegrationDetailsPage = Loadable(
+  lazy(() => import('@/pages/IntegrationDetailsPage.tsx'))
+);
+const AddIntegrationPage = Loadable(
+  lazy(() => import('@/pages/AddIntegrationPage.tsx'))
+);
+const EdgeManagement = Loadable(
+  lazy(() => import('@/pages/EdgeManagementPage.tsx'))
+);
+const ScheduleManagement = Loadable(
+  lazy(() => import('@/pages/ScheduleManagementPage.tsx'))
+);
+const SharingCenter = Loadable(
+  lazy(() => import('@/pages/SharingCenterPage.tsx'))
+);
 
 export const connectivityRoutes = [
   // ------------------ automation ------------------------

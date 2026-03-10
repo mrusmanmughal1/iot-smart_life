@@ -1,10 +1,20 @@
+import React, { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import {
   ProtectedRoute,
   protectedRoutes,
 } from '@/routes/RouteGuards/ProtectedRoute';
 import { PublicRoute, publicRoutes } from '@/routes/RouteGuards/PublicRoute';
-import { RouteErrorPage } from '@/pages/RouteErrorPage.tsx';
+import { Loadable } from '@/components/common/Loadable';
+
+// Lazy load error page component
+const RouteErrorPage = Loadable(
+  lazy(() =>
+    import('@/pages/RouteErrorPage.tsx').then((module) => ({
+      default: module.RouteErrorPage,
+    }))
+  )
+);
 
 export const router = createBrowserRouter([
   //  --------------------public routes--------------------

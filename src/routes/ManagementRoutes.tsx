@@ -1,10 +1,13 @@
 import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
-import SubscriptionPlans from '@/pages/SubscriptionPlans';
-import Subscriptioninvoices from '@/pages/Subscriptioninvoices';
-
 // Import management page components lazily
+const SubscriptionPlans = Loadable(
+  lazy(() => import('@/pages/SubscriptionPlans'))
+);
+const Subscriptioninvoices = Loadable(
+  lazy(() => import('@/pages/Subscriptioninvoices'))
+);
 const UsersAndRolesManagementPage = Loadable(
   lazy(() => import('@/pages/UsersAndRolesManagementPage.tsx'))
 );

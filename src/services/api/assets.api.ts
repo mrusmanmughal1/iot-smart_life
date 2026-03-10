@@ -56,7 +56,7 @@ export interface ApiResponse<T> {
 export const assetsApi = {
   // Get all assets
   getAll: (params?: AssetQuery) =>
-    apiClient.get<PaginatedResponse<Asset>>('/assets', { params }),
+    apiClient.get<ApiResponse<PaginatedResponse<Asset>>>('/assets', { params }),
 
   // Get asset by ID
   getById: (id: string) => apiClient.get<ApiResponse<Asset>>(`/assets/${id}`),

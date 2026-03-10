@@ -1,15 +1,10 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { assetsApi } from '@/services/api';
-import type {
-  Asset as ApiAsset,
-  AssetQuery,
-  PaginatedResponse,
-} from '@/services/api/assets.api';
+import type { Asset as ApiAsset, AssetQuery } from '@/services/api/assets.api';
 import { toast } from 'react-hot-toast';
 import { debounce } from '@/lib/util';
 
-// Component Asset interface matching the page expectations
 export interface Asset {
   id: string;
   name: string;
@@ -21,24 +16,14 @@ export interface Asset {
   expanded?: boolean;
 }
 
-// API response wrapper structure: { data: PaginatedResponse<T> }
-interface ApiResponseWrapper<T> {
-  data: PaginatedResponse<T>;
-}
-
 interface UseAssetsPageOptions {
   initialSearchQuery?: string;
   itemsPerPage?: number;
 }
 
-/**
- * Custom hook for Assets page
- * Manages assets data, filtering, search, and operations
- */
 export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
   const { initialSearchQuery = '', itemsPerPage = 10 } = options;
   const queryClient = useQueryClient();
-
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -73,18 +58,11 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
 
   // Transform API Asset data to component Asset format
   const assets: Asset[] = useMemo(() => {
-    // API response structure: { data: { data: [...], meta: {...} } }
-    const responseData = assetsResponse?.data as
-      | ApiResponseWrapper<ApiAsset>
-      | undefined;
-    if (!responseData?.data?.data || !Array.isArray(responseData.data.data)) {
-      return [];
-    }
-
-    return responseData.data.data.map((apiAsset: ApiAsset) => {
-      // Determine status from additionalInfo or default to active
+    const list = assetsResponse?.data?.data.data ?? [];
+    return list.map((apiAsset: ApiAsset) => {
       const statusFromInfo = apiAsset.additionalInfo?.status;
       let status: 'active' | 'warning' | 'error' = 'active';
+
       if (statusFromInfo === 'warning' || statusFromInfo === 'error') {
         status = statusFromInfo;
       } else if (
@@ -94,15 +72,12 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
         status = 'error';
       }
 
-      // Determine status indicator (primary = green, danger = red)
       const statusIndicator: 'primary' | 'danger' =
         status === 'active' ? 'primary' : 'danger';
 
-      // Get customer from customerId or additionalInfo
       const customer =
         apiAsset.additionalInfo?.customer || apiAsset.customerId || 'N/A';
 
-      // Format created date
       const created = apiAsset.createdAt
         ? new Date(apiAsset.createdAt).toISOString().split('T')[0]
         : 'N/A';
@@ -118,7 +93,6 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
       };
     });
   }, [assetsResponse]);
-
   // Filter assets based on local search query (client-side filtering for immediate UI)
   const filteredAssets = useMemo(() => {
     if (!localSearchQuery.trim()) return assets;
@@ -274,17 +248,11 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
 
   // Get total count and pages from API response
   const totalAssets = useMemo(() => {
-    const responseData = assetsResponse?.data as
-      | ApiResponseWrapper<ApiAsset>
-      | undefined;
-    return responseData?.data?.meta?.total || 0;
+    return assetsResponse?.data?.data?.meta?.total || 0;
   }, [assetsResponse]);
 
   const totalPages = useMemo(() => {
-    const responseData = assetsResponse?.data as
-      | ApiResponseWrapper<ApiAsset>
-      | undefined;
-    return responseData?.data?.meta?.totalPages || 1;
+    return assetsResponse?.data?.data?.meta?.totalPages || 1;
   }, [assetsResponse]);
 
   const handlePageChange = useCallback(
@@ -303,7 +271,7 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
     isLoading,
     isError,
     error,
-
+    meta: assetsResponse?.data?.data?.meta,
     // Data
     assets: filteredAssets,
     totalAssets,

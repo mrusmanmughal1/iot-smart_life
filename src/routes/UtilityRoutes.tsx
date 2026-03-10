@@ -1,8 +1,21 @@
+import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
-import { PaymentSuccess } from '@/components/common/PaymentSuccess/PaymentSuccess.tsx';
-import WidgetEditorPage from '@/pages/WidgetEditorPage.tsx';
-import PrivateNotFoundPage from '@/pages/PrivateNotFoundPage.tsx';
-import SubscriptionPlans from '@/pages/SubscriptionPlans';
+import { Loadable } from '@/components/common/Loadable';
+
+// Import utility page components lazily
+const PaymentSuccess = Loadable(
+  lazy(() =>
+    import('@/components/common/PaymentSuccess/PaymentSuccess.tsx').then(
+      (module) => ({ default: module.PaymentSuccess })
+    )
+  )
+);
+const WidgetEditorPage = Loadable(
+  lazy(() => import('@/pages/WidgetEditorPage.tsx'))
+);
+const PrivateNotFoundPage = Loadable(
+  lazy(() => import('@/pages/PrivateNotFoundPage.tsx'))
+);
 
 export const utilityRoutes = [
   {
@@ -15,17 +28,6 @@ export const utilityRoutes = [
       },
     ],
   },
-  {
-    path: '/payment-status',
-    element: <FeatureRoute feature="subscription" />,
-    children: [
-      {
-        index: true,
-        element: <PaymentSuccess />,
-      },
-    ],
-  },
-
   {
     path: '/payment-status',
     element: <FeatureRoute feature="subscription" />,

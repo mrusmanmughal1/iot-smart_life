@@ -1,14 +1,10 @@
 import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
-import DevicesPage from '@/pages/DevicesPage';
 
 // Import inventory page components lazily
+const DevicesPage = Loadable(lazy(() => import('@/pages/DevicesPage.tsx')));
 const AssetsPage = Loadable(lazy(() => import('@/pages/AssetsPage.tsx')));
-const AnalyticsPage = Loadable(lazy(() => import('@/pages/AnalyticsPage.tsx')));
-const DeviceAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/DeviceAnalyticsPage.tsx'))
-);
 const IndividualDeviceAnalyticsPage = Loadable(
   lazy(() => import('@/pages/IndividualDeviceAnalyticsPage.tsx'))
 );
@@ -29,14 +25,19 @@ const DeviceProfileDetails = Loadable(
 );
 
 export const inventoryRoutes = [
-  //--------devices routes--------
   {
-    path: 'devices',
-    element: <DevicesPage />,
-  },
-  {
-    path: 'devices/:id',
-    element: <IndividualDeviceAnalyticsPage />,
+    path: '/devices',
+    element: <FeatureRoute feature="devices" />,
+    children: [
+      {
+        index: true,
+        element: <DevicesPage />,
+      },
+      {
+        path: ':id',
+        element: <IndividualDeviceAnalyticsPage />,
+      },
+    ],
   },
   //  ----------------------- routes for assets -----------------------
   {

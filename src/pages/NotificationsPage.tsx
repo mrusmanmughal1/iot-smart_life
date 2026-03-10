@@ -25,16 +25,14 @@ export default function NotificationsPage() {
   const markAsRead = useMarkAsRead();
   const notifications: PaginatedNotificationsResponse | any =
     notificationsData?.data || [];
+  console.log(notificationsData);
   return (
     <div className="space-y-6">
       <PageHeader
         title="All Notifications"
-        description={`(${notificationsData?.limit}) notifications found`}
+        description={`(${notificationsData?.total}) notifications found`}
       />
       <Card className="shadow-lg rounded-xl pt-4 border-secondary/50">
-        <CardHeader>
-          <CardTitle>All Notifications</CardTitle>
-        </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="space-y-3">
@@ -42,7 +40,7 @@ export default function NotificationsPage() {
                 <Skeleton key={i} className="h-20 w-full" />
               ))}
             </div>
-          ) : notifications.limit === 0 ? (
+          ) : notificationsData.total === 0 ? (
             <div className="text-center py-12">
               <Bell className="h-12 w-12 mx-auto text-slate-400 mb-4" />
               <p className="text-slate-500">

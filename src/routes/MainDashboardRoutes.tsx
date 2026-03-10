@@ -5,7 +5,7 @@ import { Loadable } from '@/components/common/Loadable';
 // Import dashboard page components lazily
 const DashboardPage = Loadable(
   lazy(() =>
-    import('../pages/DashboardPage.tsx').then((module) => ({
+    import('@/pages/DashboardPage.tsx').then((module) => ({
       default: module.DashboardPage,
     }))
   )

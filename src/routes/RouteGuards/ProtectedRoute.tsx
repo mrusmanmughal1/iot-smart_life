@@ -1,7 +1,18 @@
+import React, { lazy } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAppStore } from '@/stores/useAppStore';
 import { ROUTES } from '@/utils/constants/routes';
-import AppLayout from '@/components/layout/AppLayout';
+import { Loadable } from '@/components/common/Loadable';
+
+// Lazy load layout component
+const AppLayout = Loadable(
+  lazy(() =>
+    import('@/components/layout/AppLayout').then((module) => ({
+      default: module.AppLayout,
+    }))
+  )
+);
+
 import { mainDashboardRoutes } from '@/routes/MainDashboardRoutes.tsx';
 import { inventoryRoutes } from '@/routes/InventoryRoutes.tsx';
 import { solutionRoutes } from '@/routes/SolutionRoutes.tsx';

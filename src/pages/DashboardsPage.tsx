@@ -48,36 +48,36 @@ export default function DashboardsPage() {
   const handleOpenImportModal = () => {
     setIsImportModalOpen(true);
   };
-console.log(dashboards , 'dashboards')
+  console.log(dashboards, 'dashboards');
   // Handle importing dashboard from modal
   const handleImportFromModal = async (file: File) => {
     setIsImporting(true);
     try {
       const text = await file.text();
       const dashboardData = JSON.parse(text) as Record<string, unknown>;
-      
+
       // Import the dashboard via API
       await dashboardsApi.import(dashboardData);
-      
+
       // Invalidate queries to refresh the list
       queryClient.invalidateQueries({ queryKey: ['dashboards'] });
-      
+
       toast.success('Dashboard imported successfully');
-      
+
       // Close modal after successful import
       setIsImportModalOpen(false);
     } catch (error: unknown) {
       console.error('Failed to import dashboard:', error);
       const errorMessage =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Failed to import dashboard';
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || 'Failed to import dashboard';
       toast.error(errorMessage);
     } finally {
       setIsImporting(false);
     }
   };
   return (
-    < >
+    <>
       <div className="space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
@@ -113,20 +113,26 @@ console.log(dashboards , 'dashboards')
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-            <Button className="bg-secondary hover:bg-secondary/90 text-white dark:bg-gray-800 dark:text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              {t('solutionDashboards.createNewDashboard')}
+                <Button className="bg-secondary hover:bg-secondary/90 text-white dark:bg-gray-800 dark:text-white">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('solutionDashboards.createNewDashboard')}
                   <ChevronDown className="h-4 w-4 ml-2" />
-            </Button>
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="start"
                 className="w-56 absolute border border-secondary/50 shadow-md rounded-md dark:bg-gray-950 dark:border-gray-700 "
               >
-                <DropdownMenuItem onClick={handleCreateDashboard} className="dark:text-white dark:hover:bg-gray-800">
+                <DropdownMenuItem
+                  onClick={handleCreateDashboard}
+                  className="dark:text-white dark:hover:bg-gray-800"
+                >
                   {t('solutionDashboards.createNewDashboard')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleOpenImportModal} className="dark:text-white dark:hover:bg-gray-800">
+                <DropdownMenuItem
+                  onClick={handleOpenImportModal}
+                  className="dark:text-white dark:hover:bg-gray-800"
+                >
                   {t('solutionDashboards.importDashboard') ||
                     'Import Dashboard'}
                 </DropdownMenuItem>
@@ -173,17 +179,17 @@ console.log(dashboards , 'dashboards')
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
               </div>
             ) : (
-            <DashboardTable
-              linkto="dashboards"
-              data={dashboards}
-              onStatusToggle={handleStatusToggle}
-              onAction={handleAction}
-              pagination={pagination}  
-              handleNextPage={handleNextPage}
-              handlePreviousPage={handlePreviousPage}
-              handleFirstPage={handleFirstPage}
-              handleLastPage={handleLastPage}
-            />
+              <DashboardTable
+                linkto="dashboards"
+                data={dashboards}
+                onStatusToggle={handleStatusToggle}
+                onAction={handleAction}
+                pagination={pagination}
+                handleNextPage={handleNextPage}
+                handlePreviousPage={handlePreviousPage}
+                handleFirstPage={handleFirstPage}
+                handleLastPage={handleLastPage}
+              />
             )}
           </CardContent>
         </Card>

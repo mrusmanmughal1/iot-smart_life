@@ -7,70 +7,70 @@ import { Loadable } from '@/components/common/Loadable';
 // Import public page components lazily
 const LoginPage = Loadable(
   lazy(() =>
-    import('../../pages/LoginPage.tsx').then((module) => ({
+    import('@/pages/LoginPage.tsx').then((module) => ({
       default: module.LoginPage,
     }))
   )
 );
 const RegisterPage = Loadable(
   lazy(() =>
-    import('../../pages/RegisterPage.tsx').then((module) => ({
+    import('@/pages/RegisterPage.tsx').then((module) => ({
       default: module.RegisterPage,
     }))
   )
 );
 const ForgotPasswordPage = Loadable(
   lazy(() =>
-    import('../../pages/ForgotPasswordPage.tsx').then((module) => ({
+    import('@/pages/ForgotPasswordPage.tsx').then((module) => ({
       default: module.ForgotPasswordPage,
     }))
   )
 );
 const CheckEmailPage = Loadable(
   lazy(() =>
-    import('../../pages/CheckEmailPage.tsx').then((module) => ({
+    import('@/pages/CheckEmailPage.tsx').then((module) => ({
       default: module.CheckEmailPage,
     }))
   )
 );
 const ResetPasswordPage = Loadable(
   lazy(() =>
-    import('../../pages/ResetPasswordPage.tsx').then((module) => ({
+    import('@/pages/ResetPasswordPage.tsx').then((module) => ({
       default: module.ResetPasswordPage,
     }))
   )
 );
 const AccountBlockedPage = Loadable(
   lazy(() =>
-    import('../../pages/AccountBlockedPage.tsx').then((module) => ({
+    import('@/pages/AccountBlockedPage.tsx').then((module) => ({
       default: module.AccountBlockedPage,
     }))
   )
 );
 const VerifyAccountPage = Loadable(
   lazy(() =>
-    import('../../pages/VerifyAccountPage.tsx').then((module) => ({
+    import('@/pages/VerifyAccountPage.tsx').then((module) => ({
       default: module.VerifyAccountPage,
     }))
   )
 );
 const PinCodeVerificationPage = Loadable(
   lazy(() =>
-    import('../../pages/PinCodeVerificationPage.tsx').then((module) => ({
+    import('@/pages/PinCodeVerificationPage.tsx').then((module) => ({
       default: module.PinCodeVerificationPage,
     }))
   )
 );
 const SelectRolePage = Loadable(
   lazy(() =>
-    import('../../pages/SelectRolePage.tsx').then((module) => ({
+    import('@/pages/SelectRolePage.tsx').then((module) => ({
       default: module.SelectRolePage,
     }))
   )
 );
 const OAuthCallbackPage = Loadable(
   lazy(() =>
-    import('../../pages/OAuthCallbackPage.tsx').then((module) => ({
+    import('@/pages/OAuthCallbackPage.tsx').then((module) => ({
       default: module.OAuthCallbackPage,
     }))
   )

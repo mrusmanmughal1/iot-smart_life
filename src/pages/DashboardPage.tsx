@@ -18,7 +18,6 @@ import {
   Factory,
   ChevronLeft,
   ChevronRight,
-  Settings,
 } from 'lucide-react';
 import {
   LineChart,
@@ -28,9 +27,9 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import AppLayout from '@/components/layout/AppLayout';
 import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
+import { PageHeader } from '@/components/common/PageHeader';
 
 // Chart Data
 const activeSolutionsData = [
@@ -159,14 +158,12 @@ export const DashboardPage = () => {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold dark:text-white text-slate-900">
-            {t('dashboard.overview')}
-          </h1>
-        </div>
-        <Settings className="h-6 w-6" />
-      </div>
+
+      <PageHeader
+        title="Overview"
+        description="Real-time Monitoring of Your IoT Platform"
+      />
+
       <div className="border dark:border-gray-700 p-4 rounded-3xl  border-secondary shadow-xl">
         {/* Solution Category Selection Bar */}
         <div className="relative">

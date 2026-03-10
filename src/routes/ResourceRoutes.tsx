@@ -1,8 +1,14 @@
+import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
-import WidgetsBundle from '@/pages/WidgetsBundle.tsx';
-import Widgets from '@/pages/WidgetsPage.tsx';
-import ImageLibrary from '@/pages/ImageLibraryPage.tsx';
-import ScriptLibrary from '@/pages/ScriptLibrary.tsx';
+import { Loadable } from '@/components/common/Loadable';
+
+// Import resource page components lazily
+const WidgetsBundle = Loadable(lazy(() => import('@/pages/WidgetsBundle.tsx')));
+const Widgets = Loadable(lazy(() => import('@/pages/WidgetsPage.tsx')));
+const ImageLibrary = Loadable(
+  lazy(() => import('@/pages/ImageLibraryPage.tsx'))
+);
+const ScriptLibrary = Loadable(lazy(() => import('@/pages/ScriptLibrary.tsx')));
 
 export const resourceRoutes = [
   {

@@ -21,14 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import {
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-  Download,
-  Share2,
-} from 'lucide-react';
+import { MoreVertical, Trash2, Eye, Download } from 'lucide-react';
 import { AddAssetModal } from '@/features/assets/components/AddAssetModal';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { Pagination } from '@/components/common/Pagination/Pagination';
@@ -48,6 +41,7 @@ export default function AssetsPage() {
     currentPage,
     totalPages,
     itemsPerPage,
+    meta,
     handleSearchChange,
     handlePageChange,
     handleAction,
@@ -205,11 +199,11 @@ export default function AssetsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {assets.length === 0 && !isLoading ? (
+                  {meta?.total === 0 && !isLoading ? (
                     <TableRow>
                       <TableCell
                         colSpan={6}
-                        className="h-24 text-center text-muted-foreground"
+                        className="h-24 text-center bg-slate-50 text-muted-foreground"
                       >
                         {t('assets.noAssets') || 'No assets found'}
                       </TableCell>

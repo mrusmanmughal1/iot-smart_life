@@ -239,11 +239,11 @@ export default function DevicesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {devices.length === 0 ? (
+                {meta.totalItems === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={6}
-                      className="h-24 text-center text-muted-foreground"
+                      className="h-24 text-center bg-gray-100 text-muted-foreground"
                     >
                       {t('devices.noDevices') || 'No devices found'}
                     </TableCell>
