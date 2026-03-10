@@ -168,7 +168,7 @@ const getNavItems = (): NavItem[] => [
   {
     titleKey: 'nav.usersAndRoles',
     icon: <Users className="h-5 w-5" />,
-    feature: 'usersManagement',
+    feature: 'userRoles',
     children: [
       {
         titleKey: 'nav.usersAndRoles',

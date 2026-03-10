@@ -70,7 +70,7 @@ export const managementRoutes = [
   //  -------------------Users Management Routes-------------------
   {
     path: '/users-management',
-    element: <FeatureRoute feature="usersManagement" />,
+    element: <FeatureRoute feature="userRoles" />,
     children: [
       {
         index: true,
