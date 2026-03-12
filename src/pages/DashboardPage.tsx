@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Card,
@@ -16,20 +16,19 @@ import {
   Car,
   Home,
   Factory,
-  ChevronLeft,
-  ChevronRight,
+  Layout,
+  Globe,
+  Database,
+  Map,
+  Zap,
+  Users,
 } from 'lucide-react';
-import {
-  LineChart,
-  Line,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
 import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useUsage } from '@/features/Subscription/hooks';
+import { UsageDonutChart } from '@/components/common/UsageDonutChart';
+import { SolutionSelectionBar } from '@/components/common/SolutionSelectionBar';
 
 // Chart Data
 const activeSolutionsData = [
@@ -45,60 +44,7 @@ const COLORS = ['#C36BA9', '#E5E7EB', '#1FB3E1'];
 export const DashboardPage = () => {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState('smartCity');
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-
-  // Check scroll position
-  const checkScrollPosition = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    setCanScrollLeft(container.scrollLeft > 0);
-    setCanScrollRight(
-      container.scrollLeft < container.scrollWidth - container.clientWidth - 10
-    );
-  };
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    // Initial check
-    checkScrollPosition();
-
-    // Listen to scroll events
-    container.addEventListener('scroll', checkScrollPosition);
-    window.addEventListener('resize', checkScrollPosition);
-
-    return () => {
-      container.removeEventListener('scroll', checkScrollPosition);
-      window.removeEventListener('resize', checkScrollPosition);
-    };
-  }, []);
-
-  // Scroll functions
-  const scrollLeft = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const scrollAmount = 200;
-    container.scrollBy({
-      left: -scrollAmount,
-      behavior: 'smooth',
-    });
-  };
-
-  const scrollRight = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const scrollAmount = 200;
-    container.scrollBy({
-      left: scrollAmount,
-      behavior: 'smooth',
-    });
-  };
+  const { data: SubscriptionUsage, isLoading: isUsageLoading } = useUsage();
 
   // Solution Categories with localization
   const solutions = [
@@ -112,26 +58,24 @@ export const DashboardPage = () => {
 
   // Donut chart data for Connected Devices
   const deviceUsageData = [
-    { name: t('dashboard.deviceUsage.used'), value: 20 },
-    { name: t('dashboard.deviceUsage.remaining'), value: 80 },
+    {
+      name: t('dashboard.deviceUsage.used'),
+      value: SubscriptionUsage?.current?.devices || 0,
+    },
+    {
+      name: t('dashboard.deviceUsage.remaining'),
+      value:
+        (SubscriptionUsage?.limits?.devices || 0) -
+        (SubscriptionUsage?.current?.devices || 0),
+    },
   ];
+
+  const devicePercentage = Math.round(
+    SubscriptionUsage?.percentage?.devices || 0
+  );
 
   // User avatars data
   const userAvatars = ['S', 'A', 'P'];
-
-  // Pending tasks
-  const pendingTasks = [
-    {
-      task: t('dashboard.tasks.addGateway'),
-      priority: t('dashboard.priorities.high'),
-      color: 'bg-green-500',
-    },
-    {
-      task: t('dashboard.tasks.configureAlert'),
-      priority: t('dashboard.priorities.medium'),
-      color: 'bg-orange-500',
-    },
-  ];
 
   // Dashboard preview data
   const dashboardPreviews = [
@@ -165,127 +109,104 @@ export const DashboardPage = () => {
       />
 
       <div className="border dark:border-gray-700 p-4 rounded-3xl  border-secondary shadow-xl">
-        {/* Solution Category Selection Bar */}
-        <div className="relative">
-          <div className="flex items-center gap-4 pb-4">
-            <button
-              onClick={scrollLeft}
-              disabled={!canScrollLeft}
-              className={`hidden sm:flex absolute left-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${
-                canScrollLeft
-                  ? 'opacity-100 cursor-pointer'
-                  : 'opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <ChevronLeft
-                size={26}
-                className="text-gray-700 dark:text-white"
-              />
-            </button>
-
-            <div
-              ref={scrollContainerRef}
-              className="flex flex-1 items-center gap-4 bg-[#D9D9D92B] dark:bg-gray-950  rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
-            >
-              <div className="flex gap-4 w-full  p-4">
-                {solutions.map((solution) => (
-                  <button
-                    key={solution.key}
-                    onClick={() => setSelectedCategory(solution.key)}
-                    className={`min-w-[140px] sm:min-w-[160px] flex-shrink-0 p-4 py-8 rounded-xl dark:bg-gray-800 dark:text-white transition-all flex flex-col items-center gap-3 ${
-                      selectedCategory === solution.key
-                        ? 'bg-secondary text-white shadow-md border border-gray-200'
-                        : 'bg-white text-gray-700 hover:bg-gray-50 '
-                    }`}
-                  >
-                    <solution.icon className="h-10 w-10" />
-                    <span className="text-sm font-medium">
-                      {t(`dashboard.solutionCategories.${solution.key}`)}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={scrollRight}
-              disabled={!canScrollRight}
-              className={`hidden sm:flex absolute right-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${
-                canScrollRight
-                  ? 'opacity-100 cursor-pointer'
-                  : 'opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <ChevronRight size={26} className="text-gray-700" />
-            </button>
-          </div>
-        </div>
+        <SolutionSelectionBar
+          solutions={solutions}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+        />
 
         {/* Main Content Grid - 3 Columns */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Column 1 - Left */}
           <div className="space-y-6">
-            {/* Active Solutions Card */}
+            {/* Usage Summary Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg font-semibold pt-4 text-gray-600">
-                  {t('dashboard.activeSolutions')}
+                <CardTitle className="text-lg font-semibold text-gray-600">
+                  {t('dashboard.usageSummary')}
                 </CardTitle>
-
-                <CardDescription>
-                  <Link
-                    to="/solution-templates"
-                    className="text-secondary dark:text-white text-xs mt-1 hover:underline"
-                  >
-                    {t('dashboard.viewAll')}
-                  </Link>
-                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
-                  <div className="h-16 w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={activeSolutionsData}>
-                        <Line
-                          type="monotone"
-                          dataKey="value"
-                          stroke="#44489D"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+              <CardContent className="space-y-4 pb-6">
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-600">
+                        {t('dashboard.customers', 'Customers')}
+                      </span>
+                      <span className="font-semibold">
+                        {SubscriptionUsage?.current?.customers || 0}/
+                        {SubscriptionUsage?.limits?.customers || 0}
+                      </span>
+                    </div>
+                    <Progress
+                      value={SubscriptionUsage?.percentage?.customers || 0}
+                      className="h-2"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm  mb-1">
+                      <span className="text-gray-600">
+                        {t('dashboard.floorPlans', 'Floor Plans')}
+                      </span>
+                      <span className="font-semibold text-gray-900">
+                        {SubscriptionUsage?.current?.floorPlans || 0}/
+                        {SubscriptionUsage?.limits?.floorPlans || 0}
+                      </span>
+                    </div>
+                    <Progress
+                      value={SubscriptionUsage?.percentage?.floorPlans || 0}
+                      className="h-2"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm  mb-1">
+                      <span className="text-gray-600">
+                        {t('dashboard.automations', 'Automations')}
+                      </span>
+                      <span className="font-semibold text-gray-900">
+                        {SubscriptionUsage?.current?.automations || 0}/
+                        {SubscriptionUsage?.limits?.automations || 0}
+                      </span>
+                    </div>
+                    <Progress
+                      value={SubscriptionUsage?.percentage?.automations || 0}
+                      className="h-2"
+                    />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Pending Tasks Card */}
+            {/* API Usage Card */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-600">
-                  {t('dashboard.pendingTasks')}
-                </CardTitle>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-semibold text-gray-600">
+                    {t('dashboard.apiUsage', 'API Usage')}
+                  </CardTitle>
+                  <Globe className="h-8 w-8 text-green-500" />
+                </div>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {pendingTasks.map((task, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between   rounded-lg"
-                  >
-                    <span className="text-sm font-medium text-gray-500">
-                      {task.task}
-                    </span>
-                    <Badge
-                      className={`${task.color} rounded-md text-white text-xs`}
-                    >
-                      {task.priority}
-                    </Badge>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-gray-900">
+                    {SubscriptionUsage?.current?.apiCalls || 0}
+                  </span>
+                  <Badge variant="outline" className="text-xs">
+                    {t('dashboard.monthlyLimit', 'Monthly Limit')}:{' '}
+                    {SubscriptionUsage?.limits?.apiCallsPerMonth || 0}
+                  </Badge>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>{t('dashboard.usage', 'Usage')}</span>
+                    <span>{SubscriptionUsage?.percentage?.apiCalls || 0}%</span>
                   </div>
-                ))}
-                <Button className="rounded-md text-xs    bg-secondary hover:bg-secondary/90 text-white">
-                  {t('dashboard.viewTasks')}
-                </Button>
+                  <Progress
+                    value={SubscriptionUsage?.percentage?.apiCalls || 0}
+                    className="h-2"
+                  />
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -299,7 +220,9 @@ export const DashboardPage = () => {
                   {t('dashboard.connectedDevices')}
                 </CardTitle>
                 <CardDescription className="text-sm  text-gray-500 dark:text-white">
-                  {t('dashboard.connections', { count: 12 })}
+                  {t('dashboard.connections', {
+                    count: SubscriptionUsage?.current?.devices || 0,
+                  })}
                 </CardDescription>
                 <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
                   {t('dashboard.addNewDevice')}
@@ -307,54 +230,54 @@ export const DashboardPage = () => {
               </CardHeader>
 
               <CardContent>
-                <div className="flex   items-center justify-between space-y-4">
-                  <div className="relative flex items-center justify-center">
-                    <ResponsiveContainer width={100} height={120}>
-                      <PieChart>
-                        <Pie
-                          data={deviceUsageData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={35}
-                          outerRadius={50}
-                          dataKey="value"
-                          startAngle={90}
-                          endAngle={-270}
-                        >
-                          {deviceUsageData.map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index]} />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <span className="absolute text-2xl font-semibold text-gray-900 dark:text-white">
-                      20%
-                    </span>
-                  </div>
-                </div>
+                <UsageDonutChart
+                  data={deviceUsageData}
+                  percentage={devicePercentage}
+                  colors={COLORS}
+                />
               </CardContent>
             </Card>
 
-            {/* Billing Status Card */}
+            {/* Storage & Assets Card */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-600">
-                  {t('dashboard.billingStatus')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-5  py-6 ">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">
-                    {t('dashboard.nextBilling', { date: 'May 15, 2025' })}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {t('dashboard.currentPlan', {
-                      plan: 'Smart City Trial',
-                    })}
-                  </p>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-semibold text-gray-600">
+                    {t('dashboard.storageAndAssets', 'Storage & Assets')}
+                  </CardTitle>
+                  <Database className="h-8 w-8 text-secondary-main" />
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <Progress value={65} max={100} />
+              </CardHeader>
+              <CardContent className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">
+                      {t('dashboard.storage', 'Storage')}
+                    </span>
+                    <span className="font-semibold">
+                      {SubscriptionUsage?.current?.storageGB || 0} /{' '}
+                      {SubscriptionUsage?.limits?.storageGB || 0} GB
+                    </span>
+                  </div>
+                  <Progress
+                    value={SubscriptionUsage?.percentage?.storageGB || 0}
+                    className="h-2"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">
+                      {t('dashboard.assets', 'Assets')}
+                    </span>
+                    <span className="font-semibold">
+                      {SubscriptionUsage?.current?.assets || 0} /{' '}
+                      {SubscriptionUsage?.limits?.assets || 0}
+                    </span>
+                  </div>
+                  <Progress
+                    value={SubscriptionUsage?.percentage?.assets || 0}
+                    className="h-2"
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -369,7 +292,9 @@ export const DashboardPage = () => {
                   {t('dashboard.totalUsers')}
                 </CardTitle>
                 <CardDescription className="text-sm  text-gray-500">
-                  {t('dashboard.users', { count: 10 })}
+                  {t('dashboard.users', {
+                    count: SubscriptionUsage?.current?.users || 0,
+                  })}
                 </CardDescription>
                 <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
                   {t('dashboard.manageUsers')}
@@ -391,38 +316,34 @@ export const DashboardPage = () => {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Usage Summary Card */}
+            {/* Active Dashboards Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg   font-semibold text-gray-600">
-                  {t('dashboard.usageSummary')}
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-semibold pt-4 text-gray-600">
+                    {t('dashboard.activeDashboards', 'Active Dashboards')}
+                  </CardTitle>
+                  <Layout className="h-8 w-8 text-secondary mt-4" />
+                </div>
+
+                <CardDescription>
+                  <div className="text-2xl font-bold text-gray-900 mt-2">
+                    {SubscriptionUsage?.current?.dashboards || 0}/
+                    {SubscriptionUsage?.limits?.dashboards || 0}
+                  </div>
+                  <br />
+                  <Progress
+                    value={SubscriptionUsage?.percentage?.dashboards || 0}
+                    className="h-2"
+                  />
+                  <Link
+                    to="/dashboards"
+                    className="text-secondary  block text-end   pt-6 dark:text-white text-xs mt-1 hover:underline"
+                  >
+                    {t('dashboard.viewAll')}
+                  </Link>
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 pb-10">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">
-                      {t('dashboard.devices')}
-                    </span>
-                    <span className="font-semibold text-gray-900">12/30</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <Progress value={65} max={100} />
-                  </div>
-                </div>
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">
-                      {t('dashboard.dashboards')}
-                    </span>
-                    <span className="font-semibold text-gray-900">5/10</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <Progress value={65} max={100} />
-                  </div>
-                </div>
-              </CardContent>
             </Card>
           </div>
         </div>

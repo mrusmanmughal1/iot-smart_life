@@ -1,5 +1,5 @@
 import React, { Suspense, ElementType } from 'react';
-import { LoadingPage } from './LoadingSpinner';
+import { LoadingOverlay, LoadingPage } from './LoadingSpinner';
 
 /**
  * Higher-order component to wrap lazy-loaded components with a Suspense boundary.
@@ -9,7 +9,7 @@ import { LoadingPage } from './LoadingSpinner';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Loadable = (Component: any) => (props: any) => (
-  <Suspense fallback={<LoadingPage />}>
+  <Suspense fallback={<LoadingOverlay />}>
     <Component {...props} />
   </Suspense>
 );

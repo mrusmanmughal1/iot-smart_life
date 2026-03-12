@@ -4,23 +4,24 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button.tsx'
+import { Button } from '@/components/ui/button.tsx';
 import { Input } from '@/components/ui/input.tsx';
 import { useLogin } from '../hooks/useLogin.ts';
 import { Link } from 'react-router-dom';
 
 type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>;
 
-const createLoginSchema = (t: (key: string) => string) => z.object({
-  email: z
-    .string()
-    .min(1, t('auth.login.emailRequired'))
-    .email(t('auth.login.emailInvalid')),
-  password: z
-    .string()
-    .min(1, t('auth.login.passwordRequired'))
-    .min(6, t('auth.login.passwordMinLength')),
-});
+const createLoginSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z
+      .string()
+      .min(1, t('auth.login.emailRequired'))
+      .email(t('auth.login.emailInvalid')),
+    password: z
+      .string()
+      .min(1, t('auth.login.passwordRequired'))
+      .min(6, t('auth.login.passwordMinLength')),
+  });
 
 export const LoginForm: React.FC = () => {
   const { t } = useTranslation();
@@ -85,7 +86,9 @@ export const LoginForm: React.FC = () => {
             className="px-12"
             isLoading={isPending}
           >
-            {isPending ? t('auth.login.loggingIn') : t('auth.login.loginButton')}
+            {isPending
+              ? t('auth.login.loggingIn')
+              : t('auth.login.loginButton')}
           </Button>
 
           <div className="flex justify-start">

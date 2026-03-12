@@ -75,6 +75,48 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+export interface UsageStatsResponse {
+  current: CurrentUsage;
+  limits: UsageLimits;
+  percentage: UsagePercentage;
+  warnings: string[];
+}
+
+export interface CurrentUsage {
+  users: number;
+  assets: number;
+  devices: number;
+  apiCalls: number;
+  customers: number;
+  dashboards?: number;
+  floorPlans?: number;
+  automations?: number;
+  storageGB?: number;
+}
+
+export interface UsageLimits {
+  users: number;
+  assets: number;
+  devices: number;
+  customers: number;
+  storageGB: number;
+  dashboards?: number;
+  floorPlans?: number;
+  automations?: number;
+  apiCallsPerMonth?: number;
+}
+
+export interface UsagePercentage {
+  users?: number;
+  assets?: number;
+  devices?: number;
+  dashboards?: number;
+  floorPlans?: number;
+  automations?: number;
+  apiCalls?: number;
+  customers?: number;
+  storageGB?: number;
+}
 
 export const subscriptionsApi = {
   // Get all plans
@@ -120,7 +162,8 @@ export const subscriptionsApi = {
     apiClient.post<ApiResponse<Subscription>>('/subscriptions/renew'),
 
   // Get usage
-  getUsage: () => apiClient.get<ApiResponse<Usage>>('/subscriptions/usage'),
+  getUsage: () =>
+    apiClient.get<ApiResponse<UsageStatsResponse>>('/subscriptions/usage'),
 
   // Get billing history
   getBillingHistory: () =>

@@ -66,11 +66,11 @@ export function SecurityTab() {
 
   const twoFactorEnabled = settings?.isEnabled ?? false;
   const currentSelectedMethod = selectedMethod || 'none';
-
+  console.log(selectedMethod, 'selectedMethod');
   // Show method selection UI if 2FA is enabled OR if user toggled switch to enable
   const shouldShowMethodSelection = twoFactorEnabled || showMethodSelection;
 
-  const handleToggle2FA  = (enabled: boolean) => {
+  const handleToggle2FA = (enabled: boolean) => {
     if (enabled) {
       // Show method selection UI without making API call
       // isEnabled will be set to true by API only when user sets up a method
@@ -85,7 +85,7 @@ export function SecurityTab() {
       }
     }
   };
-   
+
   // Reset showMethodSelection when 2FA is successfully enabled
   useEffect(() => {
     if (twoFactorEnabled && showMethodSelection) {
@@ -218,7 +218,7 @@ export function SecurityTab() {
                   <div className="flex items-start space-x-3 p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                     <div className="mt-1">
                       <Radio
-                        checked={currentSelectedMethod === 'email'}
+                        checked={currentSelectedMethod == 'email'}
                         onChange={() => handleMethodChange('email')}
                         value="email"
                         id="email"
@@ -235,7 +235,7 @@ export function SecurityTab() {
                       <p className="text-sm text-slate-500 mt-1">
                         Receive verification codes via email
                       </p>
-                      {currentSelectedMethod !== 'email' && (
+                      {currentSelectedMethod == 'email' && (
                         <div className="mt-2">
                           <Button
                             size="sm"
@@ -453,10 +453,6 @@ export function SecurityTab() {
         </div>
 
         <Separator />
-
-        <Separator />
-
-        <Button variant="destructive">Change Password</Button>
       </CardContent>
 
       <Disable2FAModal

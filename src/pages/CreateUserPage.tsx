@@ -43,8 +43,7 @@ export default function CreateUserPage() {
   const { data: customersData } = useCustomers();
   const [showPassword, setShowPassword] = useState(false);
 
-  const roles: Role[] = rolesData?.data || []
-
+  const roles: Role[] = rolesData?.data || [];
 
   const customersList: Customer[] = customersData?.data || [];
   const {
@@ -105,7 +104,7 @@ export default function CreateUserPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white  ">
+    <div className="min-h-screen    ">
       <div className="  mx-auto">
         <h1 className="text-2xl font-semibold text-gray-900 mb-6">
           Add New User
@@ -224,7 +223,10 @@ export default function CreateUserPage() {
                       name="role"
                       control={control}
                       render={({ field }) => (
-                        <Select value={field.value} onValueChange={field.onChange}>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
                           <SelectTrigger
                             id="role"
                             className="w-full border border-gray-300 rounded-md"
@@ -285,9 +287,10 @@ export default function CreateUserPage() {
                               >
                                 <div className="flex flex-col">
                                   {customer.name}
-                                  <span className="text-xs text-gray-500">{customer.email}</span>
+                                  <span className="text-xs text-gray-500">
+                                    {customer.email}
+                                  </span>
                                 </div>
-
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -319,7 +322,9 @@ export default function CreateUserPage() {
                         <Checkbox
                           checked={field.value}
                           onChange={(e) =>
-                            field.onChange((e.target as HTMLInputElement).checked)
+                            field.onChange(
+                              (e.target as HTMLInputElement).checked
+                            )
                           }
                           label="Active"
                         />

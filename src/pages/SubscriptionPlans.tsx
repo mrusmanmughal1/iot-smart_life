@@ -16,7 +16,7 @@ import {
   subscriptionsApi,
   SubscriptionPlan,
   BillingPeriod,
-} from '@/services/api/subscriptions.api';
+} from '@/features/Subscription/services/subscriptions.api';
 import { toast } from 'react-hot-toast';
 import { useQuery } from '@tanstack/react-query';
 import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
@@ -415,10 +415,6 @@ export default function SubscriptionPlans() {
       setIsSubscribing(null);
     }
   };
-
-  if (isLoading) {
-    return <LoadingOverlay />;
-  }
 
   if (isError) {
     return (

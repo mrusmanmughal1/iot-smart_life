@@ -13,7 +13,8 @@ export const useSecuritySettings = () => {
   const [showEnableModal, setShowEnableModal] = useState(false);
   const [enableMethod, setEnableMethod] = useState<TwoFactorMethod>('none');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [selectedMethodLocal, setSelectedMethodLocal] = useState<TwoFactorMethod>('none');
+  const [selectedMethodLocal, setSelectedMethodLocal] =
+    useState<TwoFactorMethod>('none');
 
   const { data, isLoading } = useQuery({
     queryKey: ['securitySettings'],
@@ -41,7 +42,7 @@ export const useSecuritySettings = () => {
       setShowQRCode(true);
     },
     onError: () => {
-      toast.error('Failed to generate QR code' , {id: 'generate-qr-error'});
+      toast.error('Failed to generate QR code', { id: 'generate-qr-error' });
     },
   });
 
@@ -60,7 +61,9 @@ export const useSecuritySettings = () => {
         error && typeof error === 'object' && 'response' in error
           ? (error.response as { data?: { message?: string } })?.data?.message
           : 'Failed to enable authenticator 2FA';
-      toast.error(errorMessage || 'Invalid verification code. Please try again.');
+      toast.error(
+        errorMessage || 'Invalid verification code. Please try again.'
+      );
     },
   });
 
@@ -102,7 +105,9 @@ export const useSecuritySettings = () => {
         error && typeof error === 'object' && 'response' in error
           ? (error.response as { data?: { message?: string } })?.data?.message
           : 'Failed to enable SMS 2FA';
-      toast.error(errorMessage || 'Invalid verification code. Please try again.');
+      toast.error(
+        errorMessage || 'Invalid verification code. Please try again.'
+      );
     },
   });
 
@@ -132,7 +137,9 @@ export const useSecuritySettings = () => {
         error && typeof error === 'object' && 'response' in error
           ? (error.response as { data?: { message?: string } })?.data?.message
           : 'Failed to enable email 2FA';
-      toast.error(errorMessage || 'Invalid verification code. Please try again.');
+      toast.error(
+        errorMessage || 'Invalid verification code. Please try again.'
+      );
     },
   });
 
@@ -151,7 +158,9 @@ export const useSecuritySettings = () => {
         error && typeof error === 'object' && 'response' in error
           ? (error.response as { data?: { message?: string } })?.data?.message
           : 'Failed to disable two-factor authentication';
-      toast.error(errorMessage || 'Invalid verification code. Please try again.');
+      toast.error(
+        errorMessage || 'Invalid verification code. Please try again.'
+      );
     },
   });
 
@@ -194,8 +203,6 @@ export const useSecuritySettings = () => {
   const handleDisable2FA = () => {
     setShowDisableModal(true);
     sendEmailCodeMutation.mutate();
-
-    
   };
 
   const handleVerifyDisable = async (code: string) => {
@@ -208,10 +215,10 @@ export const useSecuritySettings = () => {
     setShowQRCode(false);
   };
 
-  
-
   // Use local selected method if 2FA is not enabled, otherwise use the method from settings
-  const selectedMethod = data?.isEnabled ? (data?.method as TwoFactorMethod) : selectedMethodLocal;
+  const selectedMethod = data?.isEnabled
+    ? (data?.method as TwoFactorMethod)
+    : selectedMethodLocal;
 
   return {
     settings: data,
@@ -246,4 +253,3 @@ export const useSecuritySettings = () => {
     isDisabling2FA: disable2FAMutation.isPending,
   };
 };
-

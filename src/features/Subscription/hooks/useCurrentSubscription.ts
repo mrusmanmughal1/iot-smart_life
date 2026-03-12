@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { subscriptionsApi } from '@/services/api/subscriptions.api';
+import { subscriptionsApi } from '@/features/Subscription/services/subscriptions.api';
 import { useAppStore } from '@/stores/useAppStore';
 import { SubscriptionFeatures } from '@/types/authentication';
 
