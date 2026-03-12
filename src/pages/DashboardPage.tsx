@@ -323,7 +323,7 @@ export const DashboardPage = () => {
                   <CardTitle className="text-lg font-semibold pt-4 text-gray-600">
                     {t('dashboard.activeDashboards', 'Active Dashboards')}
                   </CardTitle>
-                  <Layout className="h-8 w-8 text-secondary mt-4" />
+                  <Layout className="h-8 w-8 text-secondary mt-4 o" />
                 </div>
 
                 <CardDescription>
