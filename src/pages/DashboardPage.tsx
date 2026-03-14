@@ -174,7 +174,6 @@ export const DashboardPage = () => {
                 </div>
               </CardContent>
             </Card>
-
             {/* API Usage Card */}
             <Card>
               <CardHeader className="pb-2">
@@ -238,7 +237,6 @@ export const DashboardPage = () => {
                 />
               </CardContent>
             </Card>
-
             {/* Storage & Assets Card */}
             <Card>
               <CardHeader className="pb-2">
@@ -298,7 +296,7 @@ export const DashboardPage = () => {
                   })}
                 </CardDescription>
                 <Link
-                  to="/users"
+                  to="/users-management"
                   className=" p-3 text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white"
                 >
                   {t('dashboard.manageUsers')}

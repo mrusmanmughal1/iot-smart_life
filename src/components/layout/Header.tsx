@@ -273,7 +273,6 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             </div>
           )}
         </div>
-
         {/* Notifications */}
         <div className="relative" ref={notifRef}>
           <button
@@ -395,7 +394,6 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             </div>
           )}
         </div>
-
         {/* Profile Menu */}
         <div className="relative" ref={profileRef}>
           <div
@@ -419,12 +417,12 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 direction === 'rtl' && 'text-right'
               )}
             >
-              <span className="text-sm font-medium dark:text-white block">
+              <span className="text-sm capitalize font-medium dark:text-white block">
                 {user ? `${truncatedUsername} ` : 'Admin User'}
               </span>
               {user?.role && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {user.role}
+                <span className="text-xs bg-indigo-100 capitalize  text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 rounded px-2 py-1">
+                  {user.role.replace(/_/g, ' ')}
                 </span>
               )}
             </div>
@@ -441,14 +439,14 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             >
               {user && (
                 <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                  <p className="text-sm font-medium dark:text-white">
+                  <p className="text-sm font-medium capitalize dark:text-white">
                     {truncatedUsername}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {user.email}
                   </p>
-                  <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded">
-                    {user.role}
+                  <span className="inline-block capitalize mt-1 px-2 py-0.5 text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded">
+                    {user.role.replace(/_/g, ' ')}
                   </span>
                 </div>
               )}
