@@ -19,9 +19,6 @@ import {
   Layout,
   Globe,
   Database,
-  Map,
-  Zap,
-  Users,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
@@ -30,21 +27,12 @@ import { useUsage } from '@/features/Subscription/hooks';
 import { UsageDonutChart } from '@/components/common/UsageDonutChart';
 import { SolutionSelectionBar } from '@/components/common/SolutionSelectionBar';
 
-// Chart Data
-const activeSolutionsData = [
-  { name: 'Jan', value: 2 },
-  { name: 'Feb', value: 3 },
-  { name: 'Mar', value: 2 },
-  { name: 'Apr', value: 4 },
-  { name: 'May', value: 3 },
-];
-
 const COLORS = ['#C36BA9', '#E5E7EB', '#1FB3E1'];
 
 export const DashboardPage = () => {
   const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState('smartCity');
-  const { data: SubscriptionUsage, isLoading: isUsageLoading } = useUsage();
+  const { data: SubscriptionUsage } = useUsage();
 
   // Solution Categories with localization
   const solutions = [
@@ -73,10 +61,20 @@ export const DashboardPage = () => {
   const devicePercentage = Math.round(
     SubscriptionUsage?.percentage?.devices || 0
   );
+  const userUsageData = [
+    {
+      name: t('dashboard.userUsage.used'),
+      value: SubscriptionUsage?.current?.users || 0,
+    },
+    {
+      name: t('dashboard.userUsage.remaining'),
+      value:
+        (SubscriptionUsage?.limits?.users || 0) -
+        (SubscriptionUsage?.current?.users || 0),
+    },
+  ];
 
-  // User avatars data
-  const userAvatars = ['S', 'A', 'P'];
-
+  const userPercentage = Math.round(SubscriptionUsage?.percentage?.users || 0);
   // Dashboard preview data
   const dashboardPreviews = [
     {
@@ -127,7 +125,7 @@ export const DashboardPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pb-6">
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-2">
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-600">
@@ -187,7 +185,7 @@ export const DashboardPage = () => {
                   <Globe className="h-8 w-8 text-green-500" />
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 py-2">
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900">
                     {SubscriptionUsage?.current?.apiCalls || 0}
@@ -197,7 +195,7 @@ export const DashboardPage = () => {
                     {SubscriptionUsage?.limits?.apiCallsPerMonth || 0}
                   </Badge>
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1 pb-6">
                   <div className="flex justify-between text-xs text-gray-500">
                     <span>{t('dashboard.usage', 'Usage')}</span>
                     <span>{SubscriptionUsage?.percentage?.apiCalls || 0}%</span>
@@ -215,7 +213,7 @@ export const DashboardPage = () => {
           <div className="space-y-6">
             {/* Connected Devices Card */}
             <Card className="flex items-center  justify-between pt-2 pb-10">
-              <CardHeader>
+              <CardHeader className="">
                 <CardTitle className="text-lg font-semibold text-gray-600 dark:text-white">
                   {t('dashboard.connectedDevices')}
                 </CardTitle>
@@ -224,9 +222,12 @@ export const DashboardPage = () => {
                     count: SubscriptionUsage?.current?.devices || 0,
                   })}
                 </CardDescription>
-                <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
+                <Link
+                  to="/devices"
+                  className="  p-3     text-xs  rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white"
+                >
                   {t('dashboard.addNewDevice')}
-                </Button>
+                </Link>
               </CardHeader>
 
               <CardContent>
@@ -286,7 +287,7 @@ export const DashboardPage = () => {
           {/* Column 3 - Right */}
           <div className="space-y-6">
             {/* Total Users Card */}
-            <Card className="flex items-center  justify-between pt-2 pb-12">
+            <Card className="flex items-center  justify-between pt-2 pb-10">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-gray-600">
                   {t('dashboard.totalUsers')}
@@ -296,38 +297,33 @@ export const DashboardPage = () => {
                     count: SubscriptionUsage?.current?.users || 0,
                   })}
                 </CardDescription>
-                <Button className=" text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white">
+                <Link
+                  to="/users"
+                  className=" p-3 text-xs rounded-md bg-secondary-main hover:bg-secondary-main/90 text-white"
+                >
                   {t('dashboard.manageUsers')}
-                </Button>
+                </Link>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex -space-x-2">
-                    {userAvatars.map((letter, index) => (
-                      <div
-                        key={index}
-                        className="w-10 h-10 rounded-full text-white flex items-center justify-center text-sm font-semibold border-2 border-white"
-                        style={{ backgroundColor: COLORS[index] }}
-                      >
-                        {letter}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <UsageDonutChart
+                  data={userUsageData}
+                  percentage={userPercentage}
+                  colors={COLORS}
+                />
               </CardContent>
             </Card>
             {/* Active Dashboards Card */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold pt-4 text-gray-600">
+                  <CardTitle className="text-lg font-semibold  text-gray-600">
                     {t('dashboard.activeDashboards', 'Active Dashboards')}
                   </CardTitle>
                   <Layout className="h-8 w-8 text-secondary mt-4 o" />
                 </div>
 
                 <CardDescription>
-                  <div className="text-2xl font-bold text-gray-900 mt-2">
+                  <div className="text-2xl font-bold text-gray-900  ">
                     {SubscriptionUsage?.current?.dashboards || 0}/
                     {SubscriptionUsage?.limits?.dashboards || 0}
                   </div>
@@ -338,7 +334,7 @@ export const DashboardPage = () => {
                   />
                   <Link
                     to="/dashboards"
-                    className="text-secondary  block text-end   pt-6 dark:text-white text-xs mt-1 hover:underline"
+                    className="text-secondary  block text-end   pt-2 dark:text-white text-xs mt-1 hover:underline"
                   >
                     {t('dashboard.viewAll')}
                   </Link>

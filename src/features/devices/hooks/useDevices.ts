@@ -1,7 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { devicesApi } from '@/services/api/index.ts';
 import { deviceService } from '../services/deviceService.ts';
-import type { DeviceQuery, DeviceType, Device } from '@/services/api/devices.api.ts';
+import type {
+  DeviceQuery,
+  DeviceType,
+  Device,
+} from '@/services/api/devices.api.ts';
 import type { DeviceFormData } from '../types/index.ts';
 
 export const useDevices = (params?: DeviceQuery) => {
@@ -50,6 +54,7 @@ export const useCreateDevice = () => {
     mutationFn: (data: DeviceFormData) => deviceService.provisionDevice(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
+      queryClient.invalidateQueries({ queryKey: ['subscription-usage'] });
     },
   });
 };
@@ -58,7 +63,13 @@ export const useUpdateDevice = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<DeviceFormData> }) => {
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<DeviceFormData>;
+    }) => {
       // Convert DeviceFormData to Device format
       const deviceData: Partial<Device> = {
         ...data,
@@ -86,7 +97,6 @@ export const useDeleteDevice = () => {
 
 export const useActivateDevice = () => {
   // const queryClient = useQueryClient();
-
   // return useMutation({
   //   mutationFn: (deviceId: string) => deviceService.activateDevice(deviceId),
   //   onSuccess: (_, deviceId) => {
@@ -98,7 +108,6 @@ export const useActivateDevice = () => {
 
 export const useDeactivateDevice = () => {
   // const queryClient = useQueryClient();
-
   // return useMutation({
   //   mutationFn: ({ deviceId, reason }: { deviceId: string; reason?: string }) =>
   //     deviceService.deactivateDevice(deviceId, reason),
@@ -113,8 +122,13 @@ export const useCloneDevice = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ deviceId, newName }: { deviceId: string; newName: string }) =>
-      deviceService.cloneDevice(deviceId, newName),
+    mutationFn: ({
+      deviceId,
+      newName,
+    }: {
+      deviceId: string;
+      newName: string;
+    }) => deviceService.cloneDevice(deviceId, newName),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
     },
@@ -125,7 +139,8 @@ export const useBulkProvision = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (devices: DeviceFormData[]) => deviceService.bulkProvision(devices),
+    mutationFn: (devices: DeviceFormData[]) =>
+      deviceService.bulkProvision(devices),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['devices'] });
     },

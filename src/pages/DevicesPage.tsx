@@ -41,7 +41,6 @@ import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
 import type { DeviceFormData } from '@/features/devices/types';
-import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { Pagination } from '@/components/common/Pagination/Pagination';
 
 export default function DevicesPage() {
@@ -58,7 +57,7 @@ export default function DevicesPage() {
     label?: string;
   } | null>(null);
 
-  const { data: devicesData, isLoading: DeviceLoading } = useDevices({
+  const { data: devicesData } = useDevices({
     page: currentPage,
     limit: itemsPerPage,
   });
