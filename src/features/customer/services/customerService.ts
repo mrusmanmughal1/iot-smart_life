@@ -1,8 +1,5 @@
 import { customersApi } from '@/services/api/customers.api.ts';
-import type {
-  Customer,
-  CreateCustomerData,
-} from '@/features/customer/types';
+import type { Customer, CreateCustomerData } from '@/features/customer/types';
 
 /**
  * Customer Feature Service
@@ -44,10 +41,7 @@ export const customerService = {
   /**
    * Update customer with validation
    */
-  async updateCustomer(
-    customerId: string,
-    data: Partial<CreateCustomerData>
-  ) {
+  async updateCustomer(customerId: string, data: Partial<CreateCustomerData>) {
     // If email is being updated, validate it
     if (data.email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -92,4 +86,3 @@ export const customerService = {
     }
   },
 };
-

@@ -63,7 +63,8 @@ export default function CreateUserPage() {
       name: data.name,
       phone: data.phone,
       // role: data.role as UserRole,
-      customerId: data.customerId || undefined,
+      // customerId: data.customerId || undefined
+      customerId: '',
     };
 
     createUserMutation.mutate(

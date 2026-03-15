@@ -2,8 +2,8 @@ import { apiClient } from './apiClient';
 
 export interface IntegrationQuery {
   search?: string;
-  type?: IntegrationType;
-  status?: IntegrationStatus;
+  type?: any;
+  status?: any;
   enabled?: boolean;
   page?: number;
   limit?: number;

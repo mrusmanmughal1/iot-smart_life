@@ -82,6 +82,7 @@ export interface CreateCustomerData {
   phone: string;
   description?: string;
   city?: string;
+  address?: string;
   state?: string;
   zip?: string;
   country: string;
