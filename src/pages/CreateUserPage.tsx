@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -13,35 +12,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useCreateUser, useRoles } from '@/features/users/hooks';
+import { useRoles } from '@/features/users/hooks';
 import { useCustomers } from '@/features/customer/hooks';
 import type { Role } from '@/services/api/users.api';
 import type { Customer } from '@/features/customer/types';
-import { UserRole, UserStatus } from '@/services/api/users.api';
+import { UserRole } from '@/services/api/users.api';
 import { toast } from 'react-hot-toast';
-import { useState } from 'react';
+import { useCreateCustomerUser } from '@/features/customerUser/hooks';
+import { useCustomersByTenantId } from '@/features/customer/hooks/useCustomers';
 
 const createUserSchema = z.object({
   name: z.string().min(1, 'Contact email is required'),
   email: z.string().email('Email must be valid').min(1, 'Email is required'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
   role: z.string().min(1, 'Role is required'),
   phone: z.string().optional(),
-  phoneNumber: z.string().min(1, 'Phone number is required'),
   customerId: z.string().optional(),
-  status: z.boolean(),
-  additionalInfo: z.string().optional(),
 });
 
 type CreateUserFormData = z.infer<typeof createUserSchema>;
 
 export default function CreateUserPage() {
   const navigate = useNavigate();
-  const createUserMutation = useCreateUser();
+  const createUserMutation = useCreateCustomerUser();
   const { data: rolesData } = useRoles();
-  const { data: customersData } = useCustomers();
-  const [showPassword, setShowPassword] = useState(false);
+  const { data: customersData } = useCustomersByTenantId();
 
   const roles: Role[] = rolesData?.data || [];
 
@@ -56,13 +50,9 @@ export default function CreateUserPage() {
     defaultValues: {
       name: '',
       email: '',
-      password: '',
       role: '',
       phone: '',
-      phoneNumber: '',
       customerId: '',
-      status: true,
-      additionalInfo: '',
     },
     mode: 'onChange',
   });
@@ -71,18 +61,13 @@ export default function CreateUserPage() {
     const userData = {
       email: data.email,
       name: data.name,
-      phone: data.phoneNumber || data.phone,
-      password: data.password,
-      role: data.role as UserRole,
-      status: data.status ? UserStatus.ACTIVE : UserStatus.INACTIVE,
+      phone: data.phone,
+      // role: data.role as UserRole,
       customerId: data.customerId || undefined,
-      additionalInfo: data.additionalInfo
-        ? { notes: data.additionalInfo }
-        : undefined,
     };
 
     createUserMutation.mutate(
-      { userData, roleId: data.role },
+      { userData },
       {
         onSuccess: () => {
           toast.success('User created successfully');
@@ -149,14 +134,14 @@ export default function CreateUserPage() {
                       Phone Number <span className="text-red-500">*</span>
                     </label>
                     <Input
-                      id="phoneNumber"
-                      {...register('phoneNumber')}
+                      id="phone"
+                      {...register('phone')}
                       placeholder="Enter phone number"
                       className="w-full border border-gray-300 rounded-md"
                     />
-                    {errors.phoneNumber && (
+                    {errors.phone && (
                       <p className="mt-1 text-sm text-red-600">
-                        {errors.phoneNumber.message}
+                        {errors.phone.message}
                       </p>
                     )}
                   </div>
@@ -178,36 +163,6 @@ export default function CreateUserPage() {
                     {errors.email && (
                       <p className="mt-1 text-sm text-red-600">
                         {errors.email.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="password"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Password <span className="text-red-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? 'text' : 'password'}
-                        {...register('password')}
-                        placeholder="Enter password"
-                        className="w-full border border-gray-300 rounded-md"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 hover:text-gray-700"
-                      >
-                        {showPassword ? 'Hide' : 'Show'}
-                      </button>
-                    </div>
-                    {errors.password && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.password.message}
                       </p>
                     )}
                   </div>
@@ -298,39 +253,6 @@ export default function CreateUserPage() {
                       )}
                     />
                   </div>
-
-                  <div>
-                    <label
-                      htmlFor="phone"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Phone
-                    </label>
-                    <Input
-                      id="phone"
-                      {...register('phone')}
-                      placeholder="Enter phone number"
-                      className="w-full border border-gray-300 rounded-md"
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <Controller
-                      name="status"
-                      control={control}
-                      render={({ field }) => (
-                        <Checkbox
-                          checked={field.value}
-                          onChange={(e) =>
-                            field.onChange(
-                              (e.target as HTMLInputElement).checked
-                            )
-                          }
-                          label="Active"
-                        />
-                      )}
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -339,12 +261,12 @@ export default function CreateUserPage() {
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   Additional Information
                 </h2>
-                <Textarea
+                {/* <Textarea
                   id="additionalInfo"
                   {...register('additionalInfo')}
                   placeholder="Enter additional information..."
                   className="min-h-[100px] w-full border border-gray-300 rounded-md"
-                />
+                /> */}
               </div>
 
               {/* Action buttons */}

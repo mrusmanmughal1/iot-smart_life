@@ -25,7 +25,7 @@ const createCustomerSchema = z.object({
     .email('Contact email must be valid')
     .min(1, 'Contact email is required'),
   phone: z.string().min(1, 'Phone number is required').trim(),
-  address: z.string().optional(),
+  description: z.string().optional(),
   city: z.string().optional(),
   state: z.string().optional(),
   zip: z.string().optional(),
@@ -34,6 +34,14 @@ const createCustomerSchema = z.object({
   maxUsers: z.string(),
   plan: z.string(),
   features: z.array(z.string()),
+  allocatedLimits: z.object({
+    devices: z.string(),
+    dashboards: z.string(),
+    assets: z.string(),
+    floorPlans: z.string(),
+    automations: z.string(),
+    users: z.string(),
+  }),
 });
 type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
 const availableFeatures = [
@@ -61,21 +69,29 @@ export default function CreateCustomerPage() {
       name: '',
       email: '',
       phone: '',
-      address: '',
+      description: '',
       city: '',
       state: '',
       zip: '',
       country: '',
       status: 'Active',
-      maxUsers: '50',
-      plan: 'Standard',
-      features: [
-        'device-management',
-        'advanced-reports',
-        'api-access',
-        'data-analytics',
-        'white-labeling',
-      ],
+      // maxUsers: '0',
+      // plan: 'Standard',
+      // features: [
+      //   'device-management',
+      //   'advanced-reports',
+      //   'api-access',
+      //   'data-analytics',
+      //   'white-labeling',
+      // ],
+      allocatedLimits: {
+        devices: '',
+        dashboards: '',
+        assets: '',
+        floorPlans: '',
+        automations: '',
+        users: '',
+      },
     },
     mode: 'onChange',
   });
@@ -89,15 +105,23 @@ export default function CreateCustomerPage() {
       name: data.name,
       email: data.email,
       phone: data.phone,
-      address: data.address || undefined,
+      description: data.description || undefined,
       city: data.city || undefined,
       state: data.state || undefined,
       zip: data.zip || undefined,
       country: data.country,
-      status: data.status as CustomerStatus,
-      maxUsers: parseInt(data.maxUsers, 10),
-      plan: data.plan as CustomerPlan,
-      features: data.features,
+      // status: data.status as CustomerStatus,
+      // maxUsers: parseInt(data.maxUsers, 10),
+      // plan: data.plan as CustomerPlan,
+      // features: data.features,
+      allocatedLimits: {
+        devices: parseInt(data.allocatedLimits.devices) || 0,
+        dashboards: parseInt(data.allocatedLimits.dashboards) || 0,
+        assets: parseInt(data.allocatedLimits.assets) || 0,
+        floorPlans: parseInt(data.allocatedLimits.floorPlans) || 0,
+        automations: parseInt(data.allocatedLimits.automations) || 0,
+        users: parseInt(data.allocatedLimits.users) || 0,
+      },
     };
     createCustomerMutation.mutate(customerData);
   };
@@ -138,7 +162,6 @@ export default function CreateCustomerPage() {
                     Customer Information
                   </h2>
                   <div className="space-y-4">
-
                     {/* Customer Name */}
                     <div>
                       <label
@@ -206,15 +229,15 @@ export default function CreateCustomerPage() {
                     {/* Address */}
                     <div>
                       <label
-                        htmlFor="address"
+                        htmlFor="description"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
-                        Address
+                        Description
                       </label>
                       <Input
-                        id="address"
-                        {...register('address')}
-                        placeholder="Enter street address"
+                        id="description"
+                        {...register('description')}
+                        placeholder="Enter description"
                         className="w-full border border-gray-300 rounded-md"
                       />
                     </div>
@@ -280,13 +303,80 @@ export default function CreateCustomerPage() {
                           placeholder="Enter country"
                           className="w-full border border-gray-300 rounded-md"
                         />
-
                       </div>
                     </div>
 
                     {/* Customer Settings Card */}
                     <div className="pt-6 border-t border-gray-200">
-                      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                      {/* Allocated Limits */}
+                      <div className="    border-gray-200">
+                        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                          Allocated Limits
+                        </h2>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Devices
+                            </label>
+                            <Input
+                              type="number"
+                              {...register('allocatedLimits.devices')}
+                              className="w-full border border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Dashboards
+                            </label>
+                            <Input
+                              type="number"
+                              {...register('allocatedLimits.dashboards')}
+                              className="w-full border border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Assets
+                            </label>
+                            <Input
+                              type="number"
+                              {...register('allocatedLimits.assets')}
+                              className="w-full border border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Floor Plans
+                            </label>
+                            <Input
+                              type="number"
+                              {...register('allocatedLimits.floorPlans')}
+                              className="w-full border border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Automations
+                            </label>
+                            <Input
+                              type="number"
+                              {...register('allocatedLimits.automations')}
+                              className="w-full border border-gray-300 rounded-md"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Users
+                            </label>
+                            <Input
+                              type="number"
+                              {...register('allocatedLimits.users')}
+                              className="w-full border border-gray-300 rounded-md"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <h2 className="text-lg  mt-6 font-semibold text-gray-900 mb-4">
                         Customer Settings
                       </h2>
                       <div className="flex flex-col md:flex-row justify-between gap-2">
@@ -394,10 +484,11 @@ export default function CreateCustomerPage() {
                                       className="flex items-center gap-2"
                                     >
                                       <div
-                                        className={`w-3 h-3 rounded-sm ${isChecked
-                                          ? 'bg-green-500'
-                                          : 'bg-gray-900'
-                                          }`}
+                                        className={`w-3 h-3 rounded-sm ${
+                                          isChecked
+                                            ? 'bg-green-500'
+                                            : 'bg-gray-900'
+                                        }`}
                                       />
                                       <Checkbox
                                         checked={isChecked}
@@ -438,13 +529,6 @@ export default function CreateCustomerPage() {
                     Actions
                   </h2>
                   <div className="space-y-3">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="w-full justify-start bg-gray-100 hover:bg-gray-200 text-gray-700"
-                    >
-                      Actions
-                    </Button>
                     <Button
                       type="submit"
                       variant="ghost"

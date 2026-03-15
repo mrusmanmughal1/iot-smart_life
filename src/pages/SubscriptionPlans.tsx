@@ -11,105 +11,21 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Zap, Rocket, Users, Gift } from 'lucide-react';
-import AppLayout from '@/components/layout/AppLayout';
 import {
   subscriptionsApi,
   SubscriptionPlan,
   BillingPeriod,
 } from '@/features/Subscription/services/subscriptions.api';
 import { toast } from 'react-hot-toast';
-import { useQuery } from '@tanstack/react-query';
 import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
-import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { format } from 'date-fns';
 import apiClient from '@/lib/axios';
-
-interface ApiPlan {
-  plan: string;
-  name: string;
-  monthlyPrice: number;
-  yearlyPrice: number;
-  popular: boolean;
-  trialPeriodDays: number;
-  limits: {
-    devices: number;
-    users: number;
-    customers: number;
-    apiCallsPerMonth: number;
-    dataRetentionDays: number;
-    storageGB: number;
-    dashboardTemplates: number;
-    customDashboards: number;
-    customIntegrations: number;
-    webhooks: number;
-    apiRateLimitPerMin: number;
-    concurrentConnections: number;
-    smsNotificationsPerMonth: number;
-    historicalDataQueryDays: number;
-    trainingSessions: number;
-  };
-  features: {
-    realtimeAnalytics: boolean;
-    advancedAutomation: boolean;
-    ruleEngine: string;
-    restApiAccess: boolean;
-    mqttAccess: boolean;
-    customIntegrations: boolean;
-    whiteLabelBranding: boolean;
-    brandingLevel: string;
-    emailNotifications: boolean;
-    smsNotifications: boolean;
-    mobileAppAccess: boolean;
-    widgetLibrary: string;
-    alarmManagement: string;
-    advancedAlarms: boolean;
-    dataExport: string;
-    scheduledReports: string;
-    supportLevel: string;
-    slaGuarantee: boolean;
-    slaPercentage: number;
-    onboardingSupport: string;
-    floorMapping: number;
-    customDevelopment: boolean;
-    multiTenancy: boolean;
-    customerManagement: boolean;
-    roleBasedAccess: boolean;
-    auditLogs: boolean;
-    backupRecovery: boolean;
-    otaUpdates: string;
-    deviceGroups: boolean;
-    assetManagement: string;
-    geofencing: boolean;
-    customAttributes: boolean;
-    rpcCommands: boolean;
-    dataAggregation: boolean;
-  };
-}
-
-interface CurrentSubscription {
-  id: string;
-  plan: string;
-  status: string;
-  billingPeriod: string;
-  price: string;
-  nextBillingDate: string;
-  createdAt: string;
-  limits: {
-    devices: number;
-    users: number;
-    apiCalls: number;
-    dataRetention: number;
-    storage: number;
-  };
-  features: {
-    analytics: boolean;
-    automation: boolean;
-    integrations: boolean;
-    support: string;
-    whiteLabel: boolean;
-  };
-}
+import { useCurrentSubscription } from '@/features/Subscription/hooks';
+import {
+  ApiPlan,
+  getSubscriptionPlans,
+} from '@/features/Subscription/hooks/useSubscriptionPlans';
 
 interface Plan {
   id: string;
@@ -296,59 +212,8 @@ export default function SubscriptionPlans() {
 
   const [isSubscribing, setIsSubscribing] = useState<string | null>(null);
 
-  const {
-    data: plansResponse,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ['subscription-plans'],
-    queryFn: async () => {
-      const response = await subscriptionsApi.getPlans();
-      // Handle API response structure: { data: { json: [...] } }
-      const apiResponse = response.data as unknown as
-        | { data?: { json?: ApiPlan[] } }
-        | { json?: ApiPlan[] }
-        | undefined;
-      // Try different response structures
-      if (
-        apiResponse &&
-        'json' in apiResponse &&
-        Array.isArray(apiResponse.json)
-      ) {
-        return apiResponse.json;
-      }
-      if (
-        apiResponse &&
-        'data' in apiResponse &&
-        apiResponse.data &&
-        'json' in apiResponse.data &&
-        Array.isArray(apiResponse.data.json)
-      ) {
-        return apiResponse.data.json;
-      }
-      if (
-        apiResponse &&
-        'data' in apiResponse &&
-        Array.isArray(apiResponse.data)
-      ) {
-        return apiResponse.data;
-      }
-      return [];
-    },
-  });
-
-  const { data: currentSubscriptionResponse } = useQuery({
-    queryKey: ['current-subscription'],
-    queryFn: async () => {
-      const response = await subscriptionsApi.getCurrent();
-      // Handle nested API response structure: { data: { data: {...} } }
-      const apiResponse = response.data as unknown as
-        | { data?: CurrentSubscription }
-        | undefined;
-      return apiResponse?.data;
-    },
-  });
+  const { data: currentSubscriptionResponse } = useCurrentSubscription();
+  const { data: plansResponse, isError } = getSubscriptionPlans();
 
   // call payment method here to pay get the url and open in new tab and return the url
   const handlePayment = async (
@@ -419,7 +284,9 @@ export default function SubscriptionPlans() {
   if (isError) {
     return (
       <ErrorMessage
-        message={getErrorMessage(error) || 'Failed to load subscription plans'}
+        message={
+          getErrorMessage(isError) || 'Failed to load subscription plans'
+        }
       />
     );
   }

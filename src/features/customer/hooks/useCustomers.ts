@@ -21,7 +21,6 @@ export const useCustomers = (params?: CustomerQuery) => {
   });
 };
 
- 
 // get customer by id
 export const useCustomerById = (customerId: string | undefined) => {
   return useQuery({
@@ -73,4 +72,23 @@ export const useDeleteCustomer = () => {
     },
   });
 };
-
+// get customers by the tenant id
+export const useCustomersByTenantId = () => {
+  return useQuery({
+    queryKey: ['customers'],
+    queryFn: async () => {
+      const res = await customersApi.getByTenant();
+      return res.data.data;
+    },
+  });
+};
+//get customer tenant
+export const useCustomerTenant = () => {
+  return useQuery({
+    queryKey: ['customer-tenant'],
+    queryFn: async () => {
+      const res = await customersApi.getByTenant();
+      return res.data.data;
+    },
+  });
+};

@@ -8,26 +8,14 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  Building2,
-  Sprout,
-  Building,
-  Car,
-  Home,
-  Factory,
-  Layout,
-  Globe,
-  Database,
-} from 'lucide-react';
+import { Building2, Sprout, Building, Car, Home, Factory } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useUsage } from '@/features/Subscription/hooks';
 import { UsageDonutChart } from '@/components/common/UsageDonutChart';
 import { SolutionSelectionBar } from '@/components/common/SolutionSelectionBar';
-
-const COLORS = ['#C36BA9', '#E5E7EB', '#1FB3E1'];
+import { COLORSCHART } from '@/utils/constants/colors';
 
 export const DashboardPage = () => {
   const { t } = useTranslation();
@@ -57,7 +45,6 @@ export const DashboardPage = () => {
         (SubscriptionUsage?.current?.devices || 0),
     },
   ];
-
   const devicePercentage = Math.round(
     SubscriptionUsage?.percentage?.devices || 0
   );
@@ -100,10 +87,9 @@ export const DashboardPage = () => {
   return (
     <div className="space-y-4">
       {/* Header */}
-
       <PageHeader
-        title="Overview"
-        description="Real-time Monitoring of Your IoT Platform"
+        title={t('dashboard.title')}
+        description={t('dashboard.description')}
       />
 
       <div className="border dark:border-gray-700 p-4 rounded-3xl  border-secondary shadow-xl">
@@ -181,7 +167,6 @@ export const DashboardPage = () => {
                   <CardTitle className="text-lg font-semibold text-gray-600">
                     {t('dashboard.apiUsage', 'API Usage')}
                   </CardTitle>
-                  <Globe className="h-8 w-8 text-green-500" />
                 </div>
               </CardHeader>
               <CardContent className="space-y-4 py-2">
@@ -233,7 +218,7 @@ export const DashboardPage = () => {
                 <UsageDonutChart
                   data={deviceUsageData}
                   percentage={devicePercentage}
-                  colors={COLORS}
+                  colors={COLORSCHART}
                 />
               </CardContent>
             </Card>
@@ -244,7 +229,6 @@ export const DashboardPage = () => {
                   <CardTitle className="text-lg font-semibold text-gray-600">
                     {t('dashboard.storageAndAssets', 'Storage & Assets')}
                   </CardTitle>
-                  <Database className="h-8 w-8 text-secondary-main" />
                 </div>
               </CardHeader>
               <CardContent className="space-y-4 py-4">
@@ -306,7 +290,7 @@ export const DashboardPage = () => {
                 <UsageDonutChart
                   data={userUsageData}
                   percentage={userPercentage}
-                  colors={COLORS}
+                  colors={COLORSCHART}
                 />
               </CardContent>
             </Card>
@@ -317,15 +301,20 @@ export const DashboardPage = () => {
                   <CardTitle className="text-lg font-semibold  text-gray-600">
                     {t('dashboard.activeDashboards', 'Active Dashboards')}
                   </CardTitle>
-                  <Layout className="h-8 w-8 text-secondary mt-4 o" />
                 </div>
 
                 <CardDescription>
-                  <div className="text-2xl font-bold text-gray-900  ">
+                  <div className="text-2xl pb-3 font-bold text-gray-900  ">
                     {SubscriptionUsage?.current?.dashboards || 0}/
                     {SubscriptionUsage?.limits?.dashboards || 0}
                   </div>
-                  <br />
+
+                  <div className="flex justify-between text-xs pb-2 text-gray-500">
+                    <span>{t('dashboard.usage', 'Usage')}</span>
+                    <span>
+                      {SubscriptionUsage?.percentage?.dashboards || 0}%
+                    </span>
+                  </div>
                   <Progress
                     value={SubscriptionUsage?.percentage?.dashboards || 0}
                     className="h-2"

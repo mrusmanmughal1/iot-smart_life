@@ -9,6 +9,8 @@ export const BRAND_COLORS = {
   success: '#22C55E', // Green
 } as const;
 
+export const COLORSCHART = ['#C36BA9', '#E5E7EB', '#1FB3E1'];
+
 // Status Colors
 export const STATUS_COLORS = {
   online: '#22C55E',

@@ -133,6 +133,7 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "overview": "نظرة عامة",
+    "description": " مراقبة منصة إنترنت الأشياء الخاصة بك في الوقت الفعلي",
     "systemOverview": "نظرة عامة على النظام",
     "totalDevices": "إجمالي الأجهزة",
     "activeDevices": "الأجهزة النشطة",

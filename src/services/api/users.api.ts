@@ -98,7 +98,7 @@ export const usersApi = {
   getById: (id: string) => apiClient.get<ApiResponse<User>>(`/users/${id}`),
 
   // Create user
-  create: (data: Partial<User> & { password: string }) =>
+  create: (data: Partial<User>) =>
     apiClient.post<ApiResponse<User>>('/users', data),
   //search users
   search: (query: string, page?: number, limit?: number) =>

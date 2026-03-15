@@ -40,6 +40,13 @@ const ResetPasswordPage = Loadable(
     }))
   )
 );
+const SetPasswordPage = Loadable(
+  lazy(() =>
+    import('@/pages/SetPasswordPage.tsx').then((module) => ({
+      default: module.SetPasswordPage,
+    }))
+  )
+);
 const AccountBlockedPage = Loadable(
   lazy(() =>
     import('@/pages/AccountBlockedPage.tsx').then((module) => ({
@@ -95,6 +102,7 @@ export const PUBLIC_ROUTES = {
   VERIFY_PIN: '/verify-pin',
   SELECT_ROLE: '/select-role',
   AUTH_CALLBACK: '/auth/callback',
+  ACCEPT_INVITATION: '/auth/accept-invitation',
 } as const;
 
 export const PublicRoute = () => {
@@ -137,6 +145,10 @@ export const publicRoutes = [
   {
     path: PUBLIC_ROUTES.RESET_PASSWORD,
     element: <ResetPasswordPage />,
+  },
+  {
+    path: PUBLIC_ROUTES.ACCEPT_INVITATION,
+    element: <SetPasswordPage />,
   },
   {
     path: PUBLIC_ROUTES.ACCOUNT_BLOCKED,

@@ -60,9 +60,9 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               />
             </NavLink>
             <div className="">
-              <LanguageSwitcher 
-                settings={{ language: i18n.language }} 
-                handleLanguageChange={handleLanguageChange} 
+              <LanguageSwitcher
+                settings={{ language: i18n.language }}
+                handleLanguageChange={handleLanguageChange}
               />
             </div>
           </div>

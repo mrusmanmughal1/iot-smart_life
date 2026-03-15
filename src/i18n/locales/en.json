@@ -163,6 +163,7 @@
   "dashboard": {
     "title": "Dashboard",
     "overview": "Overview",
+    "description": "Real-time Monitoring of Your IoT Platform",
     "systemOverview": "System Overview",
     "totalDevices": "Total Devices",
     "activeDevices": "Active Devices",

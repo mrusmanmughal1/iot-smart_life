@@ -1,4 +1,4 @@
-import { UserRole } from "@/services/api/users.api";
+import { UserRole } from '@/services/api/users.api';
 
 export enum CustomerStatus {
   ACTIVE = 'Active',
@@ -21,6 +21,7 @@ export interface Customer {
   id: string;
   name: string;
   email: string;
+
   phoneNumber: string;
   address?: string;
   address2?: string;
@@ -35,6 +36,14 @@ export interface Customer {
   maxUsers: number;
   plan: CustomerPlan;
   features: string[];
+  allocatedLimits?: {
+    devices: number;
+    dashboards: number;
+    assets: number;
+    floorPlans: number;
+    automations: number;
+    users: number;
+  };
   tenantId?: string;
   tenant?: {
     id: string;
@@ -71,7 +80,7 @@ export interface CreateCustomerData {
   name: string;
   email: string;
   phone: string;
-  address?: string;
+  description?: string;
   city?: string;
   state?: string;
   zip?: string;
@@ -80,6 +89,14 @@ export interface CreateCustomerData {
   maxUsers: number;
   plan: CustomerPlan;
   features: string[];
+  allocatedLimits: {
+    devices: number;
+    dashboards: number;
+    assets: number;
+    floorPlans: number;
+    automations: number;
+    users: number;
+  };
 }
 
 export interface UpdateCustomerData extends Partial<CreateCustomerData> {
@@ -94,4 +111,3 @@ export interface CustomerQuery {
   page?: number;
   limit?: number;
 }
-

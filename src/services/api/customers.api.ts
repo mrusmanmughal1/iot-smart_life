@@ -45,8 +45,7 @@ export const customersApi = {
   delete: (id: string) => apiClient.delete(`/customers/${id}`),
 
   // Get customer statistics
-  getStatistics: () =>
-    apiClient.get<ApiResponse<any>>('/customers/statistics'),
+  getStatistics: () => apiClient.get<ApiResponse<any>>('/customers/statistics'),
 
   // Activate customer
   activate: (id: string) =>
@@ -61,10 +60,9 @@ export const customersApi = {
     apiClient.patch<ApiResponse<Customer>>(`/customers/${id}/suspend`),
 
   // Get customers by tenant
-  getByTenant: (tenantId: string, params?: CustomerQuery) =>
+  getByTenant: () =>
     apiClient.get<ApiResponse<PaginatedResponse<Customer>>>(
-      `/tenants/${tenantId}/customers`,
-      { params }
+      `/customers/tenant`
     ),
 
   // Get users by customer
@@ -88,4 +86,3 @@ export const customersApi = {
       data,
     }),
 };
-

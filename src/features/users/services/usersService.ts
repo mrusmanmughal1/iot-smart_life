@@ -9,18 +9,10 @@ export const userService = {
   /**
    * Create user with role assignment
    */
-  async createUserWithRole(
-    userData: Partial<User> & { password: string },
-    roleId: string
-  ) {
+  async createUserWithRole(userData: Partial<User>, roleId: string) {
     // Validate email format
     if (!this.validateEmail(userData.email!)) {
       throw new Error('Invalid email format');
-    }
-
-    // Validate password strength
-    if (!this.validatePassword(userData.password)) {
-      throw new Error('Password does not meet requirements');
     }
 
     // Create user

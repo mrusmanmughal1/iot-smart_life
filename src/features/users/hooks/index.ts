@@ -75,7 +75,7 @@ export const useCreateUser = () => {
       userData,
       roleId,
     }: {
-      userData: Partial<User> & { password: string };
+      userData: Partial<User>;
       roleId: string;
     }) => userService.createUserWithRole(userData, roleId),
     onSuccess: () => {
