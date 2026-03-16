@@ -100,7 +100,7 @@ export default function CreateCustomerPage() {
 
   const onSubmit = async (data: CreateCustomerFormData) => {
     // Transform form data to API format
-    const customerData: any = {
+    const customerData: CreateCustomerData = {
       // tenantId: "cb077395-1f42-486e-8a6f-72551c1e3022",
       name: data.name,
       email: data.email,

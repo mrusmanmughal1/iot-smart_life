@@ -28,16 +28,7 @@ export const utilityRoutes = [
       },
     ],
   },
-  {
-    path: '/payment-status',
-    element: <FeatureRoute feature="subscription" />,
-    children: [
-      {
-        index: true,
-        element: <PaymentSuccess />,
-      },
-    ],
-  },
+
   {
     path: '*',
     element: <PrivateNotFoundPage />,

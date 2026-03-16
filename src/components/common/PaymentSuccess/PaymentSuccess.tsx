@@ -24,14 +24,14 @@ export const PaymentSuccess: React.FC = () => {
         <p className="text-base text-gray-600 mb-6">
           {isSuccess ? (
             <>
-              Your payment has been processed successfully. Your subscription has
-              been activated and you can now enjoy all the features of your selected
-              plan.
+              Your payment has been processed successfully. Your subscription
+              has been activated and you can now enjoy all the features of your
+              selected plan.
             </>
           ) : (
             <>
-              Unfortunately, your payment could not be processed. Please try again or
-              contact support if the problem persists.
+              Unfortunately, your payment could not be processed. Please try
+              again or contact support if the problem persists.
             </>
           )}
         </p>
@@ -46,4 +46,3 @@ export const PaymentSuccess: React.FC = () => {
     </div>
   );
 };
-

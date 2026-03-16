@@ -3,6 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAppStore } from '@/stores/useAppStore';
 import { DASHBOARD_ROUTES } from '@/utils/constants/routes';
 import { Loadable } from '@/components/common/Loadable';
+import { PaymentSuccess } from '@/components/common/PaymentSuccess';
 
 // Import public page components lazily
 const LoginPage = Loadable(
@@ -103,6 +104,7 @@ export const PUBLIC_ROUTES = {
   SELECT_ROLE: '/select-role',
   AUTH_CALLBACK: '/auth/callback',
   ACCEPT_INVITATION: '/auth/accept-invitation',
+  PAYMENT_STATUS: '/payment-status',
 } as const;
 
 export const PublicRoute = () => {
@@ -173,5 +175,9 @@ export const publicRoutes = [
   {
     path: '*',
     element: <PublicNotFoundPage />,
+  },
+  {
+    path: PUBLIC_ROUTES.PAYMENT_STATUS,
+    element: <PaymentSuccess />,
   },
 ];
