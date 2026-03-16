@@ -6,6 +6,7 @@ import {
 } from '@/routes/RouteGuards/ProtectedRoute';
 import { PublicRoute, publicRoutes } from '@/routes/RouteGuards/PublicRoute';
 import { Loadable } from '@/components/common/Loadable';
+import { PaymentSuccess } from '@/components/common/PaymentSuccess';
 
 // Lazy load error page component
 const RouteErrorPage = Loadable(
@@ -29,5 +30,9 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     errorElement: <RouteErrorPage />,
     children: protectedRoutes,
+  },
+  {
+    path: '/payment-status',
+    element: <PaymentSuccess />,
   },
 ]);
