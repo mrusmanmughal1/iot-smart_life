@@ -20,6 +20,7 @@ import { UserRole } from '@/services/api/users.api';
 import { toast } from 'react-hot-toast';
 import { useCreateCustomerUser } from '@/features/customerUser/hooks';
 import { useCustomersByTenantId } from '@/features/customer/hooks/useCustomers';
+import { useAppStore } from '@/stores/useAppStore';
 
 const createUserSchema = z.object({
   name: z.string().min(1, 'Contact email is required'),
@@ -36,7 +37,9 @@ export default function CreateUserPage() {
   const createUserMutation = useCreateCustomerUser();
   const { data: rolesData } = useRoles();
   const { data: customersData } = useCustomersByTenantId();
-
+  const { user } = useAppStore();
+  const isCustomerAdmin = user?.role === 'customer';
+  console.log(isCustomerAdmin);
   const roles: Role[] = rolesData?.data || [];
 
   const customersList: Customer[] = customersData?.data || [];
@@ -213,47 +216,49 @@ export default function CreateUserPage() {
 
                 {/* Right column */}
                 <div className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="customerId"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Customers List
-                    </label>
-                    <Controller
-                      name="customerId"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value || ''}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            id="customerId"
-                            className="w-full border border-gray-300 rounded-md"
+                  {!isCustomerAdmin && (
+                    <div>
+                      <label
+                        htmlFor="customerId"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Customers List
+                      </label>
+                      <Controller
+                        name="customerId"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            value={field.value || ''}
+                            onValueChange={field.onChange}
                           >
-                            <SelectValue placeholder="Select customer" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {customersList.map((customer) => (
-                              <SelectItem
-                                key={customer.id}
-                                value={customer.id}
-                                textValue={customer.name}
-                              >
-                                <div className="flex flex-col">
-                                  {customer.name}
-                                  <span className="text-xs text-gray-500">
-                                    {customer.email}
-                                  </span>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                  </div>
+                            <SelectTrigger
+                              id="customerId"
+                              className="w-full border border-gray-300 rounded-md"
+                            >
+                              <SelectValue placeholder="Select customer" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {customersList.map((customer) => (
+                                <SelectItem
+                                  key={customer.id}
+                                  value={customer.id}
+                                  textValue={customer.name}
+                                >
+                                  <div className="flex flex-col">
+                                    {customer.name}
+                                    <span className="text-xs text-gray-500">
+                                      {customer.email}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 

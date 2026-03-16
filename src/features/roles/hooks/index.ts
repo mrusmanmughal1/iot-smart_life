@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { rolesService } from '../services/rolesService';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 export const useRoles = () => {
   return useQuery({
@@ -32,11 +34,14 @@ export const useTenantRoles = (tenantId?: string) => {
 };
 
 export const useCreateRole = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: rolesService.createRole,
     onSuccess: () => {
+      toast.success('Role created successfully');
       queryClient.invalidateQueries({ queryKey: ['roles'] });
+      navigate('/users-management');
     },
   });
 };
@@ -73,10 +78,17 @@ export const useRolePermissions = (roleId?: string) => {
 export const useAssignRolePermissions = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ roleId, permissions }: { roleId: string; permissions: string[] }) =>
-      rolesService.assignPermissions(roleId, permissions),
+    mutationFn: ({
+      roleId,
+      permissions,
+    }: {
+      roleId: string;
+      permissions: string[];
+    }) => rolesService.assignPermissions(roleId, permissions),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['roles', variables.roleId, 'permissions'] });
+      queryClient.invalidateQueries({
+        queryKey: ['roles', variables.roleId, 'permissions'],
+      });
     },
   });
 };

@@ -27,9 +27,6 @@ export const rolesService = {
   },
 
   async createRole(data: Partial<Role>) {
-    if (!data.name) {
-      throw new Error('Role name is required');
-    }
     const response = await rolesApi.create(data);
     return response.data.data;
   },
@@ -50,7 +47,10 @@ export const rolesService = {
   },
 
   async assignPermissions(roleId: string, permissions: string[]) {
-    const response = await rolesApi.assignPermissionsToRole(roleId, permissions);
+    const response = await rolesApi.assignPermissionsToRole(
+      roleId,
+      permissions
+    );
     return response.data.data;
   },
 };

@@ -1,10 +1,10 @@
 import { UserRole } from '@/services/api/users.api';
 
 export enum CustomerStatus {
-  ACTIVE = 'Active',
-  INACTIVE = 'Inactive',
-  SUSPENDED = 'Suspended',
-  PENDING = 'Pending',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
+  PENDING = 'pending',
 }
 
 export enum CustomerPlan {

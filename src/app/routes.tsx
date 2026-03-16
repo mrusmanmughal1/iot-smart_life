@@ -7,6 +7,7 @@ import {
 import { PublicRoute, publicRoutes } from '@/routes/RouteGuards/PublicRoute';
 import { Loadable } from '@/components/common/Loadable';
 import { PaymentSuccess } from '@/components/common/PaymentSuccess';
+import { SetPasswordPage } from '@/pages/SetPasswordPage';
 
 // Lazy load error page component
 const RouteErrorPage = Loadable(
@@ -34,5 +35,9 @@ export const router = createBrowserRouter([
   {
     path: '/payment-status',
     element: <PaymentSuccess />,
+  },
+  {
+    path: '/auth/accept-invitation',
+    element: <SetPasswordPage />,
   },
 ]);

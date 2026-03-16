@@ -320,6 +320,7 @@ export default function CreateCustomerPage() {
                             </label>
                             <Input
                               type="number"
+                              min={0}
                               {...register('allocatedLimits.devices')}
                               className="w-full border border-gray-300 rounded-md"
                             />
@@ -330,6 +331,7 @@ export default function CreateCustomerPage() {
                             </label>
                             <Input
                               type="number"
+                              min={0}
                               {...register('allocatedLimits.dashboards')}
                               className="w-full border border-gray-300 rounded-md"
                             />
@@ -340,6 +342,7 @@ export default function CreateCustomerPage() {
                             </label>
                             <Input
                               type="number"
+                              min={0}
                               {...register('allocatedLimits.assets')}
                               className="w-full border border-gray-300 rounded-md"
                             />
@@ -350,6 +353,7 @@ export default function CreateCustomerPage() {
                             </label>
                             <Input
                               type="number"
+                              min={0}
                               {...register('allocatedLimits.floorPlans')}
                               className="w-full border border-gray-300 rounded-md"
                             />
@@ -360,6 +364,7 @@ export default function CreateCustomerPage() {
                             </label>
                             <Input
                               type="number"
+                              min={0}
                               {...register('allocatedLimits.automations')}
                               className="w-full border border-gray-300 rounded-md"
                             />
@@ -370,6 +375,7 @@ export default function CreateCustomerPage() {
                             </label>
                             <Input
                               type="number"
+                              min={0}
                               {...register('allocatedLimits.users')}
                               className="w-full border border-gray-300 rounded-md"
                             />
@@ -422,6 +428,7 @@ export default function CreateCustomerPage() {
                           <Input
                             id="maxUsers"
                             type="number"
+                            min={0}
                             {...register('maxUsers')}
                             placeholder="Enter max users"
                             className="w-full border border-gray-300 rounded-md"
@@ -538,7 +545,7 @@ export default function CreateCustomerPage() {
                       }
                       isLoading={createCustomerMutation.isPending}
                     >
-                      Save and Add User
+                      Save and Add
                     </Button>
                     <div className="flex items-center gap-3">
                       <Button

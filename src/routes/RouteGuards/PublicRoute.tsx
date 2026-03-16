@@ -103,7 +103,6 @@ export const PUBLIC_ROUTES = {
   VERIFY_PIN: '/verify-pin',
   SELECT_ROLE: '/select-role',
   AUTH_CALLBACK: '/auth/callback',
-  ACCEPT_INVITATION: '/auth/accept-invitation',
 } as const;
 
 export const PublicRoute = () => {
@@ -147,10 +146,7 @@ export const publicRoutes = [
     path: PUBLIC_ROUTES.RESET_PASSWORD,
     element: <ResetPasswordPage />,
   },
-  {
-    path: PUBLIC_ROUTES.ACCEPT_INVITATION,
-    element: <SetPasswordPage />,
-  },
+
   {
     path: PUBLIC_ROUTES.ACCOUNT_BLOCKED,
     element: <AccountBlockedPage />,

@@ -242,7 +242,7 @@ export default function DevicesPage() {
                   <TableRow>
                     <TableCell
                       colSpan={6}
-                      className="h-24 text-center bg-gray-100 text-muted-foreground"
+                      className="h-24 text-center bg-gray-50 text-muted-foreground"
                     >
                       {t('devices.noDevices') || 'No devices found'}
                     </TableCell>

@@ -211,7 +211,6 @@ export default function SubscriptionPlans() {
   );
 
   const [isSubscribing, setIsSubscribing] = useState<string | null>(null);
-
   const { data: currentSubscriptionResponse } = useCurrentSubscription();
   const { data: plansResponse, isError } = getSubscriptionPlans();
 
@@ -280,16 +279,6 @@ export default function SubscriptionPlans() {
       setIsSubscribing(null);
     }
   };
-
-  if (isError) {
-    return (
-      <ErrorMessage
-        message={
-          getErrorMessage(isError) || 'Failed to load subscription plans'
-        }
-      />
-    );
-  }
 
   return (
     <div className="space-y-6 border bg-[#fff6fb]/50 p-6 rounded-lg border-secondary dark:bg-gray-800 dark:border-gray-700 ">

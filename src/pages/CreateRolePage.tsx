@@ -15,6 +15,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useUserId } from '@/features/auth/hooks/useUserId';
 import { usePermissions } from '@/features/permissions/hooks';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useCreateRole } from '@/features/roles/hooks';
 
 // Zod validation schema
 const createRoleSchema = z.object({
@@ -26,9 +27,11 @@ const createRoleSchema = z.object({
 type CreateRoleFormData = z.infer<typeof createRoleSchema>;
 export default function CreateRolePage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { mutateAsync: createRole } = useCreateRole();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
+    {}
+  );
 
   const {
     register,
@@ -101,32 +104,9 @@ export default function CreateRolePage() {
       onChange([...currentPermissions, permissionId]);
     }
   };
-  const userid = useUserId()
-
 
   const onSubmit = async (data: CreateRoleFormData) => {
-    setIsSubmitting(true);
-    try {
-      const roleData = {
-        name: data.name,
-        description: data.description || undefined,
-        permissionIds: data.permissionIds,
-        isSystem: data.isSystem,
-        tenantId: userid || undefined
-      };
-      await rolesApi.create(roleData);
-      toast.success('Role created successfully');
-      queryClient.invalidateQueries({ queryKey: ['roles'] });
-      navigate('/users-management');
-    } catch (error: unknown) {
-      console.error('Failed to create role:', error);
-      const errorMessage =
-        (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message || 'Failed to create role';
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
+    createRole(data);
   };
 
   const handleCancel = () => {
@@ -244,15 +224,18 @@ export default function CreateRolePage() {
                   render={({ field }) => (
                     <div className="space-y-3 max-h-[600px] overflow-y-auto">
                       {permissionCategories.map((category) => {
-                        const isOpen = openCategories[category.category] ?? false;
+                        const isOpen =
+                          openCategories[category.category] ?? false;
                         return (
                           <div key={category.category} className="">
                             <button
                               type="button"
                               onClick={() => toggleCategory(category.category)}
-                              className="flex w-full items-center justify-between rounded p-2   text-left text-sm font-semibold text-gray-800 bg-secondary text-white"
+                              className="flex w-full items-center justify-between rounded p-2   text-left text-sm font-semibold text-gray-800 bg-gray-200 text-gray-700"
                             >
-                              <span className='first-letter:uppercase '>{category.category}</span>
+                              <span className="first-letter:uppercase ">
+                                {category.category.replace('_', ' ')}
+                              </span>
                               {isOpen ? (
                                 <ChevronDown className="h-4 w-4" />
                               ) : (
@@ -260,13 +243,12 @@ export default function CreateRolePage() {
                               )}
                             </button>
                             {isOpen && (
-                              <div className="space-y-2  bg-secondary/10 p-2">
+                              <div className="space-y-2  bg-gray-100 p-2">
                                 {category.permissions.map((permission) => {
-                                  const isChecked = selectedPermissions.includes(
-                                    permission.id
-                                  );
+                                  const isChecked =
+                                    selectedPermissions.includes(permission.id);
                                   const actionText = permission.action;
-                                  
+
                                   return (
                                     <div
                                       key={permission.id}
@@ -281,7 +263,11 @@ export default function CreateRolePage() {
                                             field.onChange
                                           )
                                         }
-                                        label={permission.description || permission.name || `${permission.resource}${actionText ? `: ${actionText}` : ''}`}
+                                        label={
+                                          permission.description ||
+                                          permission.name ||
+                                          `${permission.resource}${actionText ? `: ${actionText}` : ''}`
+                                        }
                                       />
                                     </div>
                                   );
@@ -289,12 +275,11 @@ export default function CreateRolePage() {
                               </div>
                             )}
                           </div>
-                        )
+                        );
                       })}
                     </div>
                   )}
                 />
-
               </CardContent>
             </Card>
           </div>
