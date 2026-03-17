@@ -86,7 +86,7 @@ export const DashboardPage = () => {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
+      {/* Headers */}
       <PageHeader
         title={t('dashboard.title')}
         description={t('dashboard.description')}
