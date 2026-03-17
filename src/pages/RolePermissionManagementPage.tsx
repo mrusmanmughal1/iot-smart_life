@@ -16,6 +16,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { toast } from 'react-hot-toast';
 import { useRoleById } from '@/features/roles/hooks';
 import type { Permission } from '@/services/api/users.api';
+import { FileWarningIcon } from 'lucide-react';
 
 type PermissionStatus = 'allowed' | 'denied' | 'conditional';
 
@@ -92,13 +93,12 @@ export default function RolePermissionManagementPage() {
   const { data } = useRoleById(id);
   const [permissionCategory, setPermissionCategory] = useState('');
   const [permissions, setPermissions] = useState<PermissionRow[]>([]);
+  const isSystemRole = data?.isSystem;
+  const role = data as
+    | { permissions?: RolePermission[]; name?: string }
+    | undefined;
 
-  const role = data as { permissions?: RolePermission[]; name?: string } | undefined;
-
-  const allPermissions = useMemo(
-    () => role?.permissions ?? [],
-    [role]
-  );
+  const allPermissions = useMemo(() => role?.permissions ?? [], [role]);
 
   const permissionRows = useMemo(
     () => toPermissionRows(allPermissions),
@@ -168,9 +168,9 @@ export default function RolePermissionManagementPage() {
       prev.map((perm) =>
         perm.id === permissionId
           ? {
-            ...perm,
-            [field]: perm[field] === 'allowed' ? 'denied' : 'allowed',
-          }
+              ...perm,
+              [field]: perm[field] === 'allowed' ? 'denied' : 'allowed',
+            }
           : perm
       )
     );
@@ -178,12 +178,12 @@ export default function RolePermissionManagementPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
-
       <div className="mx-auto space-y-6">
         <PageHeader
           title="Role Permission Management"
           description={`Role: ${role?.name || ''}`}
         />
+
         <Card className="bg-white shadow-sm">
           <CardContent className="p-6 space-y-6">
             {/* Category Tabs */}
@@ -192,7 +192,7 @@ export default function RolePermissionManagementPage() {
               onValueChange={handleCategoryChange}
               defaultValue={categories[0]}
             >
-              <TabsList className="w-full justify-start rounded-none border-b border-gray-200  bg-transparent p-0 h-auto">
+              <TabsList className="w-full justify-start rounded-none overflow-x-auto border-b border-gray-200  bg-transparent p-0 h-auto">
                 {categories.map((category) => (
                   <TabsTrigger
                     key={category}
@@ -236,10 +236,15 @@ export default function RolePermissionManagementPage() {
                 <TableBody>
                   {permissions
                     .filter((permission) =>
-                      permissionCategory ? permission.category === permissionCategory : true
+                      permissionCategory
+                        ? permission.category === permissionCategory
+                        : true
                     )
                     .map((permission) => (
-                      <TableRow key={permission.id} className="hover:bg-gray-50">
+                      <TableRow
+                        key={permission.id}
+                        className="hover:bg-gray-50"
+                      >
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
                             {permission.permission}
@@ -251,31 +256,41 @@ export default function RolePermissionManagementPage() {
                         <TableCell className="text-center">
                           <Checkbox
                             checked={isChecked(permission.access)}
-                            onChange={() => togglePermission(permission.id, 'access')}
+                            onChange={() =>
+                              togglePermission(permission.id, 'access')
+                            }
                           />
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
                             checked={isChecked(permission.create)}
-                            onChange={() => togglePermission(permission.id, 'create')}
+                            onChange={() =>
+                              togglePermission(permission.id, 'create')
+                            }
                           />
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
                             checked={isChecked(permission.read)}
-                            onChange={() => togglePermission(permission.id, 'read')}
+                            onChange={() =>
+                              togglePermission(permission.id, 'read')
+                            }
                           />
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
                             checked={isChecked(permission.update)}
-                            onChange={() => togglePermission(permission.id, 'update')}
+                            onChange={() =>
+                              togglePermission(permission.id, 'update')
+                            }
                           />
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
                             checked={isChecked(permission.delete)}
-                            onChange={() => togglePermission(permission.id, 'delete')}
+                            onChange={() =>
+                              togglePermission(permission.id, 'delete')
+                            }
                           />
                         </TableCell>
                       </TableRow>
@@ -283,47 +298,48 @@ export default function RolePermissionManagementPage() {
                 </TableBody>
               </Table>
             </div>
+            {isSystemRole ? (
+              <div className="text-center text-gray-600">
+                {/* add warning icon */}
+                <p className="flex w-full  items-center justify-center">
+                  <FileWarningIcon className="h-4 w-4 mr-2 text-red-500 " />
+                  You cannot edit System Roles
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-start justify-between pt-4">
+                {/* Legend */}
 
-            {/* Bottom Section */}
-            <div className="flex items-start justify-between pt-4">
-              {/* Legend */}
-
-              {/* Action Buttons */}
-              <div className="flex  justify-between w-full gap-3 items-end">
-                <div className="flex gap-3">
-                  <Button
-                    onClick={handleGrantAll}
-                    variant="primary"
-                  >
-                    Grant All Permissions
-                  </Button>
-                  <Button
-                    onClick={handleRevokeAll}
-                    variant="secondary"
-                  >
-                    Revoke All Permissions
-                  </Button>
-                </div>
-                <div className="flex gap-3">
-                  <Button
-                    onClick={handleSave}
-                    className="bg-gray-600 hover:bg-gray-700 text-white"
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    onClick={handleCancel}
-                    variant="outline"
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-700"
-                  >
-                    Cancel
-                  </Button>
+                {/* Action Buttons */}
+                <div className="flex  justify-between w-full gap-3 items-end">
+                  <div className="flex gap-3">
+                    <Button onClick={handleGrantAll} variant="primary">
+                      Grant All Permissions
+                    </Button>
+                    <Button onClick={handleRevokeAll} variant="secondary">
+                      Revoke All Permissions
+                    </Button>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleSave}
+                      className="bg-gray-600 hover:bg-gray-700 text-white"
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      onClick={handleCancel}
+                      variant="outline"
+                      className="bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
-
       </div>
     </div>
   );

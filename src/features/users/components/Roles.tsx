@@ -24,12 +24,14 @@ import {
 import { DropdownMenu } from '@/components/ui/dropdown-menu';
 import { toast } from 'react-hot-toast';
 import { Pagination } from '@/components/common/Pagination';
+import { Badge } from '@/components/ui/badge';
 
 const Roles = ({ searchQuery }: { searchQuery: string }) => {
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+
   const itemsPerPage = 10;
   const { data: roles } = useRoles({
     page: currentPage,
@@ -89,6 +91,9 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                     <TableHead className="text-white font-semibold">
                       DESCRIPTION
                     </TableHead>
+                    <TableHead className="text-white font-semibold ">
+                      TYPE
+                    </TableHead>
                     <TableHead className="text-white font-semibold text-right">
                       ACTIONS
                     </TableHead>
@@ -118,6 +123,11 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                       <TableCell className="text-gray-600">
                         {role.description}
                       </TableCell>
+                      <TableCell className="text-gray-600">
+                        <Badge variant={role.isSystem ? 'default' : 'success'}>
+                          {role.isSystem ? 'System' : 'Custom'}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="text-right flex items-center  relative justify-end gap-1">
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -138,32 +148,34 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                             Manage Role
                           </TooltipContent>
                         </Tooltip>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon-sm">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() =>
-                                navigate(
-                                  `/users-management/edit-role/${role.id}`
-                                )
-                              }
-                            >
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-red-600"
-                              onClick={() => handleDelete(role.id)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        {!role.isSystem && (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon-sm">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  navigate(
+                                    `/users-management/edit-role/${role.id}`
+                                  )
+                                }
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={() => handleDelete(role.id)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

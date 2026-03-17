@@ -54,6 +54,7 @@ export interface Permission {
 }
 
 export interface Role {
+  isSystem: any;
   id: string;
   name: string;
   description?: string;

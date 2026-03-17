@@ -41,7 +41,7 @@ export const useCreateRole = () => {
     onSuccess: () => {
       toast.success('Role created successfully');
       queryClient.invalidateQueries({ queryKey: ['roles'] });
-      navigate('/users-management');
+      navigate('/users-management', { state: { tab: 'Roles' } });
     },
   });
 };

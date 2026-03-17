@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -6,14 +6,27 @@ import { Plus, Search } from 'lucide-react';
 import Roles from '@/features/users/components/Roles';
 import Users from '@/features/users/components/Users';
 import CustomerPage from '@/features/users/components/Customer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDebouncedValue } from '@/utils/helpers/Debounce';
+import { useAppStore } from '@/stores/useAppStore';
 
 export default function UsersAndRolesManagementPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('Users');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(location.state?.tab || 'Users');
+
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state?.tab]);
+
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 300);
+
+  const { user } = useAppStore();
+  const isCustomer = user?.role === 'customer';
 
   const handleAddAction = () => {
     if (activeTab === 'Users') {
@@ -68,7 +81,9 @@ export default function UsersAndRolesManagementPage() {
             >
               <TabsList className="p-1">
                 <TabsTrigger value="Users">Users</TabsTrigger>
-                <TabsTrigger value="Customers">Customers</TabsTrigger>
+                {!isCustomer && (
+                  <TabsTrigger value="Customers">Customers</TabsTrigger>
+                )}
                 <TabsTrigger value="Roles">Roles</TabsTrigger>
               </TabsList>
             </Tabs>
