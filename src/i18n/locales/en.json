@@ -1154,7 +1154,7 @@
       "loginSuccess": "Login successful",
       "loginWithGoogle": "Sign in with Google",
       "loginWithGithub": "Sign in with GitHub",
-      "donthaveaccount": "Don't have an account?"
+      "donthaveaccount": "Don't have an account? "
     },
     "register": {
       "title": "Create Account",

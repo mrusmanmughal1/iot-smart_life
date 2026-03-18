@@ -36,9 +36,7 @@ const SearchResultsPage = Loadable(
 const CreateCustomerPage = Loadable(
   lazy(() => import('@/pages/CreateCustomerPage.tsx'))
 );
-const EditCustomerPage = Loadable(
-  lazy(() => import('@/features/users/components/EditCustomerPage.tsx'))
-);
+
 const CreateUserPage = Loadable(
   lazy(() => import('@/pages/CreateUserPage.tsx'))
 );
@@ -114,7 +112,7 @@ export const managementRoutes = [
       },
       {
         path: 'edit-customer/:id',
-        element: <EditCustomerPage />,
+        element: <CreateCustomerPage />,
       },
       {
         path: 'add-new-user',

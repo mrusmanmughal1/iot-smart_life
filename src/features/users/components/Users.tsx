@@ -128,7 +128,7 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
     if (user.role === UserRole.CUSTOMER_USER) {
       navigate(`/users-management/edit-customer-user/${user.id}`);
     } else {
-      navigate(`/users-management/edit-customer/${user.id}`);
+      navigate(`/users-management/edit-customer/${user.customerId}`);
     }
   };
 

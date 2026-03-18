@@ -1,7 +1,9 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,9 +16,14 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { HelpCircle } from 'lucide-react';
-import { useCreateCustomer } from '@/features/customer/hooks';
+import {
+  useCreateCustomer,
+  useCustomerById,
+  useUpdateCustomer,
+} from '@/features/customer/hooks';
 import type { CreateCustomerData } from '@/features/customer/types';
 import { CustomerStatus, CustomerPlan } from '@/features/customer/types';
+import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 // Zod validation schema
 const createCustomerSchema = z.object({
   name: z.string().min(1, 'Customer name is required').trim(),
@@ -56,12 +63,18 @@ const statusOptions = ['Active', 'Inactive', 'Suspended', 'Pending'];
 const planOptions = ['Standard', 'Premium', 'Enterprise', 'Basic'];
 export default function CreateCustomerPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = !!id;
   const createCustomerMutation = useCreateCustomer();
+  const updateCustomerMutation = useUpdateCustomer();
+
+  const { data: customerData, isLoading } = useCustomerById(id);
   const {
     register,
     handleSubmit,
     control,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<CreateCustomerFormData>({
     resolver: zodResolver(createCustomerSchema),
@@ -98,6 +111,36 @@ export default function CreateCustomerPage() {
 
   const selectedFeatures = watch('features') || [];
 
+  useEffect(() => {
+    if (isEditMode && customerData) {
+      const customer = (customerData as any).data || customerData;
+      if (!customer) return;
+
+      reset({
+        name: customer.name || '',
+        email: customer.email || '',
+        phone: customer.phone || '',
+        description: customer.description || '',
+        city: customer.city || '',
+        state: customer.state || '',
+        zip: customer.zip || '',
+        country: customer.country || '',
+        status: customer.status || 'Active',
+        maxUsers: customer.maxUsers?.toString() || '0',
+        plan: customer.plan || 'Standard',
+        features: customer.features || [],
+        allocatedLimits: {
+          devices: customer.allocatedLimits?.devices?.toString() || '0',
+          dashboards: customer.allocatedLimits?.dashboards?.toString() || '0',
+          assets: customer.allocatedLimits?.assets?.toString() || '0',
+          floorPlans: customer.allocatedLimits?.floorPlans?.toString() || '0',
+          automations: customer.allocatedLimits?.automations?.toString() || '0',
+          users: customer.allocatedLimits?.users?.toString() || '0',
+        },
+      });
+    }
+  }, [customerData, isEditMode, reset]);
+
   const onSubmit = async (data: CreateCustomerFormData) => {
     // Transform form data to API format
     const customerData: any = {
@@ -123,7 +166,27 @@ export default function CreateCustomerPage() {
         users: parseInt(data.allocatedLimits.users) || 0,
       },
     };
-    createCustomerMutation.mutate(customerData);
+
+    if (isEditMode) {
+      updateCustomerMutation.mutate(
+        { customerId: id!, data: customerData },
+        {
+          onSuccess: () => {
+            toast.success('Customer updated successfully');
+            navigate('/users-management', {
+              state: { tab: 'Customers' },
+            });
+          },
+          onError: (error: any) => {
+            const errorMessage =
+              error?.response?.data?.message || 'Failed to update customer';
+            toast.error(errorMessage);
+          },
+        }
+      );
+    } else {
+      createCustomerMutation.mutate(customerData);
+    }
   };
 
   const handleCancel = () => {
@@ -141,13 +204,16 @@ export default function CreateCustomerPage() {
       onChange([...currentFeatures, featureId]);
     }
   };
+  if (isLoading) {
+    return <LoadingOverlay />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50  ">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-          Add New Customer
+          {isEditMode ? 'Edit Customer' : 'Add New Customer'}
         </h1>
 
         {/* Two Column Layout */}
@@ -541,11 +607,16 @@ export default function CreateCustomerPage() {
                       variant="ghost"
                       className="w-full justify-start bg-gray-100 hover:bg-gray-200 text-gray-700"
                       disabled={
-                        isSubmitting || createCustomerMutation.isPending
+                        isSubmitting ||
+                        createCustomerMutation.isPending ||
+                        updateCustomerMutation.isPending
                       }
-                      isLoading={createCustomerMutation.isPending}
+                      isLoading={
+                        createCustomerMutation.isPending ||
+                        updateCustomerMutation.isPending
+                      }
                     >
-                      Save and Add
+                      {isEditMode ? 'Save Changes' : 'Save and Add'}
                     </Button>
                     <div className="flex items-center gap-3">
                       <Button

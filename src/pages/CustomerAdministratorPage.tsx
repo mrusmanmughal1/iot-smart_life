@@ -23,10 +23,11 @@ interface Permission {
 const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
   return (
     <div
-      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${granted
-        ? 'bg-green-500 border-green-500'
-        : 'bg-gray-200 border-gray-300'
-        }`}
+      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+        granted
+          ? 'bg-green-500 border-green-500'
+          : 'bg-gray-200 border-gray-300'
+      }`}
     >
       {granted && (
         <svg
@@ -67,7 +68,7 @@ export default function CustomerAdministratorPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handleEditRole = () => {
-    navigate('/users-management-');
+    navigate(`/users-management/edit-customer/${id}`);
   };
 
   const handleDelete = () => {
@@ -91,22 +92,28 @@ export default function CustomerAdministratorPage() {
   };
 
   // Group permissions by category
-  const permissionsByCategory = useMemo(() => UserPermissionsdata?.reduce((acc, permission) => {
-    if (!acc[permission.resource]) {
-      acc[permission.resource] = [];
-    }
-    acc[permission.resource].push({
-      id: permission.id,
-      label: permission.action,
-      granted: true,
-      category: permission.resource,
-    });
-    return acc;
-  }, {} as Record<string, Permission[]>), [UserPermissionsdata]);
+  const permissionsByCategory = useMemo(
+    () =>
+      UserPermissionsdata?.reduce(
+        (acc, permission) => {
+          if (!acc[permission.resource]) {
+            acc[permission.resource] = [];
+          }
+          acc[permission.resource].push({
+            id: permission.id,
+            label: permission.action,
+            granted: true,
+            category: permission.resource,
+          });
+          return acc;
+        },
+        {} as Record<string, Permission[]>
+      ),
+    [UserPermissionsdata]
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
-
       <div className="mx-auto space-y-6">
         {/* Header Section */}
         <Card className="bg-white shadow-sm">
@@ -184,8 +191,9 @@ export default function CustomerAdministratorPage() {
                   Address
                 </p>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {[customer?.address, customer?.address2].filter(Boolean).join(', ') ||
-                    '-'}
+                  {[customer?.address, customer?.address2]
+                    .filter(Boolean)
+                    .join(', ') || '-'}
                 </p>
               </div>
               <div className="space-y-1">
@@ -278,7 +286,7 @@ export default function CustomerAdministratorPage() {
 
               {/* Devices Tab */}
               <TabsContent value="devices" className="p-4 space-y-4 ">
-                 <DevicesListCustomers customerId={id || ''} />
+                <DevicesListCustomers customerId={id || ''} />
               </TabsContent>
               {/* Permissions Tab */}
               <TabsContent value="permissions" className="p-4 space-y-4 ">
@@ -296,8 +304,7 @@ export default function CustomerAdministratorPage() {
                     ([category, categoryPermissions]) => (
                       <Card
                         key={category}
-                        className={`${'bg-white hover:bg-green-50 dark:bg-gray-900 dark:border-gray-700'
-                          }`}
+                        className={`${'bg-white hover:bg-green-50 dark:bg-gray-900 dark:border-gray-700'}`}
                       >
                         <CardHeader>
                           <CardTitle className="text-lg capitalize font-semibold text-gray-900 dark:text-white">
@@ -352,11 +359,12 @@ export default function CustomerAdministratorPage() {
 
               {/* Activity Log Tab */}
               <TabsContent value="activity-log" className="p-6 space-y-4">
-                <CustomerActivityLog customerId={id || ''} title="Activity Log" />
+                <CustomerActivityLog
+                  customerId={id || ''}
+                  title="Activity Log"
+                />
               </TabsContent>
-
             </Tabs>
-
           </CardContent>
         </Card>
 

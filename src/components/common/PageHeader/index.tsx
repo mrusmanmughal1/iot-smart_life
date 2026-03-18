@@ -51,7 +51,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             <p className="text-muted-foreground">{description}</p>
           )}
         </div>
-        
+
         {actions && actions.length > 0 && (
           <div className="flex items-center gap-2">
             {actions.map((action, index) => (
@@ -67,7 +67,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           </div>
         )}
       </div>
-      
+
       {children}
     </div>
   );
