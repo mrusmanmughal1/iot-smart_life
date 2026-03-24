@@ -289,57 +289,6 @@ export function AccountTab() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
-          <CardDescription>Manage your account information</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label>Account Type</Label>
-            <div className="p-3 bg-purple-50 dark:bg-gray-900 dark:border-gray-700 border border-purple-200 rounded-lg">
-              <p className="font-medium text-purple-900 dark:text-white">
-                {accountType}
-              </p>
-              <p className="text-sm text-purple-700 dark:text-white">
-                Full access to all features
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Storage Used</Label>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>
-                  {storageUsed} GB of {storageTotal} GB used
-                </span>
-                <span>{Math.round(storagePercentage)}%</span>
-              </div>
-              <div className="w-full bg-slate-200 dark:bg-gray-900 dark:border-gray-700 rounded-full h-2">
-                <div
-                  className="bg-purple-600 h-2 rounded-full"
-                  style={{ width: `${storagePercentage}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-2">
-            <Label className="text-red-600 dark:text-white">Danger Zone</Label>
-            <div className="p-4 border border-red-200 rounded-lg space-y-2">
-              <p className="text-sm text-slate-600 dark:text-white">
-                Once you delete your account, there is no going back. Please be
-                certain.
-              </p>
-              <Button variant="destructive">Delete Account</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Change Password Form */}
       <Card className="mt-4 p-4">
         <CardContent>

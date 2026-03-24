@@ -16,6 +16,8 @@ export const useCreateCustomer = () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast.success('Customer created successfully');
       navigate('/users-management', { state: { tab: 'Customers' } });
+      // invalidate users query
+      queryClient.invalidateQueries({ queryKey: ['subscription-usage'] });
     },
     onError: (error: unknown) => {
       const errorMessage =
