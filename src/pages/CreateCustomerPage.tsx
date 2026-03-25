@@ -66,16 +66,7 @@ export default function CreateCustomerPage() {
       state: '',
       zip: '',
       country: '',
-      status: 'Active',
-      // maxUsers: '0',
-      // plan: 'Standard',
-      // features: [
-      //   'device-management',
-      //   'advanced-reports',
-      //   'api-access',
-      //   'data-analytics',
-      //   'white-labeling',
-      // ],
+
       allocatedLimits: {
         devices: '',
         dashboards: '',
