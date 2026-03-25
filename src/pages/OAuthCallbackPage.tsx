@@ -18,12 +18,16 @@ export const OAuthCallbackPage: React.FC = () => {
   const { i18n } = useTranslation();
 
   const code = searchParams.get('code');
-  console.log(code , 'code')
-  const { mutate: handleCallback, isPending, isError } = useMutation({
+  console.log(code, 'code');
+  const {
+    mutate: handleCallback,
+    isPending,
+    isError,
+  } = useMutation({
     mutationFn: (code: string) => authService.handleOAuthCallback(code),
     onSuccess: async (data) => {
       console.log('=== OAUTH CALLBACK SUCCESS ===');
-      console.log(data , 'data')
+      console.log(data, 'data');
       console.log('1. Data received:', {
         hasUser: !!data.data?.user || !!data.user,
         hasAccessToken: !!data.data?.accessToken || !!data.accessToken,
@@ -50,17 +54,19 @@ export const OAuthCallbackPage: React.FC = () => {
 
       console.log('3. Tokens stored:', {
         accessToken: localStorageService.getToken()?.substring(0, 20) + '...',
-        refreshToken: localStorageService.getRefreshToken()?.substring(0, 20) + '...',
+        refreshToken:
+          localStorageService.getRefreshToken()?.substring(0, 20) + '...',
         expiresAt: localStorageService.getExpiresAt(),
       });
-      console.log(userData , 'userData'	)
+      console.log(userData, 'userData');
 
       // Update store SECOND
       if (userData) {
         // Transform user data to match useAppStore User interface
         const nameParts = userData.name?.split(' ') || [];
         const firstName = userData.firstName || nameParts[0] || '';
-        const lastName = userData.lastName || nameParts.slice(1).join(' ') || '';
+        const lastName =
+          userData.lastName || nameParts.slice(1).join(' ') || '';
 
         const storeUser = {
           id: userData.id || '',
@@ -80,7 +86,7 @@ export const OAuthCallbackPage: React.FC = () => {
       // Fetch and apply settings from API before navigating
       try {
         const settings = await settingsService.getGeneralSettings();
-        
+
         // Sync theme from API (map 'system' to 'auto')
         if (settings.theme) {
           syncFromApi({ theme: settings.theme });
@@ -92,13 +98,16 @@ export const OAuthCallbackPage: React.FC = () => {
           // Update i18n language immediately
           i18n.changeLanguage(settings.language);
         }
-        
+
         console.log('6. Settings synced from API:', {
           theme: settings.theme,
-          language: settings.language
+          language: settings.language,
         });
       } catch (error) {
-        console.warn('Failed to fetch settings from API, using defaults:', error);
+        console.warn(
+          'Failed to fetch settings from API, using defaults:',
+          error
+        );
         // Continue with navigation even if settings fetch fails
       }
 
@@ -113,8 +122,8 @@ export const OAuthCallbackPage: React.FC = () => {
     onError: (error: unknown) => {
       console.error('OAuth callback error:', error);
       const message =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        'Authentication failed. Please try again.';
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || 'Authentication failed. Please try again.';
       toast.error(message);
       // Redirect to login on error
       setTimeout(() => {
@@ -141,17 +150,20 @@ export const OAuthCallbackPage: React.FC = () => {
         {isPending && (
           <>
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1976D2] mb-4"></div>
-            <p className="text-sm text-[#545454]">Completing authentication...</p>
+            <p className="text-sm text-[#545454]">
+              Completing authentication...
+            </p>
           </>
         )}
         {isError && (
           <>
             <div className="text-red-500 mb-4">✕</div>
-            <p className="text-sm text-red-600">Authentication failed. Redirecting to login...</p>
+            <p className="text-sm text-red-600">
+              Authentication failed. Redirecting to login...
+            </p>
           </>
         )}
       </div>
     </AuthLayout>
   );
 };
-

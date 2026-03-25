@@ -10,19 +10,25 @@ import { Input } from '@/components/ui/input.tsx';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 
-type VerifyAccountFormData = z.infer<ReturnType<typeof createVerifyAccountSchema>>;
+type VerifyAccountFormData = z.infer<
+  ReturnType<typeof createVerifyAccountSchema>
+>;
 
-const createVerifyAccountSchema = (t: (key: string) => string) => z.object({
-  email: z.string().min(1, t('auth.verifyAccount.emailRequired')).email(t('auth.verifyAccount.emailInvalid')),
-  phoneCode: z.string().min(1, t('auth.verifyAccount.phoneCodeRequired')),
-});
+const createVerifyAccountSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z
+      .string()
+      .min(1, t('auth.verifyAccount.emailRequired'))
+      .email(t('auth.verifyAccount.emailInvalid')),
+    phoneCode: z.string().min(1, t('auth.verifyAccount.phoneCodeRequired')),
+  });
 
 // Mask email for display (e.g., ***********john@gmail.com)
 const maskEmailDisplay = (email: string) => {
   if (!email) return '';
   const [localPart, domain] = email.split('@');
   if (!domain) return email;
-  
+
   // Show last few characters of local part, mask the rest
   const visibleChars = Math.min(4, localPart.length);
   const masked = '*'.repeat(Math.max(11, localPart.length - visibleChars));
@@ -40,7 +46,7 @@ const maskPhoneCodeDisplay = (code: string) => {
 export const VerifyAccountForm: React.FC = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  
+
   // Get email and phone from query params if available (for display only)
   const prefillEmail = searchParams.get('email') || '';
   const prefillPhone = searchParams.get('phone') || '';
@@ -80,11 +86,17 @@ export const VerifyAccountForm: React.FC = () => {
       // navigate('/verify-code');
     },
     onError: (error: unknown) => {
-      const errorMessage = 
-        (error && typeof error === 'object' && 'response' in error && 
-         error.response && typeof error.response === 'object' && 'data' in error.response &&
-         error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data &&
-         typeof error.response.data.message === 'string')
+      const errorMessage =
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'data' in error.response &&
+        error.response.data &&
+        typeof error.response.data === 'object' &&
+        'message' in error.response.data &&
+        typeof error.response.data.message === 'string'
           ? error.response.data.message
           : t('auth.verifyAccount.failedToSendCode');
       toast.error(errorMessage);
@@ -106,7 +118,11 @@ export const VerifyAccountForm: React.FC = () => {
         <div className="relative">
           <Input
             type="email"
-            placeholder={emailValue && emailValue.includes('@') ? maskEmailDisplay(emailValue) : t('auth.verifyAccount.emailPlaceholder')}
+            placeholder={
+              emailValue && emailValue.includes('@')
+                ? maskEmailDisplay(emailValue)
+                : t('auth.verifyAccount.emailPlaceholder')
+            }
             {...register('email')}
             error={errors.email?.message}
             icon={<Mail className="h-5 w-5 text-gray-400" />}
@@ -128,7 +144,11 @@ export const VerifyAccountForm: React.FC = () => {
         <div className="relative">
           <Input
             type="text"
-            placeholder={phoneCodeValue ? maskPhoneCodeDisplay(phoneCodeValue) : t('auth.verifyAccount.phoneCodePlaceholder')}
+            placeholder={
+              phoneCodeValue
+                ? maskPhoneCodeDisplay(phoneCodeValue)
+                : t('auth.verifyAccount.phoneCodePlaceholder')
+            }
             {...register('phoneCode')}
             error={errors.phoneCode?.message}
             icon={<Phone className="h-5 w-5 text-gray-400" />}
@@ -154,7 +174,9 @@ export const VerifyAccountForm: React.FC = () => {
             className="w-full bg-gray-900 hover:bg-gray-800 text-white px-8 py-3   shadow-md"
             isLoading={isPending}
           >
-            {isPending ? t('auth.verifyAccount.sending') : t('auth.verifyAccount.sendCode')}
+            {isPending
+              ? t('auth.verifyAccount.sending')
+              : t('auth.verifyAccount.sendCode')}
           </Button>
         </div>
 
@@ -172,4 +194,3 @@ export const VerifyAccountForm: React.FC = () => {
     </div>
   );
 };
-

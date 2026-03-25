@@ -5,8 +5,6 @@ import { toast } from 'react-hot-toast';
  * Handles Google OAuth authentication via redirect to backend
  */
 export const useGoogleLogin = () => {
-  // const apiUrl = import.meta.env.VITE_API_URL || 'https://api.smart-life.sa/';
-  //  new key envs
   const handleGoogleLogin = () => {
     try {
       const backendUrl =

@@ -8,11 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { rolesApi } from '@/services/api';
 import type { Permission } from '@/services/api/users.api';
-import { toast } from 'react-hot-toast';
-import { useQueryClient } from '@tanstack/react-query';
-import { useUserId } from '@/features/auth/hooks/useUserId';
 import { usePermissions } from '@/features/permissions/hooks';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useCreateRole } from '@/features/roles/hooks';
@@ -21,10 +17,11 @@ import { useCreateRole } from '@/features/roles/hooks';
 const createRoleSchema = z.object({
   name: z.string().min(1, 'Role name is required').trim(),
   description: z.string().optional(),
-  isSystem: z.boolean(),
   permissionIds: z.array(z.string()),
 });
+
 type CreateRoleFormData = z.infer<typeof createRoleSchema>;
+
 export default function CreateRolePage() {
   const navigate = useNavigate();
   const { mutateAsync: createRole } = useCreateRole();
@@ -45,7 +42,6 @@ export default function CreateRolePage() {
     defaultValues: {
       name: '',
       description: '',
-      isSystem: false,
       permissionIds: [],
     },
     mode: 'onChange',
@@ -169,7 +165,7 @@ export default function CreateRolePage() {
                   </div>
 
                   {/* Status */}
-                  <div>
+                  {/* <div>
                     <Controller
                       name="isSystem"
                       control={control}
@@ -181,7 +177,7 @@ export default function CreateRolePage() {
                         />
                       )}
                     />
-                  </div>
+                  </div> */}
 
                   {/* Required fields note */}
                   <p className="text-xs text-gray-500 mt-4">
@@ -291,7 +287,7 @@ export default function CreateRolePage() {
               variant="outline"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300"
+              className="bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
             >
               Cancel
             </Button>

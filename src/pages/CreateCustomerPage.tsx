@@ -1,4 +1,4 @@
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -7,22 +7,15 @@ import { toast } from 'react-hot-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import { HelpCircle } from 'lucide-react';
 import {
   useCreateCustomer,
   useCustomerById,
   useUpdateCustomer,
 } from '@/features/customer/hooks';
+
 import type { CreateCustomerData } from '@/features/customer/types';
-import { CustomerStatus, CustomerPlan } from '@/features/customer/types';
+
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 // Zod validation schema
 const createCustomerSchema = z.object({
@@ -37,10 +30,7 @@ const createCustomerSchema = z.object({
   state: z.string().optional(),
   zip: z.string().optional(),
   country: z.string(),
-  status: z.string(),
-  maxUsers: z.string(),
-  plan: z.string(),
-  features: z.array(z.string()),
+
   allocatedLimits: z.object({
     devices: z.string(),
     dashboards: z.string(),
@@ -51,16 +41,7 @@ const createCustomerSchema = z.object({
   }),
 });
 type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
-const availableFeatures = [
-  { id: 'device-management', label: 'Device Management', enabled: true },
-  { id: 'advanced-reports', label: 'Advanced Reports', enabled: true },
-  { id: 'api-access', label: 'API Access', enabled: true },
-  { id: 'data-analytics', label: 'Data Analytics', enabled: true },
-  { id: 'user-management', label: 'User Management', enabled: false },
-  { id: 'white-labeling', label: 'White Labeling', enabled: true },
-];
-const statusOptions = ['Active', 'Inactive', 'Suspended', 'Pending'];
-const planOptions = ['Standard', 'Premium', 'Enterprise', 'Basic'];
+
 export default function CreateCustomerPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -72,8 +53,6 @@ export default function CreateCustomerPage() {
   const {
     register,
     handleSubmit,
-    control,
-    watch,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<CreateCustomerFormData>({
@@ -109,8 +88,6 @@ export default function CreateCustomerPage() {
     mode: 'onChange',
   });
 
-  const selectedFeatures = watch('features') || [];
-
   useEffect(() => {
     if (isEditMode && customerData) {
       const customer = (customerData as any).data || customerData;
@@ -125,10 +102,6 @@ export default function CreateCustomerPage() {
         state: customer.state || '',
         zip: customer.zip || '',
         country: customer.country || '',
-        status: customer.status || 'Active',
-        maxUsers: customer.maxUsers?.toString() || '0',
-        plan: customer.plan || 'Standard',
-        features: customer.features || [],
         allocatedLimits: {
           devices: customer.allocatedLimits?.devices?.toString() || '0',
           dashboards: customer.allocatedLimits?.dashboards?.toString() || '0',
@@ -141,10 +114,8 @@ export default function CreateCustomerPage() {
     }
   }, [customerData, isEditMode, reset]);
 
-  const onSubmit = async (data: CreateCustomerFormData) => {
-    // Transform form data to API format
+  const onSubmit = async (data: any) => {
     const customerData: any = {
-      // tenantId: "cb077395-1f42-486e-8a6f-72551c1e3022",
       name: data.name,
       email: data.email,
       phone: data.phone,
@@ -153,10 +124,6 @@ export default function CreateCustomerPage() {
       state: data.state || undefined,
       zip: data.zip || undefined,
       country: data.country,
-      // status: data.status as CustomerStatus,
-      // maxUsers: parseInt(data.maxUsers, 10),
-      // plan: data.plan as CustomerPlan,
-      // features: data.features,
       allocatedLimits: {
         devices: parseInt(data.allocatedLimits.devices) || 0,
         dashboards: parseInt(data.allocatedLimits.dashboards) || 0,
@@ -193,17 +160,6 @@ export default function CreateCustomerPage() {
     navigate('/customer-management');
   };
 
-  const handleFeatureToggle = (
-    featureId: string,
-    currentFeatures: string[],
-    onChange: (value: string[]) => void
-  ) => {
-    if (currentFeatures.includes(featureId)) {
-      onChange(currentFeatures.filter((id) => id !== featureId));
-    } else {
-      onChange([...currentFeatures, featureId]);
-    }
-  };
   if (isLoading) {
     return <LoadingOverlay />;
   }
@@ -447,140 +403,6 @@ export default function CreateCustomerPage() {
                             />
                           </div>
                         </div>
-                      </div>
-                      <h2 className="text-lg  mt-6 font-semibold text-gray-900 mb-4">
-                        Customer Settings
-                      </h2>
-                      <div className="flex flex-col md:flex-row justify-between gap-2">
-                        {/* Status */}
-                        <div className="mb-4 w-full">
-                          <label
-                            htmlFor="status"
-                            className="block text-sm font-medium text-gray-700 mb-2"
-                          >
-                            Status
-                          </label>
-                          <Controller
-                            name="status"
-                            control={control}
-                            render={({ field }) => (
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <SelectTrigger id="status" className="w-full">
-                                  <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {statusOptions.map((status) => (
-                                    <SelectItem key={status} value={status}>
-                                      {status}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          />
-                        </div>
-
-                        {/* Max Users */}
-                        <div className="mb-4 w-full">
-                          <label
-                            htmlFor="maxUsers"
-                            className="block text-sm font-medium text-gray-700 mb-2"
-                          >
-                            Max Users
-                          </label>
-                          <Input
-                            id="maxUsers"
-                            type="number"
-                            min={0}
-                            {...register('maxUsers')}
-                            placeholder="Enter max users"
-                            className="w-full border border-gray-300 rounded-md"
-                          />
-                        </div>
-
-                        {/* Plan */}
-                        <div className="mb-4 w-full">
-                          <label
-                            htmlFor="plan"
-                            className="block text-sm font-medium text-gray-700 mb-2"
-                          >
-                            Plan
-                          </label>
-                          <Controller
-                            name="plan"
-                            control={control}
-                            render={({ field }) => (
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                              >
-                                <SelectTrigger id="plan" className="w-full">
-                                  <SelectValue placeholder="Select plan" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {planOptions.map((plan) => (
-                                    <SelectItem key={plan} value={plan}>
-                                      {plan}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          />
-                        </div>
-                      </div>
-                      {/* Features */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">
-                          Features
-                        </label>
-                        <Controller
-                          name="features"
-                          control={control}
-                          render={({ field }) => (
-                            <div className="space-y-2 grid grid-cols-2 gap-2">
-                              {availableFeatures.map(
-                                (feature: {
-                                  id: string;
-                                  label: string;
-                                  enabled: boolean;
-                                }) => {
-                                  const isChecked = selectedFeatures.includes(
-                                    feature.id
-                                  );
-                                  return (
-                                    <div
-                                      key={feature.id}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <div
-                                        className={`w-3 h-3 rounded-sm ${
-                                          isChecked
-                                            ? 'bg-green-500'
-                                            : 'bg-gray-900'
-                                        }`}
-                                      />
-                                      <Checkbox
-                                        checked={isChecked}
-                                        onChange={() =>
-                                          handleFeatureToggle(
-                                            feature.id,
-                                            selectedFeatures,
-                                            field.onChange
-                                          )
-                                        }
-                                        label={feature.label}
-                                      />
-                                    </div>
-                                  );
-                                }
-                              )}
-                            </div>
-                          )}
-                        />
                       </div>
                     </div>
 
