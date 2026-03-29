@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 interface DeviceProfileTransportTabProps {
   profileId: string;
   profileData?: {
-    transportConfig?: DeviceProfileMultiStepFormData['transportConfig'];
+    transportConfiguration?: DeviceProfileMultiStepFormData['transportConfiguration'];
   };
   onSuccess?: () => void;
 }
@@ -34,10 +34,10 @@ const DeviceProfileTransportTab: React.FC<DeviceProfileTransportTabProps> = ({
 
   // Initialize form with existing profile data
   useEffect(() => {
-    if (profileData?.transportConfig) {
+    if (profileData?.transportConfiguration) {
       form.reset({
         ...DEFAULT_MULTI_STEP_FORM_DATA,
-        transportConfig: profileData.transportConfig,
+        transportConfiguration: profileData.transportConfiguration,
       });
     }
   }, [profileData, form]);
@@ -62,10 +62,10 @@ const DeviceProfileTransportTab: React.FC<DeviceProfileTransportTabProps> = ({
 
   const handleCancel = () => {
     // Reset form to original values
-    if (profileData?.transportConfig) {
+    if (profileData?.transportConfiguration) {
       form.reset({
         ...DEFAULT_MULTI_STEP_FORM_DATA,
-        transportConfig: profileData.transportConfig,
+        transportConfiguration: profileData.transportConfiguration,
       });
     }
   };
@@ -77,7 +77,10 @@ const DeviceProfileTransportTab: React.FC<DeviceProfileTransportTabProps> = ({
     <Card className="border-2 rounded-lg">
       <CardContent className="pt-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
             <Step2TransportConfiguration form={form} />
 
             <div className="flex justify-end gap-2 pt-4 border-t">
@@ -105,4 +108,3 @@ const DeviceProfileTransportTab: React.FC<DeviceProfileTransportTabProps> = ({
 };
 
 export default DeviceProfileTransportTab;
-

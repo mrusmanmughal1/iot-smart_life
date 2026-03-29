@@ -73,6 +73,8 @@ export interface PaginatedResponse<T> {
     page: number;
     limit: number;
     totalPages: number;
+    customRoles: number;
+    systemRoles: number;
   };
 }
 export interface UsersResponse {

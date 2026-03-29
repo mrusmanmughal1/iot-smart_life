@@ -47,12 +47,15 @@ export const useCreateRole = () => {
 };
 
 export const useUpdateRole = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ roleId, data }: { roleId: string; data: any }) =>
       rolesService.updateRole(roleId, data),
     onSuccess: () => {
+      toast.success('Role updated successfully');
       queryClient.invalidateQueries({ queryKey: ['roles'] });
+      navigate('/users-management', { state: { tab: 'roles' } });
     },
   });
 };

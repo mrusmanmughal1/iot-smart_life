@@ -1,4 +1,11 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 
 interface SelectContextValue {
@@ -20,13 +27,19 @@ interface SelectProps {
   className?: string;
 }
 
-export function Select({ value: controlledValue, onValueChange, defaultValue = '', children, className = '' }: SelectProps) {
+export function Select({
+  value: controlledValue,
+  onValueChange,
+  defaultValue = '',
+  children,
+  className = '',
+}: SelectProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [open, setOpen] = useState(false);
   const [itemLabels, setItemLabels] = useState<Record<string, string>>({});
 
   const value = controlledValue !== undefined ? controlledValue : internalValue;
-  
+
   const handleValueChange = (newValue: string) => {
     if (controlledValue === undefined) {
       setInternalValue(newValue);
@@ -37,10 +50,15 @@ export function Select({ value: controlledValue, onValueChange, defaultValue = '
 
   const registerItem = useCallback((itemValue: string, label: string) => {
     if (!label) return;
-    setItemLabels((prev) => (prev[itemValue] === label ? prev : { ...prev, [itemValue]: label }));
+    setItemLabels((prev) =>
+      prev[itemValue] === label ? prev : { ...prev, [itemValue]: label }
+    );
   }, []);
 
-  const getItemLabel = useCallback((itemValue: string) => itemLabels[itemValue], [itemLabels]);
+  const getItemLabel = useCallback(
+    (itemValue: string) => itemLabels[itemValue],
+    [itemLabels]
+  );
 
   return (
     <SelectContext.Provider
@@ -53,9 +71,7 @@ export function Select({ value: controlledValue, onValueChange, defaultValue = '
         getItemLabel,
       }}
     >
-      <div className={`relative ${className}`}>
-        {children}
-      </div>
+      <div className={`relative ${className}`}>{children}</div>
     </SelectContext.Provider>
   );
 }
@@ -64,13 +80,18 @@ interface SelectTriggerProps {
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
-  
+
   id?: string;
 }
 
-export function SelectTrigger({ children, className = '', disabled = false, id }: SelectTriggerProps) {
+export function SelectTrigger({
+  children,
+  className = '',
+  disabled = false,
+  id,
+}: SelectTriggerProps) {
   const context = useContext(SelectContext);
-  
+
   if (!context) {
     throw new Error('SelectTrigger must be used within Select');
   }
@@ -94,13 +115,16 @@ interface SelectValueProps {
   className?: string;
 }
 
-export function SelectValue({ placeholder = 'Select...', className = '' }: SelectValueProps) {
+export function SelectValue({
+  placeholder = 'Select...',
+  className = '',
+}: SelectValueProps) {
   const context = useContext(SelectContext);
-  
+
   if (!context) {
     throw new Error('SelectValue must be used within Select');
   }
-   
+
   const label = context.value ? context.getItemLabel(context.value) : undefined;
 
   return (
@@ -115,10 +139,13 @@ interface SelectContentProps {
   className?: string;
 }
 
-export function SelectContent({ children, className = '' }: SelectContentProps) {
+export function SelectContent({
+  children,
+  className = '',
+}: SelectContentProps) {
   const context = useContext(SelectContext);
   const contentRef = useRef<HTMLDivElement>(null);
-  
+
   if (!context) {
     throw new Error('SelectContent must be used within Select');
   }
@@ -127,7 +154,10 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (contentRef.current && !contentRef.current.contains(event.target as Node)) {
+      if (
+        contentRef.current &&
+        !contentRef.current.contains(event.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -141,14 +171,10 @@ export function SelectContent({ children, className = '' }: SelectContentProps) 
     };
   }, [open, setOpen]);
 
-  if (!open) {
-    return null;
-  }
-
   return (
     <div
       ref={contentRef}
-      className={`absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg dark:bg-gray-950 dark:border-gray-700 dark:text-white ${className}`}
+      className={`absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg dark:bg-gray-950 dark:border-gray-700 dark:text-white ${className} ${!open ? 'hidden' : ''}`}
     >
       {children}
     </div>
@@ -163,9 +189,15 @@ interface SelectItemProps {
   disabled?: boolean;
 }
 
-export function SelectItem({ value, children, textValue, className = '', disabled = false }: SelectItemProps) {
+export function SelectItem({
+  value,
+  children,
+  textValue,
+  className = '',
+  disabled = false,
+}: SelectItemProps) {
   const context = useContext(SelectContext);
-  
+
   if (!context) {
     throw new Error('SelectItem must be used within Select');
   }
@@ -174,7 +206,9 @@ export function SelectItem({ value, children, textValue, className = '', disable
 
   useEffect(() => {
     const inferred =
-      typeof children === 'string' || typeof children === 'number' ? String(children) : '';
+      typeof children === 'string' || typeof children === 'number'
+        ? String(children)
+        : '';
     context.registerItem(value, textValue ?? inferred);
   }, [children, context, textValue, value]);
 

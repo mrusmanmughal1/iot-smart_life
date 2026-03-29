@@ -31,7 +31,11 @@ import {
 import type { AssetProfileFormData } from '../types/asset-profile-form.types';
 import { DEFAULT_ASSET_PROFILE_FORM_DATA } from '../types/asset-profile-form.types';
 import { assetProfileFormSchema } from '../types/asset-profile-form.schema';
-import { useEdgeRuleChain, useQueues, useRuleChains } from '@/features/rules/hooks';
+import {
+  useEdgeRuleChain,
+  useQueues,
+  useRuleChains,
+} from '@/features/rules/hooks';
 
 interface AssetProfileFormProps {
   open: boolean;
@@ -44,10 +48,8 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
   open,
   onOpenChange,
   onSubmit,
-  isLoading
+  isLoading,
 }) => {
-
-   
   const form = useForm<AssetProfileFormData>({
     resolver: zodResolver(assetProfileFormSchema),
     defaultValues: DEFAULT_ASSET_PROFILE_FORM_DATA,
@@ -219,15 +221,15 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
                   </FormItem>
                 )}
               />
-
-               
             </div>
 
             <DialogFooter className="p-4 absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 ">
               <Button type="button" variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
-              <Button type="submit" isLoading={isLoading}>{isLoading ? 'Creating...' : 'Create Profile'}</Button>
+              <Button type="submit" isLoading={isLoading}>
+                {isLoading ? 'Creating...' : 'Create Profile'}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

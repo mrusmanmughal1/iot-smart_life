@@ -3,7 +3,6 @@ import type { Device } from '@/services/api/devices.api.ts';
 export interface DeviceFormData {
   name: string;
   type: string;
-  label?: string;
   deviceProfileId?: string;
   gatewayId?: string;
   description?: string;

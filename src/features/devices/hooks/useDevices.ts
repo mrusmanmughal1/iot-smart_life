@@ -22,6 +22,14 @@ export const useDevice = (deviceId: string) => {
     enabled: !!deviceId,
   });
 };
+// get device by id and populate gateway
+export const useGetDeviceById = (deviceId: string) => {
+  return useQuery({
+    queryKey: ['devices', deviceId],
+    queryFn: () => devicesApi.getById(deviceId),
+    enabled: !!deviceId,
+  });
+};
 
 export const useDeviceWithTelemetry = (deviceId: string, keys?: string[]) => {
   return useQuery({

@@ -92,93 +92,93 @@ export const useAssetProfile = (profileId: string) => {
 /**
  * Transform form data to API format for device profile
  */
-function transformFormDataToApiFormat(
-  formData: DeviceProfileMultiStepFormData
-): Partial<import('@/services/api/profiles.api').DeviceProfile> {
-  // Transform device type
-  const transformType = (
-    type: string
-  ): 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP' => {
-    const typeMap: Record<
-      string,
-      'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP'
-    > = {
-      Sensor: 'DEFAULT',
-      Gateway: 'DEFAULT',
-      Meter: 'DEFAULT',
-      Actuator: 'DEFAULT',
-    };
-    return typeMap[type] || 'DEFAULT';
-  };
+// function transformFormDataToApiFormat(
+//   formData: DeviceProfileMultiStepFormData
+// ): Partial<import('@/services/api/profiles.api').DeviceProfile> {
+//   // Transform device type
+//   const transformType = (
+//     type: string
+//   ): 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP' => {
+//     const typeMap: Record<
+//       string,
+//       'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP'
+//     > = {
+//       Sensor: 'DEFAULT',
+//       Gateway: 'DEFAULT',
+//       Meter: 'DEFAULT',
+//       Actuator: 'DEFAULT',
+//     };
+//     return typeMap[type] || 'DEFAULT';
+//   };
 
-  // Transform transport type
-  const transformTransportType = (
-    type?: string
-  ): 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP' => {
-    if (!type) return 'DEFAULT';
-    const transportMap: Record<
-      string,
-      'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP'
-    > = {
-      MQTT: 'MQTT',
-      HTTP: 'HTTP',
-      COAP: 'COAP',
-      LWM2M: 'LWM2M',
-      SNMP: 'SNMP',
-    };
-    return transportMap[type] || 'DEFAULT';
-  };
+//   // Transform transport type
+//   const transformTransportType = (
+//     type?: string
+//   ): 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP' => {
+//     if (!type) return 'DEFAULT';
+//     const transportMap: Record<
+//       string,
+//       'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP'
+//     > = {
+//       MQTT: 'MQTT',
+//       HTTP: 'HTTP',
+//       COAP: 'COAP',
+//       LWM2M: 'LWM2M',
+//       SNMP: 'SNMP',
+//     };
+//     return transportMap[type] || 'DEFAULT';
+//   };
 
-  // Transform provision type
-  const transformProvisionType = (
-    provisionType?: string
-  ):
-    | 'DISABLED'
-    | 'ALLOW_CREATE_NEW_DEVICES'
-    | 'CHECK_PRE_PROVISIONED_DEVICES'
-    | undefined => {
-    if (!provisionType) return undefined;
-    if (provisionType === 'Disabled') return 'DISABLED';
-    if (provisionType === 'Allow creating new devices')
-      return 'ALLOW_CREATE_NEW_DEVICES';
-    if (provisionType === 'Check pre-provisioned devices')
-      return 'CHECK_PRE_PROVISIONED_DEVICES';
-    return undefined;
-  };
+//   // Transform provision type
+//   const transformProvisionType = (
+//     provisionType?: string
+//   ):
+//     | 'DISABLED'
+//     | 'ALLOW_CREATE_NEW_DEVICES'
+//     | 'CHECK_PRE_PROVISIONED_DEVICES'
+//     | undefined => {
+//     if (!provisionType) return undefined;
+//     if (provisionType === 'Disabled') return 'DISABLED';
+//     if (provisionType === 'Allow creating new devices')
+//       return 'ALLOW_CREATE_NEW_DEVICES';
+//     if (provisionType === 'Check pre-provisioned devices')
+//       return 'CHECK_PRE_PROVISIONED_DEVICES';
+//     return undefined;
+//   };
 
-  return {
-    name: formData.name,
-    description: formData.description || undefined,
-    type: transformType(formData.type),
-    transportType: transformTransportType(formData.transportConfig?.type),
-    transportConfiguration: formData.transportConfig
-      ? {
-          type: formData.transportConfig.type,
-          ...formData.transportConfig.mqttConfig,
-          ...formData.transportConfig.httpConfig,
-          ...formData.transportConfig.coapConfig,
-          ...formData.transportConfig.modbusConfig,
-          ...formData.transportConfig.loraWanConfig,
-        }
-      : undefined,
-    alarmRules: formData.alarmRules?.map((rule) => ({
-      name: rule.name,
-      condition: rule.condition,
-      severity: rule.severity,
-    })),
-    provisionType: transformProvisionType(
-      formData.provisioningConfig?.provisionType
-    ),
-    provisionConfiguration: formData.provisioningConfig
-      ? {
-          provisionType: formData.provisioningConfig.provisionType,
-          defaultRuleChain: formData.provisioningConfig.defaultRuleChain,
-          preProvisionedDevices:
-            formData.provisioningConfig.preProvisionedDevices,
-        }
-      : undefined,
-  };
-}
+//   return {
+//     name: formData.name,
+//     description: formData.description || undefined,
+//     type: transformType(formData.type),
+//     transportType: transformTransportType(formData.transportConfig?.type),
+//     transportConfiguration: formData.transportConfig
+//       ? {
+//           type: formData.transportConfig.type,
+//           ...formData.transportConfig.mqttConfig,
+//           ...formData.transportConfig.httpConfig,
+//           ...formData.transportConfig.coapConfig,
+//           ...formData.transportConfig.modbusConfig,
+//           ...formData.transportConfig.loraWanConfig,
+//         }
+//       : undefined,
+//     alarmRules: formData.alarmRules?.map((rule) => ({
+//       name: rule.name,
+//       condition: rule.condition,
+//       severity: rule.severity,
+//     })),
+//     provisionType: transformProvisionType(
+//       formData.provisioningConfig?.provisionType
+//     ),
+//     provisionConfiguration: formData.provisioningConfig
+//       ? {
+//           provisionType: formData.provisioningConfig.provisionType,
+//           defaultRuleChain: formData.provisioningConfig.defaultRuleChain,
+//           preProvisionedDevices:
+//             formData.provisioningConfig.preProvisionedDevices,
+//         }
+//       : undefined,
+//   };
+// }
 
 /**
  * Hook to create a device profile
@@ -189,8 +189,8 @@ export const useCreateDeviceProfile = () => {
 
   return useMutation({
     mutationFn: async (formData: DeviceProfileMultiStepFormData) => {
-      const apiData = transformFormDataToApiFormat(formData);
-      return deviceProfilesApi.create(apiData);
+      // const apiData = transformFormDataToApiFormat(formData);
+      return deviceProfilesApi.create(formData);
     },
     onSuccess: () => {
       // Invalidate and refetch device profiles list
@@ -213,8 +213,8 @@ export const useUpdateDeviceProfile = () => {
       profileId: string;
       data: DeviceProfileMultiStepFormData;
     }) => {
-      const apiData = transformFormDataToApiFormat(data);
-      return deviceProfilesApi.update(profileId, apiData);
+      // const apiData = transformFormDataToApiFormat(data);
+      return deviceProfilesApi.update(profileId, data);
     },
     onSuccess: (_, variables) => {
       // Invalidate and refetch device profiles list and the specific profile

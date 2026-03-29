@@ -17,7 +17,6 @@ const CustomerUserAssociationPage = Loadable(
 const CreateRolePage = Loadable(
   lazy(() => import('@/pages/CreateRolePage.tsx'))
 );
-const EditRolePage = Loadable(lazy(() => import('@/pages/EditRolePage.tsx')));
 const CustomerDetails = Loadable(
   lazy(() => import('@/features/users/components/CustomerDetails.tsx'))
 );
@@ -84,7 +83,7 @@ export const managementRoutes = [
       },
       {
         path: 'edit-role/:id',
-        element: <EditRolePage />,
+        element: <CreateRolePage />,
       },
       {
         path: 'customer-details/:id',

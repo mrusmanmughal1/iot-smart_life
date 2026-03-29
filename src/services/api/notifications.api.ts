@@ -33,9 +33,6 @@ export interface Notification {
   readAt: string;
   isRead: boolean;
   endDate: string;
-
-
-
 }
 
 export interface NotificationTemplate {
@@ -60,7 +57,6 @@ export interface NotificationQuery {
   userId?: string;
   page?: number;
   limit?: number;
-
 }
 
 export interface PaginatedResponse<T> {
@@ -96,14 +92,7 @@ export const notificationsApi = {
 
   getAll: (params?: NotificationQuery) =>
     apiClient.get<
-
-      BackendEnvelope<
-        BackendEnvelope<
-          PaginatedNotificationsResponse
-        >
-      >
-
-
+      BackendEnvelope<BackendEnvelope<PaginatedNotificationsResponse>>
     >('/notifications', { params }),
 
   // Get notification by ID
@@ -119,8 +108,7 @@ export const notificationsApi = {
     apiClient.patch<ApiResponse<Notification>>(`/notifications/${id}`, data),
 
   // Delete notification
-  delete: (id: string) =>
-    apiClient.delete(`/notifications/${id}`),
+  delete: (id: string) => apiClient.delete(`/notifications/${id}`),
 
   // Mark as read
   markAsRead: (id: string) =>
@@ -136,13 +124,18 @@ export const notificationsApi = {
 
   // Bulk delete
   bulkDelete: (notificationIds: string[]) =>
-    apiClient.post<ApiResponse<any>>('/notifications/bulk/delete', { notificationIds }),
+    apiClient.post<ApiResponse<any>>('/notifications/bulk/delete', {
+      notificationIds,
+    }),
 
   // Get unread count
   getUnreadCount: (userId?: string) =>
-    apiClient.get<ApiResponse<{ count: number }>>('/notifications/unread/count', {
-      params: { userId },
-    }),
+    apiClient.get<ApiResponse<{ count: number }>>(
+      '/notifications/unread/count',
+      {
+        params: { userId },
+      }
+    ),
 
   // Get statistics
   getStatistics: () =>
@@ -155,41 +148,57 @@ export const notificationsApi = {
     title: string;
     message: string;
     priority?: NotificationPriority;
-  }) =>
-    apiClient.post<ApiResponse<Notification>>('/notifications/send', data),
+  }) => apiClient.post<ApiResponse<Notification>>('/notifications/send', data),
 };
 
 // Notification Templates API
 export const notificationTemplatesApi = {
   // Get all templates
   getAll: (params?: TemplateQuery) =>
-    apiClient.get<PaginatedResponse<NotificationTemplate>>('/notifications/templates', { params }),
+    apiClient.get<PaginatedResponse<NotificationTemplate>>(
+      '/notifications/templates',
+      { params }
+    ),
 
   // Get template by ID
   getById: (id: string) =>
-    apiClient.get<ApiResponse<NotificationTemplate>>(`/notifications/templates/${id}`),
+    apiClient.get<ApiResponse<NotificationTemplate>>(
+      `/notifications/templates/${id}`
+    ),
 
   // Create template
   create: (data: Partial<NotificationTemplate>) =>
-    apiClient.post<ApiResponse<NotificationTemplate>>('/notifications/templates', data),
+    apiClient.post<ApiResponse<NotificationTemplate>>(
+      '/notifications/templates',
+      data
+    ),
 
   // Update template
   update: (id: string, data: Partial<NotificationTemplate>) =>
-    apiClient.patch<ApiResponse<NotificationTemplate>>(`/notifications/templates/${id}`, data),
+    apiClient.patch<ApiResponse<NotificationTemplate>>(
+      `/notifications/templates/${id}`,
+      data
+    ),
 
   // Delete template
-  delete: (id: string) =>
-    apiClient.delete(`/notifications/templates/${id}`),
+  delete: (id: string) => apiClient.delete(`/notifications/templates/${id}`),
 
   // Enable template
   enable: (id: string) =>
-    apiClient.patch<ApiResponse<NotificationTemplate>>(`/notifications/templates/${id}/enable`),
+    apiClient.patch<ApiResponse<NotificationTemplate>>(
+      `/notifications/templates/${id}/enable`
+    ),
 
   // Disable template
   disable: (id: string) =>
-    apiClient.patch<ApiResponse<NotificationTemplate>>(`/notifications/templates/${id}/disable`),
+    apiClient.patch<ApiResponse<NotificationTemplate>>(
+      `/notifications/templates/${id}/disable`
+    ),
 
   // Test template
   test: (id: string, testData?: any) =>
-    apiClient.post<ApiResponse<any>>(`/notifications/templates/${id}/test`, testData),
+    apiClient.post<ApiResponse<any>>(
+      `/notifications/templates/${id}/test`,
+      testData
+    ),
 };

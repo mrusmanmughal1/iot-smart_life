@@ -303,7 +303,7 @@ export const DashboardPage = () => {
                   </CardTitle>
                 </div>
 
-                <CardDescription>
+                <div className="text-sm text-slate-500 dark:text-slate-400">
                   <div className="text-2xl pb-3 font-bold text-gray-900  ">
                     {SubscriptionUsage?.current?.dashboards || 0}/
                     {SubscriptionUsage?.limits?.dashboards || 0}
@@ -325,7 +325,7 @@ export const DashboardPage = () => {
                   >
                     {t('dashboard.viewAll')}
                   </Link>
-                </CardDescription>
+                </div>
               </CardHeader>
             </Card>
           </div>

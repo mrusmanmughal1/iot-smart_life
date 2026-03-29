@@ -23,7 +23,7 @@ export const useUnreadCount = (userId?: string) => {
 };
 
 export const useMarkAsRead = () => {
-  const queryClient = useQueryClient();  
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (notificationId: string) =>
       notificationsApi.markAsRead(notificationId),
@@ -33,17 +33,16 @@ export const useMarkAsRead = () => {
   });
 };
 export const useMarkAllAsRead = () => {
-  const queryClient = useQueryClient();  
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () =>
-      notificationsApi.markAllAsRead(),
+    mutationFn: () => notificationsApi.markAllAsRead(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
     },
   });
 };
 export const DeleteNotificationById = () => {
-  const queryClient = useQueryClient();  
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (notificationId: string) =>
       notificationsApi.delete(notificationId),

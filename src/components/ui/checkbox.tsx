@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { Check } from 'lucide-react';
 
-export interface CheckboxProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ className, label, ...props }, ref) => {
+  ({ className, disabled, label, ...props }, ref) => {
     return (
       <label className="flex items-center gap-2 cursor-pointer">
         <div className="relative">
@@ -17,7 +16,9 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             ref={ref}
             {...props}
           />
-          <div className="w-5 h-5 border-2 border-[#949CA9] rounded peer-checked:bg-secondary peer-checked:border-secondary transition-all flex items-center justify-center">
+          <div
+            className={`w-5 h-5 border-2 border-[#949CA9] rounded peer-checked:bg-secondary peer-checked:border-secondary transition-all flex items-center justify-center ${disabled ? 'cursor-not-allowed' : ''}`}
+          >
             <Check className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" />
           </div>
         </div>

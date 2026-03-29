@@ -70,19 +70,18 @@ const getNavItems = (): NavItem[] => [
   {
     titleKey: 'nav.profiles',
     icon: <PiSquare className="h-5 w-5" />,
-    feature: 'profiles',
     children: [
       {
         titleKey: 'nav.deviceProfiles',
         href: '/device-profiles',
         icon: <Smartphone className="h-4 w-4" />,
-        feature: 'devices',
+        feature: 'deviceProfiles',
       },
       {
         titleKey: 'nav.assetProfiles',
         href: '/asset-profiles',
         icon: <Box className="h-4 w-4" />,
-        feature: 'assets',
+        feature: 'assetProfiles',
       },
     ],
   },

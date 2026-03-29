@@ -63,7 +63,6 @@ export const DeviceProfileMultiStepForm: React.FC<
     defaultValues: DEFAULT_MULTI_STEP_FORM_DATA,
     mode: 'onChange',
   });
-
   const validateCurrentStep = async (): Promise<boolean> => {
     let fieldsToValidate: (keyof DeviceProfileMultiStepFormData)[] = [];
 
@@ -72,19 +71,19 @@ export const DeviceProfileMultiStepForm: React.FC<
         // Step 1 is required - validate all fields
         fieldsToValidate = [
           'name',
-          'description', 
+          'description',
           'type',
-          'defaultRuleChain',
-          'queue',
-          'defaultEdgeRuleChain',
+          'defaultRuleChainId',
+          'defaultQueueName',
+          // 'defaultEdgeRuleChain',
         ];
         break;
       }
       case 2: {
         // Step 2 is optional - only validate if transportConfig exists
-        const transportConfig = form.getValues('transportConfig');
-        if (transportConfig) {
-          fieldsToValidate = ['transportConfig'];
+        const transportType = form.getValues('transportType');
+        if (transportType) {
+          fieldsToValidate = ['transportType', 'transportConfiguration'];
         } else {
           // Optional step, allow proceeding
           return true;
@@ -137,9 +136,9 @@ export const DeviceProfileMultiStepForm: React.FC<
       }
       case 4: {
         // Step 4 is optional - only validate if provisioningConfig exists
-        const provisioningConfig = form.getValues('provisioningConfig');
-        if (provisioningConfig) {
-          fieldsToValidate = ['provisioningConfig'];
+        const provisionType = form.getValues('provisionType');
+        if (provisionType) {
+          fieldsToValidate = ['provisionType', 'provisionConfiguration'];
         } else {
           // Optional step, allow proceeding
           return true;

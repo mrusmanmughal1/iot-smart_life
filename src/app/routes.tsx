@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import {
   ProtectedRoute,
@@ -26,7 +26,6 @@ export const router = createBrowserRouter([
     children: publicRoutes,
   },
   //  --------------------protected routes--------------------
-
   {
     element: <ProtectedRoute />,
     errorElement: <RouteErrorPage />,

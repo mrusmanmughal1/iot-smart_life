@@ -1,8 +1,8 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router-dom';
-import { useState, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,8 +10,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { Permission } from '@/services/api/users.api';
 import { usePermissions } from '@/features/permissions/hooks';
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import { useCreateRole } from '@/features/roles/hooks';
+import { ChevronDown, ChevronRight, Loader2 } from 'lucide-react';
+import {
+  useCreateRole,
+  useRoleById,
+  useUpdateRole,
+} from '@/features/roles/hooks';
 
 // Zod validation schema
 const createRoleSchema = z.object({
@@ -23,8 +27,12 @@ const createRoleSchema = z.object({
 type CreateRoleFormData = z.infer<typeof createRoleSchema>;
 
 export default function CreateRolePage() {
+  const { id } = useParams();
+  const isEditMode = !!id;
   const navigate = useNavigate();
   const { mutateAsync: createRole } = useCreateRole();
+  const { mutateAsync: updateRole } = useUpdateRole();
+  const { data: roleData, isLoading: isRoleLoading } = useRoleById(id);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
     {}
@@ -36,6 +44,7 @@ export default function CreateRolePage() {
     control,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<CreateRoleFormData>({
     resolver: zodResolver(createRoleSchema),
@@ -46,6 +55,16 @@ export default function CreateRolePage() {
     },
     mode: 'onChange',
   });
+
+  useEffect(() => {
+    if (isEditMode && roleData) {
+      reset({
+        name: roleData.name || '',
+        description: roleData.description || '',
+        permissionIds: roleData.permissions?.map((p: any) => p.id) || [],
+      });
+    }
+  }, [isEditMode, roleData, reset]);
   const { data: permissionsData } = usePermissions();
   const permissions = useMemo(
     () => (permissionsData || []) as Permission[],
@@ -102,11 +121,28 @@ export default function CreateRolePage() {
   };
 
   const onSubmit = async (data: CreateRoleFormData) => {
-    createRole(data);
+    setIsSubmitting(true);
+    try {
+      if (isEditMode) {
+        await updateRole({ roleId: id as string, data });
+        navigate('/users-management', {
+          state: { tab: 'Roles' },
+        });
+      } else {
+        await createRole(data);
+        navigate('/users-management', {
+          state: { tab: 'Roles' },
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
-    navigate('/users-management');
+    navigate('/users-management', {
+      state: { tab: 'Roles' },
+    });
   };
 
   return (
@@ -114,7 +150,7 @@ export default function CreateRolePage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <h1 className="text-xl font-semibold text-gray-900 mb-6">
-          Create Role
+          {isEditMode ? 'Edit Role' : 'Create Role'}
         </h1>
 
         {/* Two Column Layout */}
@@ -122,50 +158,55 @@ export default function CreateRolePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Role Details */}
             <Card className="shadow-lg rounded-xl border-gray-200">
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Role Information
-                </h2>
-                <div className="space-y-4">
-                  {/* Role Name */}
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Role Name <span className="text-red-500">*</span>
-                    </label>
-                    <Input
-                      id="name"
-                      {...register('name')}
-                      placeholder="Enter role name"
-                      className="w-full border border-gray-300 rounded-md"
-                    />
-                    {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.name.message}
-                      </p>
-                    )}
-                  </div>
+              {isRoleLoading ? (
+                <div className="flex h-48 items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-secondary" />
+                </div>
+              ) : (
+                <CardContent className="p-6">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                    Role Information
+                  </h2>
+                  <div className="space-y-4">
+                    {/* Role Name */}
+                    <div>
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Role Name <span className="text-red-500">*</span>
+                      </label>
+                      <Input
+                        id="name"
+                        {...register('name')}
+                        placeholder="Enter role name"
+                        className="w-full border border-gray-300 rounded-md"
+                      />
+                      {errors.name && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.name.message}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* Description */}
-                  <div>
-                    <label
-                      htmlFor="description"
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                      Description
-                    </label>
-                    <Textarea
-                      id="description"
-                      {...register('description')}
-                      placeholder="Enter role description..."
-                      className="min-h-[100px] w-full border border-gray-300 rounded-md"
-                    />
-                  </div>
+                    {/* Description */}
+                    <div>
+                      <label
+                        htmlFor="description"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Description
+                      </label>
+                      <Textarea
+                        id="description"
+                        {...register('description')}
+                        placeholder="Enter role description..."
+                        className="min-h-[100px] w-full border border-gray-300 rounded-md"
+                      />
+                    </div>
 
-                  {/* Status */}
-                  {/* <div>
+                    {/* Status */}
+                    {/* <div>
                     <Controller
                       name="isSystem"
                       control={control}
@@ -179,12 +220,13 @@ export default function CreateRolePage() {
                     />
                   </div> */}
 
-                  {/* Required fields note */}
-                  <p className="text-xs text-gray-500 mt-4">
-                    <span className="text-red-500">*</span> Required fields
-                  </p>
-                </div>
-              </CardContent>
+                    {/* Required fields note */}
+                    <p className="text-xs text-gray-500 mt-4">
+                      <span className="text-red-500">*</span> Required fields
+                    </p>
+                  </div>
+                </CardContent>
+              )}
             </Card>
 
             {/* Right Column - Permissions */}
@@ -295,10 +337,12 @@ export default function CreateRolePage() {
               type="submit"
               variant="default"
               disabled={isSubmitting}
-              isLoading={isSubmitting}
               className="bg-secondary hover:bg-secondary/90 text-white"
             >
-              Save
+              {isSubmitting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              {isEditMode ? 'Update' : 'Save'}
             </Button>
           </div>
         </form>

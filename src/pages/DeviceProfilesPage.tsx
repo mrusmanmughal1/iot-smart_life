@@ -58,6 +58,7 @@ export default function DeviceProfiles() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleCreateProfile = async (data: DeviceProfileMultiStepFormData) => {
+    console.log(data);
     try {
       await createDeviceProfileMutation.mutateAsync(data);
       toast.success('Device profile created successfully');
@@ -173,7 +174,9 @@ export default function DeviceProfiles() {
                     <TableRow key={deviceProfile.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <p className="font-medium">{deviceProfile.name}</p>
+                          <p className="font-medium  capitalize">
+                            {deviceProfile.name}
+                          </p>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -187,7 +190,7 @@ export default function DeviceProfiles() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <p className="font-medium">
+                          <p className="font-medium capitalize">
                             {deviceProfile.transportType}
                           </p>
                         </div>

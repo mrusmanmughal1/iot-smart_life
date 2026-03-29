@@ -1,4 +1,5 @@
 import { AssetProfilesResponse } from '@/features/assets/types';
+import { DeviceProfileMultiStepFormData } from '@/features/profiles/types';
 import apiClient from '@/lib/axios.ts';
 
 // Device Profile Types
@@ -6,12 +7,12 @@ export interface DeviceProfile {
   id: string;
   name: string;
   description?: string;
-  type: 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP';
-  transportType: 'DEFAULT' | 'MQTT' | 'HTTP' | 'COAP' | 'LWM2M' | 'SNMP';
+  type: 'default' | 'mqtt' | 'http' | 'coap' | 'lwm2m' | 'snmp';
+  transportType: 'default' | 'mqtt' | 'http' | 'coap' | 'lwm2m' | 'snmp';
   provisionType?:
-    | 'DISABLED'
-    | 'ALLOW_CREATE_NEW_DEVICES'
-    | 'CHECK_PRE_PROVISIONED_DEVICES';
+    | 'disabled'
+    | 'allow_create_new_devices'
+    | 'check_pre_provisioned_devices';
   default?: boolean;
   transportConfiguration?: Record<string, any>;
   telemetryKeys?: Array<{
@@ -29,7 +30,7 @@ export interface DeviceProfile {
   alarmRules?: Array<{
     name: string;
     condition: string;
-    severity: 'CRITICAL' | 'MAJOR' | 'MINOR' | 'WARNING' | 'INDETERMINATE';
+    severity: 'critical' | 'major' | 'minor' | 'warning' | 'indeterminate';
   }>;
   provisionConfiguration?: Record<string, any>;
   tenantId?: string;
@@ -105,11 +106,11 @@ export const deviceProfilesApi = {
     apiClient.get<ApiResponse<DeviceProfile>>(`/profiles/device/${id}`),
 
   // Create device profile
-  create: (data: Partial<DeviceProfile>) =>
+  create: (data: DeviceProfileMultiStepFormData) =>
     apiClient.post<ApiResponse<DeviceProfile>>('/profiles/device', data),
 
   // Update device profile
-  update: (id: string, data: Partial<DeviceProfile>) =>
+  update: (id: string, data: DeviceProfileMultiStepFormData) =>
     apiClient.patch<ApiResponse<DeviceProfile>>(`/profiles/device/${id}`, data),
 
   // Delete device profile

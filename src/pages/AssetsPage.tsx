@@ -155,26 +155,13 @@ export default function AssetsPage() {
               className="w-96 pr-10"
             />
           </div>
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            {t('assets.filters.assetType')}
-          </Button>
-          <Button variant="ghost" size="sm" className="flex items-center gap-2">
-            {t('assets.filters.customer')}
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white"
-          >
-            {t('assets.filters.filter')}
-          </Button>
         </div>
 
         {/* Assets Table */}
         <Card className="shadow-md rounded-xl border-gray-200 overflow-hidden">
           <CardContent className="p-6 relative min-h-[400px]">
             {isLoading && <LoadingOverlay />}
-            <div className="overflow-x-auto">
+            <div className="">
               <Table>
                 <TableHeader className="bg-primary text-white">
                   <TableRow className="hover:bg-primary">
@@ -268,7 +255,7 @@ export default function AssetsPage() {
                                 }
                               >
                                 <Eye className="mr-2 h-4 w-4" />
-                                {t('common.view') || 'View Details'}
+                                {t('common.edit') || 'Edit'}
                               </DropdownMenuItem>
 
                               <DropdownMenuItem

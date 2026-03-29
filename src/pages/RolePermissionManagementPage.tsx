@@ -97,7 +97,6 @@ export default function RolePermissionManagementPage() {
   const role = data as
     | { permissions?: RolePermission[]; name?: string }
     | undefined;
-
   const allPermissions = useMemo(() => role?.permissions ?? [], [role]);
 
   const permissionRows = useMemo(
@@ -121,59 +120,12 @@ export default function RolePermissionManagementPage() {
     setPermissionCategory(category);
   };
 
-  const handleGrantAll = () => {
-    setPermissions((prev) =>
-      prev.map((p) => ({
-        ...p,
-        access: 'allowed' as PermissionStatus,
-        create: 'allowed' as PermissionStatus,
-        read: 'allowed' as PermissionStatus,
-        update: 'allowed' as PermissionStatus,
-        delete: 'allowed' as PermissionStatus,
-      }))
-    );
-    toast.success('All permissions granted');
-  };
-
-  const handleRevokeAll = () => {
-    setPermissions((prev) =>
-      prev.map((p) => ({
-        ...p,
-        access: 'denied' as PermissionStatus,
-        create: 'denied' as PermissionStatus,
-        read: 'denied' as PermissionStatus,
-        update: 'denied' as PermissionStatus,
-        delete: 'denied' as PermissionStatus,
-      }))
-    );
-    toast.success('All permissions revoked');
-  };
-
-  const handleSave = () => {
-    toast.success('Permissions saved successfully');
-  };
-
   const handleCancel = () => {
-    navigate('/users');
+    navigate('/users-management', { state: { tab: 'Roles' } });
   };
 
-  const togglePermission = (
-    permissionId: string,
-    field: keyof Pick<
-      PermissionRow,
-      'access' | 'create' | 'read' | 'update' | 'delete'
-    >
-  ) => {
-    setPermissions((prev) =>
-      prev.map((perm) =>
-        perm.id === permissionId
-          ? {
-              ...perm,
-              [field]: perm[field] === 'allowed' ? 'denied' : 'allowed',
-            }
-          : perm
-      )
-    );
+  const handleEdit = () => {
+    navigate(`/users-management/edit-role/${id}`);
   };
 
   return (
@@ -255,42 +207,32 @@ export default function RolePermissionManagementPage() {
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
+                            disabled={true}
                             checked={isChecked(permission.access)}
-                            onChange={() =>
-                              togglePermission(permission.id, 'access')
-                            }
                           />
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
+                            disabled={true}
                             checked={isChecked(permission.create)}
-                            onChange={() =>
-                              togglePermission(permission.id, 'create')
-                            }
                           />
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
+                            disabled={true}
                             checked={isChecked(permission.read)}
-                            onChange={() =>
-                              togglePermission(permission.id, 'read')
-                            }
                           />
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
+                            disabled={true}
                             checked={isChecked(permission.update)}
-                            onChange={() =>
-                              togglePermission(permission.id, 'update')
-                            }
                           />
                         </TableCell>
                         <TableCell className="text-center">
                           <Checkbox
+                            disabled={true}
                             checked={isChecked(permission.delete)}
-                            onChange={() =>
-                              togglePermission(permission.id, 'delete')
-                            }
                           />
                         </TableCell>
                       </TableRow>
@@ -311,27 +253,14 @@ export default function RolePermissionManagementPage() {
                 {/* Legend */}
 
                 {/* Action Buttons */}
-                <div className="flex  justify-between w-full gap-3 items-end">
+                <div className="flex  justify-end w-full gap-3 items-end">
                   <div className="flex gap-3">
-                    <Button onClick={handleGrantAll} variant="primary">
-                      Grant All Permissions
-                    </Button>
-                    <Button onClick={handleRevokeAll} variant="secondary">
-                      Revoke All Permissions
+                    <Button onClick={handleEdit} variant="primary">
+                      Edit Roles
                     </Button>
                   </div>
                   <div className="flex gap-3">
-                    <Button
-                      onClick={handleSave}
-                      className="bg-gray-600 hover:bg-gray-700 text-white"
-                    >
-                      Save
-                    </Button>
-                    <Button
-                      onClick={handleCancel}
-                      variant="outline"
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-700"
-                    >
+                    <Button onClick={handleCancel} variant="outline">
                       Cancel
                     </Button>
                   </div>

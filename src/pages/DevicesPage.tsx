@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,36 +25,34 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import {
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-  Download,
-  Share2,
-  Activity,
-  History,
-} from 'lucide-react';
+import { MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { DeviceDialog } from '@/features/devices/components/DeviceDialog';
+import { DeviceCredentialsDialog } from '@/features/devices/components/DeviceCredentialsDialog';
 
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
 import type { DeviceFormData } from '@/features/devices/types';
 import { Pagination } from '@/components/common/Pagination/Pagination';
+import { debounce } from '@/lib/util';
+import { Input } from '@/components/ui/input';
 
 export default function DevicesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [inputValue, setInputValue] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isCredentialsDialogOpen, setIsCredentialsDialogOpen] = useState(false);
+  const [newDeviceCredentials, setNewDeviceCredentials] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [selectedDevice, setSelectedDevice] = useState<{
     id: string;
     name: string;
     type: string;
-    label?: string;
+    connectionType: string;
+    description: string;
   } | null>(null);
 
   const { data: devicesData } = useDevices({
@@ -90,11 +88,6 @@ export default function DevicesPage() {
   );
 
   // Handle status toggle
-  const handleStatusToggle = useCallback(async (deviceId: string) => {
-    // TODO: Implement status toggle functionality
-    console.log('Toggle status for device:', deviceId);
-    toast('Status toggle functionality coming soon', { icon: 'ℹ️' });
-  }, []);
 
   // Extract devices and pagination info from API response
   const { devices, meta } = useMemo(() => {
@@ -119,7 +112,8 @@ export default function DevicesPage() {
       id: device.id,
       name: device.name,
       type: device.type || '',
-      label: device.label || '',
+      connectionType: device.connectionType || '',
+      description: device.description || '',
     });
     setIsEditDialogOpen(true);
   }, []);
@@ -151,15 +145,22 @@ export default function DevicesPage() {
     [handleDelete, navigate]
   );
 
+  // Handle form submissions
   const handleCreate = async (data: DeviceFormData) => {
     try {
-      const response = await createDevice.mutateAsync(data);
+      const resp = await createDevice.mutateAsync(data);
       const successMessage =
-        (response as { data?: { message?: string } })?.data?.message ||
-        (response as { message?: string })?.message ||
+        (resp as { data?: { message?: string } })?.data?.message ||
+        (resp as { message?: string })?.message ||
         t('success.created') ||
         'Device created successfully';
       toast.success(successMessage);
+
+      const credentials = (resp as any)?.data?.data?.credentials || (resp as any)?.data?.credentials;
+      if (credentials) {
+        setNewDeviceCredentials(credentials);
+        setIsCredentialsDialogOpen(true);
+      }
       setIsCreateDialogOpen(false);
     } catch (error) {
       const errorMessage =
@@ -193,6 +194,26 @@ export default function DevicesPage() {
       toast.error(errorMessage);
     }
   };
+  // const debouncedSearch = useMemo(
+  //   () =>
+  //     debounce((value: string) => {
+  //       handleSearchChange(value);
+  //     }, 300),
+  //   [handleSearchChange]
+  // );
+  // const handleInputChange = useCallback(
+  //   (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     const value = e.target.value;
+  //     setInputValue(value);
+  //     debouncedSearch(value);
+  //   },
+  //   [debouncedSearch]
+  // );
+  console.log(devicesData);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setInputValue(value);
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -208,11 +229,23 @@ export default function DevicesPage() {
           {t('devices.addDevice')}
         </Button>
       </div>
-
+      {/* Search and Filter Section */}
+      <div className="flex items-center gap-3">
+        <div className="relative  ">
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            type="text"
+            placeholder={t('devices.searchPlaceholder')}
+            value={inputValue}
+            onChange={handleInputChange}
+            className="w-96 pr-10"
+          />
+        </div>
+      </div>
       {/* Devices Table */}
       <Card className="pt-6">
         <CardContent className="relative min-h-[400px]">
-          <div className="overflow-x-auto">
+          <div className="">
             <Table>
               <TableHeader className="bg-primary  text-white">
                 <TableRow className="hover:bg-primary ">
@@ -286,7 +319,7 @@ export default function DevicesPage() {
                           : 'N/A'}
                       </TableCell>
                       <TableCell
-                        className="text-right"
+                        className="text-right relative"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <DropdownMenu>
@@ -304,12 +337,6 @@ export default function DevicesPage() {
                             >
                               <Edit className="mr-2 h-4 w-4" />
                               {t('common.edit') || 'Edit'}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleStatusToggle(device.id)}
-                            >
-                              <Activity className="mr-2 h-4 w-4" />
-                              Toggle Status
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
@@ -362,16 +389,24 @@ export default function DevicesPage() {
         }}
         mode="edit"
         initialData={
-          selectedDevice
+          isEditDialogOpen && selectedDevice
             ? {
                 name: selectedDevice.name,
                 type: selectedDevice.type,
-                label: selectedDevice.label,
+                connectionType: selectedDevice.connectionType,
+                description: selectedDevice.description,
               }
             : undefined
         }
         onSubmit={handleEdit}
         isLoading={updateDevice.isPending}
+      />
+
+      {/* Credentials Dialog */}
+      <DeviceCredentialsDialog
+        open={isCredentialsDialogOpen}
+        onOpenChange={setIsCredentialsDialogOpen}
+        credentials={newDeviceCredentials}
       />
     </div>
   );

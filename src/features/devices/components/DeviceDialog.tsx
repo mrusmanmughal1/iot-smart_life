@@ -43,24 +43,21 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
   const [formData, setFormData] = useState<DeviceFormData>({
     name: '',
     type: '',
-    label: '',
     description: '',
     gatewayId: '',
     connectionType: '',
     ...initialData,
   });
   const [enableGatewayAssignment, setEnableGatewayAssignment] = useState(false);
-
   // Reset form when dialog opens/closes or initialData changes
   useEffect(() => {
     if (open) {
       setFormData({
         name: initialData?.name || '',
         type: initialData?.type || '',
-        label: initialData?.label || '',
         description: initialData?.description || '',
-        deviceProfileId: initialData?.deviceProfileId,
         gatewayId: initialData?.gatewayId || '',
+        connectionType: initialData?.connectionType || '',
       });
       setEnableGatewayAssignment(!!initialData?.gatewayId);
     }
@@ -76,7 +73,6 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
     setFormData({
       name: '',
       type: '',
-      label: '',
       description: '',
       gatewayId: '',
       connectionType: '',
@@ -101,7 +97,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
         </DialogHeader>
         <form
           onSubmit={handleSubmit}
-          className="max-h-[90vh] p-6 overflow-y-auto"
+          className="max-h-[90vh] px-6 pb-6 overflow-y-auto"
         >
           <div className="space-y-4">
             <div>
@@ -114,13 +110,15 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 }
                 placeholder="Enter device name"
                 required
-                className='border-2 rounded-md'
+                className="border-2 rounded-md"
               />
             </div>
             <div>
-              <Label htmlFor="device-type">{t('devices.deviceType')} *</Label>
+              <Label htmlFor="device-type-select">
+                {t('devices.deviceType')} *
+              </Label>
               <Select
-                value={formData.type}
+                value={formData.type?.toLowerCase() || undefined}
                 onValueChange={(value) =>
                   setFormData({ ...formData, type: value })
                 }
@@ -142,11 +140,11 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
               </Select>
             </div>
             <div>
-              <Label htmlFor="device-type">
+              <Label htmlFor="device-connection-select">
                 {t('devices.connectionType')} *
               </Label>
               <Select
-                value={formData.connectionType}
+                value={formData.connectionType?.toLowerCase() || undefined}
                 onValueChange={(value) =>
                   setFormData({ ...formData, connectionType: value })
                 }
@@ -154,7 +152,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 <SelectTrigger>
                   <SelectValue
                     className="placeholder:text-slate-100"
-                    placeholder="Select type"
+                    placeholder="Select connection type"
                   />
                 </SelectTrigger>
                 <SelectContent>
@@ -167,18 +165,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="device-label">Device Label</Label>
-              <Input
-                id="device-label"
-                value={formData.label || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, label: e.target.value })
-                }
-                placeholder="Optional label"
-                className='border-2 rounded-md'
-              />
-            </div>
+
             <div>
               <Label htmlFor="device-description">Description</Label>
               <Textarea
@@ -231,7 +218,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
               </Select>
             </div>
           </div>
-          <DialogFooter className=' pt-4'>
+          <DialogFooter className=" pt-4">
             <Button
               type="button"
               variant="outline"

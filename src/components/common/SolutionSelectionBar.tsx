@@ -67,7 +67,9 @@ export const SolutionSelectionBar: React.FC<SolutionSelectionBarProps> = ({
           onClick={scrollLeft}
           disabled={!canScrollLeft}
           className={`hidden sm:flex absolute left-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${
-            canScrollLeft ? 'opacity-100 cursor-pointer' : 'opacity-50 cursor-not-allowed'
+            canScrollLeft
+              ? 'opacity-100 cursor-pointer'
+              : 'opacity-50 cursor-not-allowed'
           }`}
         >
           <ChevronLeft size={26} className="text-gray-700 dark:text-white" />
@@ -77,7 +79,7 @@ export const SolutionSelectionBar: React.FC<SolutionSelectionBarProps> = ({
           ref={scrollContainerRef}
           className="flex flex-1 items-center gap-4 bg-[#D9D9D92B] dark:bg-gray-950 rounded-xl overflow-x-auto pb-4 no-scrollbar scroll-smooth px-10 sm:px-12"
         >
-          <div className="flex gap-4 w-full p-4">
+          <div className="flex gap-4 w-full py-4">
             {solutions.map((solution) => (
               <button
                 key={solution.key}
@@ -101,7 +103,9 @@ export const SolutionSelectionBar: React.FC<SolutionSelectionBarProps> = ({
           onClick={scrollRight}
           disabled={!canScrollRight}
           className={`hidden sm:flex absolute right-0 z-10 p-2 rounded-full bg-white shadow-md border border-gray-200 hover:bg-gray-50 transition-all ${
-            canScrollRight ? 'opacity-100 cursor-pointer' : 'opacity-50 cursor-not-allowed'
+            canScrollRight
+              ? 'opacity-100 cursor-pointer'
+              : 'opacity-50 cursor-not-allowed'
           }`}
         >
           <ChevronRight size={26} className="text-gray-700" />

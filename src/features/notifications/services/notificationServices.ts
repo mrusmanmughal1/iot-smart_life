@@ -1,5 +1,12 @@
-import { notificationsApi, notificationTemplatesApi } from '@/services/api/index.ts';
-import type { Notification, NotificationType, NotificationPriority } from '@/services/api/notifications.api.ts';
+import {
+  notificationsApi,
+  notificationTemplatesApi,
+} from '@/services/api/index.ts';
+import type {
+  Notification,
+  NotificationType,
+  NotificationPriority,
+} from '@/services/api/notifications.api.ts';
 
 /**
  * Notifications Feature Service
@@ -11,7 +18,7 @@ export const notificationService = {
    */
   async markMultipleAsRead(notificationIds: string[]) {
     await Promise.all(
-      notificationIds.map(id => notificationsApi.markAsRead(id))
+      notificationIds.map((id) => notificationsApi.markAsRead(id))
     );
 
     return {
@@ -28,10 +35,8 @@ export const notificationService = {
       isRead: false,
       userId,
     });
- 
+
     return unread.data.data.data;
-
-
   },
 
   /**
@@ -123,13 +128,13 @@ export const notificationService = {
     }
   ) {
     const results = await Promise.allSettled(
-      userIds.map(userId =>
+      userIds.map((userId) =>
         notificationsApi.send({ ...notification, userId })
       )
     );
 
-    const successful = results.filter(r => r.status === 'fulfilled').length;
-    const failed = results.filter(r => r.status === 'rejected').length;
+    const successful = results.filter((r) => r.status === 'fulfilled').length;
+    const failed = results.filter((r) => r.status === 'rejected').length;
 
     return {
       total: userIds.length,

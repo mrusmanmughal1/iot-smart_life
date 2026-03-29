@@ -38,7 +38,7 @@ export const Step4DeviceProvisioning: React.FC<
       <div className="space-y-4">
         <FormField
           control={form.control}
-          name="provisioningConfig.provisionType"
+          name="provisionType"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Provision Strategy</FormLabel>
@@ -49,13 +49,13 @@ export const Step4DeviceProvisioning: React.FC<
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Allow creating new devices">
+                  <SelectItem value="allow_create_new">
                     Allow creating new devices
                   </SelectItem>
-                  <SelectItem value="Check pre-provisioned devices">
+                  <SelectItem value="check_pre_provisioned">
                     Check pre-provisioned devices
                   </SelectItem>
-                  <SelectItem value="Disabled">Disabled</SelectItem>
+                  <SelectItem value="disabled">Disabled</SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
@@ -68,7 +68,7 @@ export const Step4DeviceProvisioning: React.FC<
 
         <FormField
           control={form.control}
-          name="provisioningConfig.defaultRuleChain"
+          name="defaultRuleChainId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Default Rule Chain</FormLabel>

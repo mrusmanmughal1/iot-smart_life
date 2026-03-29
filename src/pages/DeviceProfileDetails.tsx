@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {   
+import {
   DetailPageHeader,
   type Tab,
 } from '@/components/common/DetailPageHeader';
@@ -49,7 +49,7 @@ const DeviceProfileDetails = () => {
       />
     );
   }
- 
+
   // API response structure: response.data.data.data
   const apiResponse = deviceData?.data as
     | {
@@ -77,17 +77,21 @@ const DeviceProfileDetails = () => {
   // Transform API data to form data format
   const transformTransportConfig = (
     transportConfig?: Record<string, unknown>
-  ): DeviceProfileMultiStepFormData['transportConfig'] | undefined => {
+  ): DeviceProfileMultiStepFormData['transportConfiguration'] | undefined => {
     if (!transportConfig) return undefined;
-    const type = (transportConfig.type as string) || 'MQTT';
     return {
-      type: type as 'MQTT' | 'HTTP' | 'CoAP' | 'Modbus' | 'LoRaWAN',
       mqttConfig: transportConfig.deviceTelemetryTopic
         ? {
             deviceTelemetryTopic: String(transportConfig.deviceTelemetryTopic),
-            deviceAttributesTopic: String(transportConfig.deviceAttributesTopic || ''),
-            deviceRpcRequestTopic: String(transportConfig.deviceRpcRequestTopic || ''),
-            deviceRpcResponseTopic: String(transportConfig.deviceRpcResponseTopic || ''),
+            deviceAttributesTopic: String(
+              transportConfig.deviceAttributesTopic || ''
+            ),
+            deviceRpcRequestTopic: String(
+              transportConfig.deviceRpcRequestTopic || ''
+            ),
+            deviceRpcResponseTopic: String(
+              transportConfig.deviceRpcResponseTopic || ''
+            ),
           }
         : undefined,
       httpConfig: transportConfig.baseUrl
@@ -96,12 +100,13 @@ const DeviceProfileDetails = () => {
             timeout: Number(transportConfig.timeout) || undefined,
           }
         : undefined,
-      coapConfig: transportConfig.port && !transportConfig.baudRate
-        ? {
-            port: Number(transportConfig.port) || undefined,
-            timeout: Number(transportConfig.timeout) || undefined,
-          }
-        : undefined,
+      coapConfig:
+        transportConfig.port && !transportConfig.baudRate
+          ? {
+              port: Number(transportConfig.port) || undefined,
+              timeout: Number(transportConfig.timeout) || undefined,
+            }
+          : undefined,
       modbusConfig: transportConfig.baudRate
         ? {
             port: Number(transportConfig.port) || undefined,
@@ -119,13 +124,20 @@ const DeviceProfileDetails = () => {
 
   const transformProvisioningConfig = (
     provisionConfig?: Record<string, unknown>
-  ): DeviceProfileMultiStepFormData['provisioningConfig'] | undefined => {
+  ): DeviceProfileMultiStepFormData['provisionConfiguration'] | undefined => {
     if (!provisionConfig) return undefined;
-    const provisionType = String(provisionConfig.provisionType || 'Allow creating new devices');
+    const provisionType = String(
+      provisionConfig.provisionType || 'Allow creating new devices'
+    );
     return {
-      provisionType: provisionType as 'Allow creating new devices' | 'Check pre-provisioned devices' | 'Disabled',
+      provisionType: provisionType as
+        | 'Allow creating new devices'
+        | 'Check pre-provisioned devices'
+        | 'Disabled',
       defaultRuleChain: String(provisionConfig.defaultRuleChain || ''),
-      preProvisionedDevices: Array.isArray(provisionConfig.preProvisionedDevices)
+      preProvisionedDevices: Array.isArray(
+        provisionConfig.preProvisionedDevices
+      )
         ? (provisionConfig.preProvisionedDevices as string[])
         : [],
     };
@@ -173,7 +185,7 @@ const DeviceProfileDetails = () => {
         <DeviceProfileTransportTab
           profileId={id}
           profileData={{
-            transportConfig: transformTransportConfig(
+            transportConfiguration: transformTransportConfig(
               device?.transportConfiguration
             ),
           }}
@@ -185,7 +197,7 @@ const DeviceProfileDetails = () => {
         <DeviceProfileProvisioningTab
           profileId={id}
           profileData={{
-            provisioningConfig: transformProvisioningConfig(
+            provisionConfiguration: transformProvisioningConfig(
               device?.provisionConfiguration
             ),
           }}
@@ -200,7 +212,12 @@ const DeviceProfileDetails = () => {
             alarmRules: device?.alarmRules?.map((rule) => ({
               name: rule.name,
               condition: rule.condition,
-              severity: rule.severity as 'CRITICAL' | 'MAJOR' | 'MINOR' | 'WARNING' | 'INDETERMINATE',
+              severity: rule.severity as
+                | 'CRITICAL'
+                | 'MAJOR'
+                | 'MINOR'
+                | 'WARNING'
+                | 'INDETERMINATE',
             })),
           }}
           onSuccess={handleSuccess}

@@ -44,12 +44,12 @@ const DeviceProfileDetailsTab: React.FC<DeviceProfileDetailsTabProps> = ({
         name: profileData.name || '',
         description: profileData.description || '',
         type: (profileData.type as any) || 'Sensor',
-        defaultRuleChain: profileData.defaultRuleChain || '',
-        queue: profileData.queue || '',
-        defaultEdgeRuleChain: profileData.defaultEdgeRuleChain || '',
-        transportConfig: DEFAULT_MULTI_STEP_FORM_DATA.transportConfig,
-        alarmRules: [],
-        provisioningConfig: DEFAULT_MULTI_STEP_FORM_DATA.provisioningConfig,
+        // defaultRuleChain: profileData.defaultRuleChain || '',
+        // queue: profileData.queue || '',
+        // defaultEdgeRuleChain: profileData.defaultEdgeRuleChain || '',
+        // transportConfig: DEFAULT_MULTI_STEP_FORM_DATA.transportConfig,
+        // alarmRules: [],
+        // provisioningConfig: DEFAULT_MULTI_STEP_FORM_DATA.provisioningConfig,
       });
     }
   }, [profileData, form]);
@@ -79,12 +79,12 @@ const DeviceProfileDetailsTab: React.FC<DeviceProfileDetailsTabProps> = ({
         name: profileData.name || '',
         description: profileData.description || '',
         type: (profileData.type as any) || 'Sensor',
-        defaultRuleChain: profileData.defaultRuleChain || '',
-        queue: profileData.queue || '',
-        defaultEdgeRuleChain: profileData.defaultEdgeRuleChain || '',
-        transportConfig: DEFAULT_MULTI_STEP_FORM_DATA.transportConfig,
-        alarmRules: [],
-        provisioningConfig: DEFAULT_MULTI_STEP_FORM_DATA.provisioningConfig,
+        // defaultRuleChain: profileData.defaultRuleChain || '',
+        // queue: profileData.queue || '',
+        // defaultEdgeRuleChain: profileData.defaultEdgeRuleChain || '',
+        // transportConfig: DEFAULT_MULTI_STEP_FORM_DATA.transportConfig,
+        // alarmRules: [],
+        // provisioningConfig: DEFAULT_MULTI_STEP_FORM_DATA.provisioningConfig,
       });
     }
   };
@@ -96,7 +96,10 @@ const DeviceProfileDetailsTab: React.FC<DeviceProfileDetailsTabProps> = ({
     <Card className="border-2 rounded-lg">
       <CardContent className="pt-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
             <Step1DeviceProfileDetails form={form} />
 
             <div className="flex justify-end gap-2 pt-4 border-t">
@@ -124,4 +127,3 @@ const DeviceProfileDetailsTab: React.FC<DeviceProfileDetailsTabProps> = ({
 };
 
 export default DeviceProfileDetailsTab;
-

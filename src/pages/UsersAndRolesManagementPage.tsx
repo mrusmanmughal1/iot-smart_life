@@ -17,6 +17,7 @@ export default function UsersAndRolesManagementPage() {
 
   useEffect(() => {
     if (location.state?.tab) {
+      console.log(location.state.tab);
       setActiveTab(location.state.tab);
       window.history.replaceState({}, document.title);
     }

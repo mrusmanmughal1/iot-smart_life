@@ -66,6 +66,10 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
   const roleItems = roles?.data || [];
   const totalPages = roles?.meta?.totalPages || 1;
   const totalItems = roles?.meta?.total || roleItems.length;
+  const customRoles = roles?.meta?.customRoles || 0;
+  const systemRoles = roles?.meta?.systemRoles || 0;
+  const totalRoles = roles?.meta?.total || 0;
+  console.log(customRoles);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -202,7 +206,7 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                 Total Roles
               </p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                12
+                {totalRoles}
               </p>
             </div>
           </CardContent>
@@ -211,10 +215,10 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
           <CardContent className="p-6">
             <div className="text-center">
               <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
-                Active Roles
+                System Roles
               </p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                10
+                {systemRoles}
               </p>
             </div>
           </CardContent>
@@ -226,7 +230,7 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                 Custom Roles
               </p>
               <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                09
+                {customRoles}
               </p>
             </div>
           </CardContent>

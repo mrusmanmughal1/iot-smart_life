@@ -22,13 +22,15 @@ interface Step1DeviceProfileDetailsProps {
   form: UseFormReturn<DeviceProfileMultiStepFormData>;
 }
 
-export const Step1DeviceProfileDetails: React.FC<Step1DeviceProfileDetailsProps> = ({
-  form,
-}) => {
+export const Step1DeviceProfileDetails: React.FC<
+  Step1DeviceProfileDetailsProps
+> = ({ form }) => {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg text-primary font-semibold mb-1 dark:text-white">Device Profile Details</h3>
+        <h3 className="text-lg text-primary font-semibold mb-1 dark:text-white">
+          Device Profile Details
+        </h3>
         <p className="text-sm text-gray-500 dark:text-white">
           Provide basic information about the device profile
         </p>
@@ -44,7 +46,7 @@ export const Step1DeviceProfileDetails: React.FC<Step1DeviceProfileDetailsProps>
                 <Input
                   placeholder="e.g., Temperature Sensor"
                   {...field}
-                  className='border-2 rounded-md'
+                  className="border-2 rounded-md"
                 />
               </FormControl>
               <FormMessage className="text-red-500" />
@@ -76,10 +78,7 @@ export const Step1DeviceProfileDetails: React.FC<Step1DeviceProfileDetailsProps>
           render={({ field }) => (
             <FormItem>
               <FormLabel>Device Type *</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select device type" />
@@ -99,14 +98,11 @@ export const Step1DeviceProfileDetails: React.FC<Step1DeviceProfileDetailsProps>
 
         <FormField
           control={form.control}
-          name="defaultRuleChain"
+          name="defaultRuleChainId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Default Rule Chain</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value || ''}
-              >
+              <Select onValueChange={field.onChange} value={field.value || ''}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select default rule chain" />
@@ -134,7 +130,7 @@ export const Step1DeviceProfileDetails: React.FC<Step1DeviceProfileDetailsProps>
 
         <FormField
           control={form.control}
-          name="queue"
+          name="defaultQueueName"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Queue</FormLabel>
@@ -150,16 +146,13 @@ export const Step1DeviceProfileDetails: React.FC<Step1DeviceProfileDetailsProps>
           )}
         />
 
-        <FormField
+        {/* <FormField
           control={form.control}
           name="defaultEdgeRuleChain"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Default Edge Rule Chain</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value || ''}
-              >
+              <Select onValueChange={field.onChange} value={field.value || ''}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select default edge rule chain" />
@@ -183,9 +176,8 @@ export const Step1DeviceProfileDetails: React.FC<Step1DeviceProfileDetailsProps>
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
       </div>
     </div>
   );
 };
-

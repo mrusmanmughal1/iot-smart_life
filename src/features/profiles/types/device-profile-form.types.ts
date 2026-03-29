@@ -1,4 +1,8 @@
-import type { DeviceType, TransportType, ProvisionType } from '@/features/device-profiles/types';
+import type {
+  DeviceType,
+  TransportType,
+  ProvisionType,
+} from '@/features/device-profiles/types';
 
 export interface AlarmRule {
   id?: string;
@@ -47,17 +51,13 @@ export type DeviceProfileMultiStepFormData = DeviceProfileMultiStepFormSchema;
 export const DEFAULT_MULTI_STEP_FORM_DATA: DeviceProfileMultiStepFormData = {
   name: '',
   description: '',
-  type: 'Sensor',
-  defaultRuleChain: '',
-  queue: '',
-  defaultEdgeRuleChain: '',
-  transportConfig: {
-    type: 'MQTT',
-  },
+  type: '',
+  defaultRuleChainId: '',
+  defaultQueueName: '',
+  // defaultEdgeRuleChain: '',
+  transportType: '',
+  transportConfiguration: {},
   alarmRules: [],
-  provisioningConfig: {
-    provisionType: 'Allow creating new devices',
-    defaultRuleChain: 'Root Rule Chain',
-  },
+  provisionType: '',
+  provisionConfiguration: {},
 };
-

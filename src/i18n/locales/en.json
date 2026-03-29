@@ -521,6 +521,7 @@
     "noDevices": "No devices found",
     "searchDevices": "Search devices...",
     "totalDevices": "Total Devices",
+    "searchPlaceholder": "Search devices...",
     "table": {
       "name": "Name",
       "createdTime": "Created time",

@@ -19,9 +19,9 @@ export const useAuth = () => {
     if (currentUser && !user) {
       // Transform API User to store User format
       // const nameParts = currentUser.name?.split(' ') || [];
-      const firstName = currentUser.firstName ||   '';
-      const lastName = currentUser.lastName ||   '';
-      
+      const firstName = currentUser.firstName || '';
+      const lastName = currentUser.lastName || '';
+
       setUser({
         id: currentUser.id || '',
         email: currentUser.email || '',

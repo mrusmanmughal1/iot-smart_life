@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 interface DeviceProfileProvisioningTabProps {
   profileId: string;
   profileData?: {
-    provisioningConfig?: DeviceProfileMultiStepFormData['provisioningConfig'];
+    provisionConfiguration?: DeviceProfileMultiStepFormData['provisionConfiguration'];
   };
   onSuccess?: () => void;
 }
@@ -32,10 +32,10 @@ const DeviceProfileProvisioningTab: React.FC<
 
   // Initialize form with existing profile data
   useEffect(() => {
-    if (profileData?.provisioningConfig) {
+    if (profileData?.provisionConfiguration) {
       form.reset({
         ...DEFAULT_MULTI_STEP_FORM_DATA,
-        provisioningConfig: profileData.provisioningConfig,
+        provisionConfiguration: profileData.provisionConfiguration,
       });
     }
   }, [profileData, form]);
@@ -60,10 +60,10 @@ const DeviceProfileProvisioningTab: React.FC<
 
   const handleCancel = () => {
     // Reset form to original values
-    if (profileData?.provisioningConfig) {
+    if (profileData?.provisionConfiguration) {
       form.reset({
         ...DEFAULT_MULTI_STEP_FORM_DATA,
-        provisioningConfig: profileData.provisioningConfig,
+        provisionConfiguration: profileData.provisionConfiguration,
       });
     }
   };
@@ -75,7 +75,10 @@ const DeviceProfileProvisioningTab: React.FC<
     <Card className="border-2 rounded-lg">
       <CardContent className="pt-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-6"
+          >
             <Step4DeviceProvisioning form={form} />
 
             <div className="flex justify-end gap-2 pt-4 border-t">
@@ -103,4 +106,3 @@ const DeviceProfileProvisioningTab: React.FC<
 };
 
 export default DeviceProfileProvisioningTab;
-
