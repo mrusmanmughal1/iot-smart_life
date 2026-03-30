@@ -24,13 +24,6 @@ interface User {
 
 const mockAvailableUsers: User[] = [
   { id: '1', name: 'John Doe', email: 'john.doe@email.com', status: 'Active' },
-  {
-    id: '2',
-    name: 'Jane Smith',
-    email: 'jane.smith@email.com',
-    status: 'Active',
-  },
-  { id: '3', name: 'John Doe', email: 'john.doe@email.com', status: 'Active' },
 ];
 
 const mockAssignedUsers: User[] = [
@@ -38,27 +31,6 @@ const mockAssignedUsers: User[] = [
     id: '4',
     name: 'John Doe',
     email: 'john.doe@email.com',
-    role: 'Admin',
-    status: 'Active',
-  },
-  {
-    id: '5',
-    name: 'Jane Smith',
-    email: 'jane.smith@email.com',
-    role: 'User',
-    status: 'Active',
-  },
-  {
-    id: '6',
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    role: 'Manager',
-    status: 'Active',
-  },
-  {
-    id: '6',
-    name: 'Super Admin',
-    email: 'superadmin@email.com',
     role: 'Admin',
     status: 'Active',
   },
@@ -75,12 +47,10 @@ const getInitials = (name: string) => {
 
 const getRoleBadgeVariant = (role?: string) => {
   switch (role) {
-    case 'Admin':
+    case 'active':
       return 'default';
-    case 'Manager':
+    case 'inactive':
       return 'secondary';
-    case 'User':
-      return 'outline';
     default:
       return 'outline';
   }
@@ -102,7 +72,7 @@ const getRoleBadgeColor = (role?: string) => {
 export default function CustomerUserAssociationPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('all');
-  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [availableUsers, setAvailableUsers] =
     useState<User[]>(mockAvailableUsers);
   const [assignedUsers, setAssignedUsers] = useState<User[]>(mockAssignedUsers);
@@ -113,7 +83,11 @@ export default function CustomerUserAssociationPage() {
     Set<string>
   >(new Set());
 
-  const { data: users } = useUsers();
+  const { data: users } = useUsers({
+    search: searchQuery,
+    role: 'customer_user',
+    status: selectedStatus,
+  });
 
   const customerInfo = {
     name: 'Acme Corporation',
@@ -225,9 +199,7 @@ export default function CustomerUserAssociationPage() {
           <h1 className="text-3xl font-bold text-slate-900">
             Customer-User Association
           </h1>
-          <p className="text-slate-500 mt-2">
-            Customer: {customerInfo.name} (ID: {customerInfo.id})
-          </p>
+          <p className="text-slate-500 mt-2">Assign users to customers</p>
         </div>
         <Button className="bg-black hover:bg-black/90 text-white">
           <Plus className="h-4 w-4 mr-2" />
@@ -272,9 +244,9 @@ export default function CustomerUserAssociationPage() {
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="Active">Active</SelectItem>
-            <SelectItem value="Inactive">Inactive</SelectItem>
+            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -300,10 +272,11 @@ export default function CustomerUserAssociationPage() {
                   return (
                     <div
                       key={user.id}
-                      className={`flex items-center gap-3 p-3 rounded-lg border ${selectedAvailableUsers.has(user.id)
-                        ? 'border-purple-500 bg-purple-50'
-                        : 'border-slate-200 hover:border-slate-300'
-                        } transition-colors cursor-pointer`}
+                      className={`flex items-center gap-3 p-3 rounded-lg border ${
+                        selectedAvailableUsers.has(user.id)
+                          ? 'border-purple-500 bg-purple-50'
+                          : 'border-slate-200 hover:border-slate-300'
+                      } transition-colors cursor-pointer`}
                       onClick={() => toggleAvailableUserSelection(user.id)}
                     >
                       <Avatar>
@@ -319,19 +292,12 @@ export default function CustomerUserAssociationPage() {
                           {user.email}
                         </p>
                       </div>
-                      <Button
-                        size="icon"
-                        variant="primary"
-                        className="h-6 w-6 rounded-full  "
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddUser(user.id);
-                        }}
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
+                      {/* add badge with status */}
+                      <Badge variant={getRoleBadgeVariant(user.status)}>
+                        {user.status}
+                      </Badge>
                     </div>
-                  )
+                  );
                 })
               )}
             </div>
@@ -374,10 +340,11 @@ export default function CustomerUserAssociationPage() {
                 filteredAssignedUsers.map((user) => (
                   <div
                     key={user.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border ${selectedAssignedUsers.has(user.id)
-                      ? 'border-purple-500 bg-purple-50'
-                      : 'border-slate-200 hover:border-slate-300'
-                      } transition-colors cursor-pointer`}
+                    className={`flex items-center gap-3 p-3 rounded-lg border ${
+                      selectedAssignedUsers.has(user.id)
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-slate-200 hover:border-slate-300'
+                    } transition-colors cursor-pointer`}
                     onClick={() => toggleAssignedUserSelection(user.id)}
                   >
                     <Avatar>

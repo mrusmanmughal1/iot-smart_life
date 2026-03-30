@@ -66,8 +66,8 @@ export default function CreateUserPage() {
       name: data.name,
       phone: data.phone,
       // role: data.role as UserRole,
-      // customerId: data.customerId || undefined
-      customerId: '',
+      customerId: data.customerId || undefined,
+      // customerId: '',
     };
 
     createUserMutation.mutate(
@@ -260,19 +260,6 @@ export default function CreateUserPage() {
                     </div>
                   )}
                 </div>
-              </div>
-
-              {/* Additional Information - full width */}
-              <div className="mt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Additional Information
-                </h2>
-                {/* <Textarea
-                  id="additionalInfo"
-                  {...register('additionalInfo')}
-                  placeholder="Enter additional information..."
-                  className="min-h-[100px] w-full border border-gray-300 rounded-md"
-                /> */}
               </div>
 
               {/* Action buttons */}

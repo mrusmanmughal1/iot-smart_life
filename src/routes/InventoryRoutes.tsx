@@ -1,6 +1,7 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
+import DeviceDetailsPage from '@/pages/DeviceDetailsPage';
 
 // Import inventory page components lazily
 const DevicesPage = Loadable(lazy(() => import('@/pages/DevicesPage.tsx')));
@@ -35,7 +36,7 @@ export const inventoryRoutes = [
       },
       {
         path: ':id',
-        element: <IndividualDeviceAnalyticsPage />,
+        element: <DeviceDetailsPage />,
       },
     ],
   },

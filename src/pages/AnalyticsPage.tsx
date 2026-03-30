@@ -3,12 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { PageHeader } from '@/components/common/PageHeader';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   LineChart,
@@ -172,7 +167,9 @@ export default function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">24</div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+              24
+            </div>
             <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
               <span>{t('analytics.trendUpFromLastWeek', { count: 2 })}</span>
@@ -187,7 +184,9 @@ export default function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">3</div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+              3
+            </div>
             <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingDown className="h-4 w-4" />
               <span>{t('analytics.trendDownFromLastWeek', { count: 1 })}</span>
@@ -202,7 +201,9 @@ export default function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">5</div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+              5
+            </div>
             <div className="flex items-center gap-1 text-sm text-red-600 dark:text-red-400 mt-1">
               <TrendingUp className="h-4 w-4" />
               <span>{t('analytics.trendUpFromLastWeek', { count: 2 })}</span>
@@ -217,10 +218,14 @@ export default function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">1,247</div>
+            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+              1,247
+            </div>
             <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>{t('analytics.trendUpFromYesterday', { percent: 15 })}</span>
+              <span>
+                {t('analytics.trendUpFromYesterday', { percent: 15 })}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -335,31 +340,41 @@ export default function AnalyticsPage() {
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 {t('analytics.performanceMetrics')}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">2.3ms</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                2.3ms
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 {t('analytics.networkUptime')}
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">99.8%</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                99.8%
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 {t('analytics.dataLossRate')}
               </p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">0.02%</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                0.02%
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 {t('analytics.signalStrengthAvg')}
               </p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">-65 dBm</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                -65 dBm
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                 {t('analytics.batteryHealthAverage')}
               </p>
-              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">78%</p>
+              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                78%
+              </p>
             </div>
           </div>
         </CardContent>
@@ -368,32 +383,29 @@ export default function AnalyticsPage() {
       {/* Footer Actions */}
       <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
         <div className="flex gap-3">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => navigate('/floor-plans')}
             className="dark:border-gray-700 dark:text-gray-300"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t('common.back')}
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleExport3D}
             className="dark:border-gray-700 dark:text-gray-300"
           >
             <Download className="mr-2 h-4 w-4" />
             {t('analytics.export3D')}
           </Button>
-          <Button 
-            onClick={handleSetAlerts} 
-            className="bg-primary text-white"
-          >
+          <Button onClick={handleSetAlerts} className="bg-primary text-white">
             <Bell className="mr-2 h-4 w-4" />
             {t('analytics.setAlerts')}
           </Button>
         </div>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={handleRefresh}
           className="dark:border-gray-700 dark:text-gray-300"
         >

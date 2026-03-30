@@ -74,10 +74,11 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
   >([]);
 
   const handleManageUsersClick = (user: User) => {
+    console.log(user);
     if (user.role === UserRole.CUSTOMER_USER) {
       navigate(`/users-management/customer-user-permissions/${user.id}`);
     } else {
-      navigate(`/users-management/customer/${user.id}`);
+      navigate(`/users-management/customer/${user.customerId}`);
     }
   };
 

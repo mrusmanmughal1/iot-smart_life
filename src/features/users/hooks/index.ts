@@ -11,10 +11,17 @@ type RoleQuery = {
 };
 
 export const useUsers = (params?: UserQuery) => {
+  // only allow the params with value to be passed
+  const filteredParams = Object.fromEntries(
+    Object.entries(params || {}).filter(
+      ([_, value]) => value !== undefined && value !== null && value !== ''
+    )
+  );
+  console.log(filteredParams);
   return useQuery({
-    queryKey: ['users', params],
+    queryKey: ['users', filteredParams],
     queryFn: async () => {
-      const response = await usersApi.getAll(params);
+      const response = await usersApi.getAll(filteredParams);
       return response.data.data;
     },
   });
