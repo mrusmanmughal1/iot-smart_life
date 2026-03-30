@@ -39,7 +39,6 @@ export default function CreateUserPage() {
   const { data: customersData } = useCustomersByTenantId();
   const { user } = useAppStore();
   const isCustomerAdmin = user?.role === 'customer';
-  console.log(isCustomerAdmin);
   const roles: Role[] = rolesData?.data || [];
 
   const customersList: Customer[] = customersData?.data || [];
