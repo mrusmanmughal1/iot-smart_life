@@ -17,7 +17,6 @@ export const useUsers = (params?: UserQuery) => {
       ([_, value]) => value !== undefined && value !== null && value !== ''
     )
   );
-  console.log(filteredParams);
   return useQuery({
     queryKey: ['users', filteredParams],
     queryFn: async () => {

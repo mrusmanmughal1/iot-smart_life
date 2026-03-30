@@ -1,7 +1,6 @@
 import apiClient from '@/lib/axios.ts';
 
 export enum UserRole {
-  SUPER_ADMIN = 'SUPER_ADMIN',
   TENANT_ADMIN = 'tenant_admin',
   USER = 'user',
   CUSTOMER_USER = 'customer_user',
@@ -17,8 +16,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: UserRole;
-  status: UserStatus;
+  role: string;
+  status: string;
   companyName: string;
   tenantId?: string;
   customerId?: string;
@@ -34,8 +33,8 @@ export interface User {
 
 export interface UserQuery {
   search?: string;
-  role?: UserRole;
-  status?: UserStatus;
+  role?: string;
+  status?: string;
   tenantId?: string;
   customerId?: string;
   page?: number;
