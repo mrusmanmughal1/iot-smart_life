@@ -177,7 +177,7 @@ export const usersApi = {
     }),
 
   // Bulk update user status
-  bulkUpdateStatus: (userIds: string[], status: UserStatus) =>
+  bulkUpdateStatus: (userIds: string[], status: string) =>
     apiClient.patch<ApiResponse<unknown>>('/users/bulk/status', {
       userIds,
       status,

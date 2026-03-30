@@ -103,13 +103,8 @@ export const useDeleteUser = () => {
 export const useBulkUpdateUserStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      userIds,
-      status,
-    }: {
-      userIds: string[];
-      status: User['status'];
-    }) => usersApi.bulkUpdateStatus(userIds, status),
+    mutationFn: ({ userIds, status }: { userIds: string[]; status: string }) =>
+      usersApi.bulkUpdateStatus(userIds, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
