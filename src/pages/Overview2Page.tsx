@@ -60,6 +60,20 @@ const recentActivities = [
     time: '1 hour ago',
     dotClass: 'bg-amber-500',
   },
+  {
+    id: '3',
+    name: 'Mike',
+    action: 'Resolved alarm #A-1024',
+    time: '1 hour ago',
+    dotClass: 'bg-amber-500',
+  },
+  {
+    id: '3',
+    name: 'Mike',
+    action: 'Resolved alarm #A-1024',
+    time: '1 hour ago',
+    dotClass: 'bg-amber-500',
+  },
 ];
 
 const quickActions = [
@@ -98,8 +112,8 @@ const liveMetrics = [
   {
     label: 'Temperature',
     value: '28.5°C',
-    border: 'border-transparent',
-    spark: [22, 24, 23, 26, 28, 27, 28.5],
+    border: 'border-pink-100',
+    spark: [2, 24, 100, 26, 28, 90, 28.5],
     lineColor: '#b366a4',
   },
   {
@@ -112,15 +126,15 @@ const liveMetrics = [
   {
     label: 'Occupancy',
     value: '73%',
-    border: 'border-transparent',
-    spark: [65, 68, 70, 71, 72, 73, 73],
+    border: 'border-blue-100',
+    spark: [5, 68, 70, 71, 72, 73, 93],
     lineColor: '#22c55e',
   },
   {
     label: 'CO2 Levels',
     value: '450 ppm',
-    border: 'border-transparent',
-    spark: [420, 430, 440, 445, 448, 450, 450],
+    border: 'border-amber-100',
+    spark: [200, 230, 240, 25, 248, 20, 250],
     lineColor: '#eab308',
   },
 ];
@@ -190,7 +204,7 @@ export default function Overview2Page() {
                   <Link to="/analytics">View All Activity Logs</Link>
                 </Button>
               </CardHeader>
-              <CardContent className="space-y-4 ">
+              <CardContent className="space-y-4  h-[270px] overflow-y-auto  sidebar-scroll ">
                 {recentActivities.map((item) => (
                   <div
                     key={item.id}
@@ -304,8 +318,8 @@ export default function Overview2Page() {
                     <div
                       key={m.label}
                       className={cn(
-                        'rounded-lg border border-slate-100 hover:border-slate-200 transition-all bg-white p-4 dark:bg-slate-900/40'
-                      )}
+                        'rounded-lg border  border-slate-100 hover:border-slate-200 transition-all bg-white p-4 dark:bg-slate-900/40'
+                        , m.border)}
                     >
                       <p className="text-xs text-slate-500">{m.label}</p>
                       <p className="text-lg font-semibold text-slate-900 dark:text-white">

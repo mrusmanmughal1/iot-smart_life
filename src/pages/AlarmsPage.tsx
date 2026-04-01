@@ -19,6 +19,7 @@ import {
 } from '@/features/alarms/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function AlarmsPage() {
   const { t } = useTranslation();
@@ -67,15 +68,8 @@ export default function AlarmsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-slate-900">
-          {t('alarms.title')}
-        </h1>
-        <p className="text-slate-500 text-sm mt-2">
-          Monitor and manage system alarms
-        </p>
-      </div>
 
+      <PageHeader title={t('alarms.title')} description="Monitor and manage system alarms" />
       <div className="grid gap-6 md:grid-cols-4">
         {statusCards.map((card) => (
           <Card key={card.key} className={card.cardClassName}>

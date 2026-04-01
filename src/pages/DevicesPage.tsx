@@ -36,6 +36,7 @@ import type { DeviceFormData } from '@/features/devices/types';
 import { Pagination } from '@/components/common/Pagination/Pagination';
 import { debounce } from '@/lib/util';
 import { Input } from '@/components/ui/input';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function DevicesPage() {
   const { t } = useTranslation();
@@ -218,12 +219,7 @@ export default function DevicesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            {t('devices.title')}
-          </h1>
-          <p className="text-slate-500  text-sm mt-">{t('devices.subtitle')}</p>
-        </div>
+        <PageHeader title={t('devices.title')} description={t('devices.subtitle')} />
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           {t('devices.addDevice')}
@@ -297,11 +293,10 @@ export default function DevicesPage() {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className={`${
-                            device.status === 'active'
+                          className={`${device.status === 'active'
                               ? 'bg-green-500 hover:bg-green-600'
                               : 'bg-red-500 hover:bg-red-600'
-                          } text-white`}
+                            } text-white`}
                         >
                           {device.status === 'active'
                             ? t('common.active') || 'Active'
@@ -391,11 +386,11 @@ export default function DevicesPage() {
         initialData={
           isEditDialogOpen && selectedDevice
             ? {
-                name: selectedDevice.name,
-                type: selectedDevice.type,
-                connectionType: selectedDevice.connectionType,
-                description: selectedDevice.description,
-              }
+              name: selectedDevice.name,
+              type: selectedDevice.type,
+              connectionType: selectedDevice.connectionType,
+              description: selectedDevice.description,
+            }
             : undefined
         }
         onSubmit={handleEdit}

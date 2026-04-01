@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 
 import type { AuditLog } from '@/services/api/audit.api';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function AuditPage() {
   const { data: auditData, isLoading } = useAuditLogs();
@@ -36,12 +37,8 @@ export default function AuditPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900">Audit Logs</h1>
-        <p className="text-slate-500 mt-2">
-          Track all system activities and changes
-        </p>
-      </div>
+
+      <PageHeader title='Audit Logs' description='Track all system activities and changes' />
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -96,11 +93,11 @@ export default function AuditPage() {
                       <Badge
                         variant={
                           getActionColor(log.action) as
-                            | 'default'
-                            | 'destructive'
-                            | 'secondary'
-                            | 'outline'
-                            | 'success'
+                          | 'default'
+                          | 'destructive'
+                          | 'secondary'
+                          | 'outline'
+                          | 'success'
                         }
                       >
                         {log.action.replace('_', ' ')}

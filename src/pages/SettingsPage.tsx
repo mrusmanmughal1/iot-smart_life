@@ -11,6 +11,7 @@ import {
 import { useGeneralSettings } from '@/features/settings/hooks';
 import { LoadingPage } from '@/components/common/LoadingSpinner';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
@@ -38,14 +39,8 @@ export default function SettingsPage() {
   }
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-          {t('settings.title')}
-        </h1>
-        <p className="text-slate-500 mt-2 dark:text-white">
-          {t('settings.description')}
-        </p>
-      </div>
+
+      <PageHeader title={t('settings.title')} description={t('settings.description')} />
 
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList className="dark:bg-gray-800 dark:text-white">

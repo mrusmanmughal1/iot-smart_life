@@ -9,6 +9,7 @@ import CustomerPage from '@/features/users/components/Customer';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDebouncedValue } from '@/utils/helpers/Debounce';
 import { useAppStore } from '@/stores/useAppStore';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function UsersAndRolesManagementPage() {
   const navigate = useNavigate();
@@ -56,14 +57,8 @@ export default function UsersAndRolesManagementPage() {
         {/* Header Section */}
         <div className="space-y-2">
           <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900 mb-1 dark:text-white">
-                Users and Roles Management
-              </h1>
-              <p className="text-gray-600 text-sm dark:text-white">
-                Manage users and their roles
-              </p>
-            </div>
+
+            <PageHeader title='Users and Roles Management' description='Manage users and their roles' />
             <Button onClick={handleAddAction} variant="secondary">
               <Plus className="h-4 w-4" />
               {addButtonLabel}

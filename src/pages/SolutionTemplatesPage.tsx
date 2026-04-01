@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { useSolutionTemplates } from '@/features/solution-templates/hooks';
 import { debounce } from '@/lib/util';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function SolutionTemplates() {
   const { t } = useTranslation();
@@ -101,9 +102,7 @@ export default function SolutionTemplates() {
     <div className="space-y-4">
       {/* Header Section */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold dark:text-white text-gray-900">
-          {t('solutionTemplates.title')}
-        </h1>
+        <PageHeader title={t('solutionTemplates.title')} />
       </div>
 
       <div className="border border-secondary dark:border-gray-700 p-4 rounded-2xl">

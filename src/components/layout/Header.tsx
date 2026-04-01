@@ -9,6 +9,7 @@ import {
   Sun,
   Moon,
   Monitor,
+  ChevronLeft,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRTL } from '@/hooks/useRTL';
@@ -29,6 +30,7 @@ import type {
 } from '@/services/api/notifications.api';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useCurrentSubscription } from '@/features/Subscription/hooks';
+import { Button } from '../ui/button';
 
 export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const navigate = useNavigate();
@@ -181,6 +183,8 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
           </div>
         </div>
       </div>
+
+    
       {/* Right Section */}
       <div
         className={cn(
@@ -232,7 +236,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'light' &&
-                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Sun className="h-4 w-4" />
@@ -248,7 +252,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'dark' &&
-                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Moon className="h-4 w-4" />
@@ -264,7 +268,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'auto' &&
-                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Monitor className="h-4 w-4" />

@@ -1,7 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/util';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronLeft } from 'lucide-react';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 export interface PageHeaderAction {
   label: string;
@@ -24,26 +25,24 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   description,
   actions,
-  showBack,
-  onBack,
+
   className,
   children,
 }) => {
+  const navigate = useNavigate();
   return (
-    <div className={cn('space-y-4 mb-6', className)}>
+    <div className={cn('space-y-4 ', className)}>
       <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 space-y-1">
-          {showBack && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onBack}
-              className="mb-2 -ml-2"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          )}
+        <div className="flex-1 space-y-1 relative">
+          <Button
+            variant="social"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className=" p-1 px-2 rounded-full absolute -left-9 top-0"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             {title}
           </h1>

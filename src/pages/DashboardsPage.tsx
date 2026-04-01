@@ -21,6 +21,7 @@ import { ImportDashboardModal } from '@/components/common/ImportDashboardModal';
 import { dashboardsApi } from '@/services/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function DashboardsPage() {
   const { t } = useTranslation();
@@ -80,11 +81,7 @@ export default function DashboardsPage() {
     <>
       <div className="space-y-6">
         {/* Header Section */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold dark:text-white text-gray-900">
-            {t('solutionDashboards.title')}
-          </h1>
-        </div>
+          <PageHeader title={t('solutionDashboards.title')} />
 
         {/* Tabs */}
         <div className="flex justify-between items-center gap-2">

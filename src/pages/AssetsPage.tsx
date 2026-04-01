@@ -26,6 +26,7 @@ import { AddAssetModal } from '@/features/assets/components/AddAssetModal';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { Pagination } from '@/components/common/Pagination/Pagination';
 import { format } from 'date-fns';
+import { PageHeader } from '@/components/common/PageHeader';
 
 export default function AssetsPage() {
   const { t } = useTranslation();
@@ -107,12 +108,7 @@ export default function AssetsPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {t('assets.title')}
-            </h1>
-            <p className="text-gray-500 mt-2 text-sm">{t('assets.subtitle')}</p>
-          </div>
+          <PageHeader title={t('assets.title')} description={t('assets.subtitle')} />
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

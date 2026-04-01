@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Building2, Sprout, Building, Car, Home, Factory } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useUsage } from '@/features/Subscription/hooks';
@@ -20,6 +20,7 @@ import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 export const DashboardPage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('smartCity');
   const { data: SubscriptionUsage } = useUsage();
 
@@ -91,6 +92,7 @@ export const DashboardPage = () => {
       <PageHeader
         title={t('dashboard.title')}
         description={t('dashboard.description')}
+        
       />
 
       <div className="border dark:border-gray-700 p-4 rounded-3xl  border-secondary shadow-xl">
