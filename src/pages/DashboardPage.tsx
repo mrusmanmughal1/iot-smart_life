@@ -332,7 +332,7 @@ export const DashboardPage = () => {
             </Card>
           </div>
           {/* make a div having full space */}
-          <div className="col-span-3">
+          <div className="col-span-2">
             <AssetLocationsMapCard />
           </div>
         </div>

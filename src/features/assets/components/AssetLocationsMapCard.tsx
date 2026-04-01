@@ -43,7 +43,7 @@ interface GoogleMapsApi {
 
 declare global {
   interface Window {
-    google?: GoogleMapsApi;
+    google?: any;
   }
 }
 

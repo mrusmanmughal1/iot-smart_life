@@ -45,7 +45,7 @@ interface GoogleMarker {
 
 declare global {
   interface Window {
-    google?: GoogleMaps;
+    google?: any;
     initMap?: () => void;
     REACT_APP_GOOGLE_MAPS_API_KEY?: string;
   }
@@ -153,8 +153,10 @@ export const LocationMap: React.FC<LocationMapProps> = ({
             });
 
             // Center map on marker
-            map.setCenter(position);
-            map.setZoom(15);
+            if (map) {
+              map.setCenter(position);
+              map.setZoom(15);
+            }
           }
         } else {
           // Remove marker if coordinates are invalid
