@@ -1,6 +1,7 @@
 import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
+import CustomerDetailsPage from '@/pages/CustomerDetailsPage';
 // Import management page components lazily
 const SubscriptionPlans = Loadable(
   lazy(() => import('@/pages/SubscriptionPlans'))
@@ -21,7 +22,7 @@ const CustomerDetails = Loadable(
   lazy(() => import('@/features/users/components/CustomerDetails.tsx'))
 );
 const CustomerAdministratorPage = Loadable(
-  lazy(() => import('@/pages/CustomerAdministratorPage.tsx'))
+  lazy(() => import('@/pages/CustomerDetailsPage'))
 );
 const RolePermissionManagementPage = Loadable(
   lazy(() => import('@/pages/RolePermissionManagementPage.tsx'))
@@ -91,7 +92,7 @@ export const managementRoutes = [
       },
       {
         path: 'customer/:id',
-        element: <CustomerAdministratorPage />,
+        element: <CustomerDetailsPage />,
       },
       {
         path: 'role-permission-management/:id',

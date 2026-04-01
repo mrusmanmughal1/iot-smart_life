@@ -23,11 +23,10 @@ interface Permission {
 const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
   return (
     <div
-      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
-        granted
-          ? 'bg-green-500 border-green-500'
-          : 'bg-gray-200 border-gray-300'
-      }`}
+      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${granted
+        ? 'bg-green-500 border-green-500'
+        : 'bg-gray-200 border-gray-300'
+        }`}
     >
       {granted && (
         <svg
@@ -46,11 +45,11 @@ const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
   );
 };
 
-export default function CustomerAdministratorPage() {
+export default function CustomerDetailsPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { data } = useCustomerById(id);
-  const customer = data?.data as Customer | undefined;
+  const customer = data as Customer | undefined;
   const deleteCustomerMutation = useDeleteCustomer();
 
   // get permissions for the customer
@@ -172,7 +171,7 @@ export default function CustomerAdministratorPage() {
                   Tenant
                 </p>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {customer?.tenant?.name || '-'}
+                  {customer?.tenantId || customer?.tenant?.name || '-'}
                 </p>
               </div>
 
@@ -243,6 +242,26 @@ export default function CustomerAdministratorPage() {
                 </p>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
                   {contractEnd || '-'}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Allocated Limits
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {`Users: ${customer?.allocatedLimits?.users ?? 0}, Assets: ${customer?.allocatedLimits?.assets ?? 0
+                    }, Devices: ${customer?.allocatedLimits?.devices ?? 0}`}
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                  Usage Counters
+                </p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {`Users: ${customer?.usageCounters?.users ?? 0}, Assets: ${customer?.usageCounters?.assets ?? 0
+                    }, Devices: ${customer?.usageCounters?.devices ?? 0}`}
                 </p>
               </div>
             </div>

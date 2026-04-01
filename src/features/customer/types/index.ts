@@ -44,6 +44,14 @@ export interface Customer {
     automations: number;
     users: number;
   };
+  usageCounters?: {
+    devices?: number;
+    dashboards?: number;
+    assets?: number;
+    floorPlans?: number;
+    automations?: number;
+    users?: number;
+  };
   tenantId?: string;
   tenant?: {
     id: string;

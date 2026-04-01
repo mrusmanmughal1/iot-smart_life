@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Building2, Sprout, Building, Car, Home, Factory } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
 import { PageHeader } from '@/components/common/PageHeader';
 import { useUsage } from '@/features/Subscription/hooks';
@@ -17,10 +17,10 @@ import { UsageDonutChart } from '@/components/common/UsageDonutChart';
 import { SolutionSelectionBar } from '@/components/common/SolutionSelectionBar';
 import { COLORSCHART } from '@/utils/constants/colors';
 import DashboardNavigation from '@/components/ui/DashboardNavigation';
+import AssetLocationsMapCard from '@/features/assets/components/AssetLocationsMapCard';
 
 export const DashboardPage = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('smartCity');
   const { data: SubscriptionUsage } = useUsage();
 
@@ -92,7 +92,6 @@ export const DashboardPage = () => {
       <PageHeader
         title={t('dashboard.title')}
         description={t('dashboard.description')}
-        
       />
 
       <div className="border dark:border-gray-700 p-4 rounded-3xl  border-secondary shadow-xl">
@@ -332,6 +331,10 @@ export const DashboardPage = () => {
               </CardHeader>
             </Card>
           </div>
+          {/* make a div having full space */}
+          <div className="col-span-3">
+            <AssetLocationsMapCard />
+          </div>
         </div>
 
         {/* Recently Accessed Dashboards */}
@@ -361,7 +364,10 @@ export const DashboardPage = () => {
             ))}
           </div>
         </div>
-        <DashboardNavigation previousRoute="/dashboard" nextRoute="/dashboard/overview-2" />
+        <DashboardNavigation
+          previousRoute="/dashboard"
+          nextRoute="/dashboard/overview-2"
+        />
       </div>
     </div>
   );

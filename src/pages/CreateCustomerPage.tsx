@@ -13,8 +13,8 @@ import {
   useCustomerById,
   useUpdateCustomer,
 } from '@/features/customer/hooks';
-
-import type { CreateCustomerData } from '@/features/customer/types';
+import type { Customer } from '@/features/customer/types';
+import { CustomerPlan, CustomerStatus } from '@/features/customer/types';
 
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 // Zod validation schema
@@ -27,6 +27,7 @@ const createCustomerSchema = z.object({
   phone: z.string().min(1, 'Phone number is required').trim(),
   description: z.string().optional(),
   city: z.string().optional(),
+  address: z.string().optional(),
   state: z.string().optional(),
   zip: z.string().optional(),
   country: z.string(),
@@ -63,6 +64,7 @@ export default function CreateCustomerPage() {
       phone: '',
       description: '',
       city: '',
+      address: '',
       state: '',
       zip: '',
       country: '',
@@ -81,7 +83,9 @@ export default function CreateCustomerPage() {
 
   useEffect(() => {
     if (isEditMode && customerData) {
-      const customer = (customerData as any).data || customerData;
+      const customer =
+        (customerData as { data?: Customer })?.data ||
+        (customerData as unknown as Customer);
       if (!customer) return;
 
       reset({
@@ -90,6 +94,7 @@ export default function CreateCustomerPage() {
         phone: customer.phone || '',
         description: customer.description || '',
         city: customer.city || '',
+        address: customer.address || '',
         state: customer.state || '',
         zip: customer.zip || '',
         country: customer.country || '',
@@ -105,16 +110,21 @@ export default function CreateCustomerPage() {
     }
   }, [customerData, isEditMode, reset]);
 
-  const onSubmit = async (data: any) => {
-    const customerData: any = {
+  const onSubmit = async (data: CreateCustomerFormData) => {
+    const customerData = {
       name: data.name,
       email: data.email,
       phone: data.phone,
       description: data.description || undefined,
       city: data.city || undefined,
+      address: data.address || undefined,
       state: data.state || undefined,
       zip: data.zip || undefined,
       country: data.country,
+      status: CustomerStatus.ACTIVE,
+      maxUsers: parseInt(data.allocatedLimits.users) || 0,
+      plan: CustomerPlan.BASIC,
+      features: [],
       allocatedLimits: {
         devices: parseInt(data.allocatedLimits.devices) || 0,
         dashboards: parseInt(data.allocatedLimits.dashboards) || 0,
@@ -135,9 +145,10 @@ export default function CreateCustomerPage() {
               state: { tab: 'Customers' },
             });
           },
-          onError: (error: any) => {
+          onError: (error: unknown) => {
             const errorMessage =
-              error?.response?.data?.message || 'Failed to update customer';
+              (error as { response?: { data?: { message?: string } } })?.response
+                ?.data?.message || 'Failed to update customer';
             toast.error(errorMessage);
           },
         }
@@ -285,6 +296,21 @@ export default function CreateCustomerPage() {
                           className="w-full border border-gray-300 rounded-md"
                         />
                       </div>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="address"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                      >
+                        Address
+                      </label>
+                      <Input
+                        id="address"
+                        {...register('address')}
+                        placeholder="Enter address"
+                        className="w-full border border-gray-300 rounded-md"
+                      />
                     </div>
 
                     {/* Zip/Postal Code and Country */}
