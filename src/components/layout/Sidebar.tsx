@@ -168,18 +168,7 @@ const getNavItems = (): NavItem[] => [
     titleKey: 'nav.usersAndRoles',
     icon: <Users className="h-5 w-5" />,
     feature: 'userRoles',
-    children: [
-      {
-        titleKey: 'nav.usersAndRoles',
-        href: '/users-management',
-        icon: <Users className="h-4 w-4" />,
-      },
-      {
-        titleKey: 'nav.customerUserAssociation',
-        href: '/users-management/customer-user-association',
-        icon: <Users className="h-4 w-4" />,
-      },
-    ],
+    href: '/users-management',
   },
   {
     titleKey: 'nav.automation',
@@ -206,23 +195,6 @@ const getNavItems = (): NavItem[] => [
     feature: 'scheduleManagement',
   },
 
-  {
-    titleKey: 'nav.subscription',
-    feature: 'subscription',
-    children: [
-      {
-        titleKey: 'nav.plans',
-        href: '/subscription',
-        icon: <SquareChartGantt className="h-5 w-5" />,
-      },
-      {
-        titleKey: 'nav.invoices',
-        href: '/subscription/invoices',
-        icon: <BarChart3 className="h-5 w-5" />,
-      },
-    ],
-    icon: <Rss className="h-5 w-5" />,
-  },
   {
     titleKey: 'nav.resources',
 
@@ -273,6 +245,23 @@ const getNavItems = (): NavItem[] => [
     href: '/audit',
     icon: <FileText className="h-5 w-5" />,
     feature: 'auditLogs',
+  },
+  {
+    titleKey: 'nav.subscription',
+    feature: 'subscription',
+    children: [
+      {
+        titleKey: 'nav.plans',
+        href: '/subscription',
+        icon: <SquareChartGantt className="h-5 w-5" />,
+      },
+      {
+        titleKey: 'nav.invoices',
+        href: '/subscription/invoices',
+        icon: <BarChart3 className="h-5 w-5" />,
+      },
+    ],
+    icon: <Rss className="h-5 w-5" />,
   },
   {
     titleKey: 'nav.settings',

@@ -1,3 +1,4 @@
+
 import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
@@ -27,6 +28,7 @@ const DashboardAnalyticsPage = Loadable(
 const ProductionOverviewPage = Loadable(
   lazy(() => import('@/pages/ProductionOverviewPage.tsx'))
 );
+const Overview2Page = Loadable(lazy(() => import('@/pages/Overview2Page.tsx')));
 const GeoAnalyticsPage = Loadable(
   lazy(() => import('@/pages/GeoAnalyticsPage.tsx'))
 );
@@ -40,6 +42,10 @@ export const mainDashboardRoutes = [
       {
         index: true,
         element: <DashboardPage />,
+      },
+      {
+        path: 'overview-2',
+        element: <Overview2Page />,
       },
     ],
   },

@@ -16,6 +16,7 @@ import { useUsage } from '@/features/Subscription/hooks';
 import { UsageDonutChart } from '@/components/common/UsageDonutChart';
 import { SolutionSelectionBar } from '@/components/common/SolutionSelectionBar';
 import { COLORSCHART } from '@/utils/constants/colors';
+import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 export const DashboardPage = () => {
   const { t } = useTranslation();
@@ -358,6 +359,7 @@ export const DashboardPage = () => {
             ))}
           </div>
         </div>
+        <DashboardNavigation previousRoute="/dashboard" nextRoute="/dashboard/overview-2" />
       </div>
     </div>
   );

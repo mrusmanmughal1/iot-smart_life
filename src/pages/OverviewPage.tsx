@@ -32,6 +32,7 @@ import { useWebSocket } from '@/hooks/useWebSocket';
 import { useQuery } from '@tanstack/react-query';
 import { devicesApi } from '@/services/api/devices.api';
 import { formatRelativeTime } from '@/utils/formatters/dateFormatter';
+import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 // Solution Categories
 const solutions = [
@@ -502,7 +503,7 @@ export const OverviewPage: React.FC = () => {
           {[
             {
               title: 'Dashboard Preview',
-              subtitle: 'Smart Building Overview',
+              subtitle: 'Smart Building Overviews',
               gradient: 'from-pink-500 to-[#C36BA8] text-white',
             },
             {
@@ -528,7 +529,8 @@ export const OverviewPage: React.FC = () => {
             </Card>
           ))}
         </div>
-      </div>
+      </div> 
+      <DashboardNavigation previousRoute="/dashboard" nextRoute="/dashboard/overview-2" />
     </div>
   );
 };
