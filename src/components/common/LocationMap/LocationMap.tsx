@@ -12,13 +12,16 @@ interface LocationMapProps {
 // Google Maps types
 interface GoogleMaps {
   maps: {
-    Map: new (element: HTMLElement, options: {
-      center: { lat: number; lng: number };
-      zoom: number;
-      mapTypeControl?: boolean;
-      streetViewControl?: boolean;
-      fullscreenControl?: boolean;
-    }) => GoogleMap;
+    Map: new (
+      element: HTMLElement,
+      options: {
+        center: { lat: number; lng: number };
+        zoom: number;
+        mapTypeControl?: boolean;
+        streetViewControl?: boolean;
+        fullscreenControl?: boolean;
+      }
+    ) => GoogleMap;
     Marker: new (options: {
       position: { lat: number; lng: number };
       map: GoogleMap;
@@ -73,16 +76,20 @@ export const LocationMap: React.FC<LocationMapProps> = ({
         }
 
         // Check if script is already being loaded
-        const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
+        const existingScript = document.querySelector(
+          'script[src*="maps.googleapis.com"]'
+        );
         if (existingScript) {
           existingScript.addEventListener('load', () => resolve());
-          existingScript.addEventListener('error', () => reject(new Error('Failed to load Google Maps')));
+          existingScript.addEventListener('error', () =>
+            reject(new Error('Failed to load Google Maps'))
+          );
           return;
         }
 
         // Get API key from environment variable or use a placeholder
         // You should set REACT_APP_GOOGLE_MAPS_API_KEY in your .env file
-        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||'';
+        const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
         // Load Google Maps JavaScript API
         const script = document.createElement('script');
@@ -118,9 +125,19 @@ export const LocationMap: React.FC<LocationMapProps> = ({
         const map = mapInstanceRef.current;
 
         // Update marker position if coordinates are provided
-        if (latitude !== null && longitude !== null && !isNaN(latitude) && !isNaN(longitude)) {
+        if (
+          latitude !== null &&
+          longitude !== null &&
+          !isNaN(latitude) &&
+          !isNaN(longitude)
+        ) {
           // Validate coordinates
-          if (latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180) {
+          if (
+            latitude >= -90 &&
+            latitude <= 90 &&
+            longitude >= -180 &&
+            longitude <= 180
+          ) {
             const position = { lat: latitude, lng: longitude };
 
             // Remove existing marker
@@ -133,7 +150,6 @@ export const LocationMap: React.FC<LocationMapProps> = ({
               position,
               map,
               title: 'Asset Location',
-              animation: maps.Animation.DROP,
             });
 
             // Center map on marker
@@ -190,7 +206,9 @@ export const LocationMap: React.FC<LocationMapProps> = ({
       },
       (error) => {
         console.error('Error getting location:', error);
-        alert('Unable to retrieve your location. Please check your browser permissions.');
+        alert(
+          'Unable to retrieve your location. Please check your browser permissions.'
+        );
         setIsGettingLocation(false);
       },
       {
@@ -202,11 +220,10 @@ export const LocationMap: React.FC<LocationMapProps> = ({
   };
 
   return (
-    <div className={`relative w-full rounded-lg border border-gray-300 overflow-hidden ${className}`}>
-      <div
-        ref={mapRef}
-        style={{ height }}
-      />
+    <div
+      className={`relative w-full rounded-lg border border-gray-300 overflow-hidden ${className}`}
+    >
+      <div ref={mapRef} style={{ height }} />
       {onLocationChange && (
         <button
           type="button"
@@ -215,7 +232,9 @@ export const LocationMap: React.FC<LocationMapProps> = ({
           className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 px-3 py-2 rounded-md shadow-md border border-gray-300 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
           title="Get current location"
         >
-          <Navigation className={`h-4 w-4 ${isGettingLocation ? 'animate-spin' : ''}`} />
+          <Navigation
+            className={`h-4 w-4 ${isGettingLocation ? 'animate-spin' : ''}`}
+          />
           {isGettingLocation ? 'Getting location...' : 'Use current location'}
         </button>
       )}
