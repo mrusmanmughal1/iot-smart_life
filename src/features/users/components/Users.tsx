@@ -1,4 +1,4 @@
-import { MoreVertical, Edit, Trash2, ShieldCheck } from 'lucide-react';
+import { MoreVertical, Edit, Trash2, ShieldCheck, Users2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,7 @@ import {
   useDeleteUser,
   useSearchUsers,
   useUsers,
+  useUpdateUserStatus,
 } from '@/features/users/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -28,6 +29,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { DeleteUserModal } from '@/components/models/DeleteUserModal';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { Switch } from '@/components/ui/switch';
 import { Pagination } from '@/components/common/Pagination';
 import {
   Tooltip,
@@ -70,8 +73,14 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<
-    Array<{ id: string; name: string; email: string }>
+    Array<{ id: string; name: string; email: string; role: string }>
   >([]);
+
+  const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
+  const [userToUpdateStatus, setUserToUpdateStatus] = useState<User | null>(
+    null
+  );
+  const updateUserStatusMutation = useUpdateUserStatus();
 
   const handleManageUsersClick = (user: User) => {
     console.log(user);
@@ -114,7 +123,12 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
       }
       return [
         ...prev,
-        { id: user.id, name: user.name || '', email: user.email },
+        {
+          id: user.id,
+          name: user.name || '',
+          email: user.email,
+          role: user.role,
+        },
       ];
     });
   };
@@ -130,6 +144,35 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
       navigate(`/users-management/edit-customer-user/${user.id}`);
     } else {
       navigate(`/users-management/edit-customer/${user.customerId}`);
+    }
+  };
+
+  const handleStatusToggle = (user: User) => {
+    setUserToUpdateStatus(user);
+    setStatusConfirmOpen(true);
+  };
+
+  const handleStatusConfirm = () => {
+    if (userToUpdateStatus) {
+      const newStatus =
+        userToUpdateStatus.status === UserStatus.ACTIVE
+          ? UserStatus.INACTIVE
+          : UserStatus.ACTIVE;
+      updateUserStatusMutation.mutate(
+        { userId: userToUpdateStatus.id, status: newStatus },
+        {
+          onSuccess: () => {
+            toast.success(`User status updated to ${newStatus}`);
+            setStatusConfirmOpen(false);
+            setUserToUpdateStatus(null);
+          },
+          onError: (error: any) => {
+            toast.error(
+              error.response?.data?.message || 'Failed to update user status'
+            );
+          },
+        }
+      );
     }
   };
 
@@ -199,16 +242,16 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                         </p>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={
-                            user.status === UserStatus.ACTIVE
-                              ? 'success'
-                              : 'secondary'
-                          }
-                          className="capitalize"
-                        >
-                          {user.status}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={user.status === UserStatus.ACTIVE}
+                            onCheckedChange={() => handleStatusToggle(user)}
+                            disabled={
+                              updateUserStatusMutation.isPending &&
+                              userToUpdateStatus?.id === user.id
+                            }
+                          />
+                        </div>
                       </TableCell>
                       <TableCell>
                         {new Date(user.createdAt).toLocaleDateString()}
@@ -222,7 +265,7 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                               className="hover:bg-secondary hover:text-white"
                               onClick={() => handleManageUsersClick(user)}
                             >
-                              <ShieldCheck className="h-4 w-4" />
+                              <Users2 className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="bottom-[70%] w-32">
@@ -275,6 +318,19 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
         user={selectedUser}
         onConfirm={handleDeleteConfirm}
         role={selectedUser?.role}
+      />
+
+      {/* Status Confirmation Modal */}
+      <ConfirmDialog
+        open={statusConfirmOpen}
+        onOpenChange={setStatusConfirmOpen}
+        title="Confirm Status Change"
+        description={`Are you sure you want to ${
+          userToUpdateStatus?.status === UserStatus.ACTIVE
+            ? 'deactivate'
+            : 'activate'
+        } user ${userToUpdateStatus?.name || userToUpdateStatus?.email}?`}
+        onConfirm={handleStatusConfirm}
       />
     </div>
   );

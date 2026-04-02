@@ -162,8 +162,11 @@ export const DashboardPage = () => {
                 </div>
               </CardContent>
             </Card>
+            <div className="col-span-">
+              <AssetLocationsMapCard />
+            </div>
             {/* API Usage Card */}
-            <Card>
+            {/* <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg font-semibold text-gray-600">
@@ -192,7 +195,7 @@ export const DashboardPage = () => {
                   />
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
           {/* Column 2 - Middle */}
@@ -330,10 +333,6 @@ export const DashboardPage = () => {
                 </div>
               </CardHeader>
             </Card>
-          </div>
-          {/* make a div having full space */}
-          <div className="col-span-2">
-            <AssetLocationsMapCard />
           </div>
         </div>
 

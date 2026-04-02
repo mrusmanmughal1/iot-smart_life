@@ -110,6 +110,17 @@ export const useBulkUpdateUserStatus = () => {
     },
   });
 };
+
+export const useUpdateUserStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, status }: { userId: string; status: string }) =>
+      usersApi.updateStatus(userId, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
 //get devices by customer id
 export const useDevicesByCustomerId = (customerId: string) => {
   return useQuery({

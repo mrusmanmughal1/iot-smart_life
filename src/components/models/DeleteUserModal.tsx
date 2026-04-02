@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User } from '@/services/api/users.api';
@@ -77,7 +73,9 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 space-y-1">
-                <p className="font-bold text-gray-900">{user.name || 'Unknown User'}</p>
+                <p className="font-bold text-gray-900">
+                  {user.name || 'Unknown User'}
+                </p>
                 <p className="text-sm text-gray-600">{user.email}</p>
                 <p className="text-sm text-gray-600">Role: {role}</p>
                 {/* <p className="text-sm text-gray-600">Customer: {customer}</ p> */}
@@ -118,4 +116,3 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
     </Dialog>
   );
 };
-

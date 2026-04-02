@@ -18,9 +18,7 @@ const CustomerUserAssociationPage = Loadable(
 const CreateRolePage = Loadable(
   lazy(() => import('@/pages/CreateRolePage.tsx'))
 );
-const CustomerDetails = Loadable(
-  lazy(() => import('@/features/users/components/CustomerDetails.tsx'))
-);
+
 const CustomerAdministratorPage = Loadable(
   lazy(() => import('@/pages/CustomerDetailsPage'))
 );
@@ -49,9 +47,7 @@ const CompanyProfilePage = Loadable(
 const BulkUserManagementPage = Loadable(
   lazy(() => import('@/pages/BulkUserManagementPage.tsx'))
 );
-const UserDetailsPermissionsPage = Loadable(
-  lazy(() => import('@/pages/UserDetailsPermissionsPage.tsx'))
-);
+
 const CustomerPage = Loadable(
   lazy(() =>
     import('@/features/users/components/Customer.tsx').then((module) => ({
@@ -86,10 +82,7 @@ export const managementRoutes = [
         path: 'edit-role/:id',
         element: <CreateRolePage />,
       },
-      {
-        path: 'customer-details/:id',
-        element: <CustomerDetails />,
-      },
+
       {
         path: 'customer/:id',
         element: <CustomerDetailsPage />,
@@ -130,17 +123,10 @@ export const managementRoutes = [
         path: 'bulk-management',
         element: <BulkUserManagementPage />,
       },
-      {
-        path: ':id/permissions',
-        element: <UserDetailsPermissionsPage />,
-      },
+
       {
         path: 'customers',
         element: <CustomerPage searchQuery="" />,
-      },
-      {
-        path: 'customer-users',
-        element: <UserDetailsPermissionsPage />,
       },
     ],
   },

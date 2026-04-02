@@ -57,8 +57,10 @@ export default function UsersAndRolesManagementPage() {
         {/* Header Section */}
         <div className="space-y-2">
           <div className="flex items-start justify-between">
-
-            <PageHeader title='Users and Roles Management' description='Manage users and their roles' />
+            <PageHeader
+              title="Users and Roles Management"
+              description="Manage users and their roles"
+            />
             <Button onClick={handleAddAction} variant="secondary">
               <Plus className="h-4 w-4" />
               {addButtonLabel}

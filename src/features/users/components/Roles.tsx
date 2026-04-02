@@ -69,7 +69,6 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
   const customRoles = roles?.meta?.customRoles || 0;
   const systemRoles = roles?.meta?.systemRoles || 0;
   const totalRoles = roles?.meta?.total || 0;
-  console.log(customRoles);
 
   useEffect(() => {
     setCurrentPage(1);

@@ -121,10 +121,6 @@ export default function CreateCustomerPage() {
       state: data.state || undefined,
       zip: data.zip || undefined,
       country: data.country,
-      status: CustomerStatus.ACTIVE,
-      maxUsers: parseInt(data.allocatedLimits.users) || 0,
-      plan: CustomerPlan.BASIC,
-      features: [],
       allocatedLimits: {
         devices: parseInt(data.allocatedLimits.devices) || 0,
         dashboards: parseInt(data.allocatedLimits.dashboards) || 0,
@@ -147,8 +143,8 @@ export default function CreateCustomerPage() {
           },
           onError: (error: unknown) => {
             const errorMessage =
-              (error as { response?: { data?: { message?: string } } })?.response
-                ?.data?.message || 'Failed to update customer';
+              (error as { response?: { data?: { message?: string } } })
+                ?.response?.data?.message || 'Failed to update customer';
             toast.error(errorMessage);
           },
         }

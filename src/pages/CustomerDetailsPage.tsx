@@ -1,17 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Trash2, Edit } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { useCustomerById, useDeleteCustomer } from '@/features/customer/hooks';
+import { useCustomerById } from '@/features/customer/hooks';
 import type { Customer } from '@/features/customer/types';
 import CustomerUsersList from '@/features/customer/components/CustomerUsersList';
 import CustomerActivityLog from '@/features/customer/components/CustomerActivityLog';
 import { usePermissions } from '@/features/permissions/hooks';
-import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import DevicesListCustomers from '@/features/users/components/DevicesListCustomers';
+import { CustomerDetailsCard } from '@/features/customer/components/CustomerDetailsCard';
 
 interface Permission {
   id: string;
@@ -23,10 +20,11 @@ interface Permission {
 const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
   return (
     <div
-      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${granted
-        ? 'bg-green-500 border-green-500'
-        : 'bg-gray-200 border-gray-300'
-        }`}
+      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+        granted
+          ? 'bg-green-500 border-green-500'
+          : 'bg-gray-200 border-gray-300'
+      }`}
     >
       {granted && (
         <svg
@@ -46,49 +44,15 @@ const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
 };
 
 export default function CustomerDetailsPage() {
-  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { data } = useCustomerById(id);
-  const customer = data as Customer | undefined;
-  const deleteCustomerMutation = useDeleteCustomer();
+  const customer = data?.data as Customer | undefined;
 
   // get permissions for the customer
   const { data: permissionsData } = usePermissions();
   const UserPermissionsdata = permissionsData;
 
-  const contractStart = customer?.additionalInfo?.contractStartDate
-    ? new Date(customer.additionalInfo.contractStartDate).toLocaleDateString()
-    : undefined;
-  const contractEnd = customer?.additionalInfo?.contractEndDate
-    ? new Date(customer.additionalInfo.contractEndDate).toLocaleDateString()
-    : undefined;
-
   const [activeTab, setActiveTab] = useState('permissions');
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  const handleEditRole = () => {
-    navigate(`/users-management/edit-customer/${id}`);
-  };
-
-  const handleDelete = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!id) return;
-    try {
-      await deleteCustomerMutation.mutateAsync(id);
-      toast.success('Customer deleted successfully');
-      navigate('/users-management/customers');
-    } catch (error) {
-      console.error('Failed to delete customer:', error);
-      const errorMessage =
-        (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message || 'Failed to delete customer';
-      toast.error(errorMessage);
-      throw error;
-    }
-  };
 
   // Group permissions by category
   const permissionsByCategory = useMemo(
@@ -114,159 +78,8 @@ export default function CustomerDetailsPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <div className="mx-auto space-y-6">
-        {/* Header Section */}
-        <Card className="bg-white shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">
-                  {customer?.name || 'Customer '}
-                </h1>
-                <p className="text-gray-600 text-sm dark:text-white">
-                  {customer?.description ||
-                    'Full access to customer resources and user management'}
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleEditRole}
-                  className="bg-primary hover:bg-primary/90 text-white"
-                >
-                  <Edit className="h-4 w-4  " />
-                  Edit Customer
-                </Button>
-                <Button onClick={handleDelete} variant="secondary">
-                  <Trash2 className="h-4 w-4  " />
-                  Delete
-                </Button>
-              </div>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full dark:bg-gray-900 dark:border-gray-700">
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Status
-                </p>
-                <span className="inline-flex w-fit items-center rounded-full px-2.5 py-1 text-xs font-medium bg-success/10 text-success">
-                  {customer?.status || 'Unknown'}
-                </span>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Email
-                </p>
-                <p className="text-sm truncate max-w-[200px] font-medium text-gray-900 dark:text-white">
-                  {customer?.email || '-'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Phone
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {customer?.phone || '-'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Tenant
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {customer?.tenantId || customer?.tenant?.name || '-'}
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Location
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {[customer?.city, customer?.state, customer?.country]
-                    .filter(Boolean)
-                    .join(', ') || '-'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Address
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {[customer?.address, customer?.address2]
-                    .filter(Boolean)
-                    .join(', ') || '-'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Zip Code
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {customer?.zip || '-'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Customer Type
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {customer?.additionalInfo?.customerType || '-'}
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Tax ID
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {customer?.additionalInfo?.taxId || '-'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Account Manager
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {customer?.additionalInfo?.accountManager || '-'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Contract Start
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {contractStart || '-'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Contract End
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {contractEnd || '-'}
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Allocated Limits
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {`Users: ${customer?.allocatedLimits?.users ?? 0}, Assets: ${customer?.allocatedLimits?.assets ?? 0
-                    }, Devices: ${customer?.allocatedLimits?.devices ?? 0}`}
-                </p>
-              </div>
-
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                  Usage Counters
-                </p>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {`Users: ${customer?.usageCounters?.users ?? 0}, Assets: ${customer?.usageCounters?.assets ?? 0
-                    }, Devices: ${customer?.usageCounters?.devices ?? 0}`}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Customer Details Card Extracted */}
+        <CustomerDetailsCard customer={customer} id={id} />
 
         {/* Tabs */}
         <Card className="bg-white shadow-sm p-4">
@@ -287,19 +100,19 @@ export default function CustomerDetailsPage() {
                   value="assigned-users"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
                 >
-                  Assigned Users (8)
+                  Assigned Users
                 </TabsTrigger>
                 <TabsTrigger
                   value="devices"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
                 >
-                  Devices (8)
+                  Devices
                 </TabsTrigger>
                 <TabsTrigger
-                  value="assigned-devices"
+                  value="activity-logs"
                   className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
                 >
-                  Activity Log
+                  Activity Logs
                 </TabsTrigger>
               </TabsList>
 
@@ -313,8 +126,6 @@ export default function CustomerDetailsPage() {
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                     Permission Matrix
                   </h2>
-
-                  {/* Summary Section */}
                 </div>
 
                 {/* Permission Categories */}
@@ -377,7 +188,7 @@ export default function CustomerDetailsPage() {
               </TabsContent>
 
               {/* Activity Log Tab */}
-              <TabsContent value="activity-log" className="p-6 space-y-4">
+              <TabsContent value="activity-logs" className="p-6 space-y-4">
                 <CustomerActivityLog
                   customerId={id || ''}
                   title="Activity Log"
@@ -386,15 +197,6 @@ export default function CustomerDetailsPage() {
             </Tabs>
           </CardContent>
         </Card>
-
-        <DeleteConfirmationDialog
-          open={deleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-          onConfirm={handleDeleteConfirm}
-          title="Delete Customer"
-          itemName={customer?.name}
-          isLoading={deleteCustomerMutation.isPending}
-        />
       </div>
     </div>
   );

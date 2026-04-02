@@ -95,10 +95,6 @@ export interface CreateCustomerData {
   state?: string;
   zip?: string;
   country: string;
-  status: CustomerStatus;
-  maxUsers: number;
-  plan: CustomerPlan;
-  features: string[];
   allocatedLimits: {
     devices: number;
     dashboards: number;

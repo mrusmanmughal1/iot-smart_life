@@ -21,7 +21,9 @@ import {
 const createRoleSchema = z.object({
   name: z.string().min(1, 'Role name is required').trim(),
   description: z.string().optional(),
-  permissionIds: z.array(z.string()),
+  permissionIds: z
+    .array(z.string())
+    .min(1, 'At least one permission must be selected'),
 });
 
 type CreateRoleFormData = z.infer<typeof createRoleSchema>;
@@ -233,9 +235,11 @@ export default function CreateRolePage() {
             <Card className="shadow-lg rounded-xl border-gray-200">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-1">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Permissions
-                  </h2>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Permissions <span className="text-red-500">*</span>
+                    </h2>
+                  </div>
                   <div className="flex mb-2 gap-2">
                     <Button
                       type="button"
@@ -321,7 +325,11 @@ export default function CreateRolePage() {
               </CardContent>
             </Card>
           </div>
-
+          {errors.permissionIds && (
+            <p className="text-sm pt-3 text-red-600">
+              {errors.permissionIds.message}
+            </p>
+          )}
           {/* Action Buttons */}
           <div className="flex justify-start gap-3 mt-6">
             <Button

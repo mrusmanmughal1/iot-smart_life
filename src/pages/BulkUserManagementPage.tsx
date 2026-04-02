@@ -7,10 +7,12 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useBulkUpdateUserStatus } from '@/features/users/hooks';
 import { UserStatus } from '@/services/api/users.api';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 interface SelectedUser {
   id: string;
   email: string;
   name: string;
+  role: string;
 }
 
 export default function BulkUserManagementPage() {
@@ -23,25 +25,39 @@ export default function BulkUserManagementPage() {
   const selectedUsers: SelectedUser[] =
     (location.state as { users?: SelectedUser[] } | null)?.users || [];
 
+  const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<UserStatus | null>(null);
+
   const selectedCount = selectedUsers.length;
 
-
   const handleActionClick = (action: UserStatus) => {
-    bulkUpdateUserStatus({ userIds: selectedUsers.map((user) => user.id), status: action },
-      {
-        onSuccess: () => {
-          toast.success(`${action} users status updated successfully`);
-        },
-        onError: (error: unknown) => {
-          console.error('Failed to update users status:', error);
-          const errorMessage =
-            (error as { response?: { data?: { message?: string } } })?.response
-              ?.data?.message || 'Failed to update users status';
-          toast.error(errorMessage);
-        },
-      }
-    );
+    setPendingAction(action);
+    setStatusConfirmOpen(true);
+  };
 
+  const handleStatusConfirm = () => {
+    if (pendingAction) {
+      bulkUpdateUserStatus(
+        {
+          userIds: selectedUsers.map((user) => user.id),
+          status: pendingAction,
+        },
+        {
+          onSuccess: () => {
+            toast.success(`${pendingAction} users status updated successfully`);
+            setStatusConfirmOpen(false);
+            setPendingAction(null);
+          },
+          onError: (error: unknown) => {
+            console.error('Failed to update users status:', error);
+            const errorMessage =
+              (error as { response?: { data?: { message?: string } } })
+                ?.response?.data?.message || 'Failed to update users status';
+            toast.error(errorMessage);
+          },
+        }
+      );
+    }
   };
 
   const handleExecute = () => {
@@ -82,10 +98,11 @@ export default function BulkUserManagementPage() {
         type="button"
         variant={isSelected ? 'default' : variant}
         onClick={onClick}
-        className={`w-full ${isSelected
-          ? 'bg-[#43489C] text-white hover:bg-[#43489C]/90'
-          : className
-          }`}
+        className={`w-full ${
+          isSelected
+            ? 'bg-[#43489C] text-white hover:bg-[#43489C]/90'
+            : className
+        }`}
       >
         {label}
       </Button>
@@ -106,11 +123,14 @@ export default function BulkUserManagementPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-lg mb-1">
-                {selectedCount} users selected
+                Total {selectedCount} users selected
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {selectedUsers.map((user) => (
-                  <Card key={user.id} className="border border-gray-200 shadow-sm">
+                  <Card
+                    key={user.id}
+                    className="border border-gray-200 shadow-sm"
+                  >
                     <CardContent className="p-4 space-y-1 flex items-center gap-3">
                       <Avatar>
                         <AvatarFallback className="bg-purple-100 text-purple-700">
@@ -118,8 +138,15 @@ export default function BulkUserManagementPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="">
-                        <p className="text-sm font-semibold text-gray-900">{user.name}</p>
-                        <p className="text-sm text-gray-600">{user.email}</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {user.name}
+                        </p>
+                        <p className="text-xs text-gray-600">{user.email}</p>
+                        <div className="">
+                          <p className="text-xs capitalize text-gray-600">
+                            Role: {user.role.replace('_', ' ')}
+                          </p>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -162,7 +189,6 @@ export default function BulkUserManagementPage() {
                       className="bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-200"
                       onClick={() => handleActionClick(UserStatus.SUSPENDED)}
                     />
-
                   </div>
                 </CardContent>
               </Card>
@@ -189,7 +215,6 @@ export default function BulkUserManagementPage() {
                       label="Update Permissions"
                       className="bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-200"
                     />
-
                   </div>
                 </CardContent>
               </Card>
@@ -213,7 +238,6 @@ export default function BulkUserManagementPage() {
                         className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
                       />
                     </div>
-
                   </div>
                 </CardContent>
               </Card>
@@ -236,13 +260,13 @@ export default function BulkUserManagementPage() {
                         label="Delete Users"
                         variant="destructive"
                         className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
-                      /><ActionButton
+                      />
+                      <ActionButton
                         id="bulk-import"
                         label="Bulk Import"
                         className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200"
                       />
                     </div>
-
                   </div>
                 </CardContent>
               </Card>
@@ -290,6 +314,13 @@ export default function BulkUserManagementPage() {
           </Button>
         </div>
       </div>
+      <ConfirmDialog
+        open={statusConfirmOpen}
+        onOpenChange={setStatusConfirmOpen}
+        title="Confirm Bulk Status Change"
+        description={`Are you sure you want to change the status of ${selectedCount} users to ${pendingAction}?`}
+        onConfirm={handleStatusConfirm}
+      />
     </div>
   );
 }

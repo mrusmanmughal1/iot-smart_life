@@ -133,12 +133,12 @@ export const usersApi = {
     apiClient.post<ApiResponse<unknown>>(`/users/${userId}/reset-password`),
 
   // Activate user
-  activate: (id: string) =>
-    apiClient.patch<ApiResponse<User>>(`/users/${id}/activate`),
+  updateStatus: (id: string, status: string) =>
+    apiClient.patch<ApiResponse<User>>(`/users/${id}/status`, { status }),
 
   // Deactivate user
-  deactivate: (id: string) =>
-    apiClient.patch<ApiResponse<User>>(`/users/${id}/deactivate`),
+  deactivate: (id: string, status: string) =>
+    apiClient.patch<ApiResponse<User>>(`/users/${id}/deactivate`, { status }),
 
   // Suspend user
   suspend: (id: string) =>
