@@ -56,31 +56,10 @@ export const userService = {
   /**
    * Activate user and send welcome email
    */
-  async activateUser(userId: string) {
-    await usersApi.activate(userId);
-
-    // Here you would send welcome email
-    // await emailService.sendWelcome(user.email);
-
-    return usersApi.getById(userId);
-  },
 
   /**
    * Deactivate user with reason
    */
-  async deactivateUser(userId: string, reason: string) {
-    await usersApi.deactivate(userId);
-
-    // Log deactivation reason
-    await usersApi.update(userId, {
-      additionalInfo: {
-        deactivatedAt: new Date().toISOString(),
-        deactivationReason: reason,
-      },
-    });
-
-    return usersApi.getById(userId);
-  },
 
   /**
    * Get user with roles and permissions

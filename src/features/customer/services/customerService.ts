@@ -21,11 +21,6 @@ export const customerService = {
       throw new Error('Invalid email format');
     }
 
-    // Ensure maxUsers is a positive number
-    if (data.maxUsers < 1) {
-      throw new Error('Max users must be at least 1');
-    }
-
     const response = await customersApi.create(data);
     return response.data.data;
   },
@@ -48,11 +43,6 @@ export const customerService = {
       if (!emailRegex.test(data.email)) {
         throw new Error('Invalid email format');
       }
-    }
-
-    // If maxUsers is being updated, validate it
-    if (data.maxUsers !== undefined && data.maxUsers < 1) {
-      throw new Error('Max users must be at least 1');
     }
 
     const response = await customersApi.update(customerId, data);
