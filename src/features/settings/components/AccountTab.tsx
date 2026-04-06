@@ -4,7 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Eye, EyeOff } from 'lucide-react';
+import { Camera, Eye, EyeOff, Trash2, Upload } from 'lucide-react';
+import { imagesApi, ImageType } from '@/services/api';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'react-hot-toast';
 import {
   Card,
@@ -34,6 +36,7 @@ export function AccountTab() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const changePasswordSchema = createChangePasswordSchema(t);
   const profileSchema = createProfileSchema(t);
 
@@ -164,10 +167,59 @@ export function AccountTab() {
     });
   };
 
-  const accountType = settings?.accountType || 'Premium Account';
-  const storageUsed = settings?.storageUsed || 2.4;
-  const storageTotal = settings?.storageTotal || 10;
-  const storagePercentage = (storageUsed / storageTotal) * 100;
+  const handleAvatarUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error(
+        t('settings.profile.invalidFileType') || 'Please select an image file'
+      );
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(
+        t('settings.profile.fileTooLarge') ||
+          'File size should be less than 5MB'
+      );
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const uploadRes = await imagesApi.upload(file, ImageType.PROFILE);
+      const imageUrl = uploadRes.data.data.url;
+
+      await usersApi.updateProfile({ avatar: imageUrl });
+      toast.success(
+        t('settings.profile.avatarUpdated') || 'Profile picture updated'
+      );
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    } catch {
+      toast.error(
+        t('settings.profile.uploadFailed') || 'Failed to upload image'
+      );
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    try {
+      await usersApi.updateProfile({ avatar: '' });
+      toast.success(
+        t('settings.profile.avatarRemoved') || 'Profile picture removed'
+      );
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+    } catch {
+      toast.error(
+        t('settings.profile.removeFailed') || 'Failed to remove image'
+      );
+    }
+  };
 
   if (isLoading || isLoadingUser) {
     return (
@@ -191,6 +243,74 @@ export function AccountTab() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-6 flex flex-col items-center    gap-6">
+            <div className="relative group">
+              <Avatar className="h-24 w-24 border-2 border-gray-100 dark:border-gray-800">
+                <AvatarImage
+                  src={currentUser?.avatar || ''}
+                  alt={currentUser?.name || ''}
+                />
+                <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
+                  {currentUser?.name?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              {isUploadingAvatar && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
+                </div>
+              )}
+              <label
+                htmlFor="avatar-upload"
+                className="absolute bottom-0 right-0 p-1.5 bg-primary text-white rounded-full shadow-lg cursor-pointer hover:bg-primary/90 transition-colors shadow-primary/20"
+              >
+                <Camera size={16} />
+                <input
+                  type="file"
+                  id="avatar-upload"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  disabled={isUploadingAvatar}
+                />
+              </label>
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                {t('settings.profile.photo') || 'Profile Photo'}
+              </h3>
+              <p className="text-xs text-gray-500 max-w-[240px]">
+                {t('settings.profile.photoDescription') ||
+                  'Upload a new photo to change your profile picture. Recommended size: 400x400px.'}
+              </p>
+              <div className="flex items-center gap-3 mt-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs font-medium"
+                  onClick={() =>
+                    document.getElementById('avatar-upload')?.click()
+                  }
+                  disabled={isUploadingAvatar}
+                >
+                  <Upload size={14} className="mr-1.5" />
+                  {t('settings.profile.changePhoto') || 'Change Photo'}
+                </Button>
+                {currentUser?.avatar && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={handleRemoveAvatar}
+                    disabled={isUploadingAvatar}
+                  >
+                    <Trash2 size={14} className="mr-1.5" />
+                    {t('settings.profile.removePhoto') || 'Remove'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+          <Separator className="mb-6" />
           <form
             onSubmit={handleSubmitProfile(
               onSubmitProfile as unknown as SubmitHandler<ProfileFormData>

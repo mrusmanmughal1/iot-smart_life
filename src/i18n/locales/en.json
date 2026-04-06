@@ -40,6 +40,7 @@
     "invalidEmail": "Invalid email",
     "saving": "Saving...",
     "saved": "Saved",
+    "somethingWentWrong": "Something went wrong",
     "email": "Email",
     "emailNotEditable": "Email cannot be changed.",
     "emailRequired": "Email is required",
@@ -1098,6 +1099,18 @@
     "notifications": "Notification Settings",
     "security": "Security",
     "account": "Account Settings",
+    "profile": {
+      "photo": "Profile Photo",
+      "photoDescription": "Upload a new photo to change your profile picture. Recommended size: 400x400px.",
+      "changePhoto": "Change Photo",
+      "removePhoto": "Remove",
+      "invalidFileType": "Please select an image file",
+      "fileTooLarge": "File size should be less than 5MB",
+      "avatarUpdated": "Profile picture updated",
+      "uploadFailed": "Failed to upload image",
+      "avatarRemoved": "Profile picture removed",
+      "removeFailed": "Failed to remove image"
+    },
     "changePassword": {
       "title": "Change Password",
       "currentPassword": "Current Password",

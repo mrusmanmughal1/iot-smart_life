@@ -40,7 +40,9 @@ export default function UsersPage() {
   const handleDeleteConfirm = () => {
     if (selectedUser) {
       // TODO: Implement actual delete API call
-      toast.success(`User ${selectedUser.name || selectedUser.email} deleted successfully`);
+      toast.success(
+        `User ${selectedUser.name || selectedUser.email} deleted successfully`
+      );
       setSelectedUser(null);
     }
   };

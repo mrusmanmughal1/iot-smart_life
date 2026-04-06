@@ -13,10 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useRoles } from '@/features/users/hooks';
-import { useCustomers } from '@/features/customer/hooks';
-import type { Role } from '@/services/api/users.api';
+import type { Role, UserRole } from '@/services/api/users.api';
 import type { Customer } from '@/features/customer/types';
-import { UserRole } from '@/services/api/users.api';
 import { toast } from 'react-hot-toast';
 import { useCreateCustomerUser } from '@/features/customerUser/hooks';
 import { useCustomersByTenantId } from '@/features/customer/hooks/useCustomers';
@@ -25,9 +23,9 @@ import { useAppStore } from '@/stores/useAppStore';
 const createUserSchema = z.object({
   name: z.string().min(1, 'Contact email is required'),
   email: z.string().email('Email must be valid').min(1, 'Email is required'),
-  role: z.string().min(1, 'Role is required'),
-  phone: z.string().optional(),
-  customerId: z.string().optional(),
+  role: z.string(),
+  phone: z.string().min(8, 'Phone number is required'),
+  customerId: z.string().min(1, 'Customer is required'),
 });
 
 type CreateUserFormData = z.infer<typeof createUserSchema>;
@@ -64,7 +62,7 @@ export default function CreateUserPage() {
       email: data.email,
       name: data.name,
       phone: data.phone,
-      // role: data.role as UserRole,
+      role: data.role as UserRole,
       customerId: data.customerId || undefined,
       // customerId: '',
     };
@@ -175,7 +173,7 @@ export default function CreateUserPage() {
                       htmlFor="role"
                       className="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      Role <span className="text-red-500">*</span>
+                      Role
                     </label>
                     <Controller
                       name="role"
@@ -214,14 +212,14 @@ export default function CreateUserPage() {
                 </div>
 
                 {/* Right column */}
-                <div className="space-y-4">
+                <div className="">
                   {!isCustomerAdmin && (
                     <div>
                       <label
                         htmlFor="customerId"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
-                        Customers List
+                        Customers List <span className="text-red-500">*</span>
                       </label>
                       <Controller
                         name="customerId"
@@ -258,6 +256,11 @@ export default function CreateUserPage() {
                       />
                     </div>
                   )}
+                  {errors.customerId && (
+                    <p className=" text-sm text-red-600">
+                      {errors.customerId.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -268,7 +271,6 @@ export default function CreateUserPage() {
                   variant="outline"
                   onClick={handleCancel}
                   disabled={isSubmitting || createUserMutation.isPending}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-700 border-gray-300 rounded-md"
                 >
                   Cancel
                 </Button>
@@ -276,7 +278,7 @@ export default function CreateUserPage() {
                   type="submit"
                   disabled={isSubmitting || createUserMutation.isPending}
                   isLoading={createUserMutation.isPending}
-                  className="bg-[#43489C] hover:bg-[#43489C]/90 text-white rounded-md"
+                  variant="secondary"
                 >
                   Save
                 </Button>

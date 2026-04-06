@@ -19,13 +19,11 @@ import { UserStatus } from '@/services/api/users.api';
 type CustomerUsersListProps = {
   customerId?: string;
   searchQuery?: string;
-  title?: string;
 };
 
 const CustomerUsersList = ({
   customerId,
   searchQuery = '',
-  title = 'Customer Users',
 }: CustomerUsersListProps) => {
   const params = useParams<{ customerId?: string; id?: string }>();
   const resolvedCustomerId = customerId || params.customerId || params.id;
@@ -58,9 +56,6 @@ const CustomerUsersList = ({
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-        {title}
-      </h2>
       <Card className="bg-white shadow-sm dark:bg-gray-900 dark:border-gray-700">
         <CardContent className="p-0">
           {isLoading ? (

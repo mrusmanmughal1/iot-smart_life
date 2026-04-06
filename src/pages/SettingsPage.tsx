@@ -39,8 +39,10 @@ export default function SettingsPage() {
   }
   return (
     <div className="space-y-6">
-
-      <PageHeader title={t('settings.title')} description={t('settings.description')} />
+      <PageHeader
+        title={t('settings.title')}
+        description={t('settings.description')}
+      />
 
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList className="dark:bg-gray-800 dark:text-white">

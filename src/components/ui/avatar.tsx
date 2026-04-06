@@ -21,7 +21,12 @@ interface AvatarImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   alt?: string;
 }
 
-export function AvatarImage({ src, alt = '', className = '', ...props }: AvatarImageProps) {
+export function AvatarImage({
+  src,
+  alt = '',
+  className = '',
+  ...props
+}: AvatarImageProps) {
   return (
     <img
       src={src}
@@ -37,7 +42,11 @@ interface AvatarFallbackProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
 
-export function AvatarFallback({ children, className = '', ...props }: AvatarFallbackProps) {
+export function AvatarFallback({
+  children,
+  className = '',
+  ...props
+}: AvatarFallbackProps) {
   return (
     <div
       className={`flex h-full w-full items-center justify-center rounded-full bg-slate-100 text-slate-600 font-medium text-sm ${className}`}

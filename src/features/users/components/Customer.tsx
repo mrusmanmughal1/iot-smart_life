@@ -1,4 +1,11 @@
-import { MoreVertical, Edit, Trash2, ShieldCheck } from 'lucide-react';
+import {
+  MoreVertical,
+  Edit,
+  Trash2,
+  ShieldCheck,
+  Eye,
+  ChartNetwork,
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +23,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useEffect, useState } from 'react';
 import { DeleteUserModal } from '@/components/models/DeleteUserModal';
@@ -138,6 +144,29 @@ const CustomerPage = ({ searchQuery }: { searchQuery: string }) => {
                       {new Date(customer.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right flex items-center  relative justify-end gap-1">
+                      {/* a button with asign icon */}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="hover:bg-secondary hover:text-white"
+                            onClick={() =>
+                              navigate(
+                                `/users-management/assign-users/${customer.id}`
+                              )
+                            }
+                          >
+                            <ChartNetwork className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent
+                          className="bottom-[70%] text-center min-w-22
+                         max-w-36"
+                        >
+                          Assign users
+                        </TooltipContent>
+                      </Tooltip>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
@@ -150,11 +179,11 @@ const CustomerPage = ({ searchQuery }: { searchQuery: string }) => {
                               )
                             }
                           >
-                            <ShieldCheck className="h-4 w-4" />
+                            <Eye className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent className="bottom-[70%] w-32">
-                          Manage Customers
+                        <TooltipContent className="bottom-[70%] max-w-36">
+                          View Customer
                         </TooltipContent>
                       </Tooltip>
                       <DropdownMenu>

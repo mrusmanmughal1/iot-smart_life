@@ -111,6 +111,22 @@ export const useBulkUpdateUserStatus = () => {
   });
 };
 
+export const useBulkUpdateUsers = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userIds,
+      data,
+    }: {
+      userIds: string[];
+      data: Partial<User>;
+    }) => usersApi.bulkUpdate(userIds, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
 export const useUpdateUserStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({

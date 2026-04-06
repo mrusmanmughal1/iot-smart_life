@@ -41,6 +41,7 @@
     "invalidEmail": "بريد إلكتروني غير صالح",
     "saving": "جاري الحفظ...",
     "saved": "تم الحفظ",
+    "somethingWentWrong": "حدث خطأ ما",
     "email": "البريد الإلكتروني",
     "emailNotEditable": "البريد الإلكتروني لا يمكن تعديله.",
     "emailRequired": "البريد الإلكتروني مطلوب",
@@ -1044,6 +1045,18 @@
     "notifications": "إعدادات الإشعارات",
     "security": "الأمان",
     "account": "إعدادات الحساب",
+    "profile": {
+      "photo": "صورة الملف الشخصي",
+      "photoDescription": "قم بتحميل صورة جديدة لتغيير صورتك الشخصية. الحجم الموصى به: 400x400 بكسل.",
+      "changePhoto": "تغيير الصورة",
+      "removePhoto": "إزالة",
+      "invalidFileType": "يرجى اختيار ملف صورة",
+      "fileTooLarge": "يجب أن يكون حجم الملف أقل من 5 ميجابايت",
+      "avatarUpdated": "تم تحديث صورة الملف الشخصي",
+      "uploadFailed": "فشل تحميل الصورة",
+      "avatarRemoved": "تم إزالة صورة الملف الشخصي",
+      "removeFailed": "فشل إزالة الصورة"
+    },
     "changePassword": {
       "title": "تغيير كلمة المرور",
       "currentPassword": "كلمة المرور الحالية",

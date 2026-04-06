@@ -1,4 +1,11 @@
-import { MoreVertical, Edit, Trash2, ShieldCheck, Users2 } from 'lucide-react';
+import {
+  MoreVertical,
+  Edit,
+  Trash2,
+  ShieldCheck,
+  Users2,
+  Eye,
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -85,7 +92,7 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
   const handleManageUsersClick = (user: User) => {
     console.log(user);
     if (user.role === UserRole.CUSTOMER_USER) {
-      navigate(`/users-management/customer-user-permissions/${user.id}`);
+      navigate(`/users-management/customer-user/${user.id}`);
     } else {
       navigate(`/users-management/customer/${user.customerId}`);
     }
@@ -265,11 +272,17 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                               className="hover:bg-secondary hover:text-white"
                               onClick={() => handleManageUsersClick(user)}
                             >
-                              <Users2 className="h-4 w-4" />
+                              {user.role === UserRole.CUSTOMER_USER ? (
+                                <Eye className="h-4 w-4" />
+                              ) : (
+                                <Users2 className="h-4 w-4" />
+                              )}
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent className="bottom-[70%] w-32">
-                            Manage users
+                          <TooltipContent className="bottom-[70%] max-w-36">
+                            {user.role === UserRole.CUSTOMER_USER
+                              ? 'View Customer'
+                              : 'Manage users'}
                           </TooltipContent>
                         </Tooltip>
                         <DropdownMenu>

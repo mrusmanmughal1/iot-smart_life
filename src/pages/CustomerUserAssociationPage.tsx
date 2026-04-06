@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Plus, Minus } from 'lucide-react';
+import { Mail, ScrollText, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,9 +11,10 @@ import {
   SelectContent,
   SelectItem,
 } from '@/components/ui/select';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUsers } from '@/features/users/hooks';
-import { useCustomers } from '@/features/customer/hooks';
+import { useCustomerById, useCustomers } from '@/features/customer/hooks';
+import { useParams } from 'react-router-dom';
 
 interface User {
   id: string;
@@ -66,7 +67,10 @@ export default function CustomerUserAssociationPage() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
     null
   );
-
+  //get id from params and call the customer details api
+  const { id } = useParams();
+  const { data: customer } = useCustomerById(id);
+  const cutomerData = customer?.data;
   const { data: users } = useUsers({
     search: searchQuery,
     role: 'customer_user',
@@ -110,12 +114,33 @@ export default function CustomerUserAssociationPage() {
   return (
     <div className="space-y-6  ">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start gap-4">
+        <Avatar className="h-20 w-20">
+          {/* <AvatarImage src={cutomerData?.logo} /> */}
+          <AvatarFallback className="bg-purple-100 text-purple-700">
+            {cutomerData?.name?.[0]?.toUpperCase() || 'C'}
+          </AvatarFallback>
+        </Avatar>
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
-            Customer-User Association
+            {cutomerData?.name}{' '}
+            <Badge
+              variant={
+                cutomerData?.status === 'active' ? 'success' : 'destructive'
+              }
+            >
+              {cutomerData?.status}
+            </Badge>
           </h1>
-          <p className="text-slate-500 mt-2">Assign users to customers</p>
+          <p className="text-slate-500 flex items-center gap-2 ">
+            {' '}
+            <Mail className="h-4 w-4" /> {cutomerData?.email}
+          </p>
+          <p className="text-slate-500 flex items-center gap-2  text-sm">
+            {' '}
+            <ScrollText className="h-4 w-4" />
+            {cutomerData?.description}
+          </p>
         </div>
       </div>
 

@@ -5,9 +5,31 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useBulkUpdateUserStatus } from '@/features/users/hooks';
+import {
+  useBulkUpdateUsers,
+  useBulkUpdateUserStatus,
+  useRoles,
+} from '@/features/users/hooks';
 import { UserStatus } from '@/services/api/users.api';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Loader2 } from 'lucide-react';
+
 interface SelectedUser {
   id: string;
   email: string;
@@ -22,11 +44,20 @@ export default function BulkUserManagementPage() {
     new Set()
   );
   const { mutate: bulkUpdateUserStatus } = useBulkUpdateUserStatus();
-  const selectedUsers: SelectedUser[] =
-    (location.state as { users?: SelectedUser[] } | null)?.users || [];
+  const { mutate: bulkUpdateUsers } = useBulkUpdateUsers();
+  const { data: rolesData, isLoading: isRolesLoading } = useRoles();
+  const selectedUsers: SelectedUser[] = location.state?.users || [];
 
   const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<UserStatus | null>(null);
+
+  const [roleModalOpen, setRoleModalOpen] = useState(false);
+  const [communicationModalOpen, setCommunicationModalOpen] = useState(false);
+  const [currentAction, setCurrentAction] = useState<
+    'assign-role' | 'remove-role' | 'send-email' | 'send-notification' | ''
+  >('');
+  const [selectedRoleId, setSelectedRoleId] = useState<string>('');
+  const [messageText, setMessageText] = useState<string>('');
 
   const selectedCount = selectedUsers.length;
 
@@ -58,6 +89,61 @@ export default function BulkUserManagementPage() {
         }
       );
     }
+  };
+
+  const handleRoleAction = (action: 'assign-role' | 'remove-role') => {
+    setCurrentAction(action);
+    setRoleModalOpen(true);
+  };
+
+  const handleCommunicationAction = (
+    action: 'send-email' | 'send-notification'
+  ) => {
+    setCurrentAction(action);
+    setCommunicationModalOpen(true);
+  };
+
+  const onRoleConfirm = () => {
+    if (!selectedRoleId) {
+      toast.error('Please select a role');
+      return;
+    }
+
+    const selectedRole = rolesData?.data.find((r) => r.id === selectedRoleId);
+
+    bulkUpdateUsers(
+      {
+        userIds: selectedUsers.map((u) => u.id),
+        data: { role: selectedRole?.name },
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            `Successfully ${currentAction === 'assign-role' ? 'assigned' : 'removed'} role`
+          );
+          setRoleModalOpen(false);
+          setSelectedRoleId('');
+        },
+        onError: (error: any) => {
+          toast.error(
+            error.response?.data?.message || 'Failed to update roles'
+          );
+        },
+      }
+    );
+  };
+
+  const onCommunicationConfirm = () => {
+    if (!messageText.trim()) {
+      toast.error('Please enter a message');
+      return;
+    }
+
+    toast.success(
+      `${currentAction === 'send-email' ? 'Email' : 'Notification'} sent successfully`
+    );
+    setCommunicationModalOpen(false);
+    setMessageText('');
   };
 
   const handleExecute = () => {
@@ -117,14 +203,13 @@ export default function BulkUserManagementPage() {
           title="Bulk User Management"
           description="Perform actions on multiple users simultaneously"
         />
-
         {/* Selected Users Banner */}
-        <div className="bg-secondary text-white rounded-lg p-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-secondary    text-white rounded-lg p-4">
+          <p className="font-semibold text-lg mb-1">
+            Total {selectedCount} users selected
+          </p>
+          <div className="flex items-center pt-6 justify-between max-h-96 overflow-y-auto ">
             <div>
-              <p className="font-semibold text-lg mb-1">
-                Total {selectedCount} users selected
-              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {selectedUsers.map((user) => (
                   <Card
@@ -155,7 +240,6 @@ export default function BulkUserManagementPage() {
             </div>
           </div>
         </div>
-
         {/* Available Actions */}
         <Card className="shadow-lg rounded-xl border-gray-200">
           <CardContent className="p-6">
@@ -189,6 +273,12 @@ export default function BulkUserManagementPage() {
                       className="bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border-yellow-200"
                       onClick={() => handleActionClick(UserStatus.SUSPENDED)}
                     />
+                    <ActionButton
+                      id="delete-users"
+                      label="Delete Users"
+                      variant="destructive"
+                      className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -204,11 +294,13 @@ export default function BulkUserManagementPage() {
                       id="assign-role"
                       label="Assign Role"
                       className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
+                      onClick={() => handleRoleAction('assign-role')}
                     />
                     <ActionButton
                       id="remove-role"
                       label="Remove Role"
                       className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+                      onClick={() => handleRoleAction('remove-role')}
                     />
                     <ActionButton
                       id="update-permissions"
@@ -231,11 +323,15 @@ export default function BulkUserManagementPage() {
                         id="send-email"
                         label="Send Email"
                         className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
+                        onClick={() => handleCommunicationAction('send-email')}
                       />
                       <ActionButton
                         id="send-notification"
                         label="Send Notification"
                         className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+                        onClick={() =>
+                          handleCommunicationAction('send-notification')
+                        }
                       />
                     </div>
                   </div>
@@ -255,12 +351,7 @@ export default function BulkUserManagementPage() {
                         label="Export Data"
                         className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
                       />
-                      <ActionButton
-                        id="delete-users"
-                        label="Delete Users"
-                        variant="destructive"
-                        className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
-                      />
+
                       <ActionButton
                         id="bulk-import"
                         label="Bulk Import"
@@ -275,25 +366,8 @@ export default function BulkUserManagementPage() {
         </Card>
 
         {/* Footer Action Buttons */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gray-200">
+        <div className="flex flex-wrap items-center justify-end gap-4 pt-4 border-t border-gray-200">
           <div className="flex items-center gap-3">
-            <Button
-              type="button"
-              variant="default"
-              onClick={handleExecute}
-              disabled={selectedActions.size === 0}
-              className="bg-gray-700 hover:bg-gray-800 text-white"
-            >
-              Execute Actions
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              onClick={handlePreview}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Preview
-            </Button>
             <Button
               type="button"
               variant="outline"
@@ -302,16 +376,16 @@ export default function BulkUserManagementPage() {
             >
               Cancel
             </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleExecute}
+              disabled={selectedActions.size === 0}
+              className="bg-[#A53887] hover:bg-[#A53887]/90 text-white"
+            >
+              Ready to execute on {selectedCount} users
+            </Button>
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleExecute}
-            disabled={selectedActions.size === 0}
-            className="bg-[#A53887] hover:bg-[#A53887]/90 text-white"
-          >
-            Ready to execute on {selectedCount} users
-          </Button>
         </div>
       </div>
       <ConfirmDialog
@@ -321,6 +395,96 @@ export default function BulkUserManagementPage() {
         description={`Are you sure you want to change the status of ${selectedCount} users to ${pendingAction}?`}
         onConfirm={handleStatusConfirm}
       />
+
+      {/* Role Management Modal */}
+      <Dialog open={roleModalOpen} onOpenChange={setRoleModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {currentAction === 'assign-role' ? 'Assign Role' : 'Remove Role'}
+            </DialogTitle>
+            <DialogDescription>
+              Select a role to{' '}
+              {currentAction === 'assign-role' ? 'assign to' : 'remove from'}{' '}
+              {selectedCount} users.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4">
+            {isRolesLoading ? (
+              <div className="flex justify-center p-4">
+                <Loader2 className="h-6 w-6 animate-spin text-secondary" />
+              </div>
+            ) : (
+              <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {rolesData?.data.map((role) => (
+                    <SelectItem key={role.id} value={role.id}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRoleModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-secondary text-white hover:bg-secondary/90"
+              onClick={onRoleConfirm}
+              disabled={!selectedRoleId}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Communication Modal */}
+      <Dialog
+        open={communicationModalOpen}
+        onOpenChange={setCommunicationModalOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {currentAction === 'send-email'
+                ? 'Send Email'
+                : 'Send Notification'}
+            </DialogTitle>
+            <DialogDescription>
+              Enter the message you want to send to {selectedCount} users.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4">
+            <Textarea
+              placeholder="Type your message here..."
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              rows={5}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setCommunicationModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-secondary text-white hover:bg-secondary/90"
+              onClick={onCommunicationConfirm}
+              disabled={!messageText.trim()}
+            >
+              Send {currentAction === 'send-email' ? 'Email' : 'Notification'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

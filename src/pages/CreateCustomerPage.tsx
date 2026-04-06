@@ -7,16 +7,17 @@ import { toast } from 'react-hot-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { HelpCircle } from 'lucide-react';
+import { Cpu, Layout, Box, Map, Zap, Users } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import {
   useCreateCustomer,
   useCustomerById,
   useUpdateCustomer,
 } from '@/features/customer/hooks';
 import type { Customer } from '@/features/customer/types';
-import { CustomerPlan, CustomerStatus } from '@/features/customer/types';
 
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
+import { useAppStore } from '@/stores/useAppStore';
 // Zod validation schema
 const createCustomerSchema = z.object({
   name: z.string().min(1, 'Customer name is required').trim(),
@@ -45,7 +46,7 @@ type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
 
 export default function CreateCustomerPage() {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const id = useAppStore((state) => state.user?.id);
   const isEditMode = !!id;
   const createCustomerMutation = useCreateCustomer();
   const updateCustomerMutation = useUpdateCustomer();
@@ -82,7 +83,7 @@ export default function CreateCustomerPage() {
   });
 
   useEffect(() => {
-    if (isEditMode && customerData) {
+    if (customerData) {
       const customer =
         (customerData as { data?: Customer })?.data ||
         (customerData as unknown as Customer);
@@ -110,6 +111,11 @@ export default function CreateCustomerPage() {
     }
   }, [customerData, isEditMode, reset]);
 
+  const customer = isEditMode
+    ? (customerData as { data?: Customer })?.data ||
+      (customerData as unknown as Customer)
+    : null;
+  console.log(customer);
   const onSubmit = async (data: CreateCustomerFormData) => {
     const customerData = {
       name: data.name,
@@ -427,7 +433,6 @@ export default function CreateCustomerPage() {
                 </CardContent>
               </Card>
             </div>
-
             {/* Right Column - Actions and Help */}
             <div className="space-y-6">
               {/* Actions Card */}
@@ -466,34 +471,87 @@ export default function CreateCustomerPage() {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Help Card */}
-              <Card className="shadow-lg rounded-xl border-gray-200">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <HelpCircle className="h-5 w-5 text-gray-600" />
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      Help
-                    </h2>
+              {/* Current Subscription Card */}
+              <Card className="shadow-lg rounded-xl border-gray-200 overflow-hidden">
+                <div className="  bg-secondary p-4 text-white ">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-bold">
+                        Current Subscription
+                      </h2>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
+                      {customer?.plan || 'Active'}
+                    </span>
                   </div>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li className="flex items-start gap-2">
-                      <span className="text-gray-400 mt-1">•</span>
-                      <span>Customer name is required</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-gray-400 mt-1">•</span>
-                      <span>Contact email must be valid</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-gray-400 mt-1">•</span>
-                      <span>Features can be changed later</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-gray-400 mt-1">•</span>
-                      <span>Max users can be adjusted</span>
-                    </li>
-                  </ul>
+                </div>
+                <CardContent className="p-5">
+                  <div className="space-y-5">
+                    {/* Resource Items */}
+                    {[
+                      {
+                        label: 'Users',
+                        icon: Users,
+                        usage: customer?.usageCounters?.users || 0,
+                        limit: customer?.allocatedLimits?.users || 0,
+                        color: 'bg-blue-500',
+                      },
+                      {
+                        label: 'Devices',
+                        icon: Cpu,
+                        usage: customer?.usageCounters?.devices || 0,
+                        limit: customer?.allocatedLimits?.devices || 0,
+                        color: 'bg-indigo-500',
+                      },
+                      {
+                        label: 'Assets',
+                        icon: Box,
+                        usage: customer?.usageCounters?.assets || 0,
+                        limit: customer?.allocatedLimits?.assets || 0,
+                        color: 'bg-purple-500',
+                      },
+                      {
+                        label: 'Dashboards',
+                        icon: Layout,
+                        usage: customer?.usageCounters?.dashboards || 0,
+                        limit: customer?.allocatedLimits?.dashboards || 0,
+                        color: 'bg-pink-500',
+                      },
+                      {
+                        label: 'Floor Plans',
+                        icon: Map,
+                        usage: customer?.usageCounters?.floorPlans || 0,
+                        limit: customer?.allocatedLimits?.floorPlans || 0,
+                        color: 'bg-orange-500',
+                      },
+                      {
+                        label: 'Automations',
+                        icon: Zap,
+                        usage: customer?.usageCounters?.automations || 0,
+                        limit: customer?.allocatedLimits?.automations || 0,
+                        color: 'bg-yellow-500',
+                      },
+                    ].map((item) => (
+                      <div key={item.label} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 font-medium text-gray-700">
+                            <item.icon className="h-4 w-4 text-gray-400" />
+                            {item.label}
+                          </div>
+                          <div className="text-xs font-semibold tabular-nums">
+                            <span className="text-gray-900">{item.usage}</span>
+                            <span className="text-gray-400 mx-1">/</span>
+                            <span className="text-gray-500">{item.limit}</span>
+                          </div>
+                        </div>
+                        <Progress
+                          value={item.usage}
+                          max={item.limit || 1}
+                          className="h-1.5 bg-gray-100"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </div>

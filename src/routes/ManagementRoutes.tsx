@@ -47,6 +47,9 @@ const CompanyProfilePage = Loadable(
 const BulkUserManagementPage = Loadable(
   lazy(() => import('@/pages/BulkUserManagementPage.tsx'))
 );
+const CustomerUserDetailsPage = Loadable(
+  lazy(() => import('@/pages/CustomerUserDetailsPage.tsx'))
+);
 
 const CustomerPage = Loadable(
   lazy(() =>
@@ -71,7 +74,7 @@ export const managementRoutes = [
         element: <UsersAndRolesManagementPage />,
       },
       {
-        path: 'customer-user-association',
+        path: 'assign-users/:id',
         element: <CustomerUserAssociationPage />,
       },
       {
@@ -94,6 +97,10 @@ export const managementRoutes = [
       {
         path: 'customer-user-permissions/:id',
         element: <AssignPermissionsPage />,
+      },
+      {
+        path: 'customer-user/:id',
+        element: <CustomerUserDetailsPage />,
       },
       {
         path: 'search-results',
