@@ -182,8 +182,8 @@ export const userService = {
 
     return {
       userId,
-      lastLogin: user.data.data.lastLogin,
-      status: user.data.data.status,
+      lastLogin: user.data.data.data.lastLogin,
+      status: user.data.data.data.status,
       // Would include more activity data from audit logs
     };
   },

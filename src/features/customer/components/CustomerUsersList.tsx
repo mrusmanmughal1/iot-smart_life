@@ -19,11 +19,13 @@ import { UserStatus } from '@/services/api/users.api';
 type CustomerUsersListProps = {
   customerId?: string;
   searchQuery?: string;
+  title?: string;
 };
 
 const CustomerUsersList = ({
   customerId,
   searchQuery = '',
+  title = 'Assigned Users',
 }: CustomerUsersListProps) => {
   const params = useParams<{ customerId?: string; id?: string }>();
   const resolvedCustomerId = customerId || params.customerId || params.id;

@@ -97,7 +97,8 @@ export const usersApi = {
     apiClient.get<ApiResponse<UsersResponse>>('/users', { params }),
 
   // Get user by ID
-  getById: (id: string) => apiClient.get<ApiResponse<User>>(`/users/${id}`),
+  getById: (id: string) =>
+    apiClient.get<ApiResponse<ApiResponse<User>>>(`/users/${id}`),
 
   // Create user
   create: (data: Partial<User>) =>
