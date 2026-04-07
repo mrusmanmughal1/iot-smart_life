@@ -16,6 +16,7 @@ import {
   useRoleById,
   useUpdateRole,
 } from '@/features/roles/hooks';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 // Zod validation schema
 const createRoleSchema = z.object({
@@ -67,7 +68,7 @@ export default function CreateRolePage() {
       });
     }
   }, [isEditMode, roleData, reset]);
-  const { data: permissionsData } = usePermissions();
+  const { data: permissionsData, isLoading } = usePermissions();
   const permissions = useMemo(
     () => (permissionsData || []) as Permission[],
     [permissionsData]
@@ -259,69 +260,78 @@ export default function CreateRolePage() {
                     </Button>
                   </div>
                 </div>
+                {isLoading ? (
+                  <div className="flex h-48 items-center justify-center">
+                    <LoadingSpinner />
+                  </div>
+                ) : (
+                  <Controller
+                    name="permissionIds"
+                    control={control}
+                    render={({ field }) => (
+                      <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                        {permissionCategories.map((category) => {
+                          const isOpen =
+                            openCategories[category.category] ?? false;
+                          return (
+                            <div key={category.category} className="">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  toggleCategory(category.category)
+                                }
+                                className="flex w-full items-center justify-between rounded p-2   text-left text-sm font-semibold text-gray-800 bg-gray-200 text-gray-700"
+                              >
+                                <span className="first-letter:uppercase ">
+                                  {category.category.replace('_', ' ')}
+                                </span>
+                                {isOpen ? (
+                                  <ChevronDown className="h-4 w-4" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4" />
+                                )}
+                              </button>
+                              {isOpen && (
+                                <div className="space-y-2  bg-gray-100 p-2">
+                                  {category.permissions.map((permission) => {
+                                    const isChecked =
+                                      selectedPermissions.includes(
+                                        permission.id
+                                      );
+                                    const actionText = permission.action;
 
-                <Controller
-                  name="permissionIds"
-                  control={control}
-                  render={({ field }) => (
-                    <div className="space-y-3 max-h-[600px] overflow-y-auto">
-                      {permissionCategories.map((category) => {
-                        const isOpen =
-                          openCategories[category.category] ?? false;
-                        return (
-                          <div key={category.category} className="">
-                            <button
-                              type="button"
-                              onClick={() => toggleCategory(category.category)}
-                              className="flex w-full items-center justify-between rounded p-2   text-left text-sm font-semibold text-gray-800 bg-gray-200 text-gray-700"
-                            >
-                              <span className="first-letter:uppercase ">
-                                {category.category.replace('_', ' ')}
-                              </span>
-                              {isOpen ? (
-                                <ChevronDown className="h-4 w-4" />
-                              ) : (
-                                <ChevronRight className="h-4 w-4" />
+                                    return (
+                                      <div
+                                        key={permission.id}
+                                        className="flex items-center gap-2"
+                                      >
+                                        <Checkbox
+                                          checked={isChecked}
+                                          onChange={() =>
+                                            handlePermissionToggle(
+                                              permission.id,
+                                              selectedPermissions,
+                                              field.onChange
+                                            )
+                                          }
+                                          label={
+                                            permission.description ||
+                                            permission.name ||
+                                            `${permission.resource}${actionText ? `: ${actionText}` : ''}`
+                                          }
+                                        />
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               )}
-                            </button>
-                            {isOpen && (
-                              <div className="space-y-2  bg-gray-100 p-2">
-                                {category.permissions.map((permission) => {
-                                  const isChecked =
-                                    selectedPermissions.includes(permission.id);
-                                  const actionText = permission.action;
-
-                                  return (
-                                    <div
-                                      key={permission.id}
-                                      className="flex items-center gap-2"
-                                    >
-                                      <Checkbox
-                                        checked={isChecked}
-                                        onChange={() =>
-                                          handlePermissionToggle(
-                                            permission.id,
-                                            selectedPermissions,
-                                            field.onChange
-                                          )
-                                        }
-                                        label={
-                                          permission.description ||
-                                          permission.name ||
-                                          `${permission.resource}${actionText ? `: ${actionText}` : ''}`
-                                        }
-                                      />
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  />
+                )}
               </CardContent>
             </Card>
           </div>

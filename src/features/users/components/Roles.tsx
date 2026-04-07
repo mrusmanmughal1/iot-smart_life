@@ -25,6 +25,7 @@ import { DropdownMenu } from '@/components/ui/dropdown-menu';
 import { toast } from 'react-hot-toast';
 import { Pagination } from '@/components/common/Pagination';
 import { Badge } from '@/components/ui/badge';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 const Roles = ({ searchQuery }: { searchQuery: string }) => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const itemsPerPage = 10;
-  const { data: roles } = useRoles({
+  const { data: roles, isLoading } = useRoles({
     page: currentPage,
     limit: itemsPerPage,
     search: searchQuery || undefined,
@@ -103,15 +104,26 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedRoles?.length === 0 && (
+                  {isLoading ? (
                     <TableRow>
                       <TableCell
                         colSpan={4}
                         className="bg-gray-50 text-center py-10"
                       >
-                        No Roles Found
+                        <LoadingSpinner />
                       </TableCell>
                     </TableRow>
+                  ) : (
+                    paginatedRoles?.length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={4}
+                          className="bg-gray-50 text-center py-10"
+                        >
+                          No Roles Found
+                        </TableCell>
+                      </TableRow>
+                    )
                   )}
                   {paginatedRoles.map((role: Role) => (
                     <TableRow

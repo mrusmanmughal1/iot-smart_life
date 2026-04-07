@@ -186,32 +186,21 @@ const CustomerPage = ({ searchQuery }: { searchQuery: string }) => {
                           View Customer
                         </TooltipContent>
                       </Tooltip>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon-sm">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() =>
-                              navigate(
-                                `/users-management/edit-customer/${customer.id}`
-                              )
-                            }
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-red-600"
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon-sm"
+                            className="hover:bg-secondary hover:text-white"
                             onClick={() => handleDeleteClick(customer)}
                           >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="bottom-[70%] max-w-36">
+                          Delete Customer
+                        </TooltipContent>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}

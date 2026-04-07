@@ -13,8 +13,13 @@ import {
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUsers } from '@/features/users/hooks';
-import { useCustomerById, useCustomers } from '@/features/customer/hooks';
+import {
+  useCustomerById,
+  useCustomers,
+  useCustomerUsers,
+} from '@/features/customer/hooks';
 import { useParams } from 'react-router-dom';
+import { useAssignUserToCustomer } from '@/features/customerUser/hooks';
 
 interface User {
   id: string;
@@ -64,6 +69,9 @@ export default function CustomerUserAssociationPage() {
   const [selectedAvailableUsers, setSelectedAvailableUsers] = useState<
     Set<string>
   >(new Set());
+  const [selectedUnAvailableUsers, setSelectedUnAvailableUsers] = useState<
+    Set<string>
+  >(new Set());
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(
     null
   );
@@ -77,9 +85,8 @@ export default function CustomerUserAssociationPage() {
     status: selectedStatus,
   });
 
-  const { data: customersData } = useCustomers({
-    search: searchQuery,
-  });
+  // get the list of users to this customer
+  const { data: customersData } = useCustomerUsers(id || '');
 
   const toggleAvailableUserSelection = (userId: string) => {
     const newSelection = new Set(selectedAvailableUsers);
@@ -90,10 +97,18 @@ export default function CustomerUserAssociationPage() {
     }
     setSelectedAvailableUsers(newSelection);
   };
+  const toggleUnAvailableUserSelection = (userId: string) => {
+    const newSelection = new Set(selectedUnAvailableUsers);
+    if (newSelection.has(userId)) {
+      newSelection.delete(userId);
+    } else {
+      newSelection.add(userId);
+    }
+    setSelectedUnAvailableUsers(newSelection);
+  };
+  const assignedUsers = customersData?.data || [];
 
-  const CustomersList = customersData?.data || [];
-
-  const selectedCustomerInfo = CustomersList.find(
+  const selectedCustomerInfo = assignedUsers.find(
     (c: any) => c.id === selectedCustomerId
   ) || {
     name: 'Select a Customer',
@@ -109,6 +124,15 @@ export default function CustomerUserAssociationPage() {
     regularUsers: 0,
     unassigned: users?.data?.length || 0,
     filteredResults: users?.data?.length || 0,
+  };
+  const { mutateAsync: assignUserToCustomer } = useAssignUserToCustomer();
+  const handleBulkAssign = () => {
+    selectedAvailableUsers.forEach((userId) => {
+      assignUserToCustomer({
+        userId,
+        customerId: id || '',
+      });
+    });
   };
 
   return (
@@ -241,7 +265,7 @@ export default function CustomerUserAssociationPage() {
             <div className="flex gap-2 pt-4  ">
               <Button
                 className="flex-1  "
-                // onClick={handleBulkAssign}
+                onClick={handleBulkAssign}
                 variant="secondary"
                 disabled={selectedAvailableUsers.size === 0}
               >
@@ -262,61 +286,49 @@ export default function CustomerUserAssociationPage() {
         {/* Customers List Panel */}
         <Card className="pt-4">
           <CardHeader>
-            <CardTitle>Customers</CardTitle>
+            <CardTitle>Assigned Users</CardTitle>
             <p className="text-sm text-slate-500 mt-1">
               Select Customer to Assign the Selected User
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3 max-h-[500px] overflow-y-auto">
-              {CustomersList.length === 0 ? (
+              {assignedUsers.length === 0 ? (
                 <p className="text-sm text-slate-500 text-center py-8">
                   No customers found
                 </p>
               ) : (
-                CustomersList.map((customer: any) => (
+                assignedUsers.map((user: any) => (
                   <div
-                    key={customer.id}
+                    key={user.id}
                     className={`flex items-center gap-3 p-3 rounded-lg border ${
-                      selectedCustomerId === customer.id
+                      selectedUnAvailableUsers.has(user.id)
                         ? 'border-purple-500 bg-purple-50'
                         : 'border-slate-200 hover:border-slate-300'
                     } transition-colors cursor-pointer`}
-                    onClick={() => setSelectedCustomerId(customer.id)}
+                    onClick={() => toggleUnAvailableUserSelection(user.id)}
                   >
                     <Avatar>
                       <AvatarFallback className="bg-purple-100 text-purple-700">
-                        {getInitials(customer.name)}
+                        {getInitials(user.name)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">
-                        {customer.name}
+                        {user.name}
                       </p>
                       <p className="text-xs text-slate-500 truncate">
-                        {customer.email}
+                        {user.email}
                       </p>
                     </div>
-                    {customer.status && (
-                      <Badge variant={getRoleBadgeVariant(customer.status)}>
-                        {customer.status}
+                    {user.status && (
+                      <Badge variant={getRoleBadgeVariant(user.status)}>
+                        {user.status}
                       </Badge>
                     )}
                   </div>
                 ))
               )}
-            </div>
-            <div className="flex gap-2 pt-4  ">
-              <Button
-                className="flex-1  "
-                variant="secondary"
-                // onClick={handleBulkAssign}
-                disabled={
-                  !selectedCustomerId || selectedAvailableUsers.size === 0
-                }
-              >
-                Assign
-              </Button>
             </div>
           </CardContent>
         </Card>
@@ -338,7 +350,7 @@ export default function CustomerUserAssociationPage() {
               <div>
                 <p className="text-xs text-slate-500 mb-1">Plan</p>
                 <p className="font-medium">
-                  {selectedCustomerInfo.plan || '-'}
+                  {/* {selectedCustomerInfo?.plan || '-'} */}
                 </p>
               </div>
               <div>

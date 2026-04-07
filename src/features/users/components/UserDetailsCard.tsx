@@ -152,9 +152,9 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
                     Last Login
                   </p>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {user?.lastLogin
-                      ? new Date(user.lastLogin).toLocaleString()
-                      : 'Never'}
+                    {user?.lastLoginAt
+                      ? new Date(user.lastLoginAt).toLocaleString()
+                      : 'N/A'}
                   </p>
                 </div>
               </div>

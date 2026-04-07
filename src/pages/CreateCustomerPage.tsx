@@ -1,9 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +12,6 @@ import {
   useCustomerById,
   useUpdateCustomer,
 } from '@/features/customer/hooks';
-import type { Customer } from '@/features/customer/types';
 
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { useAppStore } from '@/stores/useAppStore';
@@ -27,11 +24,11 @@ const createCustomerSchema = z.object({
     .min(1, 'Contact email is required'),
   phone: z.string().min(1, 'Phone number is required').trim(),
   description: z.string().optional(),
-  city: z.string().optional(),
-  address: z.string().optional(),
-  state: z.string().optional(),
-  zip: z.string().optional(),
-  country: z.string(),
+  city: z.string().min(1, 'City is required').trim(),
+  address: z.string().min(1, 'Address is required').trim(),
+  state: z.string().min(1, 'State is required').trim(),
+  zip: z.string().min(1, 'Zip is required').trim(),
+  country: z.string().min(1, 'Country is required').trim(),
 
   allocatedLimits: z.object({
     devices: z.string(),
@@ -39,7 +36,7 @@ const createCustomerSchema = z.object({
     assets: z.string(),
     floorPlans: z.string(),
     automations: z.string(),
-    users: z.string(),
+    users: z.string().min(1, 'Users is required'),
   }),
 });
 type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
@@ -47,7 +44,7 @@ type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
 export default function CreateCustomerPage() {
   const navigate = useNavigate();
   const id = useAppStore((state) => state.user?.id);
-  const isEditMode = !!id;
+
   const createCustomerMutation = useCreateCustomer();
   const updateCustomerMutation = useUpdateCustomer();
 
@@ -55,7 +52,7 @@ export default function CreateCustomerPage() {
   const {
     register,
     handleSubmit,
-    reset,
+
     formState: { errors, isSubmitting },
   } = useForm<CreateCustomerFormData>({
     resolver: zodResolver(createCustomerSchema),
@@ -82,40 +79,8 @@ export default function CreateCustomerPage() {
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (customerData) {
-      const customer =
-        (customerData as { data?: Customer })?.data ||
-        (customerData as unknown as Customer);
-      if (!customer) return;
+  const customer: any = customerData;
 
-      reset({
-        name: customer.name || '',
-        email: customer.email || '',
-        phone: customer.phone || '',
-        description: customer.description || '',
-        city: customer.city || '',
-        address: customer.address || '',
-        state: customer.state || '',
-        zip: customer.zip || '',
-        country: customer.country || '',
-        allocatedLimits: {
-          devices: customer.allocatedLimits?.devices?.toString() || '0',
-          dashboards: customer.allocatedLimits?.dashboards?.toString() || '0',
-          assets: customer.allocatedLimits?.assets?.toString() || '0',
-          floorPlans: customer.allocatedLimits?.floorPlans?.toString() || '0',
-          automations: customer.allocatedLimits?.automations?.toString() || '0',
-          users: customer.allocatedLimits?.users?.toString() || '0',
-        },
-      });
-    }
-  }, [customerData, isEditMode, reset]);
-
-  const customer = isEditMode
-    ? (customerData as { data?: Customer })?.data ||
-      (customerData as unknown as Customer)
-    : null;
-  console.log(customer);
   const onSubmit = async (data: CreateCustomerFormData) => {
     const customerData = {
       name: data.name,
@@ -137,27 +102,7 @@ export default function CreateCustomerPage() {
       },
     };
 
-    if (isEditMode) {
-      updateCustomerMutation.mutate(
-        { customerId: id!, data: customerData },
-        {
-          onSuccess: () => {
-            toast.success('Customer updated successfully');
-            navigate('/users-management', {
-              state: { tab: 'Customers' },
-            });
-          },
-          onError: (error: unknown) => {
-            const errorMessage =
-              (error as { response?: { data?: { message?: string } } })
-                ?.response?.data?.message || 'Failed to update customer';
-            toast.error(errorMessage);
-          },
-        }
-      );
-    } else {
-      createCustomerMutation.mutate(customerData);
-    }
+    createCustomerMutation.mutate(customerData);
   };
 
   const handleCancel = () => {
@@ -173,7 +118,7 @@ export default function CreateCustomerPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-          {isEditMode ? 'Edit Customer' : 'Add New Customer'}
+          {'Add New Customer'}
         </h1>
 
         {/* Two Column Layout */}
@@ -275,7 +220,7 @@ export default function CreateCustomerPage() {
                           htmlFor="city"
                           className="block text-sm font-medium text-gray-700 mb-2"
                         >
-                          City
+                          City <span className="text-red-500">*</span>
                         </label>
                         <Input
                           id="city"
@@ -283,13 +228,18 @@ export default function CreateCustomerPage() {
                           placeholder="Enter city"
                           className="w-full border border-gray-300 rounded-md"
                         />
+                        {errors.city && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.city.message}
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label
                           htmlFor="state"
                           className="block text-sm font-medium text-gray-700 mb-2"
                         >
-                          State/Province
+                          State/Province <span className="text-red-500">*</span>
                         </label>
                         <Input
                           id="state"
@@ -297,6 +247,11 @@ export default function CreateCustomerPage() {
                           placeholder="Enter state/province"
                           className="w-full border border-gray-300 rounded-md"
                         />
+                        {errors.state && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.state.message}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -305,7 +260,7 @@ export default function CreateCustomerPage() {
                         htmlFor="address"
                         className="block text-sm font-medium text-gray-700 mb-2"
                       >
-                        Address
+                        Address <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="address"
@@ -313,6 +268,11 @@ export default function CreateCustomerPage() {
                         placeholder="Enter address"
                         className="w-full border border-gray-300 rounded-md"
                       />
+                      {errors.address && (
+                        <p className="mt-1 text-sm text-red-600">
+                          {errors.address.message}
+                        </p>
+                      )}
                     </div>
 
                     {/* Zip/Postal Code and Country */}
@@ -322,7 +282,7 @@ export default function CreateCustomerPage() {
                           htmlFor="zip"
                           className="block text-sm font-medium text-gray-700 mb-2"
                         >
-                          Zip/Postal Code
+                          Zip/Postal Code<span className="text-red-500">*</span>
                         </label>
                         <Input
                           id="zip"
@@ -330,13 +290,18 @@ export default function CreateCustomerPage() {
                           placeholder="Enter zip/postal code"
                           className="w-full border border-gray-300 rounded-md"
                         />
+                        {errors.zip && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.zip.message}
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label
                           htmlFor="country"
                           className="block text-sm font-medium text-gray-700 mb-2"
                         >
-                          Country
+                          Country <span className="text-red-500">*</span>
                         </label>
                         <Input
                           id="country"
@@ -344,6 +309,11 @@ export default function CreateCustomerPage() {
                           placeholder="Enter country"
                           className="w-full border border-gray-300 rounded-md"
                         />
+                        {errors.country && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {errors.country.message}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -355,6 +325,22 @@ export default function CreateCustomerPage() {
                           Allocated Limits
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Users <span className="text-red-500">*</span>
+                            </label>
+                            <Input
+                              type="number"
+                              min={0}
+                              {...register('allocatedLimits.users')}
+                              className="w-full border border-gray-300 rounded-md"
+                            />
+                            {errors.allocatedLimits?.users && (
+                              <p className="mt-1 text-sm text-red-600">
+                                {errors.allocatedLimits.users.message}
+                              </p>
+                            )}
+                          </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Devices
@@ -410,17 +396,6 @@ export default function CreateCustomerPage() {
                               className="w-full border border-gray-300 rounded-md"
                             />
                           </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Users
-                            </label>
-                            <Input
-                              type="number"
-                              min={0}
-                              {...register('allocatedLimits.users')}
-                              className="w-full border border-gray-300 rounded-md"
-                            />
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -456,7 +431,7 @@ export default function CreateCustomerPage() {
                         updateCustomerMutation.isPending
                       }
                     >
-                      {isEditMode ? 'Save Changes' : 'Save and Add'}
+                      {'Save and Add'}
                     </Button>
                     <div className="flex items-center gap-3">
                       <Button

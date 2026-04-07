@@ -69,7 +69,6 @@ export default function CustomerUserDetailsPage() {
       {} as Record<string, Permission[]>
     );
   }, [permissionsData, user]);
-  console.log(user);
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white space-y-6">
       <div className="mx-auto space-y-6">

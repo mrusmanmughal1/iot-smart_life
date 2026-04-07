@@ -105,6 +105,12 @@ export const customerUsersApi = {
   // Update user
   update: (id: string, data: Partial<User>) =>
     apiClient.patch<ApiResponse<User>>(`/customer-users/${id}`, data),
+  // Delete user
+  delete: (id: string) =>
+    apiClient.delete<ApiResponse<User>>(`/customer-users/${id}`),
+  asignUserToCustomer: (userId: string, customerId: string) =>
+    apiClient.post<ApiResponse<User>>(`/customer-users/assign`, {
+      userId,
+      customerId,
+    }),
 };
-
-// Permissions API

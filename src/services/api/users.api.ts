@@ -29,6 +29,7 @@ export interface User {
   additionalInfo?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
+  lastLoginAt?: string;
 }
 
 export interface UserQuery {
