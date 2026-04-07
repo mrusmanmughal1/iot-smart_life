@@ -95,7 +95,7 @@ export default function RolePermissionManagementPage() {
   const [permissions, setPermissions] = useState<PermissionRow[]>([]);
   const isSystemRole = data?.isSystem;
   const role = data as
-    | { permissions?: RolePermission[]; name?: string }
+    | { permissions?: RolePermission[]; name?: string; description?: string }
     | undefined;
   const allPermissions = useMemo(() => role?.permissions ?? [], [role]);
 
@@ -132,8 +132,8 @@ export default function RolePermissionManagementPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
       <div className="mx-auto space-y-6">
         <PageHeader
-          title="Role Permission Management"
-          description={`Role: ${role?.name || ''}`}
+          title={`Role : ${role?.name || ''}`}
+          description={`Description: ${role?.description || ''}`}
         />
 
         <Card className="bg-white shadow-sm">

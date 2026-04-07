@@ -119,6 +119,11 @@ export const managementRoutes = [
         element: <CreateUserPage />,
       },
       {
+        path: 'edit-user/:id',
+        element: <CreateUserPage />,
+      },
+
+      {
         path: 'profile-settings',
         element: <ProfileSettingsPage />,
       },

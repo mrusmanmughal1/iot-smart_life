@@ -23,6 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useDeleteUser,
   useSearchUsers,
@@ -47,15 +48,23 @@ import {
 const Users = ({ searchQuery }: { searchQuery: string }) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [roleFilter, setRoleFilter] = useState<'all' | 'customer_user' | 'user'>(
+    'all'
+  );
   const itemsPerPage = 10;
+
+  const roleParam = roleFilter === 'all' ? undefined : roleFilter;
+
   const { data: usersData, isLoading } = useUsers({
     page: currentPage,
     limit: itemsPerPage,
+    role: roleParam,
   });
   const { data: searchUsersData, isLoading: isSearchLoading } = useSearchUsers(
     searchQuery,
     currentPage,
-    itemsPerPage
+    itemsPerPage,
+    roleParam
   );
   const deleteUserMutation = useDeleteUser();
   const isSearching = searchQuery.trim().length > 0;
@@ -71,7 +80,7 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, roleFilter]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -185,9 +194,25 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-        All Users
-      </h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          All Users
+        </h2>
+        <Tabs
+          defaultValue="all"
+          value={roleFilter}
+          onValueChange={(value) =>
+            setRoleFilter(value as 'all' | 'customer_user' | 'user')
+          }
+          className="w-auto"
+        >
+          <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="customer_user">Customer User</TabsTrigger>
+            <TabsTrigger value="user">Customer</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
       <Card className="pt-6">
         <CardContent>
           {isTableLoading ? (
@@ -270,43 +295,30 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                               variant="ghost"
                               size="icon-sm"
                               className="hover:bg-secondary hover:text-white"
-                              onClick={() => handleManageUsersClick(user)}
+                              onClick={() => handleDeleteClick(user)}
                             >
-                              {user.role === UserRole.CUSTOMER_USER ? (
-                                <Eye className="h-4 w-4" />
-                              ) : (
-                                <Users2 className="h-4 w-4" />
-                              )}
+                              <Trash2 className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="bottom-[70%] max-w-36">
-                            {user.role === UserRole.CUSTOMER_USER
-                              ? 'View Customer'
-                              : 'Manage users'}
+                            Delete User
                           </TooltipContent>
                         </Tooltip>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon-sm">
-                              <MoreVertical className="h-4 w-4" />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="hover:bg-secondary hover:text-white"
+                              onClick={() => handleManageUsersClick(user)}
+                            >
+                              <Eye className="h-4 w-4" />
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleEditClick(user)}
-                            >
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-red-600"
-                              onClick={() => handleDeleteClick(user)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                          </TooltipTrigger>
+                          <TooltipContent className="bottom-[70%] max-w-36">
+                            View Details
+                          </TooltipContent>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))}

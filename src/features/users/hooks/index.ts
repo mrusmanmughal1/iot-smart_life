@@ -29,12 +29,13 @@ export const useUsers = (params?: UserQuery) => {
 export const useSearchUsers = (
   query: string,
   page?: number,
-  limit?: number
+  limit?: number,
+  role?: string
 ) => {
   return useQuery({
-    queryKey: ['users', 'search', query, page, limit],
+    queryKey: ['users', 'search', query, page, limit, role],
     queryFn: async () => {
-      const response = await usersApi.search(query, page, limit);
+      const response = await usersApi.search(query, page, limit, role);
       return response.data.data;
     },
   });
@@ -137,6 +138,36 @@ export const useUpdateUserStatus = () => {
     },
   });
 };
+// Update user by ID
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, data }: { userId: string; data: Partial<User> }) =>
+      usersApi.update(userId, data),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['users', userId] });
+    },
+  });
+};
+
+// Update user permissions
+export const useUpdateUserPermissions = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      permissions,
+    }: {
+      userId: string;
+      permissions: string[];
+    }) => usersApi.updatePermissions(userId, permissions),
+    onSuccess: (_, { userId }) => {
+      queryClient.invalidateQueries({ queryKey: ['users', userId] });
+    },
+  });
+};
+
 //get devices by customer id
 export const useDevicesByCustomerId = (customerId: string) => {
   return useQuery({

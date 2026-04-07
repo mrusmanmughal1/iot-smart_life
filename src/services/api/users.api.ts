@@ -105,9 +105,9 @@ export const usersApi = {
   create: (data: Partial<User>) =>
     apiClient.post<ApiResponse<User>>('/users', data),
   //search users
-  search: (query: string, page?: number, limit?: number) =>
+  search: (query: string, page?: number, limit?: number, role?: string) =>
     apiClient.get<ApiResponse<ApiResponse<User[]>>>('/users/search', {
-      params: { q: query, limit },
+      params: { q: query, limit, role },
     }),
   // Update user
   update: (id: string, data: Partial<User>) =>

@@ -49,7 +49,6 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
   };
 
   const handleDeleteConfirm = () => {
-    alert(selectedRole);
     if (selectedRole) {
       deleteRoleMutation.mutate(selectedRole.id, {
         onSuccess: () => {
@@ -135,7 +134,7 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                           {role.name}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-600">
+                      <TableCell className="text-gray-600 truncate max-w-[600px]">
                         {role.description}
                       </TableCell>
                       <TableCell className="text-gray-600">

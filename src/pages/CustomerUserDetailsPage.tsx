@@ -1,11 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { useUser } from '@/features/users/hooks';
+import { useUser, useUpdateUserPermissions } from '@/features/users/hooks';
 import { UserDetailsCard } from '@/features/users/components/UserDetailsCard';
 import { UserActivityLog } from '@/features/users/components/UserActivityLog';
 import { usePermissions } from '@/features/permissions/hooks';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { Edit, Check, X } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import DevicesListCustomers from '@/features/users/components/DevicesListCustomers';
 
 interface Permission {
@@ -45,9 +49,19 @@ export default function CustomerUserDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const { data: userResponse } = useUser(id || '');
   const user = userResponse?.data?.data.data;
+  const updateUserPermissionsMutation = useUpdateUserPermissions();
 
   const { data: permissionsData } = usePermissions();
   const [activeTab, setActiveTab] = useState('permissions');
+
+  const [isEditingPermissions, setIsEditingPermissions] = useState(false);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (user?.permissions) {
+      setSelectedPermissions(user.permissions);
+    }
+  }, [user]);
 
   // Group permissions by category and check if granted
   const permissionsByCategory = useMemo(() => {
@@ -69,6 +83,45 @@ export default function CustomerUserDetailsPage() {
       {} as Record<string, Permission[]>
     );
   }, [permissionsData, user]);
+
+  const handlePermissionToggle = (permissionId: string) => {
+    setSelectedPermissions((prev) =>
+      prev.includes(permissionId)
+        ? prev.filter((id) => id !== permissionId)
+        : [...prev, permissionId]
+    );
+  };
+
+  const handleSavePermissions = () => {
+    if (!id) return;
+    updateUserPermissionsMutation.mutate(
+      { userId: id, permissions: selectedPermissions },
+      {
+        onSuccess: () => {
+          toast.success('Permissions updated successfully');
+          setIsEditingPermissions(false);
+        },
+        onError: (error: unknown) => {
+          console.error('Failed to update permissions:', error);
+          const errorMessage =
+            (error as { response?: { data?: { message?: string } } })?.response
+              ?.data?.message || 'Failed to update permissions';
+          toast.error(errorMessage);
+        },
+      }
+    );
+  };
+
+  const handleEditPermissionsToggle = () => {
+    if (isEditingPermissions) {
+      // Revert if canceling
+      if (user?.permissions) {
+        setSelectedPermissions(user.permissions);
+      }
+    }
+    setIsEditingPermissions(!isEditingPermissions);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white space-y-6">
       <div className="mx-auto space-y-6">
@@ -108,13 +161,51 @@ export default function CustomerUserDetailsPage() {
 
               {/* Permissions Tab Content */}
               <TabsContent value="permissions" className="p-6 space-y-6">
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-                    Permission Matrix
-                  </h2>
-                  <p className="text-sm text-gray-500 mb-6 font-normal">
-                    Individual and role-based permissions granted to this user.
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                      Permission Matrix
+                    </h2>
+                    <p className="text-sm text-gray-500 font-normal">
+                      Individual and role-based permissions granted to this
+                      user.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {isEditingPermissions ? (
+                      <>
+                        <Button
+                          onClick={handleSavePermissions}
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          isLoading={updateUserPermissionsMutation.isPending}
+                        >
+                          <Check className="h-4 w-4 mr-2" />
+                          Save Changes
+                        </Button>
+                        <Button
+                          onClick={handleEditPermissionsToggle}
+                          size="sm"
+                          variant="outline"
+                          className="text-gray-600 border-gray-200"
+                          disabled={updateUserPermissionsMutation.isPending}
+                        >
+                          <X className="h-4 w-4 mr-2" />
+                          Cancel
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        onClick={handleEditPermissionsToggle}
+                        size="sm"
+                        variant="outline"
+                        className="bg-primary hover:bg-primary/90 text-white"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Permissions
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -135,12 +226,29 @@ export default function CustomerUserDetailsPage() {
                               key={permission.id}
                               className="flex items-center gap-3"
                             >
-                              <PermissionCheckbox
-                                granted={permission.granted}
-                              />
-                              <span className="text-sm capitalize text-gray-700 flex-1 dark:text-white">
+                              {isEditingPermissions ? (
+                                <Checkbox
+                                  checked={selectedPermissions.includes(
+                                    permission.id
+                                  )}
+                                  onChange={() =>
+                                    handlePermissionToggle(permission.id)
+                                  }
+                                  id={permission.id}
+                                />
+                              ) : (
+                                <PermissionCheckbox
+                                  granted={
+                                    !!user?.permissions?.includes(permission.id)
+                                  }
+                                />
+                              )}
+                              <label
+                                htmlFor={permission.id}
+                                className="text-sm capitalize text-gray-700 flex-1 dark:text-white cursor-pointer"
+                              >
                                 {permission.label} {category.replace('-', ' ')}
-                              </span>
+                              </label>
                             </div>
                           ))}
                         </CardContent>

@@ -11,6 +11,8 @@ import {
 import type { Customer } from '@/features/customer/types';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 interface CustomerDetailsCardProps {
   customer: Customer | undefined;
@@ -107,14 +109,31 @@ export function CustomerDetailsCard({
       <Card className="bg-white shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
-            <div>
-              <h1 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">
-                {customer?.name || 'Customer details'}
-              </h1>
-              <p className="text-gray-600 text-sm dark:text-white">
-                {customer?.description ||
-                  'Full access to customer resources and user management'}
-              </p>
+            <div className="flex gap-6">
+              <div className="">
+                {/*add iamge with avatar */}
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={customer?.logo} />
+                  <AvatarFallback>{customer?.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </div>
+              <div className="">
+                <h1 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">
+                  {customer?.name || 'Customer details'}{' '}
+                  <Badge
+                    variant={
+                      customer?.status === 'active' ? 'default' : 'secondary'
+                    }
+                    className="ml-2"
+                  >
+                    {customer?.status}
+                  </Badge>
+                </h1>
+                <p className="text-gray-600 text-sm dark:text-white">
+                  {customer?.description ||
+                    'Full access to customer resources and user management'}
+                </p>
+              </div>
             </div>
             <div className="flex gap-3">
               <Button
