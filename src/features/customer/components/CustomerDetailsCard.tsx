@@ -113,7 +113,7 @@ export function CustomerDetailsCard({
               <div className="">
                 {/*add iamge with avatar */}
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={customer?.logo} />
+                  {/* <AvatarImage src={customer?.logo} /> */}
                   <AvatarFallback>{customer?.name.charAt(0)}</AvatarFallback>
                 </Avatar>
               </div>
