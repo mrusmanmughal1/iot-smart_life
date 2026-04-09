@@ -23,7 +23,7 @@ import { useAppStore } from '@/stores/useAppStore';
 const createUserSchema = z.object({
   name: z.string().min(1, 'Contact email is required'),
   email: z.string().email('Email must be valid').min(1, 'Email is required'),
-  role: z.string(),
+  roleId: z.string(),
   phone: z.string().min(8, 'Phone number is required'),
   customerId: z.string().min(1, 'Customer is required'),
 });
@@ -50,7 +50,7 @@ export default function CreateUserPage() {
     defaultValues: {
       name: '',
       email: '',
-      role: '',
+      roleId: '',
       phone: '',
       customerId: '',
     },
@@ -62,7 +62,7 @@ export default function CreateUserPage() {
       email: data.email,
       name: data.name,
       phone: data.phone,
-      role: data.role as UserRole,
+      roleId: data.roleId as UserRole,
       customerId: data.customerId || undefined,
       // customerId: '',
     };
@@ -176,7 +176,7 @@ export default function CreateUserPage() {
                       Role
                     </label>
                     <Controller
-                      name="role"
+                      name="roleId"
                       control={control}
                       render={({ field }) => (
                         <Select
@@ -184,7 +184,7 @@ export default function CreateUserPage() {
                           onValueChange={field.onChange}
                         >
                           <SelectTrigger
-                            id="role"
+                            id="roleId"
                             className="w-full border border-gray-300 rounded-md"
                           >
                             <SelectValue placeholder="Select role" />
@@ -203,9 +203,9 @@ export default function CreateUserPage() {
                         </Select>
                       )}
                     />
-                    {errors.role && (
+                    {errors.roleId && (
                       <p className="mt-1 text-sm text-red-600">
-                        {errors.role.message}
+                        {errors.roleId.message}
                       </p>
                     )}
                   </div>

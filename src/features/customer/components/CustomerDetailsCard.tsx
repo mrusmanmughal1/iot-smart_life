@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Edit, Save, Trash2, X } from 'lucide-react';
+import { Edit, Save, ScrollText, Trash2, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 import {
@@ -38,10 +38,12 @@ export function CustomerDetailsCard({
         status: customer.status || '',
         email: customer.email || '',
         phone: customer.phone || '',
+        state: customer.state || '',
         city: customer.city || '',
         country: customer.country || '',
         address: customer.address || '',
         zip: customer.zip || '',
+        createdAt: customer.createdAt || '',
         customerType: customer.additionalInfo?.customerType || '',
         allocatedUsers: customer.allocatedLimits?.users ?? 0,
         allocatedAssets: customer.allocatedLimits?.assets ?? 0,
@@ -119,7 +121,7 @@ export function CustomerDetailsCard({
               </div>
               <div className="">
                 <h1 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">
-                  {customer?.name || 'Customer details'}{' '}
+                  {customer?.name || 'N/A'}{' '}
                   <Badge
                     variant={
                       customer?.status === 'active' ? 'default' : 'secondary'
@@ -129,9 +131,9 @@ export function CustomerDetailsCard({
                     {customer?.status}
                   </Badge>
                 </h1>
-                <p className="text-gray-600 text-sm dark:text-white">
-                  {customer?.description ||
-                    'Full access to customer resources and user management'}
+                <p className="text-gray-600 text-sm dark:text-white flex ">
+                  <ScrollText className="h-4 w-4 mr-1" />{' '}
+                  {customer?.description || 'N/A'}
                 </p>
               </div>
             </div>
@@ -173,7 +175,7 @@ export function CustomerDetailsCard({
           {/* INLINE EDIT FORM GRID */}
           <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full dark:bg-gray-900 dark:border-gray-700">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Name
               </p>
               <Input
@@ -182,10 +184,11 @@ export function CustomerDetailsCard({
                   setFormData({ ...formData, name: e.target.value })
                 }
                 disabled={!isEditing}
+                className="font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Status
               </p>
               <Input
@@ -193,11 +196,12 @@ export function CustomerDetailsCard({
                 onChange={(e) =>
                   setFormData({ ...formData, status: e.target.value })
                 }
+                className="font-semibold capitalize"
                 disabled
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Email
               </p>
               <Input
@@ -206,10 +210,11 @@ export function CustomerDetailsCard({
                   setFormData({ ...formData, email: e.target.value })
                 }
                 disabled={!isEditing}
+                className="font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Phone
               </p>
               <Input
@@ -218,21 +223,23 @@ export function CustomerDetailsCard({
                   setFormData({ ...formData, phone: e.target.value })
                 }
                 disabled={!isEditing}
+                className="font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Tenant ID
               </p>
               <Input
                 value={customer?.tenantId || customer?.tenant?.name || ''}
                 disabled={true}
                 placeholder="System Managed"
+                className="font-semibold"
               />
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 City
               </p>
               <Input
@@ -241,10 +248,11 @@ export function CustomerDetailsCard({
                   setFormData({ ...formData, city: e.target.value })
                 }
                 disabled={!isEditing}
+                className="font-semibold"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 State
               </p>
               <Input
@@ -252,15 +260,17 @@ export function CustomerDetailsCard({
                 onChange={(e) =>
                   setFormData({ ...formData, state: e.target.value })
                 }
+                className="font-semibold"
                 disabled={!isEditing}
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Country
               </p>
               <Input
                 value={formData.country || ''}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({ ...formData, country: e.target.value })
                 }
@@ -268,11 +278,12 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Address
               </p>
               <Input
                 value={formData.address || ''}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
@@ -280,11 +291,12 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Zip Code
               </p>
               <Input
                 value={formData.zip || ''}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({ ...formData, zip: e.target.value })
                 }
@@ -292,15 +304,13 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
-                Customer Type
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
+                Created At
               </p>
               <Input
-                value={formData.customerType || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerType: e.target.value })
-                }
-                disabled={!isEditing}
+                value={new Date(formData.createdAt).toLocaleDateString() || ''}
+                className="font-semibold"
+                disabled
               />
             </div>
           </div>
@@ -310,12 +320,13 @@ export function CustomerDetailsCard({
           </p>
           <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full dark:bg-gray-900 dark:border-gray-700">
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Alloc. Users
               </p>
               <Input
                 type="number"
                 value={formData.allocatedUsers || 0}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({ ...formData, allocatedUsers: e.target.value })
                 }
@@ -324,12 +335,13 @@ export function CustomerDetailsCard({
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Alloc. Assets
               </p>
               <Input
                 type="number"
                 value={formData.allocatedAssets || 0}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -341,12 +353,13 @@ export function CustomerDetailsCard({
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Alloc. Devices
               </p>
               <Input
                 type="number"
                 value={formData.allocatedDevices || 0}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -357,12 +370,13 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Alloc. Dashboards
               </p>
               <Input
                 type="number"
                 value={formData.allocatedDashboards || 0}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -373,12 +387,13 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Alloc. Floor Plans
               </p>
               <Input
                 type="number"
                 value={formData.allocatedFloorPlans || 0}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -389,12 +404,13 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                 Alloc. Automations
               </p>
               <Input
                 type="number"
                 value={formData.allocatedAutomations || 0}
+                className="font-semibold"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -417,7 +433,7 @@ export function CustomerDetailsCard({
             {/* show details   in a table   */}
             <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full dark:bg-gray-900 dark:border-gray-700">
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                   Users
                 </p>
                 <p className="text-sm font-medium text-gray-900 ">
@@ -425,7 +441,7 @@ export function CustomerDetailsCard({
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                   Assets
                 </p>
                 <p className="text-sm font-medium text-gray-900 ">
@@ -433,7 +449,7 @@ export function CustomerDetailsCard({
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                   Devices
                 </p>
                 <p className="text-sm font-medium text-gray-900 ">
@@ -441,7 +457,7 @@ export function CustomerDetailsCard({
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                   Dashboards
                 </p>
                 <p className="text-sm font-medium text-gray-900 ">
@@ -449,7 +465,7 @@ export function CustomerDetailsCard({
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                   Floor Plans
                 </p>
                 <p className="text-sm font-medium text-gray-900 ">
@@ -457,7 +473,7 @@ export function CustomerDetailsCard({
                 </p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                   Automations
                 </p>
                 <p className="text-sm font-medium text-gray-900 ">

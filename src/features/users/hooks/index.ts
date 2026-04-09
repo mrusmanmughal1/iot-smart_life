@@ -112,6 +112,61 @@ export const useBulkUpdateUserStatus = () => {
   });
 };
 
+export const useBulkDeleteUsers = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userIds: string[]) => usersApi.bulkDelete(userIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+export const useBulkAssignRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ roleId, userIds }: { roleId: string; userIds: string[] }) =>
+      usersApi.bulkAssignRole(roleId, userIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+export const useBulkRemoveRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ roleId, userIds }: { roleId: string; userIds: string[] }) =>
+      usersApi.bulkRemoveRole(roleId, userIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+};
+
+export const useBulkSendEmail = () => {
+  return useMutation({
+    mutationFn: (data: {
+      userIds: string[];
+      subject: string;
+      message: string;
+      htmlContent?: string;
+    }) => usersApi.bulkSendEmail(data),
+  });
+};
+
+export const useBulkSendNotification = () => {
+  return useMutation({
+    mutationFn: (data: {
+      userIds: string[];
+      title: string;
+      message: string;
+      type: string;
+      priority: string;
+    }) => usersApi.bulkSendNotification(data),
+  });
+};
+
 export const useBulkUpdateUsers = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -175,6 +230,22 @@ export const useDevicesByCustomerId = (customerId: string) => {
     queryFn: async () => {
       const response = await devicesApi.getByCustomerId(customerId);
       return response.data.data;
+    },
+  });
+};
+
+export const useExportUsers = () => {
+  return useMutation({
+    mutationFn: (format: 'csv' | 'json' | 'xlsx') => usersApi.export(format),
+  });
+};
+
+export const useImportUsers = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => usersApi.import(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
 };

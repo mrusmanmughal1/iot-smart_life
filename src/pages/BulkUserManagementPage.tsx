@@ -9,9 +9,17 @@ import {
   useBulkUpdateUsers,
   useBulkUpdateUserStatus,
   useRoles,
+  useBulkDeleteUsers,
+  useBulkAssignRole,
+  useBulkRemoveRole,
+  useBulkSendEmail,
+  useExportUsers,
+  useImportUsers,
+  useBulkSendNotification,
 } from '@/features/users/hooks';
 import { UserStatus } from '@/services/api/users.api';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -45,10 +53,20 @@ export default function BulkUserManagementPage() {
   );
   const { mutate: bulkUpdateUserStatus } = useBulkUpdateUserStatus();
   const { mutate: bulkUpdateUsers } = useBulkUpdateUsers();
+  const { mutate: bulkDeleteUsers } = useBulkDeleteUsers();
+  const { mutate: bulkAssignRole } = useBulkAssignRole();
+  const { mutate: bulkRemoveRole } = useBulkRemoveRole();
+  const { mutate: bulkSendEmail, isPending: isSendingEmail } =
+    useBulkSendEmail();
+  const { mutate: exportUsers, isPending: isExporting } = useExportUsers();
+  const { mutate: importUsers, isPending: isImporting } = useImportUsers();
+  const { mutate: bulkSendNotification, isPending: isSendingNotification } =
+    useBulkSendNotification();
   const { data: rolesData, isLoading: isRolesLoading } = useRoles();
   const selectedUsers: SelectedUser[] = location.state?.users || [];
 
   const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<UserStatus | null>(null);
 
   const [roleModalOpen, setRoleModalOpen] = useState(false);
@@ -58,6 +76,17 @@ export default function BulkUserManagementPage() {
   >('');
   const [selectedRoleId, setSelectedRoleId] = useState<string>('');
   const [messageText, setMessageText] = useState<string>('');
+  const [emailSubject, setEmailSubject] = useState<string>('');
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'csv' | 'json' | 'xlsx'>(
+    'csv'
+  );
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [notificationTitle, setNotificationTitle] = useState<string>('');
+  const [notificationType, setNotificationType] = useState<string>('system');
+  const [notificationPriority, setNotificationPriority] =
+    useState<string>('normal');
 
   const selectedCount = selectedUsers.length;
 
@@ -109,12 +138,13 @@ export default function BulkUserManagementPage() {
       return;
     }
 
-    const selectedRole = rolesData?.data.find((r) => r.id === selectedRoleId);
+    const roleMutation =
+      currentAction === 'assign-role' ? bulkAssignRole : bulkRemoveRole;
 
-    bulkUpdateUsers(
+    roleMutation(
       {
+        roleId: selectedRoleId,
         userIds: selectedUsers.map((u) => u.id),
-        data: { role: selectedRole?.name },
       },
       {
         onSuccess: () => {
@@ -133,17 +163,129 @@ export default function BulkUserManagementPage() {
     );
   };
 
+  const handleDeleteConfirm = () => {
+    bulkDeleteUsers(
+      selectedUsers.map((u) => u.id),
+      {
+        onSuccess: () => {
+          toast.success('Users deleted successfully');
+          setDeleteConfirmOpen(false);
+          navigate('/users-management');
+        },
+        onError: (error: any) => {
+          toast.error(
+            error.response?.data?.message || 'Failed to delete users'
+          );
+        },
+      }
+    );
+  };
+
   const onCommunicationConfirm = () => {
     if (!messageText.trim()) {
       toast.error('Please enter a message');
       return;
     }
 
-    toast.success(
-      `${currentAction === 'send-email' ? 'Email' : 'Notification'} sent successfully`
-    );
-    setCommunicationModalOpen(false);
-    setMessageText('');
+    if (currentAction === 'send-email') {
+      if (!emailSubject.trim()) {
+        toast.error('Please enter a subject');
+        return;
+      }
+
+      bulkSendEmail(
+        {
+          userIds: selectedUsers.map((u) => u.id),
+          subject: emailSubject,
+          message: messageText,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Emails sent successfully');
+            setCommunicationModalOpen(false);
+            setMessageText('');
+            setEmailSubject('');
+          },
+          onError: (error: any) => {
+            toast.error(
+              error.response?.data?.message || 'Failed to send emails'
+            );
+          },
+        }
+      );
+    } else if (currentAction === 'send-notification') {
+      if (!notificationTitle.trim()) {
+        toast.error('Please enter a notification title');
+        return;
+      }
+
+      bulkSendNotification(
+        {
+          userIds: selectedUsers.map((u) => u.id),
+          title: notificationTitle,
+          message: messageText,
+          type: notificationType,
+          priority: notificationPriority,
+        },
+        {
+          onSuccess: () => {
+            toast.success('Notifications sent successfully');
+            setCommunicationModalOpen(false);
+            setMessageText('');
+            setNotificationTitle('');
+          },
+          onError: (error: any) => {
+            toast.error(
+              error.response?.data?.message || 'Failed to send notifications'
+            );
+          },
+        }
+      );
+    } else {
+      // Logic for other actions if any
+    }
+  };
+
+  const handleExportConfirm = () => {
+    exportUsers(exportFormat, {
+      onSuccess: (response: any) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute(
+          'download',
+          `users_export_${Date.now()}.${exportFormat}`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setExportModalOpen(false);
+        toast.success('Users exported successfully');
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || 'Failed to export users');
+      },
+    });
+  };
+
+  const handleImportConfirm = () => {
+    if (!selectedFile) {
+      toast.error('Please select a file to import');
+      return;
+    }
+
+    importUsers(selectedFile, {
+      onSuccess: (response: any) => {
+        toast.success(
+          `Successfully imported ${response.data.data.imported} users. ${response.data.data.failed} failed.`
+        );
+        setImportModalOpen(false);
+        setSelectedFile(null);
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || 'Failed to import users');
+      },
+    });
   };
 
   const handleExecute = () => {
@@ -278,6 +420,7 @@ export default function BulkUserManagementPage() {
                       label="Delete Users"
                       variant="destructive"
                       className="bg-red-50 text-red-700 hover:bg-red-100 border-red-200"
+                      onClick={() => setDeleteConfirmOpen(true)}
                     />
                   </div>
                 </CardContent>
@@ -350,12 +493,13 @@ export default function BulkUserManagementPage() {
                         id="export-data"
                         label="Export Data"
                         className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200"
+                        onClick={() => setExportModalOpen(true)}
                       />
-
                       <ActionButton
                         id="bulk-import"
                         label="Bulk Import"
                         className="bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200"
+                        onClick={() => setImportModalOpen(true)}
                       />
                     </div>
                   </div>
@@ -394,6 +538,15 @@ export default function BulkUserManagementPage() {
         title="Confirm Bulk Status Change"
         description={`Are you sure you want to change the status of ${selectedCount} users to ${pendingAction}?`}
         onConfirm={handleStatusConfirm}
+      />
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Confirm Bulk Deletion"
+        description={`Are you sure you want to delete ${selectedCount} users? This action cannot be undone.`}
+        onConfirm={handleDeleteConfirm}
+        confirmLabel="Delete"
+        variant="destructive"
       />
 
       {/* Role Management Modal */}
@@ -460,27 +613,213 @@ export default function BulkUserManagementPage() {
               Enter the message you want to send to {selectedCount} users.
             </DialogDescription>
           </DialogHeader>
-          <div className="p-4">
-            <Textarea
-              placeholder="Type your message here..."
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              rows={5}
-            />
+          <div className="p-4 space-y-4">
+            {currentAction === 'send-email' && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Subject</label>
+                <Input
+                  placeholder="Enter email subject"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                />
+              </div>
+            )}
+            {currentAction === 'send-notification' && (
+              <>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Title</label>
+                  <Input
+                    placeholder="Enter notification title"
+                    value={notificationTitle}
+                    onChange={(e) => setNotificationTitle(e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Type</label>
+                    <Select
+                      value={notificationType}
+                      onValueChange={setNotificationType}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="system">System</SelectItem>
+                        <SelectItem value="user">User</SelectItem>
+                        <SelectItem value="device">Device</SelectItem>
+                        <SelectItem value="alarm">Alarm</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Priority</label>
+                    <Select
+                      value={notificationPriority}
+                      onValueChange={setNotificationPriority}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="normal">Normal</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </>
+            )}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Message</label>
+              <Textarea
+                placeholder="Type your message here..."
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                rows={5}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setCommunicationModalOpen(false)}
+              disabled={isSendingEmail}
             >
               Cancel
             </Button>
             <Button
               className="bg-secondary text-white hover:bg-secondary/90"
               onClick={onCommunicationConfirm}
-              disabled={!messageText.trim()}
+              disabled={
+                !messageText.trim() ||
+                (currentAction === 'send-email' && !emailSubject.trim()) ||
+                (currentAction === 'send-notification' &&
+                  !notificationTitle.trim()) ||
+                isSendingEmail ||
+                isSendingNotification
+              }
             >
-              Send {currentAction === 'send-email' ? 'Email' : 'Notification'}
+              {isSendingEmail || isSendingNotification ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                `Send ${currentAction === 'send-email' ? 'Email' : 'Notification'}`
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export Modal */}
+      <Dialog open={exportModalOpen} onOpenChange={setExportModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Export Users</DialogTitle>
+            <DialogDescription>
+              Select the format you want to export user data in.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Format</label>
+              <Select
+                value={exportFormat}
+                onValueChange={(val: any) => setExportFormat(val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select format" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="csv">CSV</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                  <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setExportModalOpen(false)}
+              disabled={isExporting}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-blue-600 text-white hover:bg-blue-700"
+              onClick={handleExportConfirm}
+              disabled={isExporting}
+            >
+              {isExporting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Exporting...
+                </>
+              ) : (
+                'Export Now'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Modal */}
+      <Dialog open={importModalOpen} onOpenChange={setImportModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bulk Import Users</DialogTitle>
+            <DialogDescription>
+              Select a CSV or JSON file containing user data to import.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="p-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Select File</label>
+              <input
+                type="file"
+                accept=".csv,.json,.xlsx"
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) setSelectedFile(file);
+                }}
+              />
+            </div>
+            {selectedFile && (
+              <p className="text-xs text-gray-500">
+                Selected: {selectedFile.name} (
+                {(selectedFile.size / 1024).toFixed(2)} KB)
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setImportModalOpen(false);
+                setSelectedFile(null);
+              }}
+              disabled={isImporting}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-purple-600 text-white hover:bg-purple-700"
+              onClick={handleImportConfirm}
+              disabled={!selectedFile || isImporting}
+            >
+              {isImporting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Importing...
+                </>
+              ) : (
+                'Import Now'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

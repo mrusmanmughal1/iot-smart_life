@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
+import { Eye, Plus, Search } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,30 +18,30 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { DeviceDialog } from '@/features/devices/components/DeviceDialog';
 import { DeviceCredentialsDialog } from '@/features/devices/components/DeviceCredentialsDialog';
-
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
 import type { DeviceFormData } from '@/features/devices/types';
 import { Pagination } from '@/components/common/Pagination/Pagination';
-import { debounce } from '@/lib/util';
 import { Input } from '@/components/ui/input';
 import { PageHeader } from '@/components/common/PageHeader';
+import {
+  TooltipContent,
+  TooltipTrigger,
+  Tooltip,
+} from '@/components/ui/tooltip';
+import { useDebouncedValue } from '@/utils/helpers/Debounce';
+import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
 
 export default function DevicesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [inputValue, setInputValue] = useState('');
+  const debouncedSearch = useDebouncedValue(inputValue, 500);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCredentialsDialogOpen, setIsCredentialsDialogOpen] = useState(false);
@@ -55,38 +55,38 @@ export default function DevicesPage() {
     connectionType: string;
     description: string;
   } | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deviceToDeleteId, setDeviceToDeleteId] = useState<string | null>(null);
 
   const { data: devicesData } = useDevices({
     page: currentPage,
     limit: itemsPerPage,
+    search: debouncedSearch,
   });
   const createDevice = useCreateDevice();
   const updateDevice = useUpdateDevice();
   const deleteDevice = useDeleteDevice();
 
   // Handle delete device
-  const handleDelete = useCallback(
-    async (deviceId: string) => {
-      if (window.confirm('Are you sure you want to delete this device?')) {
-        try {
-          const response = await deleteDevice.mutateAsync(deviceId);
-          const successMessage =
-            (response as { data?: { message?: string } })?.data?.message ||
-            (response as { message?: string })?.message ||
-            t('success.deleted') ||
-            'Device deleted successfully';
-          toast.success(successMessage);
-        } catch (error) {
-          const errorMessage =
-            getErrorMessage(error) ||
-            t('errors.generic') ||
-            'Failed to delete device';
-          toast.error(errorMessage);
-        }
-      }
-    },
-    [deleteDevice, t]
-  );
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deviceToDeleteId) return;
+    try {
+      const response = await deleteDevice.mutateAsync(deviceToDeleteId);
+      const successMessage =
+        (response as { data?: { message?: string } })?.data?.message ||
+        (response as { message?: string })?.message ||
+        t('success.deleted') ||
+        'Device deleted successfully';
+      toast.success(successMessage);
+      setDeviceToDeleteId(null);
+    } catch (error) {
+      const errorMessage =
+        getErrorMessage(error) ||
+        t('errors.generic') ||
+        'Failed to delete device';
+      toast.error(errorMessage);
+    }
+  }, [deleteDevice, deviceToDeleteId, t]);
 
   // Handle status toggle
 
@@ -119,33 +119,6 @@ export default function DevicesPage() {
     setIsEditDialogOpen(true);
   }, []);
 
-  // Handle actions
-  const handleAction = useCallback(
-    async (
-      action: 'share' | 'view' | 'delete' | 'download',
-      deviceId: string
-    ) => {
-      switch (action) {
-        case 'view':
-          // Navigate to device details
-          navigate(`/devices/${deviceId}`);
-          break;
-        case 'delete':
-          await handleDelete(deviceId);
-          break;
-        case 'download':
-          // TODO: Implement download functionality
-          toast('Download functionality coming soon', { icon: 'ℹ️' });
-          break;
-        case 'share':
-          // TODO: Implement share functionality
-          toast('Share functionality coming soon', { icon: 'ℹ️' });
-          break;
-      }
-    },
-    [handleDelete, navigate]
-  );
-
   // Handle form submissions
   const handleCreate = async (data: DeviceFormData) => {
     try {
@@ -157,7 +130,9 @@ export default function DevicesPage() {
         'Device created successfully';
       toast.success(successMessage);
 
-      const credentials = (resp as any)?.data?.data?.credentials || (resp as any)?.data?.credentials;
+      const credentials =
+        (resp as any)?.data?.data?.credentials ||
+        (resp as any)?.data?.credentials;
       if (credentials) {
         setNewDeviceCredentials(credentials);
         setIsCredentialsDialogOpen(true);
@@ -195,31 +170,20 @@ export default function DevicesPage() {
       toast.error(errorMessage);
     }
   };
-  // const debouncedSearch = useMemo(
-  //   () =>
-  //     debounce((value: string) => {
-  //       handleSearchChange(value);
-  //     }, 300),
-  //   [handleSearchChange]
-  // );
-  // const handleInputChange = useCallback(
-  //   (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     const value = e.target.value;
-  //     setInputValue(value);
-  //     debouncedSearch(value);
-  //   },
-  //   [debouncedSearch]
-  // );
-  console.log(devicesData);
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setInputValue(value);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+    setCurrentPage(1);
   };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <PageHeader title={t('devices.title')} description={t('devices.subtitle')} />
+        <PageHeader
+          title={t('devices.title')}
+          description={t('devices.subtitle')}
+        />
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           {t('devices.addDevice')}
@@ -233,7 +197,7 @@ export default function DevicesPage() {
             type="text"
             placeholder={t('devices.searchPlaceholder')}
             value={inputValue}
-            onChange={handleInputChange}
+            onChange={handleSearchChange}
             className="w-96 pr-10"
           />
         </div>
@@ -281,7 +245,6 @@ export default function DevicesPage() {
                     <TableRow
                       key={device.id}
                       className="cursor-pointer hover:bg-slate-50 transition-colors"
-                      onClick={() => navigate(`/devices/${device.id}`)}
                     >
                       <TableCell className="font-medium">
                         <div className="flex flex-col">
@@ -293,10 +256,11 @@ export default function DevicesPage() {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          className={`${device.status === 'active'
+                          className={`${
+                            device.status === 'active'
                               ? 'bg-green-500 hover:bg-green-600'
                               : 'bg-red-500 hover:bg-red-600'
-                            } text-white`}
+                          } text-white`}
                         >
                           {device.status === 'active'
                             ? t('common.active') || 'Active'
@@ -314,35 +278,57 @@ export default function DevicesPage() {
                           : 'N/A'}
                       </TableCell>
                       <TableCell
-                        className="text-right relative"
+                        className="text-right flex gap-1 items-end justify-end relative"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="hover:bg-secondary hover:text-white"
+                              onClick={() => navigate(`/devices/${device.id}`)}
+                            >
+                              <Eye className="h-4 w-4" />
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="w-[160px]"
-                          >
-                            <DropdownMenuItem
+                          </TooltipTrigger>
+                          <TooltipContent className="bottom-[70%] max-w-36">
+                            View Device
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="hover:bg-secondary hover:text-white"
                               onClick={() => handleOpenEditDialog(device)}
                             >
-                              <Edit className="mr-2 h-4 w-4" />
-                              {t('common.edit') || 'Edit'}
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem
-                              className="text-red-600 focus:text-red-700"
-                              onClick={() => handleAction('delete', device.id)}
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bottom-[70%] max-w-36">
+                            Edit Device
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="hover:bg-secondary hover:text-white"
+                              onClick={() => {
+                                setDeviceToDeleteId(device.id);
+                                setIsDeleteDialogOpen(true);
+                              }}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              {t('common.delete') || 'Delete'}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bottom-[70%] max-w-36">
+                            Delete Device
+                          </TooltipContent>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                   ))
@@ -386,11 +372,11 @@ export default function DevicesPage() {
         initialData={
           isEditDialogOpen && selectedDevice
             ? {
-              name: selectedDevice.name,
-              type: selectedDevice.type,
-              connectionType: selectedDevice.connectionType,
-              description: selectedDevice.description,
-            }
+                name: selectedDevice.name,
+                type: selectedDevice.type,
+                connectionType: selectedDevice.connectionType,
+                description: selectedDevice.description,
+              }
             : undefined
         }
         onSubmit={handleEdit}
@@ -402,6 +388,18 @@ export default function DevicesPage() {
         open={isCredentialsDialogOpen}
         onOpenChange={setIsCredentialsDialogOpen}
         credentials={newDeviceCredentials}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Device"
+        itemName={
+          devices.find((d: any) => d.id === deviceToDeleteId)?.name || 'Device'
+        }
+        isLoading={deleteDevice.isPending}
       />
     </div>
   );

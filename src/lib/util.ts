@@ -65,7 +65,9 @@ export function throttle<T extends (...args: any[]) => any>(
  * Generate random ID
  */
 export function generateId(length = 10): string {
-  return Math.random().toString(36).substring(2, length + 2);
+  return Math.random()
+    .toString(36)
+    .substring(2, length + 2);
 }
 
 /**
@@ -97,7 +99,8 @@ export function downloadFile(data: Blob, filename: string): void {
 /**
  * Sleep/delay function
  */
-export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Get initials from name

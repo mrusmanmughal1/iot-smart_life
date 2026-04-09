@@ -1,14 +1,6 @@
-import {
-  MoreVertical,
-  Edit,
-  Trash2,
-  ShieldCheck,
-  Users2,
-  Eye,
-} from 'lucide-react';
+import { Trash2, Eye } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -17,12 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useDeleteUser,
@@ -48,35 +34,24 @@ import {
 const Users = ({ searchQuery }: { searchQuery: string }) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [roleFilter, setRoleFilter] = useState<'all' | 'customer_user' | 'user'>(
-    'all'
-  );
+  const [roleFilter, setRoleFilter] = useState<
+    'all' | 'customer_user' | 'customer'
+  >('all');
   const itemsPerPage = 10;
-
   const roleParam = roleFilter === 'all' ? undefined : roleFilter;
 
   const { data: usersData, isLoading } = useUsers({
     page: currentPage,
     limit: itemsPerPage,
     role: roleParam,
+    search: searchQuery,
   });
-  const { data: searchUsersData, isLoading: isSearchLoading } = useSearchUsers(
-    searchQuery,
-    currentPage,
-    itemsPerPage,
-    roleParam
-  );
+
   const deleteUserMutation = useDeleteUser();
-  const isSearching = searchQuery.trim().length > 0;
-  const isTableLoading = isSearching ? isSearchLoading : isLoading;
-  const users = useMemo(
-    () => (isSearching ? searchUsersData?.data || [] : usersData?.data || []),
-    [isSearching, searchUsersData, usersData]
-  );
-  const totalPages = isSearching ? 1 : usersData?.meta?.totalPages || 1;
-  const totalItems = isSearching
-    ? searchUsersData?.data?.length || 0
-    : usersData?.meta?.total || users.length;
+  const isTableLoading = isLoading;
+  const users = useMemo(() => usersData?.data || [], [usersData]);
+  const totalPages = usersData?.meta?.totalPages || 1;
+  const totalItems = usersData?.meta?.total || users.length;
 
   useEffect(() => {
     setCurrentPage(1);
@@ -155,14 +130,6 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
     });
   };
 
-  const handleEditClick = (user: User) => {
-    if (user.role === UserRole.CUSTOMER_USER) {
-      navigate(`/users-management/edit-customer-user/${user.id}`);
-    } else {
-      navigate(`/users-management/edit-customer/${user.customerId}`);
-    }
-  };
-
   const handleStatusToggle = (user: User) => {
     setUserToUpdateStatus(user);
     setStatusConfirmOpen(true);
@@ -202,14 +169,14 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
           defaultValue="all"
           value={roleFilter}
           onValueChange={(value) =>
-            setRoleFilter(value as 'all' | 'customer_user' | 'user')
+            setRoleFilter(value as 'all' | 'customer_user' | 'customer')
           }
           className="w-auto"
         >
           <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="customer_user">Customer User</TabsTrigger>
-            <TabsTrigger value="user">Customer</TabsTrigger>
+            <TabsTrigger value="customer">Customer</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>

@@ -17,13 +17,14 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  roles: Role[];
   status: string;
   companyName: string;
   tenantId?: string;
   customerId?: string;
   phone?: string;
   avatar?: string;
-  permissions?: string[];
+  permissions?: (string | Permission)[];
   twoFactorEnabled?: boolean;
   lastLogin?: string;
   additionalInfo?: Record<string, unknown>;
@@ -169,7 +170,23 @@ export const usersApi = {
 
   // Bulk delete users
   bulkDelete: (userIds: string[]) =>
-    apiClient.post<ApiResponse<unknown>>('/users/bulk/delete', { userIds }),
+    apiClient.delete<ApiResponse<unknown>>('/users/bulk', {
+      data: { userIds },
+    }),
+
+  // Bulk assign role
+  bulkAssignRole: (roleId: string, userIds: string[]) =>
+    apiClient.patch<ApiResponse<unknown>>('/users/bulk/assign-role', {
+      roleId,
+      userIds,
+    }),
+
+  // Bulk remove role
+  bulkRemoveRole: (roleId: string, userIds: string[]) =>
+    apiClient.patch<ApiResponse<unknown>>('/users/bulk/remove-role', {
+      roleId,
+      userIds,
+    }),
 
   // Bulk update users
   bulkUpdate: (userIds: string[], data: Partial<User>) =>
@@ -184,6 +201,42 @@ export const usersApi = {
       userIds,
       status,
     }),
+
+  // Bulk send email to users
+  bulkSendEmail: (data: {
+    userIds: string[];
+    subject: string;
+    message: string;
+    htmlContent?: string;
+  }) => apiClient.post<ApiResponse<unknown>>('/users/bulk/send-email', data),
+
+  // Export users
+  export: (format: 'csv' | 'json' | 'xlsx') =>
+    apiClient.get(`/users/export`, {
+      params: { format },
+      responseType: 'blob',
+    }),
+
+  // Import users
+  import: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post<ApiResponse<{ imported: number; failed: number }>>(
+      '/users/import',
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
+  },
+
+  // Bulk send notification to users
+  bulkSendNotification: (data: {
+    userIds: string[];
+    title: string;
+    message: string;
+    type: string;
+    priority: string;
+  }) =>
+    apiClient.post<ApiResponse<unknown>>('/users/bulk/send-notification', data),
 };
 
 // Permissions API

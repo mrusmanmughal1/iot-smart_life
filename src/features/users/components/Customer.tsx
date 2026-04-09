@@ -1,11 +1,4 @@
-import {
-  MoreVertical,
-  Edit,
-  Trash2,
-  ShieldCheck,
-  Eye,
-  ChartNetwork,
-} from 'lucide-react';
+import { Trash2, Eye, ChartNetwork } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,12 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useEffect, useState } from 'react';
 import { DeleteUserModal } from '@/components/models/DeleteUserModal';

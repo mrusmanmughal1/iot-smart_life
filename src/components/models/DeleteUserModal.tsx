@@ -57,44 +57,46 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
               Are you sure you want to delete the following user?
             </p>
           </div>
-
-          {/* User Information Card */}
-          <div className="relative bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <button
-              onClick={handleCancel}
-              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <div className="flex items-start gap-4 pr-8">
-              <Avatar className="h-12 w-12 bg-gray-700">
-                <AvatarFallback className="text-white font-semibold">
-                  {getInitials(user.name || user.email)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 space-y-1">
-                <p className="font-bold text-gray-900">
-                  {user.name || 'Unknown User'}
-                </p>
-                <p className="text-sm text-gray-600">{user.email}</p>
-                <p className="text-sm text-gray-600">Role: {role}</p>
-                {/* <p className="text-sm text-gray-600">Customer: {customer}</ p> */}
+          <div className="bg-gray-100 rounded-lg p-2">
+            {/* User Information Card */}
+            <div className="relative bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <button
+                onClick={handleCancel}
+                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <div className="flex items-start gap-4 pr-8">
+                <Avatar className="h-16 w-16 bg-gray-700">
+                  <AvatarFallback className="text-white font-semibold">
+                    {getInitials(user.name || user.email)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 space-y-1">
+                  <p className="font-bold text-gray-900">
+                    {user.name || 'Unknown User'}
+                  </p>
+                  <p className="text-sm text-gray-600">{user.email}</p>
+                  <p className="text-sm capitalize text-gray-600">
+                    Role: {role?.replace('_', ' ')}
+                  </p>
+                  {/* <p className="text-sm text-gray-600">Customer: {customer}</ p> */}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Warning Section */}
-          <div className="space-y-2">
-            <p className="font-bold text-red-600 text-sm">Warning</p>
-            <p className="text-sm text-gray-700">
-              This action cannot be undone. The user will lose access to:
-            </p>
-            <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-4">
-              <li>All assigned devices and dashboards</li>
-              <li>Customer data and configurations</li>
-            </ul>
+            {/* Warning Section */}
+            <div className="space-y-2">
+              <p className="font-bold text-red-600 text-sm">Warning</p>
+              <p className="text-sm text-gray-700">
+                This action cannot be undone. The user will lose access to:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-4">
+                <li>All assigned devices and dashboards</li>
+                <li>Customer data and configurations</li>
+              </ul>
+            </div>
           </div>
-
           {/* Action Buttons */}
           <DialogFooter className="flex-row justify-end gap-3 pt-4 border-t">
             <Button

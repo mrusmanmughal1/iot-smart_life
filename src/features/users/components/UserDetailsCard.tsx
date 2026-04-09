@@ -120,78 +120,80 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
                     'U'}
                 </AvatarFallback>
               </Avatar>
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                {isEditing ? (
-                  <Input
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="text-2xl font-bold text-gray-900 dark:text-white h-10 w-64"
-                    placeholder="Enter name"
-                  />
-                ) : (
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {user?.name || 'Customer User Details'}
-                  </h1>
-                )}
-                <Badge
-                  variant={
-                    user?.status === UserStatus.ACTIVE ? 'success' : 'secondary'
-                  }
-                >
-                  {user?.status || 'Unknown'}
-                </Badge>
-              </div>
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <Shield className="h-4 w-4" />
-                <span className="capitalize">
-                  {user?.role?.replace('_', ' ') || 'No Role'}
-                </span>
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  {isEditing ? (
+                    <Input
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="text-2xl font-bold text-gray-900 dark:text-white h-10 w-64"
+                      placeholder="Enter name"
+                    />
+                  ) : (
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {user?.name || 'Customer User Details'}
+                    </h1>
+                  )}
+                  <Badge
+                    variant={
+                      user?.status === UserStatus.ACTIVE
+                        ? 'success'
+                        : 'secondary'
+                    }
+                  >
+                    {user?.status || 'Unknown'}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2 text-gray-500 text-sm">
+                  <Shield className="h-4 w-4" />
+                  <span className="capitalize">
+                    {user?.roles?.[0]?.name?.replace('_', ' ') || 'No Role'}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3 self-end md:self-start">
-            {isEditing ? (
-              <>
-                <Button
-                  onClick={handleSave}
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  isLoading={updateUserMutation.isPending}
-                >
-                  <Check className="h-4 w-4 mr-2" />
-                  Save
-                </Button>
-                <Button
-                  onClick={handleEditToggle}
-                  variant="outline"
-                  className="text-gray-600 border-gray-200 hover:bg-gray-50"
-                  disabled={updateUserMutation.isPending}
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={handleEditToggle}
-                  className="bg-primary hover:bg-primary/90 text-white"
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit User
-                </Button>
-                <Button
-                  onClick={() => setDeleteModalOpen(true)}
-                  variant="outline"
-                  className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
-                </Button>
-              </>
-            )}
-          </div>
+            <div className="flex items-center gap-3 self-end md:self-start">
+              {isEditing ? (
+                <>
+                  <Button
+                    onClick={handleSave}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    isLoading={updateUserMutation.isPending}
+                  >
+                    <Check className="h-4 w-4 mr-2" />
+                    Save
+                  </Button>
+                  <Button
+                    onClick={handleEditToggle}
+                    variant="outline"
+                    className="text-gray-600 border-gray-200 hover:bg-gray-50"
+                    disabled={updateUserMutation.isPending}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleEditToggle}
+                    className="bg-primary hover:bg-primary/90 text-white"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit User
+                  </Button>
+                  <Button
+                    onClick={() => setDeleteModalOpen(true)}
+                    variant="outline"
+                    className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

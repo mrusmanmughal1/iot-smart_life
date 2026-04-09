@@ -94,7 +94,6 @@ const assignedPermissions: AssignedPermission[] = [
 
 export default function AssignPermissionsPage() {
   const navigate = useNavigate();
-  const { userId } = useParams<{ userId: string }>();
   const [availableSearch, setAvailableSearch] = useState('');
   const [assignedSearch, setAssignedSearch] = useState('');
   const [selectedPermission, setSelectedPermission] = useState<string>('');
@@ -173,7 +172,6 @@ export default function AssignPermissionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
-      
       <div className="mx-auto space-y-6">
         {/* Header Section */}
         <Card className="bg-white shadow-sm">
@@ -343,7 +341,9 @@ export default function AssignPermissionsPage() {
                   <p className="text-sm font-medium text-gray-600 dark:text-white mb-1">
                     Current Role
                   </p>
-                  <p className="text-base text-gray-900 dark:text-white">Customer User</p>
+                  <p className="text-base text-gray-900 dark:text-white">
+                    Customer User
+                  </p>
                 </div>
 
                 <div>
@@ -370,7 +370,9 @@ export default function AssignPermissionsPage() {
                   <p className="text-sm font-medium text-gray-600 dark:text-white mb-1">
                     Last Modified
                   </p>
-                  <p className="text-base text-gray-900 dark:text-white">2024-03-15 14:30</p>
+                  <p className="text-base text-gray-900 dark:text-white">
+                    2024-03-15 14:30
+                  </p>
                 </div>
               </div>
 
