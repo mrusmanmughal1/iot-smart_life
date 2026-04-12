@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Camera, Eye, EyeOff, Trash2, Upload } from 'lucide-react';
-import { imagesApi, ImageType } from '@/services/api';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'react-hot-toast';
 import {
@@ -234,14 +233,14 @@ export function AccountTab() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-6 flex flex-col items-center    gap-6">
+          <div className="mb-6 flex flex-col items-center     gap-6">
             <div className="relative group">
               <Avatar className="h-24 w-24 border-2 border-gray-100 dark:border-gray-800">
                 <AvatarImage
                   src={
                     avatarPreview === ''
                       ? ''
-                      : (avatarPreview || currentUser?.avatar || '')
+                      : avatarPreview || currentUser?.avatar || ''
                   }
                   alt={currentUser?.name || ''}
                 />
@@ -269,13 +268,13 @@ export function AccountTab() {
                 />
               </label>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                 {t('settings.profile.photo') || 'Profile Photo'}
               </h3>
               <p className="text-xs text-gray-500 max-w-[240px]">
                 {t('settings.profile.photoDescription') ||
-                  'Upload a new photo to change your profile picture. Recommended size: 400x400px.'}
+                  'Recommended size: 400x400px.'}
               </p>
               <div className="flex items-center gap-3 mt-1">
                 <Button
@@ -290,18 +289,19 @@ export function AccountTab() {
                   <Upload size={14} className="mr-1.5" />
                   {t('settings.profile.changePhoto') || 'Change Photo'}
                 </Button>
-                {(avatarPreview !== '' && (avatarPreview || currentUser?.avatar)) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
-                    onClick={handleRemoveAvatar}
-                    disabled={isUploadingAvatar}
-                  >
-                    <Trash2 size={14} className="mr-1.5" />
-                    {t('settings.profile.removePhoto') || 'Remove'}
-                  </Button>
-                )}
+                {avatarPreview !== '' &&
+                  (avatarPreview || currentUser?.avatar) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={handleRemoveAvatar}
+                      disabled={isUploadingAvatar}
+                    >
+                      <Trash2 size={14} className="mr-1.5" />
+                      {t('settings.profile.removePhoto') || 'Remove'}
+                    </Button>
+                  )}
               </div>
             </div>
           </div>
@@ -378,7 +378,10 @@ export function AccountTab() {
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 type="submit"
-                disabled={isUpdatingProfile || (!isProfileDirty && !avatarFile && avatarPreview === null)}
+                disabled={
+                  isUpdatingProfile ||
+                  (!isProfileDirty && !avatarFile && avatarPreview === null)
+                }
               >
                 {isUpdatingProfile
                   ? t('common.saving') || 'Saving...'
@@ -398,7 +401,10 @@ export function AccountTab() {
                   setAvatarFile(null);
                   setAvatarPreview(null);
                 }}
-                disabled={isUpdatingProfile || (!isProfileDirty && !avatarFile && avatarPreview === null)}
+                disabled={
+                  isUpdatingProfile ||
+                  (!isProfileDirty && !avatarFile && avatarPreview === null)
+                }
               >
                 {t('common.cancel') || 'Cancel'}
               </Button>

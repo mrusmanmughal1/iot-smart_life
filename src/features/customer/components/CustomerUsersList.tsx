@@ -15,6 +15,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Pagination } from '@/components/common/Pagination';
 import { useCustomerUsers } from '@/features/customer/hooks';
 import { UserStatus } from '@/services/api/users.api';
+import { Button } from '@/components/ui/button';
+import { CustomerUserHierarchyModal } from './CustomerUserHierarchyModal';
 
 type CustomerUsersListProps = {
   customerId?: string;
@@ -27,6 +29,7 @@ const CustomerUsersList = ({
   searchQuery = '',
   title = 'Assigned Users',
 }: CustomerUsersListProps) => {
+  const [isHierarchical, setIsHierarchical] = useState(false);
   const params = useParams<{ customerId?: string; id?: string }>();
   const resolvedCustomerId = customerId || params.customerId || params.id;
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,9 +58,17 @@ const CustomerUsersList = ({
       </Card>
     );
   }
+  const hanldehirarchiModel = () => {
+    setIsHierarchical(!isHierarchical);
+  };
 
   return (
     <div>
+      <div className="flex justify-end p-2">
+        <Button variant="secondary" onClick={hanldehirarchiModel}>
+          Display Hierarchical
+        </Button>
+      </div>
       <Card className="bg-white shadow-sm dark:bg-gray-900 dark:border-gray-700">
         <CardContent className="p-0">
           {isLoading ? (
@@ -153,6 +164,14 @@ const CustomerUsersList = ({
           )}
         </CardContent>
       </Card>
+
+      {resolvedCustomerId && (
+        <CustomerUserHierarchyModal
+          open={isHierarchical}
+          onOpenChange={setIsHierarchical}
+          customerId={resolvedCustomerId}
+        />
+      )}
     </div>
   );
 };

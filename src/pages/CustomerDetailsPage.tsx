@@ -179,7 +179,7 @@ export default function CustomerDetailsPage() {
               </TabsContent>
 
               {/* Assigned Users Tab */}
-              <TabsContent value="assigned-users" className="p-6">
+              <TabsContent value="assigned-users" className="p-2">
                 <CustomerUsersList
                   customerId={id}
                   searchQuery=""
@@ -188,7 +188,7 @@ export default function CustomerDetailsPage() {
               </TabsContent>
 
               {/* Activity Log Tab */}
-              <TabsContent value="activity-logs" className="p-6 space-y-4">
+              <TabsContent value="activity-logs" className="p-2 space-y-4">
                 <CustomerActivityLog
                   customerId={id || ''}
                   title="Activity Log"

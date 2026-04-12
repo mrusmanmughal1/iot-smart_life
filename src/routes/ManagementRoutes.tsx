@@ -85,7 +85,6 @@ export const managementRoutes = [
         path: 'edit-role/:id',
         element: <CreateRolePage />,
       },
-
       {
         path: 'customer/:id',
         element: <CustomerDetailsPage />,

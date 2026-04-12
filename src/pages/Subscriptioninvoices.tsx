@@ -1,13 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
-import {
-  FileText,
-  Download,
-  ExternalLink,
-  Receipt,
-  CreditCard,
-} from 'lucide-react';
+import { FileText, Download, ExternalLink, CreditCard } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -75,6 +69,7 @@ export default function Subscriptioninvoices() {
       <PageHeader
         title={t('nav.subscriptions.invoices.title')}
         description={t('nav.subscriptions.invoices.subtitle')}
+        className="mb-4"
       />
       <Card className=" overflow-hidden">
         <CardHeader className="bg-white dark:bg-gray-900  ">

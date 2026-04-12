@@ -31,6 +31,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 const Users = ({ searchQuery }: { searchQuery: string }) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -183,11 +184,7 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
       <Card className="pt-6">
         <CardContent>
           {isTableLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full" />
-              ))}
-            </div>
+            <LoadingSpinner />
           ) : (
             <>
               {selectedUsers.length > 0 && (
@@ -209,86 +206,94 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {users.map((user: User) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            className=" w-4 h-4 cursor-pointer"
-                            checked={selectedUsers.some(
-                              (item) => item.id === user.id
-                            )}
-                            onChange={() => toggleUserSelection(user)}
-                          />{' '}
-                          <Avatar>
-                            <AvatarFallback className="bg-purple-100 text-purple-700">
-                              {user.name?.[0]?.toUpperCase() || 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{user.name}</p>
-                            <p className="text-sm text-slate-500">
-                              {user.email}
-                            </p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        <p className="capitalize">
-                          {user.role.replace('_', ' ')}
-                        </p>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Switch
-                            checked={user.status === UserStatus.ACTIVE}
-                            onCheckedChange={() => handleStatusToggle(user)}
-                            disabled={
-                              updateUserStatusMutation.isPending &&
-                              userToUpdateStatus?.id === user.id
-                            }
-                          />
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right flex items-center  relative justify-end gap-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="hover:bg-secondary hover:text-white"
-                              onClick={() => handleDeleteClick(user)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bottom-[70%] max-w-36">
-                            Delete User
-                          </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="hover:bg-secondary hover:text-white"
-                              onClick={() => handleManageUsersClick(user)}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bottom-[70%] max-w-36">
-                            View Details
-                          </TooltipContent>
-                        </Tooltip>
+                  {users.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center">
+                        No users found
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    users.map((user: User) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="checkbox"
+                              className=" w-4 h-4 cursor-pointer"
+                              checked={selectedUsers.some(
+                                (item) => item.id === user.id
+                              )}
+                              onChange={() => toggleUserSelection(user)}
+                            />{' '}
+                            <Avatar>
+                              <AvatarFallback className="bg-purple-100 text-purple-700">
+                                {user.name?.[0]?.toUpperCase() || 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{user.name}</p>
+                              <p className="text-sm text-slate-500">
+                                {user.email}
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <p className="capitalize">
+                            {user.role.replace('_', ' ')}
+                          </p>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={user.status === UserStatus.ACTIVE}
+                              onCheckedChange={() => handleStatusToggle(user)}
+                              disabled={
+                                updateUserStatusMutation.isPending &&
+                                userToUpdateStatus?.id === user.id
+                              }
+                            />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(user.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right flex items-center  relative justify-end gap-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="hover:bg-secondary hover:text-white"
+                                onClick={() => handleDeleteClick(user)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="bottom-[70%] max-w-36">
+                              Delete User
+                            </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="hover:bg-secondary hover:text-white"
+                                onClick={() => handleManageUsersClick(user)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent className="bottom-[70%] max-w-36">
+                              View Details
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
               <Pagination

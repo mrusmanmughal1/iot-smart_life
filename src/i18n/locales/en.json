@@ -1101,7 +1101,7 @@
     "account": "Account Settings",
     "profile": {
       "photo": "Profile Photo",
-      "photoDescription": "Upload a new photo to change your profile picture. Recommended size: 400x400px.",
+      "photoDescription": "Upload/change photo for your profile. Recommended size: 400x400px.",
       "changePhoto": "Change Photo",
       "removePhoto": "Remove",
       "invalidFileType": "Please select an image file",

@@ -1,14 +1,26 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { customerUsersApi, User } from '../services/customerUser.api';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 export const useCreateCustomerUser = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: ({ userData }: { userData: Partial<User> }) =>
       customerUsersApi.create(userData),
     onSuccess: () => {
+      toast.success('User created successfully');
       queryClient.invalidateQueries({ queryKey: ['customer-users'] });
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      navigate('/users-management');
+    },
+    onError: (error: unknown) => {
+      console.error('Failed to create user:', error);
+      const errorMessage =
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message || 'Failed to create user';
+      toast.error(errorMessage);
     },
   });
 };

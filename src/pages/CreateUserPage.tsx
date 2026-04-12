@@ -67,22 +67,7 @@ export default function CreateUserPage() {
       // customerId: '',
     };
 
-    createUserMutation.mutate(
-      { userData },
-      {
-        onSuccess: () => {
-          toast.success('User created successfully');
-          navigate('/users-management');
-        },
-        onError: (error: unknown) => {
-          console.error('Failed to create user:', error);
-          const errorMessage =
-            (error as { response?: { data?: { message?: string } } })?.response
-              ?.data?.message || 'Failed to create user';
-          toast.error(errorMessage);
-        },
-      }
-    );
+    createUserMutation.mutate({ userData });
   };
 
   const handleCancel = () => {

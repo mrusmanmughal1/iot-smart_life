@@ -9,12 +9,10 @@ import { Cpu, Layout, Box, Map, Zap, Users } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import {
   useCreateCustomer,
-  useCustomerById,
   useUpdateCustomer,
 } from '@/features/customer/hooks';
-
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
-import { useAppStore } from '@/stores/useAppStore';
+import { useUsage } from '@/features/Subscription/hooks';
 // Zod validation schema
 const createCustomerSchema = z.object({
   name: z.string().min(1, 'Customer name is required').trim(),
@@ -43,16 +41,12 @@ type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
 
 export default function CreateCustomerPage() {
   const navigate = useNavigate();
-  const id = useAppStore((state) => state.user?.id);
-
   const createCustomerMutation = useCreateCustomer();
   const updateCustomerMutation = useUpdateCustomer();
-
-  const { data: customerData, isLoading } = useCustomerById(id);
+  const { data: usageData, isLoading } = useUsage();
   const {
     register,
     handleSubmit,
-
     formState: { errors, isSubmitting },
   } = useForm<CreateCustomerFormData>({
     resolver: zodResolver(createCustomerSchema),
@@ -79,7 +73,7 @@ export default function CreateCustomerPage() {
     mode: 'onChange',
   });
 
-  const customer: any = customerData;
+  const usage: any = usageData;
 
   const onSubmit = async (data: CreateCustomerFormData) => {
     const customerData = {
@@ -456,7 +450,7 @@ export default function CreateCustomerPage() {
                       </h2>
                     </div>
                     <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
-                      {customer?.plan || 'Active'}
+                      {usage?.plan || 'Active'}
                     </span>
                   </div>
                 </div>
@@ -467,43 +461,43 @@ export default function CreateCustomerPage() {
                       {
                         label: 'Users',
                         icon: Users,
-                        usage: customer?.usageCounters?.users || 0,
-                        limit: customer?.allocatedLimits?.users || 0,
+                        usage: usage?.current?.users || 0,
+                        limit: usage?.limits?.users || 0,
                         color: 'bg-blue-500',
                       },
                       {
                         label: 'Devices',
                         icon: Cpu,
-                        usage: customer?.usageCounters?.devices || 0,
-                        limit: customer?.allocatedLimits?.devices || 0,
+                        usage: usage?.current?.devices || 0,
+                        limit: usage?.limits?.devices || 0,
                         color: 'bg-indigo-500',
                       },
                       {
                         label: 'Assets',
                         icon: Box,
-                        usage: customer?.usageCounters?.assets || 0,
-                        limit: customer?.allocatedLimits?.assets || 0,
+                        usage: usage?.current?.assets || 0,
+                        limit: usage?.limits?.assets || 0,
                         color: 'bg-purple-500',
                       },
                       {
                         label: 'Dashboards',
                         icon: Layout,
-                        usage: customer?.usageCounters?.dashboards || 0,
-                        limit: customer?.allocatedLimits?.dashboards || 0,
+                        usage: usage?.current?.dashboards || 0,
+                        limit: usage?.limits?.dashboards || 0,
                         color: 'bg-pink-500',
                       },
                       {
                         label: 'Floor Plans',
                         icon: Map,
-                        usage: customer?.usageCounters?.floorPlans || 0,
-                        limit: customer?.allocatedLimits?.floorPlans || 0,
+                        usage: usage?.current?.floorPlans || 0,
+                        limit: usage?.limits?.floorPlans || 0,
                         color: 'bg-orange-500',
                       },
                       {
                         label: 'Automations',
                         icon: Zap,
-                        usage: customer?.usageCounters?.automations || 0,
-                        limit: customer?.allocatedLimits?.automations || 0,
+                        usage: usage?.current?.automations || 0,
+                        limit: usage?.limits?.automations || 0,
                         color: 'bg-yellow-500',
                       },
                     ].map((item) => (

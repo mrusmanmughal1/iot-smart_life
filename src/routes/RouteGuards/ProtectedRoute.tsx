@@ -3,7 +3,6 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAppStore } from '@/stores/useAppStore';
 import { ROUTES } from '@/utils/constants/routes';
 import { Loadable } from '@/components/common/Loadable';
-
 // Lazy load layout component
 const AppLayout = Loadable(
   lazy(() =>
@@ -12,7 +11,6 @@ const AppLayout = Loadable(
     }))
   )
 );
-
 import { mainDashboardRoutes } from '@/routes/MainDashboardRoutes.tsx';
 import { inventoryRoutes } from '@/routes/InventoryRoutes.tsx';
 import { solutionRoutes } from '@/routes/SolutionRoutes.tsx';
@@ -25,7 +23,6 @@ export const ProtectedRoute = () => {
   const location = useLocation();
 
   if (!isAuthenticated) {
-    // Redirect to login but save the attempted location
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
