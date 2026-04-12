@@ -1,15 +1,8 @@
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import type { Role } from '@/services/api/users.api';
- 
-
- 
 
 interface DeleteRoleModalProps {
   open: boolean;
@@ -42,9 +35,7 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
         <div className="p-6 space-y-6">
           {/* Header */}
           <div className="space-y-2">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Delete Role
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Delete Role</h2>
             <p className="text-base text-gray-700">
               Are you sure you want to delete the following role?
             </p>
@@ -66,7 +57,9 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
               </div>
               <div className="flex-1 space-y-1">
                 <p className="font-bold text-gray-900">{role.name}</p>
-                <p className="text-sm text-gray-600">{role.description}</p>
+                <p className="text-sm text-gray-600">
+                  {role.description?.substring(0, 50)}
+                </p>
                 <div>
                   <span className="font-bold">Permissions</span>:
                   <div className="mt-2 border border-gray-200  p-2 rounded text-xs">
@@ -76,8 +69,7 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
                       <div className="col-span-2">Action</div>
                     </div>
                     <div className=" max-h-[200px] overflow-y-auto ">
-                      {role.permissions.map((permission  ) => {
-                        
+                      {role.permissions.map((permission) => {
                         return (
                           <div
                             key={permission.id}
@@ -91,7 +83,7 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
                             </div>
                             <div className="col-span-2">
                               <span className="inline-flex items-center rounded bg-yellow-100 px-2 py-0.5 text-[10px] font-medium capitalize text-yellow-900">
-                                {permission.action  }
+                                {permission.action}
                               </span>
                             </div>
                           </div>
@@ -108,7 +100,8 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
           <div className="space-y-2">
             <p className="font-bold text-red-600 text-sm">Warning</p>
             <p className="text-sm text-gray-700">
-              This action cannot be undone. The role will be removed and users assigned to this role will lose access to:
+              This action cannot be undone. The role will be removed and users
+              assigned to this role will lose access to:
             </p>
             <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-4">
               <li>All role-based permissions and access</li>
@@ -136,4 +129,3 @@ export const DeleteRoleModal: React.FC<DeleteRoleModalProps> = ({
     </Dialog>
   );
 };
-

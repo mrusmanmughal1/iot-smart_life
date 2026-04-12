@@ -1,5 +1,5 @@
-
 import React, { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
 
@@ -33,6 +33,34 @@ const GeoAnalyticsPage = Loadable(
   lazy(() => import('@/pages/GeoAnalyticsPage.tsx'))
 );
 const SettingsPage = Loadable(lazy(() => import('@/pages/SettingsPage.tsx')));
+const GeneralSettingsTab = Loadable(
+  lazy(() =>
+    import('@/features/settings/components/GeneralSettingsTab').then(
+      (module) => ({ default: module.GeneralSettingsTab })
+    )
+  )
+);
+const NotificationsTab = Loadable(
+  lazy(() =>
+    import('@/features/settings/components/NotificationsTab').then(
+      (module) => ({ default: module.NotificationsTab })
+    )
+  )
+);
+const SecurityTab = Loadable(
+  lazy(() =>
+    import('@/features/settings/components/SecurityTab').then((module) => ({
+      default: module.SecurityTab,
+    }))
+  )
+);
+const AccountTab = Loadable(
+  lazy(() =>
+    import('@/features/settings/components/AccountTab').then((module) => ({
+      default: module.AccountTab,
+    }))
+  )
+);
 
 export const mainDashboardRoutes = [
   {
@@ -104,8 +132,15 @@ export const mainDashboardRoutes = [
     element: <FeatureRoute feature="settings" />,
     children: [
       {
-        index: true,
+        path: '',
         element: <SettingsPage />,
+        children: [
+          { index: true, element: <Navigate to="general" replace /> },
+          { path: 'general', element: <GeneralSettingsTab /> },
+          { path: 'notifications', element: <NotificationsTab /> },
+          { path: 'security', element: <SecurityTab /> },
+          { path: 'account', element: <AccountTab /> },
+        ],
       },
     ],
   },

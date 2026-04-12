@@ -37,6 +37,8 @@ export function AccountTab() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const changePasswordSchema = createChangePasswordSchema(t);
   const profileSchema = createProfileSchema(t);
 
@@ -80,11 +82,17 @@ export function AccountTab() {
   }, [currentUser, resetProfile]);
 
   const { mutate: updateProfile, isPending: isUpdatingProfile } = useMutation({
-    mutationFn: async (data: { name: string; phone?: string }) =>
-      usersApi.updateProfile(data),
+    mutationFn: async (data: {
+      name: string;
+      phone?: string;
+      companyName?: string;
+      avatarFile?: File;
+      avatar?: string;
+    }) => usersApi.updateProfile(data),
     onSuccess: () => {
       toast.success(t('common.saved') || 'Saved');
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
+      setAvatarFile(null);
     },
     onError: (error: unknown) => {
       const errorMessage =
@@ -164,6 +172,9 @@ export function AccountTab() {
     updateProfile({
       name: data.name.trim(),
       phone: data.phone ? data.phone.trim() : undefined,
+      companyName: data.companyName ? data.companyName.trim() : undefined,
+      avatarFile: avatarFile || undefined,
+      avatar: avatarPreview === '' ? '' : undefined,
     });
   };
 
@@ -188,37 +199,17 @@ export function AccountTab() {
       return;
     }
 
-    setIsUploadingAvatar(true);
-    try {
-      const uploadRes = await imagesApi.upload(file, ImageType.PROFILE);
-      const imageUrl = uploadRes.data.data.url;
-
-      await usersApi.updateProfile({ avatar: imageUrl });
-      toast.success(
-        t('settings.profile.avatarUpdated') || 'Profile picture updated'
-      );
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
-    } catch {
-      toast.error(
-        t('settings.profile.uploadFailed') || 'Failed to upload image'
-      );
-    } finally {
-      setIsUploadingAvatar(false);
-    }
+    setAvatarFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
-  const handleRemoveAvatar = async () => {
-    try {
-      await usersApi.updateProfile({ avatar: '' });
-      toast.success(
-        t('settings.profile.avatarRemoved') || 'Profile picture removed'
-      );
-      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
-    } catch {
-      toast.error(
-        t('settings.profile.removeFailed') || 'Failed to remove image'
-      );
-    }
+  const handleRemoveAvatar = () => {
+    setAvatarFile(null);
+    setAvatarPreview(''); // Empty string indicates removal
   };
 
   if (isLoading || isLoadingUser) {
@@ -247,7 +238,11 @@ export function AccountTab() {
             <div className="relative group">
               <Avatar className="h-24 w-24 border-2 border-gray-100 dark:border-gray-800">
                 <AvatarImage
-                  src={currentUser?.avatar || ''}
+                  src={
+                    avatarPreview === ''
+                      ? ''
+                      : (avatarPreview || currentUser?.avatar || '')
+                  }
                   alt={currentUser?.name || ''}
                 />
                 <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
@@ -295,7 +290,7 @@ export function AccountTab() {
                   <Upload size={14} className="mr-1.5" />
                   {t('settings.profile.changePhoto') || 'Change Photo'}
                 </Button>
-                {currentUser?.avatar && (
+                {(avatarPreview !== '' && (avatarPreview || currentUser?.avatar)) && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -383,7 +378,7 @@ export function AccountTab() {
             <div className="flex flex-wrap items-center gap-2">
               <Button
                 type="submit"
-                disabled={isUpdatingProfile || !isProfileDirty}
+                disabled={isUpdatingProfile || (!isProfileDirty && !avatarFile && avatarPreview === null)}
               >
                 {isUpdatingProfile
                   ? t('common.saving') || 'Saving...'
@@ -398,9 +393,12 @@ export function AccountTab() {
                     name: currentUser.name ?? '',
                     email: currentUser.email ?? '',
                     phone: currentUser.phone ?? '',
+                    companyName: currentUser.companyName ?? '',
                   });
+                  setAvatarFile(null);
+                  setAvatarPreview(null);
                 }}
-                disabled={isUpdatingProfile || !isProfileDirty}
+                disabled={isUpdatingProfile || (!isProfileDirty && !avatarFile && avatarPreview === null)}
               >
                 {t('common.cancel') || 'Cancel'}
               </Button>

@@ -121,8 +121,20 @@ export const usersApi = {
   getCurrentUser: () => apiClient.get<ApiResponse<User>>('/auth/me'),
 
   // Update current user profile
-  updateProfile: (data: Partial<User>) =>
-    apiClient.patch<ApiResponse<User>>('/auth/profile', data),
+  updateProfile: (data: Partial<User> & { avatarFile?: File }) => {
+    if (data.avatarFile) {
+      const formData = new FormData();
+      if (data.name) formData.append('name', data.name);
+      if (data.phone) formData.append('phone', data.phone);
+      if (data.companyName) formData.append('companyName', data.companyName);
+      formData.append('avatar', data.avatarFile);
+      
+      return apiClient.patch<ApiResponse<User>>('/auth/profile', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+    }
+    return apiClient.patch<ApiResponse<User>>('/auth/profile', data);
+  },
 
   // Change password
   changePassword: (oldPassword: string, newPassword: string) =>

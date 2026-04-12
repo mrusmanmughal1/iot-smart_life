@@ -1,20 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { Settings, Bell, Shield, User } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AppLayout from '@/components/layout/AppLayout';
-import {
-  GeneralSettingsTab,
-  NotificationsTab,
-  SecurityTab,
-  AccountTab,
-} from '@/features/settings/components';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGeneralSettings } from '@/features/settings/hooks';
-import { LoadingPage } from '@/components/common/LoadingSpinner';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { PageHeader } from '@/components/common/PageHeader';
 
 export default function SettingsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const {
     settings,
     isLoading,
@@ -25,9 +21,12 @@ export default function SettingsPage() {
     isError,
   } = useGeneralSettings();
 
-  if (isLoading) {
-    return <LoadingPage />;
-  }
+  // Get current tab from URL (e.g., /settings/general -> general)
+  const currentTab = location.pathname.split('/').pop() || 'general';
+
+  const handleTabChange = (value: string) => {
+    navigate(`/settings/${value}`);
+  };
 
   if (isError) {
     return (
@@ -44,7 +43,12 @@ export default function SettingsPage() {
         description={t('settings.description')}
       />
 
-      <Tabs defaultValue="general" className="space-y-4">
+      <Tabs
+        value={currentTab}
+        onValueChange={handleTabChange}
+        defaultValue="general"
+        className="space-y-4"
+      >
         <TabsList className="dark:bg-gray-800 dark:text-white">
           <TabsTrigger value="general" className="dark:text-white">
             <Settings className="h-4 w-4 mr-2" />
@@ -64,31 +68,18 @@ export default function SettingsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="general">
-          <GeneralSettingsTab
-            settings={settings}
-            isLoading={isLoading}
-            isSaving={isSaving}
-            handleSaveAll={handleGeneralSettingsSave}
+        <div className="mt-6">
+          <Outlet
+            context={{
+              settings,
+              isLoading,
+              isSaving,
+              handleGeneralSettingsSave,
+              handleSaveNotificationSettings,
+              isSavingNotifications,
+            }}
           />
-        </TabsContent>
-
-        <TabsContent value="notifications">
-          <NotificationsTab
-            settings={settings}
-            isLoading={isLoading}
-            handleSaveNotificationSettings={handleSaveNotificationSettings}
-            isSaving={isSavingNotifications}
-          />
-        </TabsContent>
-
-        <TabsContent value="security">
-          <SecurityTab />
-        </TabsContent>
-
-        <TabsContent value="account">
-          <AccountTab />
-        </TabsContent>
+        </div>
       </Tabs>
     </div>
   );
