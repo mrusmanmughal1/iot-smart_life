@@ -199,14 +199,16 @@ export default function CustomerUserDetailsPage() {
                         <Checkbox
                           id="show-granted-only"
                           checked={showOnlyGranted}
-                          onCheckedChange={(checked) => setShowOnlyGranted(!!checked)}
+                          // onCheckedChange={(checked) => setShowOnlyGranted(!!checked)}
                           className="h-4 w-4 rounded-sm border-gray-300 dark:border-gray-600"
                         />
                         <label
                           htmlFor="show-granted-only"
                           className="text-xs font-semibold text-gray-600 dark:text-gray-300 cursor-pointer select-none"
                         >
-                          {t('usersManagement.user_details.matrix.showOnlyGranted')}
+                          {t(
+                            'usersManagement.user_details.matrix.showOnlyGranted'
+                          )}
                         </label>
                       </div>
                     )}
@@ -220,7 +222,9 @@ export default function CustomerUserDetailsPage() {
                             isLoading={updateUserPermissionsMutation.isPending}
                           >
                             <Check className="h-4 w-4 mr-2" />
-                            {t('usersManagement.user_details.actions.saveChanges')}
+                            {t(
+                              'usersManagement.user_details.actions.saveChanges'
+                            )}
                           </Button>
                           <Button
                             onClick={handleEditPermissionsToggle}
@@ -240,7 +244,9 @@ export default function CustomerUserDetailsPage() {
                           className="bg-secondary hover:bg-secondary/90 text-white"
                         >
                           <Edit className="h-4 w-4 mr-2" />
-                          {t('usersManagement.user_details.actions.editPermissions')}
+                          {t(
+                            'usersManagement.user_details.actions.editPermissions'
+                          )}
                         </Button>
                       )}
                     </div>
@@ -271,7 +277,10 @@ export default function CustomerUserDetailsPage() {
                                 variant="outline"
                                 className="bg-white dark:bg-gray-800 text-[10px] py-0 px-2 h-5 font-medium border-gray-200 dark:border-gray-700"
                               >
-                                {t('usersManagement.user_details.matrix.actionsCount', { count: permissionsToDisplay.length })}
+                                {t(
+                                  'usersManagement.user_details.matrix.actionsCount',
+                                  { count: permissionsToDisplay.length }
+                                )}
                               </Badge>
                             </CardTitle>
                           </CardHeader>
@@ -286,9 +295,9 @@ export default function CustomerUserDetailsPage() {
                                     checked={selectedPermissions.includes(
                                       permission.id
                                     )}
-                                    onCheckedChange={() =>
-                                      handlePermissionToggle(permission.id)
-                                    }
+                                    // onCheckedChange={() =>
+                                    //   handlePermissionToggle(permission.id)
+                                    // }
                                     id={permission.id}
                                     className="h-4 w-4"
                                   />

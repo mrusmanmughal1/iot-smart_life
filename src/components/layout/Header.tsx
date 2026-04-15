@@ -405,7 +405,8 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <div className="w-8 h-8 rounded-full flex items-center justify-center">
               <Avatar>
                 <AvatarImage
-                  src={user?.avatar || userfallbackimg}
+                  src=""
+                  // src={user?.avatar || userfallbackimg}
                   alt="User_Image"
                 />
                 <AvatarFallback className="bg-primary text-white">
