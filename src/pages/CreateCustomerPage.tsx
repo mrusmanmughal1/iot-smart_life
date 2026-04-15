@@ -13,37 +13,42 @@ import {
 } from '@/features/customer/hooks';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { useUsage } from '@/features/Subscription/hooks';
-// Zod validation schema
-const createCustomerSchema = z.object({
-  name: z.string().min(1, 'Customer name is required').trim(),
-  email: z
-    .string()
-    .email('Contact email must be valid')
-    .min(1, 'Contact email is required'),
-  phone: z.string().min(1, 'Phone number is required').trim(),
-  description: z.string().optional(),
-  city: z.string().min(1, 'City is required').trim(),
-  address: z.string().min(1, 'Address is required').trim(),
-  state: z.string().min(1, 'State is required').trim(),
-  zip: z.string().min(1, 'Zip is required').trim(),
-  country: z.string().min(1, 'Country is required').trim(),
-
-  allocatedLimits: z.object({
-    devices: z.string(),
-    dashboards: z.string(),
-    assets: z.string(),
-    floorPlans: z.string(),
-    automations: z.string(),
-    users: z.string().min(1, 'Users is required'),
-  }),
-});
-type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
+import { useTranslation } from 'react-i18next';
 
 export default function CreateCustomerPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const createCustomerMutation = useCreateCustomer();
   const updateCustomerMutation = useUpdateCustomer();
   const { data: usageData, isLoading } = useUsage();
+
+  // Zod validation schema
+  const createCustomerSchema = z.object({
+    name: z.string().min(1, t('usersManagement.create_user.validation.name')).trim(),
+    email: z
+      .string()
+      .email(t('usersManagement.create_user.validation.email'))
+      .min(1, t('usersManagement.create_user.validation.email')),
+    phone: z.string().min(1, t('usersManagement.create_user.validation.phone')).trim(),
+    description: z.string().optional(),
+    city: z.string().min(1, t('usersManagement.common.city')).trim(),
+    address: z.string().min(1, t('usersManagement.common.address')).trim(),
+    state: z.string().min(1, t('usersManagement.common.state')).trim(),
+    zip: z.string().min(1, t('usersManagement.common.zip')).trim(),
+    country: z.string().min(1, t('usersManagement.common.country')).trim(),
+
+    allocatedLimits: z.object({
+      devices: z.string(),
+      dashboards: z.string(),
+      assets: z.string(),
+      floorPlans: z.string(),
+      automations: z.string(),
+      users: z.string().min(1, t('usersManagement.create_user.validation.users') || 'Users is required'),
+    }),
+  });
+
+  type CreateCustomerFormData = z.infer<typeof createCustomerSchema>;
+
   const {
     register,
     handleSubmit,
@@ -108,11 +113,11 @@ export default function CreateCustomerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50  ">
+    <div className="min-h-screen bg-transparent dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-          {'Add New Customer'}
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+          {t('usersManagement.create_customer.title')}
         </h1>
 
         {/* Two Column Layout */}
@@ -121,25 +126,25 @@ export default function CreateCustomerPage() {
             {/* Left Column - Customer Information and Settings */}
             <div className="lg:col-span-2 space-y-6">
               {/* Customer Information Card */}
-              <Card className="shadow-lg rounded-xl border-gray-200">
+              <Card className="shadow-lg rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    Customer Information
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {t('usersManagement.create_customer.info')}
                   </h2>
                   <div className="space-y-4">
                     {/* Customer Name */}
                     <div>
                       <label
                         htmlFor="name"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Customer Name <span className="text-red-500">*</span>
+                        {t('usersManagement.common.name')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="name"
                         {...register('name')}
-                        placeholder="Enter customer name"
-                        className="w-full border border-gray-300 rounded-md "
+                        placeholder={t('usersManagement.create_customer.placeholders.name')}
+                        className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                       />
                       {errors.name && (
                         <p className="mt-1 text-sm text-red-600">
@@ -152,16 +157,16 @@ export default function CreateCustomerPage() {
                     <div>
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Contact Email <span className="text-red-500">*</span>
+                        {t('usersManagement.common.email')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="email"
                         type="email"
                         {...register('email')}
-                        placeholder="Enter contact email"
-                        className="w-full border border-gray-300 rounded-md"
+                        placeholder={t('usersManagement.create_customer.placeholders.email')}
+                        className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                       />
                       {errors.email && (
                         <p className="mt-1 text-sm text-red-600">
@@ -174,15 +179,15 @@ export default function CreateCustomerPage() {
                     <div>
                       <label
                         htmlFor="phone"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Phone Number <span className="text-red-500">*</span>
+                        {t('usersManagement.common.phone')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="phone"
                         {...register('phone')}
-                        placeholder="Enter phone number"
-                        className="w-full border border-gray-300 rounded-md"
+                        placeholder={t('usersManagement.create_customer.placeholders.phone')}
+                        className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                       />
                       {errors.phone && (
                         <p className="mt-1 text-sm text-red-600">
@@ -191,19 +196,19 @@ export default function CreateCustomerPage() {
                       )}
                     </div>
 
-                    {/* Address */}
+                    {/* Description */}
                     <div>
                       <label
                         htmlFor="description"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Description
+                        {t('usersManagement.common.description')}
                       </label>
                       <Input
                         id="description"
                         {...register('description')}
-                        placeholder="Enter description"
-                        className="w-full border border-gray-300 rounded-md"
+                        placeholder={t('usersManagement.create_customer.placeholders.description')}
+                        className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                       />
                     </div>
 
@@ -212,15 +217,15 @@ export default function CreateCustomerPage() {
                       <div>
                         <label
                           htmlFor="city"
-                          className="block text-sm font-medium text-gray-700 mb-2"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                         >
-                          City <span className="text-red-500">*</span>
+                          {t('usersManagement.common.city')} <span className="text-red-500">*</span>
                         </label>
                         <Input
                           id="city"
                           {...register('city')}
-                          placeholder="Enter city"
-                          className="w-full border border-gray-300 rounded-md"
+                          placeholder={t('usersManagement.create_customer.placeholders.city')}
+                          className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                         />
                         {errors.city && (
                           <p className="mt-1 text-sm text-red-600">
@@ -231,15 +236,15 @@ export default function CreateCustomerPage() {
                       <div>
                         <label
                           htmlFor="state"
-                          className="block text-sm font-medium text-gray-700 mb-2"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                         >
-                          State/Province <span className="text-red-500">*</span>
+                          {t('usersManagement.common.state')} <span className="text-red-500">*</span>
                         </label>
                         <Input
                           id="state"
                           {...register('state')}
-                          placeholder="Enter state/province"
-                          className="w-full border border-gray-300 rounded-md"
+                          placeholder={t('usersManagement.create_customer.placeholders.state')}
+                          className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                         />
                         {errors.state && (
                           <p className="mt-1 text-sm text-red-600">
@@ -252,15 +257,15 @@ export default function CreateCustomerPage() {
                     <div>
                       <label
                         htmlFor="address"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Address <span className="text-red-500">*</span>
+                        {t('usersManagement.common.address')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="address"
                         {...register('address')}
-                        placeholder="Enter address"
-                        className="w-full border border-gray-300 rounded-md"
+                        placeholder={t('usersManagement.create_customer.placeholders.address')}
+                        className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                       />
                       {errors.address && (
                         <p className="mt-1 text-sm text-red-600">
@@ -274,15 +279,15 @@ export default function CreateCustomerPage() {
                       <div>
                         <label
                           htmlFor="zip"
-                          className="block text-sm font-medium text-gray-700 mb-2"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                         >
-                          Zip/Postal Code<span className="text-red-500">*</span>
+                          {t('usersManagement.common.zip')} <span className="text-red-500">*</span>
                         </label>
                         <Input
                           id="zip"
                           {...register('zip')}
-                          placeholder="Enter zip/postal code"
-                          className="w-full border border-gray-300 rounded-md"
+                          placeholder={t('usersManagement.create_customer.placeholders.zip')}
+                          className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                         />
                         {errors.zip && (
                           <p className="mt-1 text-sm text-red-600">
@@ -293,15 +298,15 @@ export default function CreateCustomerPage() {
                       <div>
                         <label
                           htmlFor="country"
-                          className="block text-sm font-medium text-gray-700 mb-2"
+                          className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                         >
-                          Country <span className="text-red-500">*</span>
+                          {t('usersManagement.common.country')} <span className="text-red-500">*</span>
                         </label>
                         <Input
                           id="country"
                           {...register('country')}
-                          placeholder="Enter country"
-                          className="w-full border border-gray-300 rounded-md"
+                          placeholder={t('usersManagement.create_customer.placeholders.country')}
+                          className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                         />
                         {errors.country && (
                           <p className="mt-1 text-sm text-red-600">
@@ -312,22 +317,22 @@ export default function CreateCustomerPage() {
                     </div>
 
                     {/* Customer Settings Card */}
-                    <div className="pt-6 border-t border-gray-200">
+                    <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
                       {/* Allocated Limits */}
-                      <div className="    border-gray-200">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                          Allocated Limits
+                      <div className="">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                          {t('usersManagement.create_customer.limits')}
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Users <span className="text-red-500">*</span>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              {t('usersManagement.create_customer.subscription.resources.users')} <span className="text-red-500">*</span>
                             </label>
                             <Input
                               type="number"
                               min={0}
                               {...register('allocatedLimits.users')}
-                              className="w-full border border-gray-300 rounded-md"
+                              className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                             />
                             {errors.allocatedLimits?.users && (
                               <p className="mt-1 text-sm text-red-600">
@@ -336,58 +341,58 @@ export default function CreateCustomerPage() {
                             )}
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Devices
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              {t('usersManagement.create_customer.subscription.resources.devices')}
                             </label>
                             <Input
                               type="number"
                               min={0}
                               {...register('allocatedLimits.devices')}
-                              className="w-full border border-gray-300 rounded-md"
+                              className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Dashboards
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              {t('usersManagement.create_customer.subscription.resources.dashboards')}
                             </label>
                             <Input
                               type="number"
                               min={0}
                               {...register('allocatedLimits.dashboards')}
-                              className="w-full border border-gray-300 rounded-md"
+                              className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Assets
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              {t('usersManagement.create_customer.subscription.resources.assets')}
                             </label>
                             <Input
                               type="number"
                               min={0}
                               {...register('allocatedLimits.assets')}
-                              className="w-full border border-gray-300 rounded-md"
+                              className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Floor Plans
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              {t('usersManagement.create_customer.subscription.resources.floorPlans')}
                             </label>
                             <Input
                               type="number"
                               min={0}
                               {...register('allocatedLimits.floorPlans')}
-                              className="w-full border border-gray-300 rounded-md"
+                              className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Automations
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                              {t('usersManagement.create_customer.subscription.resources.automations')}
                             </label>
                             <Input
                               type="number"
                               min={0}
                               {...register('allocatedLimits.automations')}
-                              className="w-full border border-gray-300 rounded-md"
+                              className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                             />
                           </div>
                         </div>
@@ -395,8 +400,8 @@ export default function CreateCustomerPage() {
                     </div>
 
                     {/* Required fields note */}
-                    <p className="text-xs text-gray-500 mt-4">
-                      <span className="text-red-500">*</span> Required fields
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+                      <span className="text-red-500">*</span> {t('usersManagement.common.requiredFields')}
                     </p>
                   </div>
                 </CardContent>
@@ -405,16 +410,16 @@ export default function CreateCustomerPage() {
             {/* Right Column - Actions and Help */}
             <div className="space-y-6">
               {/* Actions Card */}
-              <Card className="shadow-lg rounded-xl border-gray-200">
+              <Card className="shadow-lg rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    Actions
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {t('usersManagement.common.actions')}
                   </h2>
                   <div className="space-y-3">
                     <Button
                       type="submit"
                       variant="ghost"
-                      className="w-full justify-start bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      className="w-full justify-start bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                       disabled={
                         isSubmitting ||
                         createCustomerMutation.isPending ||
@@ -425,7 +430,7 @@ export default function CreateCustomerPage() {
                         updateCustomerMutation.isPending
                       }
                     >
-                      {'Save and Add'}
+                      {t('usersManagement.create_customer.saveAndAdd')}
                     </Button>
                     <div className="flex items-center gap-3">
                       <Button
@@ -434,23 +439,23 @@ export default function CreateCustomerPage() {
                         className="flex-1"
                         onClick={handleCancel}
                       >
-                        Cancel
+                        {t('usersManagement.common.cancel')}
                       </Button>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               {/* Current Subscription Card */}
-              <Card className="shadow-lg rounded-xl border-gray-200 overflow-hidden">
-                <div className="  bg-secondary p-4 text-white ">
+              <Card className="shadow-lg rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800 overflow-hidden">
+                <div className="bg-secondary p-4 text-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <h2 className="text-lg font-bold">
-                        Current Subscription
+                        {t('usersManagement.create_customer.subscription.title')}
                       </h2>
                     </div>
                     <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wider backdrop-blur-sm">
-                      {usage?.plan || 'Active'}
+                      {usage?.plan || t('usersManagement.create_customer.subscription.plan')}
                     </span>
                   </div>
                 </div>
@@ -459,42 +464,42 @@ export default function CreateCustomerPage() {
                     {/* Resource Items */}
                     {[
                       {
-                        label: 'Users',
+                        label: t('usersManagement.create_customer.subscription.resources.users'),
                         icon: Users,
                         usage: usage?.current?.users || 0,
                         limit: usage?.limits?.users || 0,
                         color: 'bg-blue-500',
                       },
                       {
-                        label: 'Devices',
+                        label: t('usersManagement.create_customer.subscription.resources.devices'),
                         icon: Cpu,
                         usage: usage?.current?.devices || 0,
                         limit: usage?.limits?.devices || 0,
                         color: 'bg-indigo-500',
                       },
                       {
-                        label: 'Assets',
+                        label: t('usersManagement.create_customer.subscription.resources.assets'),
                         icon: Box,
                         usage: usage?.current?.assets || 0,
                         limit: usage?.limits?.assets || 0,
                         color: 'bg-purple-500',
                       },
                       {
-                        label: 'Dashboards',
+                        label: t('usersManagement.create_customer.subscription.resources.dashboards'),
                         icon: Layout,
                         usage: usage?.current?.dashboards || 0,
                         limit: usage?.limits?.dashboards || 0,
                         color: 'bg-pink-500',
                       },
                       {
-                        label: 'Floor Plans',
+                        label: t('usersManagement.create_customer.subscription.resources.floorPlans'),
                         icon: Map,
                         usage: usage?.current?.floorPlans || 0,
                         limit: usage?.limits?.floorPlans || 0,
                         color: 'bg-orange-500',
                       },
                       {
-                        label: 'Automations',
+                        label: t('usersManagement.create_customer.subscription.resources.automations'),
                         icon: Zap,
                         usage: usage?.current?.automations || 0,
                         limit: usage?.limits?.automations || 0,
@@ -503,20 +508,20 @@ export default function CreateCustomerPage() {
                     ].map((item) => (
                       <div key={item.label} className="space-y-1.5">
                         <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2 font-medium text-gray-700">
+                          <div className="flex items-center gap-2 font-medium text-gray-700 dark:text-gray-300">
                             <item.icon className="h-4 w-4 text-gray-400" />
                             {item.label}
                           </div>
                           <div className="text-xs font-semibold tabular-nums">
-                            <span className="text-gray-900">{item.usage}</span>
+                            <span className="text-gray-900 dark:text-white">{item.usage}</span>
                             <span className="text-gray-400 mx-1">/</span>
-                            <span className="text-gray-500">{item.limit}</span>
+                            <span className="text-gray-500 dark:text-gray-400">{item.limit}</span>
                           </div>
                         </div>
                         <Progress
                           value={item.usage}
                           max={item.limit || 1}
-                          className="h-1.5 bg-gray-100"
+                          className="h-1.5 bg-gray-100 dark:bg-gray-900"
                         />
                       </div>
                     ))}

@@ -12,11 +12,9 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   useDeleteUser,
-  useSearchUsers,
   useUsers,
   useUpdateUserStatus,
 } from '@/features/users/hooks';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, UserRole, UserStatus } from '@/services/api/users.api';
 import { useEffect, useMemo, useState } from 'react';
@@ -32,12 +30,16 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
+
 const Users = ({ searchQuery }: { searchQuery: string }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [roleFilter, setRoleFilter] = useState<
     'all' | 'customer_user' | 'customer'
   >('all');
+
   const itemsPerPage = 10;
   const roleParam = roleFilter === 'all' ? undefined : roleFilter;
 
@@ -47,7 +49,6 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
     role: roleParam,
     search: searchQuery,
   });
-
   const deleteUserMutation = useDeleteUser();
   const isTableLoading = isLoading;
   const users = useMemo(() => usersData?.data || [], [usersData]);
@@ -75,7 +76,6 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
   const updateUserStatusMutation = useUpdateUserStatus();
 
   const handleManageUsersClick = (user: User) => {
-    console.log(user);
     if (user.role === UserRole.CUSTOMER_USER) {
       navigate(`/users-management/customer-user/${user.id}`);
     } else {
@@ -87,12 +87,15 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
     setSelectedUser(user);
     setDeleteModalOpen(true);
   };
+
   const handleDeleteConfirm = () => {
     if (selectedUser) {
       deleteUserMutation.mutate(selectedUser.id, {
         onSuccess: () => {
           toast.success(
-            `User ${selectedUser.name || selectedUser.email} deleted successfully`
+            t('usersManagement.users_tab.toasts.deleteSuccess', {
+              name: selectedUser.name || selectedUser.email,
+            })
           );
           setSelectedUser(null);
         },
@@ -100,7 +103,8 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
           console.error('Failed to delete user:', error);
           const errorMessage =
             (error as { response?: { data?: { message?: string } } })?.response
-              ?.data?.message || 'Failed to delete user';
+              ?.data?.message ||
+            t('usersManagement.user_card.toasts.deleteError');
           toast.error(errorMessage);
         },
       });
@@ -146,13 +150,23 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
         { userId: userToUpdateStatus.id, status: newStatus },
         {
           onSuccess: () => {
-            toast.success(`User status updated to ${newStatus}`);
+            const statusLabel =
+              newStatus === UserStatus.ACTIVE
+                ? t('usersManagement.users_tab.statusConfirm.activate')
+                : t('usersManagement.users_tab.statusConfirm.deactivate');
+
+            toast.success(
+              t('usersManagement.users_tab.toasts.statusUpdated', {
+                status: statusLabel,
+              })
+            );
             setStatusConfirmOpen(false);
             setUserToUpdateStatus(null);
           },
           onError: (error: any) => {
             toast.error(
-              error.response?.data?.message || 'Failed to update user status'
+              error.response?.data?.message ||
+                t('usersManagement.users_tab.toasts.statusUpdateError')
             );
           },
         }
@@ -161,10 +175,10 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
   };
 
   return (
-    <div>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          All Users
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          {t('usersManagement.users_tab.title')}
         </h2>
         <Tabs
           defaultValue="all"
@@ -174,78 +188,124 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
           }
           className="w-auto"
         >
-          <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="customer_user">Customer User</TabsTrigger>
-            <TabsTrigger value="customer">Customer</TabsTrigger>
+          <TabsList className="bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+            <TabsTrigger
+              value="all"
+              className="dark:text-gray-400 dark:data-[state=active]:text-white"
+            >
+              {t('usersManagement.users_tab.tabs.all')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="customer_user"
+              className="dark:text-gray-400 dark:data-[state=active]:text-white"
+            >
+              {t('usersManagement.users_tab.tabs.customer_user')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="customer"
+              className="dark:text-gray-400 dark:data-[state=active]:text-white"
+            >
+              {t('usersManagement.users_tab.tabs.customer')}
+            </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
-      <Card className="pt-6">
-        <CardContent>
+
+      <Card className="bg-white  dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+        <CardContent className="px-4">
           {isTableLoading ? (
-            <LoadingSpinner />
+            <div className="p-20 flex justify-center">
+              <LoadingSpinner />
+            </div>
           ) : (
             <>
-              {selectedUsers.length > 0 && (
-                <div className="flex justify-end mb-3">
-                  <Button variant="secondary" onClick={handleBulkEdit}>
-                    Edit Bulk Data ({selectedUsers.length})
+              <div className="flex justify-end p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20  ">
+                {selectedUsers.length > 0 && (
+                  <Button
+                    variant="secondary"
+                    onClick={handleBulkEdit}
+                    className="bg-primary hover:bg-primary/90 text-white shadow-md animate-in fade-in slide-in-from-right-2"
+                  >
+                    {t('usersManagement.users_tab.bulkEdit', {
+                      count: selectedUsers.length,
+                    })}
                   </Button>
-                </div>
-              )}
-              <Table>
-                <TableHeader className="bg-primary    text-white">
-                  <TableRow className="bg-primary hover:bg-primary">
-                    <TableHead className="ps-2">Users</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center">
-                        No users found
-                      </TableCell>
+                )}
+              </div>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="">
+                      <TableHead className="     ">
+                        {t('usersManagement.customer_users_list.table.user')}
+                      </TableHead>
+                      <TableHead className="  ">
+                        {t('usersManagement.customer_users_list.table.email')}
+                      </TableHead>
+                      <TableHead className="text-xs  ">
+                        {t('usersManagement.customer_users_list.table.role')}
+                      </TableHead>
+                      <TableHead className="text-xs  ">
+                        {t('usersManagement.customer_users_list.table.status')}
+                      </TableHead>
+                      <TableHead className="text-xs  ">
+                        {t('usersManagement.customer_users_list.table.created')}
+                      </TableHead>
+                      <TableHead className="text-center text-xs  ">
+                        {t('usersManagement.common.actions')}
+                      </TableHead>
                     </TableRow>
-                  ) : (
-                    users.map((user: User) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <input
-                              type="checkbox"
-                              className=" w-4 h-4 cursor-pointer"
-                              checked={selectedUsers.some(
-                                (item) => item.id === user.id
-                              )}
-                              onChange={() => toggleUserSelection(user)}
-                            />{' '}
-                            <Avatar>
-                              <AvatarFallback className="bg-purple-100 text-purple-700">
-                                {user.name?.[0]?.toUpperCase() || 'U'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium">{user.name}</p>
-                              <p className="text-sm text-slate-500">
-                                {user.email}
-                              </p>
+                  </TableHeader>
+                  <TableBody>
+                    {users.length === 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={6}
+                          className="text-center py-10 text-gray-500 dark:text-gray-400"
+                        >
+                          {t('usersManagement.users_tab.noUsers')}
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      users.map((user: User) => (
+                        <TableRow
+                          key={user.id}
+                          className="hover:bg-gray-50 dark:hover:bg-gray-900/50 border-gray-100 dark:border-gray-700"
+                        >
+                          <TableCell className="ps-4">
+                            <div className="flex items-center gap-4">
+                              <input
+                                type="checkbox"
+                                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary cursor-pointer"
+                                checked={selectedUsers.some(
+                                  (item) => item.id === user.id
+                                )}
+                                onChange={() => toggleUserSelection(user)}
+                              />
+                              <Avatar className="h-9 w-9 border border-gray-200 dark:border-gray-700">
+                                <AvatarFallback className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-bold text-xs uppercase">
+                                  {user.name?.[0]?.toUpperCase() || 'U'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col">
+                                <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                                  {user.name}
+                                </p>
+                                <p className="  text-gray-500 dark:text-gray-400">
+                                  {user.email}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>
-                          <p className="capitalize">
-                            {user.role.replace('_', ' ')}
-                          </p>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
+                          </TableCell>
+                          <TableCell className="text-sm text-gray-600 dark:text-gray-300">
+                            {user.email}
+                          </TableCell>
+                          <TableCell>
+                            <span className="capitalize text-sm font-medium text-gray-900 dark:text-gray-100 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                              {user.role.replace('_', ' ')}
+                            </span>
+                          </TableCell>
+                          <TableCell>
                             <Switch
                               checked={user.status === UserStatus.ACTIVE}
                               onCheckedChange={() => handleStatusToggle(user)}
@@ -254,55 +314,61 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                                 userToUpdateStatus?.id === user.id
                               }
                             />
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          {new Date(user.createdAt).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell className="text-right flex items-center  relative justify-end gap-1">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                className="hover:bg-secondary hover:text-white"
-                                onClick={() => handleDeleteClick(user)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="bottom-[70%] max-w-36">
-                              Delete User
-                            </TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                className="hover:bg-secondary hover:text-white"
-                                onClick={() => handleManageUsersClick(user)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent className="bottom-[70%] max-w-36">
-                              View Details
-                            </TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={totalItems}
-                itemsPerPage={itemsPerPage}
-                onPageChange={handlePageChange}
-              />
+                          </TableCell>
+                          <TableCell className="text-sm text-gray-500 dark:text-gray-400">
+                            {new Date(user.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-center gap-1">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                    onClick={() => handleDeleteClick(user)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {t(
+                                    'usersManagement.users_tab.tooltips.delete'
+                                  )}
+                                </TooltipContent>
+                              </Tooltip>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    className="text-primary hover:bg-primary/10"
+                                    onClick={() => handleManageUsersClick(user)}
+                                  >
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {t('usersManagement.users_tab.tooltips.view')}
+                                </TooltipContent>
+                              </Tooltip>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="p-4 border-t border-gray-100 dark:border-gray-700">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={handlePageChange}
+                />
+              </div>
             </>
           )}
         </CardContent>
@@ -321,12 +387,14 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
       <ConfirmDialog
         open={statusConfirmOpen}
         onOpenChange={setStatusConfirmOpen}
-        title="Confirm Status Change"
-        description={`Are you sure you want to ${
-          userToUpdateStatus?.status === UserStatus.ACTIVE
-            ? 'deactivate'
-            : 'activate'
-        } user ${userToUpdateStatus?.name || userToUpdateStatus?.email}?`}
+        title={t('usersManagement.users_tab.statusConfirm.title')}
+        description={t('usersManagement.users_tab.statusConfirm.description', {
+          action:
+            userToUpdateStatus?.status === UserStatus.ACTIVE
+              ? t('usersManagement.users_tab.statusConfirm.deactivate')
+              : t('usersManagement.users_tab.statusConfirm.activate'),
+          name: userToUpdateStatus?.name || userToUpdateStatus?.email,
+        })}
         onConfirm={handleStatusConfirm}
       />
     </div>

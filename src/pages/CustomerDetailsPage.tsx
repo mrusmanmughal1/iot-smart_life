@@ -9,6 +9,7 @@ import CustomerActivityLog from '@/features/customer/components/CustomerActivity
 import { usePermissions } from '@/features/permissions/hooks';
 import DevicesListCustomers from '@/features/users/components/DevicesListCustomers';
 import { CustomerDetailsCard } from '@/features/customer/components/CustomerDetailsCard';
+import { useTranslation } from 'react-i18next';
 
 interface Permission {
   id: string;
@@ -20,10 +21,10 @@ interface Permission {
 const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
   return (
     <div
-      className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+      className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
         granted
           ? 'bg-green-500 border-green-500'
-          : 'bg-gray-200 border-gray-300'
+          : 'bg-gray-200 border-gray-300 dark:bg-gray-700 dark:border-gray-600'
       }`}
     >
       {granted && (
@@ -44,6 +45,7 @@ const PermissionCheckbox: React.FC<{ granted: boolean }> = ({ granted }) => {
 };
 
 export default function CustomerDetailsPage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const { data } = useCustomerById(id);
   const customer = data?.data as Customer | undefined;
@@ -76,43 +78,43 @@ export default function CustomerDetailsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
+    <div className="min-h-screen bg-transparent dark:bg-gray-900 dark:text-gray-100">
       <div className="mx-auto space-y-6">
         {/* Customer Details Card Extracted */}
         <CustomerDetailsCard customer={customer} id={id} />
 
         {/* Tabs */}
-        <Card className="bg-white shadow-sm p-4">
+        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm p-4">
           <CardContent className="p-0">
             <Tabs
               defaultValue="permissions"
               value={activeTab}
               onValueChange={setActiveTab}
             >
-              <TabsList className="w-full  ">
+              <TabsList className="w-full bg-transparent border-b border-gray-100 dark:border-gray-700 h-auto p-0 gap-8 justify-start">
                 <TabsTrigger
                   value="permissions"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
+                  className="rounded-none border-b-2 border-transparent px-0 py-3 data-[state=active]:border-primary dark:data-[state=active]:border-secondary data-[state=active]:bg-transparent data-[state=active]:text-primary dark:data-[state=active]:text-secondary text-gray-500 dark:text-gray-400 font-medium"
                 >
-                  Permissions
+                  {t('usersManagement.customer_details.tabs.permissions')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="assigned-users"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
+                  className="rounded-none border-b-2 border-transparent px-0 py-3 data-[state=active]:border-primary dark:data-[state=active]:border-secondary data-[state=active]:bg-transparent data-[state=active]:text-primary dark:data-[state=active]:text-secondary text-gray-500 dark:text-gray-400 font-medium"
                 >
-                  Assigned Users
+                  {t('usersManagement.customer_details.tabs.assignedUsers')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="devices"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
+                  className="rounded-none border-b-2 border-transparent px-0 py-3 data-[state=active]:border-primary dark:data-[state=active]:border-secondary data-[state=active]:bg-transparent data-[state=active]:text-primary dark:data-[state=active]:text-secondary text-gray-500 dark:text-gray-400 font-medium"
                 >
-                  Devices
+                  {t('usersManagement.customer_details.tabs.devices')}
                 </TabsTrigger>
                 <TabsTrigger
                   value="activity-logs"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:bg-transparent data-[state=active]:text-blue-600"
+                  className="rounded-none border-b-2 border-transparent px-0 py-3 data-[state=active]:border-primary dark:data-[state=active]:border-secondary data-[state=active]:bg-transparent data-[state=active]:text-primary dark:data-[state=active]:text-secondary text-gray-500 dark:text-gray-400 font-medium"
                 >
-                  Activity Logs
+                  {t('usersManagement.customer_details.tabs.activityLogs')}
                 </TabsTrigger>
               </TabsList>
 
@@ -124,7 +126,7 @@ export default function CustomerDetailsPage() {
               <TabsContent value="permissions" className="p-4 space-y-4 ">
                 <div className="flex items-start justify-between">
                   <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                    Permission Matrix
+                    {t('usersManagement.customer_details.matrixTitle')}
                   </h2>
                 </div>
 
@@ -134,11 +136,11 @@ export default function CustomerDetailsPage() {
                     ([category, categoryPermissions]) => (
                       <Card
                         key={category}
-                        className={`${'bg-white hover:bg-green-50 dark:bg-gray-900 dark:border-gray-700'}`}
+                        className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 hover:border-primary/30 dark:hover:border-secondary/30 transition-colors"
                       >
                         <CardHeader>
                           <CardTitle className="text-lg capitalize font-semibold text-gray-900 dark:text-white">
-                            {category}
+                            {category.replace(/-/g, ' ')}
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
@@ -150,8 +152,8 @@ export default function CustomerDetailsPage() {
                               <PermissionCheckbox
                                 granted={permission.granted}
                               />
-                              <span className="text-sm capitalize text-gray-900 flex-1 dark:text-white">
-                                {permission.label} {category.replace('-', ' ')}
+                              <span className="text-sm capitalize text-gray-700 dark:text-gray-300 flex-1">
+                                {permission.label} {category.replace(/-/g, ' ')}
                               </span>
                             </div>
                           ))}
@@ -162,17 +164,17 @@ export default function CustomerDetailsPage() {
                 </div>
 
                 {/* Legend */}
-                <div className="flex items-center gap-6 pt-4 border-t">
+                <div className="flex items-center gap-6 pt-4 border-t border-gray-100 dark:border-gray-700">
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-green-500"></div>
-                    <span className="text-sm text-gray-700 dark:text-white">
-                      Granted Permission
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {t('usersManagement.customer_details.legend.granted')}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full bg-gray-300"></div>
-                    <span className="text-sm text-gray-700 dark:text-white">
-                      Denied Permission
+                    <div className="w-4 h-4 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {t('usersManagement.customer_details.legend.denied')}
                     </span>
                   </div>
                 </div>
@@ -183,7 +185,7 @@ export default function CustomerDetailsPage() {
                 <CustomerUsersList
                   customerId={id}
                   searchQuery=""
-                  title="Assigned Users"
+                  title={t('usersManagement.customer_details.tabs.assignedUsers')}
                 />
               </TabsContent>
 
@@ -191,7 +193,7 @@ export default function CustomerDetailsPage() {
               <TabsContent value="activity-logs" className="p-2 space-y-4">
                 <CustomerActivityLog
                   customerId={id || ''}
-                  title="Activity Log"
+                  title={t('usersManagement.customer_details.tabs.activityLogs')}
                 />
               </TabsContent>
             </Tabs>

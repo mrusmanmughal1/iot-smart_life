@@ -13,6 +13,7 @@ import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface CustomerDetailsCardProps {
   customer: Customer | undefined;
@@ -23,6 +24,7 @@ export function CustomerDetailsCard({
   customer,
   id,
 }: CustomerDetailsCardProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const deleteCustomerMutation = useDeleteCustomer();
   const updateCustomerMutation = useUpdateCustomer();
@@ -79,13 +81,13 @@ export function CustomerDetailsCard({
           },
         },
       });
-      toast.success('Customer updated successfully');
+      toast.success(t('usersManagement.customer_card.toasts.updateSuccess'));
       setIsEditing(false);
     } catch (error) {
       console.error('Failed to update customer:', error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message || 'Failed to update customer';
+          ?.data?.message || t('usersManagement.customer_card.toasts.updateError');
       toast.error(errorMessage);
     }
   };
@@ -94,13 +96,13 @@ export function CustomerDetailsCard({
     if (!id) return;
     try {
       await deleteCustomerMutation.mutateAsync(id);
-      toast.success('Customer deleted successfully');
-      navigate('/users-management/customers');
+      toast.success(t('usersManagement.customer_card.toasts.deleteSuccess'));
+      navigate('/users-management', { state: { tab: 'Customers' } });
     } catch (error) {
       console.error('Failed to delete customer:', error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message || 'Failed to delete customer';
+          ?.data?.message || t('usersManagement.customer_card.toasts.deleteError');
       toast.error(errorMessage);
       throw error;
     }
@@ -108,31 +110,32 @@ export function CustomerDetailsCard({
 
   return (
     <>
-      <Card className="bg-white shadow-sm">
+      <Card className="bg-white dark:bg-gray-800 shadow-sm border-gray-200 dark:border-gray-700">
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex gap-6">
               <div className="">
-                {/*add iamge with avatar */}
-                <Avatar className="h-20 w-20">
+                <Avatar className="h-20 w-20 ring-4 ring-primary/10">
                   {/* <AvatarImage src={customer?.logo} /> */}
-                  <AvatarFallback>{customer?.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback className="bg-primary/5 text-primary text-2xl font-bold">
+                    {customer?.name?.charAt(0) || 'C'}
+                  </AvatarFallback>
                 </Avatar>
               </div>
               <div className="">
-                <h1 className="text-xl font-bold text-gray-900 mb-2 dark:text-white">
-                  {customer?.name || 'N/A'}{' '}
+                <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                  {customer?.name || 'N/A'}
                   <Badge
                     variant={
-                      customer?.status === 'active' ? 'default' : 'secondary'
+                      customer?.status === 'active' ? 'success' : 'secondary'
                     }
-                    className="ml-2"
+                    className="capitalize"
                   >
-                    {customer?.status}
+                    {customer?.status || 'Unknown'}
                   </Badge>
                 </h1>
-                <p className="text-gray-600 text-sm dark:text-white flex ">
-                  <ScrollText className="h-4 w-4 mr-1" />{' '}
+                <p className="text-gray-600 dark:text-gray-400 text-sm flex items-center">
+                  <ScrollText className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
                   {customer?.description || 'N/A'}
                 </p>
               </div>
@@ -140,15 +143,15 @@ export function CustomerDetailsCard({
             <div className="flex gap-3">
               <Button
                 onClick={() => setIsEditing(!isEditing)}
-                className="bg-primary hover:bg-primary/90 text-white"
+                className={isEditing ? 'text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700' : 'bg-primary hover:bg-primary/90 text-white'}
                 variant={isEditing ? 'outline' : 'default'}
               >
                 {isEditing ? (
-                  <X className="h-4 w-4 mr-2" />
+                  <X className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
                 ) : (
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
                 )}
-                {isEditing ? 'Cancel Edit' : 'Edit Customer'}
+                {isEditing ? t('usersManagement.customer_card.cancelEdit') : t('usersManagement.customer_card.editCustomer')}
               </Button>
               {isEditing && (
                 <Button
@@ -156,27 +159,28 @@ export function CustomerDetailsCard({
                   className="bg-green-600 hover:bg-green-700 text-white"
                   disabled={updateCustomerMutation.isPending}
                 >
-                  <Save className="h-4 w-4 mr-2" />
+                  <Save className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
                   {updateCustomerMutation.isPending
-                    ? 'Saving...'
-                    : 'Save Changes'}
+                    ? t('usersManagement.customer_card.saving')
+                    : t('usersManagement.customer_card.saveChanges')}
                 </Button>
               )}
               <Button
                 onClick={() => setDeleteDialogOpen(true)}
-                variant="secondary"
+                variant="outline"
+                className="text-red-600 border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-900/20"
               >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
+                <Trash2 className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                {t('usersManagement.customer_card.delete')}
               </Button>
             </div>
           </div>
 
           {/* INLINE EDIT FORM GRID */}
-          <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full dark:bg-gray-900 dark:border-gray-700">
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full border border-gray-100 dark:border-gray-700">
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Name
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.name')}
               </p>
               <Input
                 value={formData.name || ''}
@@ -184,25 +188,25 @@ export function CustomerDetailsCard({
                   setFormData({ ...formData, name: e.target.value })
                 }
                 disabled={!isEditing}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Status
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.status')}
               </p>
               <Input
                 value={formData.status || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, status: e.target.value })
                 }
-                className="font-semibold capitalize"
+                className="font-semibold capitalize bg-gray-100 dark:bg-gray-800/50 h-9"
                 disabled
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Email
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.email')}
               </p>
               <Input
                 value={formData.email || ''}
@@ -210,12 +214,12 @@ export function CustomerDetailsCard({
                   setFormData({ ...formData, email: e.target.value })
                 }
                 disabled={!isEditing}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Phone
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.phone')}
               </p>
               <Input
                 value={formData.phone || ''}
@@ -223,24 +227,24 @@ export function CustomerDetailsCard({
                   setFormData({ ...formData, phone: e.target.value })
                 }
                 disabled={!isEditing}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Tenant ID
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.tenantId')}
               </p>
               <Input
                 value={customer?.tenantId || customer?.tenant?.name || ''}
                 disabled={true}
                 placeholder="System Managed"
-                className="font-semibold"
+                className="font-semibold bg-gray-100 dark:bg-gray-800/50 h-9"
               />
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                City
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.city')}
               </p>
               <Input
                 value={formData.city || ''}
@@ -248,29 +252,29 @@ export function CustomerDetailsCard({
                   setFormData({ ...formData, city: e.target.value })
                 }
                 disabled={!isEditing}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9"
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                State
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.state')}
               </p>
               <Input
                 value={formData.state || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, state: e.target.value })
                 }
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9"
                 disabled={!isEditing}
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Country
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.country')}
               </p>
               <Input
                 value={formData.country || ''}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9"
                 onChange={(e) =>
                   setFormData({ ...formData, country: e.target.value })
                 }
@@ -278,12 +282,12 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Address
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.address')}
               </p>
               <Input
                 value={formData.address || ''}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9"
                 onChange={(e) =>
                   setFormData({ ...formData, address: e.target.value })
                 }
@@ -291,12 +295,12 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Zip Code
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.zipCode')}
               </p>
               <Input
                 value={formData.zip || ''}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9"
                 onChange={(e) =>
                   setFormData({ ...formData, zip: e.target.value })
                 }
@@ -304,29 +308,32 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Created At
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.createdAt')}
               </p>
               <Input
-                value={new Date(formData.createdAt).toLocaleDateString() || ''}
-                className="font-semibold"
+                value={formData.createdAt ? new Date(formData.createdAt).toLocaleDateString() : ''}
+                className="font-semibold bg-gray-100 dark:bg-gray-800/50 h-9"
                 disabled
               />
             </div>
           </div>
+
           {/* Allocation Limits */}
-          <p className="text-lg font-semibold text-gray-900 ms-1 my-4 dark:text-white">
-            Allocation Limits
-          </p>
-          <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full dark:bg-gray-900 dark:border-gray-700">
+          <div className="flex items-center gap-2 mt-8 mb-4">
+            <Badge variant="outline" className="rounded-full bg-primary/5 text-primary border-primary/20 px-3 py-1">
+              {t('usersManagement.customer_card.labels.allocationLimits')}
+            </Badge>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 w-full border border-gray-100 dark:border-gray-700">
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Alloc. Users
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.allocUsers')}
               </p>
               <Input
                 type="number"
                 value={formData.allocatedUsers || 0}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9 transition-all focus:ring-2 focus:ring-primary/20"
                 onChange={(e) =>
                   setFormData({ ...formData, allocatedUsers: e.target.value })
                 }
@@ -335,13 +342,13 @@ export function CustomerDetailsCard({
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Alloc. Assets
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.allocAssets')}
               </p>
               <Input
                 type="number"
                 value={formData.allocatedAssets || 0}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9 transition-all focus:ring-2 focus:ring-primary/20"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -353,13 +360,13 @@ export function CustomerDetailsCard({
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Alloc. Devices
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.allocDevices')}
               </p>
               <Input
                 type="number"
                 value={formData.allocatedDevices || 0}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9 transition-all focus:ring-2 focus:ring-primary/20"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -370,13 +377,13 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Alloc. Dashboards
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.allocDashboards')}
               </p>
               <Input
                 type="number"
                 value={formData.allocatedDashboards || 0}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9 transition-all focus:ring-2 focus:ring-primary/20"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -387,13 +394,13 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Alloc. Floor Plans
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.allocFloorPlans')}
               </p>
               <Input
                 type="number"
                 value={formData.allocatedFloorPlans || 0}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9 transition-all focus:ring-2 focus:ring-primary/20"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -404,13 +411,13 @@ export function CustomerDetailsCard({
               />
             </div>
             <div className="space-y-1">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                Alloc. Automations
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.customer_card.labels.allocAutomations')}
               </p>
               <Input
                 type="number"
                 value={formData.allocatedAutomations || 0}
-                className="font-semibold"
+                className="font-semibold bg-white dark:bg-gray-800 h-9 transition-all focus:ring-2 focus:ring-primary/20"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
@@ -422,63 +429,77 @@ export function CustomerDetailsCard({
             </div>
           </div>
 
-          <p className="text-lg font-semibold text-gray-900 ms-1 my-4 dark:text-white">
-            Usage Counters{' '}
-            <small className="text-xs text-gray-500 dark:text-gray-400">
-              {' '}
-              (Read Only)
-            </small>
-          </p>
-          <div className="space-y-1 col-span-full">
-            {/* show details   in a table   */}
-            <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full dark:bg-gray-900 dark:border-gray-700">
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                  Users
-                </p>
-                <p className="text-sm font-medium text-gray-900 ">
-                  {`${customer?.usageCounters?.users ?? 0} / ${formData.allocatedUsers}`}
-                </p>
+          <div className="flex items-center gap-2 mt-8 mb-4">
+            <Badge variant="outline" className="rounded-full bg-secondary/5 text-secondary border-secondary/20 px-3 py-1">
+              {t('usersManagement.customer_card.labels.usageCounters')}
+              <span className="ml-1 text-[10px] opacity-70">{t('usersManagement.customer_card.labels.readOnly')}</span>
+            </Badge>
+          </div>
+          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 w-full border border-gray-100 dark:border-gray-700">
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.create_customer.subscription.resources.users')}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {customer?.usageCounters?.users ?? 0}
+                </span>
+                <span className="text-xs text-gray-400">/ {formData.allocatedUsers}</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                  Assets
-                </p>
-                <p className="text-sm font-medium text-gray-900 ">
-                  {`${customer?.usageCounters?.assets ?? 0} / ${formData.allocatedAssets}`}
-                </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.create_customer.subscription.resources.assets')}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {customer?.usageCounters?.assets ?? 0}
+                </span>
+                <span className="text-xs text-gray-400">/ {formData.allocatedAssets}</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                  Devices
-                </p>
-                <p className="text-sm font-medium text-gray-900 ">
-                  {`${customer?.usageCounters?.devices ?? 0} / ${formData.allocatedDevices}`}
-                </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.create_customer.subscription.resources.devices')}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {customer?.usageCounters?.devices ?? 0}
+                </span>
+                <span className="text-xs text-gray-400">/ {formData.allocatedDevices}</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                  Dashboards
-                </p>
-                <p className="text-sm font-medium text-gray-900 ">
-                  {`${customer?.usageCounters?.dashboards ?? 0} / ${formData.allocatedDashboards}`}
-                </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.create_customer.subscription.resources.dashboards')}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {customer?.usageCounters?.dashboards ?? 0}
+                </span>
+                <span className="text-xs text-gray-400">/ {formData.allocatedDashboards}</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                  Floor Plans
-                </p>
-                <p className="text-sm font-medium text-gray-900 ">
-                  {`${customer?.usageCounters?.floorPlans ?? 0} / ${formData.allocatedFloorPlans}`}
-                </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.create_customer.subscription.resources.floorPlans')}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {customer?.usageCounters?.floorPlans ?? 0}
+                </span>
+                <span className="text-xs text-gray-400">/ {formData.allocatedFloorPlans}</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                  Automations
-                </p>
-                <p className="text-sm font-medium text-gray-900 ">
-                  {`${customer?.usageCounters?.automations ?? 0} / ${formData.allocatedAutomations}`}
-                </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                {t('usersManagement.create_customer.subscription.resources.automations')}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {customer?.usageCounters?.automations ?? 0}
+                </span>
+                <span className="text-xs text-gray-400">/ {formData.allocatedAutomations}</span>
               </div>
             </div>
           </div>
@@ -489,7 +510,7 @@ export function CustomerDetailsCard({
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        title="Delete Customer"
+        title={t('usersManagement.customer_card.modals.deleteTitle')}
         itemName={customer?.name}
         isLoading={deleteCustomerMutation.isPending}
       />

@@ -706,6 +706,480 @@
     "permissions": "Permissions",
     "lastLogin": "Last Login"
   },
+  "usersManagement": {
+    "title": "Users and Roles Management",
+    "description": "Manage users and their roles",
+    "tabs": {
+      "users": "Users",
+      "customers": "Customers",
+      "roles": "Roles"
+    },
+    "add": {
+      "user": "Add User",
+      "customer": "Add Customer",
+      "role": "Add Role"
+    },
+    "common": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone Number",
+      "role": "Role",
+      "status": "Status",
+      "description": "Description",
+      "city": "City",
+      "state": "State/Province",
+      "address": "Address",
+      "zip": "Zip/Postal Code",
+      "country": "Country",
+      "requiredFields": "* Required fields",
+      "cancel": "Cancel",
+      "save": "Save",
+      "update": "Update",
+      "actions": "Actions",
+      "created": "Created",
+      "customer": "Customer",
+      "type": "Type"
+    },
+    "create_user": {
+      "title": "Add New User",
+      "userDetails": "User Details",
+      "placeholders": {
+        "name": "Enter name",
+        "email": "Enter email address",
+        "phone": "Enter phone number",
+        "role": "Select role",
+        "customer": "Select customer"
+      },
+      "validation": {
+        "name": "Name is required",
+        "email": "Email must be valid",
+        "phone": "Phone number is required",
+        "role": "Role is required",
+        "customer": "Customer is required"
+      }
+    },
+    "create_customer": {
+      "title": "Add New Customer",
+      "info": "Customer Information",
+      "limits": "Allocated Limits",
+      "actionDescription": "Action Description",
+      "saveAndAdd": "Save and Add",
+      "subscription": {
+        "title": "Current Subscription",
+        "plan": "Active Plan",
+        "resources": {
+          "users": "Users",
+          "devices": "Devices",
+          "assets": "Assets",
+          "dashboards": "Dashboards",
+          "floorPlans": "Floor Plans",
+          "automations": "Automations"
+        }
+      },
+      "placeholders": {
+        "name": "Enter customer name",
+        "email": "Enter contact email",
+        "phone": "Enter phone number",
+        "description": "Enter description",
+        "city": "Enter city",
+        "state": "Enter state/province",
+        "address": "Enter address",
+        "zip": "Enter zip/postal code",
+        "country": "Enter country"
+      }
+    },
+    "create_role": {
+      "title": "Create Role",
+      "editTitle": "Edit Role",
+      "info": "Role Information",
+      "permissions": "Permissions",
+      "selectAll": "Select All",
+      "clearAll": "Clear All",
+      "validation": {
+        "name": "Role name is required",
+        "permissions": "At least one permission must be selected"
+      },
+      "placeholders": {
+        "name": "Enter role name",
+        "description": "Enter role description..."
+      }
+    },
+    "bulk_management": {
+      "title": "Bulk User Management",
+      "description": "Perform actions on multiple users simultaneously",
+      "selectedBanner": "Total {{count}} users selected",
+      "availableActions": "Available Actions",
+      "sections": {
+        "userStatus": "User Status",
+        "roleManagement": "Role Management",
+        "communication": "Communication",
+        "dataManagement": "Data Management"
+      },
+      "actions": {
+        "activate": "Activate Users",
+        "deactivate": "Deactivate Users",
+        "suspend": "Suspend Users",
+        "delete": "Delete Users",
+        "assignRole": "Assign Role",
+        "removeRole": "Remove Role",
+        "updatePermissions": "Update Permissions",
+        "sendEmail": "Send Email",
+        "sendNotification": "Send Notification",
+        "exportData": "Export Data",
+        "bulkImport": "Bulk Import",
+        "readyToExecute": "Ready to execute on {{count}} users"
+      },
+      "modals": {
+        "status": {
+          "title": "Confirm Bulk Status Change",
+          "description": "Are you sure you want to change the status of {{count}} users to {{status}}?"
+        },
+        "delete": {
+          "title": "Confirm Bulk Deletion",
+          "description": "Are you sure you want to delete {{count}} users? This action cannot be undone."
+        },
+        "role": {
+          "assignTitle": "Assign Role",
+          "removeTitle": "Remove Role",
+          "description": "Select a role to {{action}} {{count}} users.",
+          "placeholder": "Select a role"
+        },
+        "communication": {
+          "emailTitle": "Send Email",
+          "notifTitle": "Send Notification",
+          "description": "Enter the message you want to send to {{count}} users.",
+          "subject": "Subject",
+          "notifTitleLabel": "Title",
+          "type": "Type",
+          "priority": "Priority",
+          "message": "Message",
+          "sending": "Sending...",
+          "send": "Send {{type}}"
+        },
+        "export": {
+          "title": "Export Users",
+          "description": "Select the format you want to export user data in.",
+          "format": "Format",
+          "exporting": "Exporting...",
+          "exportNow": "Export Now"
+        },
+        "import": {
+          "title": "Bulk Import Users",
+          "description": "Select a CSV or JSON file containing user data to import.",
+          "selectFile": "Select File",
+          "selected": "Selected: {{name}} ({{size}} KB)",
+          "importNow": "Import Now",
+          "importing": "Importing..."
+        },
+        "toasts": {
+          "statusSuccess": "Users status updated successfully",
+          "statusError": "Failed to update users status",
+          "roleSuccess": "Successfully {{action}} role",
+          "roleError": "Failed to update roles",
+          "deleteSuccess": "Users deleted successfully",
+          "deleteError": "Failed to delete users",
+          "emailSuccess": "Emails sent successfully",
+          "emailError": "Failed to send emails",
+          "notifSuccess": "Notifications sent successfully",
+          "notifError": "Failed to send notifications",
+          "exportSuccess": "Users exported successfully",
+          "exportError": "Failed to export users",
+          "importSuccess": "Successfully imported {{imported}} users. {{failed}} failed.",
+          "importError": "Failed to import users"
+        },
+        "validation": {
+          "selectRole": "Please select a role",
+          "enterMessage": "Please enter a message",
+          "enterSubject": "Please enter a subject",
+          "enterTitle": "Please enter a notification title",
+          "selectFile": "Please select a file to import",
+          "selectAction": "Please select at least one action"
+        },
+        "feedback": {
+          "executing": "Executing {{actionCount}} action(s) on {{userCount}} users",
+          "comingSoon": "Preview functionality coming soon"
+        }
+      }
+    },
+    "role_permissions": {
+      "title": "Role : {{name}}",
+      "description": "Description: {{description}}",
+      "headers": {
+        "permission": "PERMISSION",
+        "description": "DESCRIPTION",
+        "access": "ACCESS",
+        "create": "CREATE",
+        "read": "READ",
+        "update": "UPDATE",
+        "delete": "DELETE"
+      },
+      "systemRoleWarning": "You cannot edit System Roles",
+      "editRoles": "Edit Roles",
+      "cancel": "Cancel"
+    },
+    "role_permission_management": {
+      "roleTitle": "Role : {{name}}",
+      "descTitle": "Description: {{desc}}",
+      "table": {
+        "permission": "PERMISSION",
+        "description": "DESCRIPTION",
+        "access": "ACCESS",
+        "create": "CREATE",
+        "read": "READ",
+        "update": "UPDATE",
+        "delete": "DELETE"
+      },
+      "warning": "You cannot edit System Roles"
+    },
+    "customer_details": {
+      "tabs": {
+        "permissions": "Permissions",
+        "assignedUsers": "Assigned Users",
+        "devices": "Devices",
+        "activityLogs": "Activity Logs"
+      },
+      "matrixTitle": "Permission Matrix",
+      "legend": {
+        "granted": "Granted Permission",
+        "denied": "Denied Permission"
+      }
+    },
+    "user_details": {
+      "tabs": {
+        "permissions": "Permissions",
+        "devices": "Devices",
+        "activityLogs": "Activity Log"
+      },
+      "matrix": {
+        "title": "Permission Matrix",
+        "description": "Individual and role-based permissions granted to this user.",
+        "showOnlyGranted": "Show Only Granted",
+        "actionsCount": "{{count}} Actions",
+        "granted": "Permission Granted",
+        "denied": "Permission Denied"
+      },
+      "actions": {
+        "editPermissions": "Edit Permissions",
+        "saveChanges": "Save Changes"
+      }
+    },
+    "assign_permissions": {
+      "title": "Assign Permissions",
+      "userLabel": "User: {{email}}",
+      "search": {
+        "available": "Search permissions...",
+        "assigned": "Search assigned..."
+      },
+      "panels": {
+        "available": "Available Permissions",
+        "assigned": "Assigned Permissions",
+        "summary": "Permission Summary"
+      },
+      "summary": {
+        "noAssigned": "No assigned permissions",
+        "currentRole": "Current Role",
+        "totalPermissions": "Total Permissions",
+        "assignedCount": "{{count}} assigned",
+        "level": "Permission Level",
+        "lastModified": "Last Modified"
+      },
+      "levels": {
+        "high": "High",
+        "moderate": "Moderate",
+        "low": "Low"
+      },
+      "toasts": {
+        "selectFirst": "Please select a permission to add",
+        "alreadyAssigned": "Permission already assigned",
+        "added": "Added permission: {{label}}",
+        "removed": "Removed permission: {{label}}",
+        "saved": "Permissions saved successfully"
+      }
+    },
+    "customer_card": {
+      "editCustomer": "Edit Customer",
+      "cancelEdit": "Cancel Edit",
+      "saveChanges": "Save Changes",
+      "saving": "Saving...",
+      "delete": "Delete",
+      "labels": {
+        "name": "Name",
+        "status": "Status",
+        "email": "Email",
+        "phone": "Phone",
+        "tenantId": "Tenant ID",
+        "city": "City",
+        "state": "State",
+        "country": "Country",
+        "address": "Address",
+        "zipCode": "Zip Code",
+        "createdAt": "Created At",
+        "allocationLimits": "Allocation Limits",
+        "usageCounters": "Usage Counters",
+        "readOnly": "(Read Only)",
+        "allocUsers": "Alloc. Users",
+        "allocAssets": "Alloc. Assets",
+        "allocDevices": "Alloc. Devices",
+        "allocDashboards": "Alloc. Dashboards",
+        "allocFloorPlans": "Alloc. Floor Plans",
+        "allocAutomations": "Alloc. Automations"
+      },
+      "toasts": {
+        "updateSuccess": "Customer updated successfully",
+        "updateError": "Failed to update customer",
+        "deleteSuccess": "Customer deleted successfully",
+        "deleteError": "Failed to delete customer"
+      },
+      "modals": {
+        "deleteTitle": "Delete Customer"
+      }
+    },
+    "user_card": {
+      "editUser": "Edit User",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "placeholders": {
+        "enterName": "Enter name",
+        "enterPhone": "Enter phone number",
+        "enterCompany": "Enter company name"
+      },
+      "labels": {
+        "emailAddress": "Email Address",
+        "phoneNumber": "Phone Number",
+        "company": "Company",
+        "lastLogin": "Last Login",
+        "createdAt": "Created At",
+        "lastUpdated": "Last Updated",
+        "noRole": "No Role"
+      },
+      "toasts": {
+        "updateSuccess": "User updated successfully",
+        "updateError": "Failed to update user",
+        "deleteSuccess": "User {{name}} deleted successfully",
+        "deleteError": "Failed to delete user"
+      }
+    },
+    "customer_users_list": {
+      "title": "Assigned Users",
+      "displayHierarchical": "Display Hierarchical",
+      "noUsers": "No users available.",
+      "selectCustomer": "Select a customer to view users.",
+      "table": {
+        "user": "USER",
+        "email": "EMAIL",
+        "role": "ROLE",
+        "status": "STATUS",
+        "created": "CREATED"
+      }
+    },
+    "activity_log": {
+      "noActivity": "No activity available.",
+      "noUserActivity": "No specific activity available for this user.",
+      "headers": {
+        "description": "Description",
+        "action": "Action",
+        "date": "Date"
+      }
+    },
+    "hierarchy": {
+      "title": "User Hierarchy Authorization",
+      "visualRep": "Visual representation of users within {{name}}",
+      "exploreStructure": "Explore the organizational structure of users.",
+      "refining": "Refining hierarchy mapping...",
+      "orgRoot": "Organization Root",
+      "noData": "No hierarchy data available",
+      "ensureUsers": "Please ensure users are assigned to this customer.",
+      "legend": {
+        "org": "Organization",
+        "role": "Functional Role",
+        "active": "Active User",
+        "inactive": "Inactive/Other"
+      },
+      "stats": "{{count}} Users Total"
+    },
+    "users_tab": {
+      "title": "All Users",
+      "tabs": {
+        "all": "All",
+        "customer_user": "Customer User",
+        "customer": "Customer"
+      },
+      "bulkEdit": "Edit Bulk Data ({{count}})",
+      "noUsers": "No users found",
+      "tooltips": {
+        "delete": "Delete User",
+        "view": "View Details"
+      },
+      "toasts": {
+        "deleteSuccess": "User {{name}} deleted successfully",
+        "statusUpdated": "User status updated to {{status}}",
+        "statusUpdateError": "Failed to update user status"
+      },
+      "statusConfirm": {
+        "title": "Confirm Status Change",
+        "description": "Are you sure you want to {{action}} user {{name}}?",
+        "activate": "activate",
+        "deactivate": "deactivate"
+      }
+    },
+    "roles_tab": {
+      "title": " Roles Management",
+      "noRoles": "No Roles Found",
+      "tooltips": {
+        "manage": "Manage Role"
+      },
+      "toasts": {
+        "deleteSuccess": "Role deleted successfully",
+        "deleteError": "Failed to delete role"
+      },
+      "summary": {
+        "total": "Total Roles",
+        "system": "System Roles",
+        "custom": "Custom Roles"
+      },
+      "type": {
+        "system": "System",
+        "custom": "Custom"
+      }
+    },
+    "customers_tab": {
+      "title": "All Customers",
+      "noCustomers": "No customers found",
+      "tooltips": {
+        "assign": "Assign users",
+        "view": "View Customer",
+        "delete": "Delete Customer"
+      },
+      "toasts": {
+        "deleteSuccess": "Customer deleted successfully",
+        "deleteError": "Failed to delete customer"
+      }
+    },
+    "association": {
+      "title": "Customer User Association",
+      "availableUsers": "Available Users",
+      "assignedUsers": "Assigned Users",
+      "selectToAssign": "Select the User you want to Assign",
+      "selectCustomerToAssign": "Select Customer to Assign the Selected User",
+      "noAvailable": "No available users",
+      "assign": "Assign",
+      "remove": "Remove",
+      "summary": {
+        "title": "Assignment Summary",
+        "userStats": "User Statistics",
+        "availableStats": "Available Users",
+        "totalAssigned": "Total Assigned:",
+        "administrators": "Administrators:",
+        "managers": "Managers:",
+        "regularUsers": "Regular Users:",
+        "unassigned": "Unassigned:",
+        "filtered": "Filtered Results:",
+        "bulkAssign": "Bulk Assign Role",
+        "exportList": "Export List"
+      }
+    }
+  },
   "floorplans": {
     "title": "Floor Plans",
     "subtitle": "Manage and monitor all your floor plans",

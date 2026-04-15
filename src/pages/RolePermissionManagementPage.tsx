@@ -13,10 +13,201 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { PageHeader } from '@/components/common/PageHeader';
-import { toast } from 'react-hot-toast';
 import { useRoleById } from '@/features/roles/hooks';
 import type { Permission } from '@/services/api/users.api';
 import { FileWarningIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+export default function RolePermissionManagementPage() {
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { data } = useRoleById(id);
+  const [permissionCategory, setPermissionCategory] = useState('');
+  const [permissions, setPermissions] = useState<PermissionRow[]>([]);
+  const isSystemRole = data?.isSystem;
+  const role = data as
+    | { permissions?: RolePermission[]; name?: string; description?: string }
+    | undefined;
+  const allPermissions = useMemo(() => role?.permissions ?? [], [role]);
+
+  const permissionRows = useMemo(
+    () => toPermissionRows(allPermissions),
+    [allPermissions]
+  );
+
+  const categories = useMemo(
+    () => Array.from(new Set(permissionRows.map((row) => row.category))),
+    [permissionRows]
+  );
+
+  useEffect(() => {
+    setPermissions(permissionRows);
+    if (!permissionCategory && categories.length > 0) {
+      setPermissionCategory(categories[0]);
+    }
+  }, [permissionRows, categories, permissionCategory]);
+
+  const handleCategoryChange = (category: string) => {
+    setPermissionCategory(category);
+  };
+
+  const handleCancel = () => {
+    navigate('/users-management', { state: { tab: 'Roles' } });
+  };
+
+  const handleEdit = () => {
+    navigate(`/users-management/edit-role/${id}`);
+  };
+
+  return (
+    <div className="min-h-screen bg-transparent dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <div className="mx-auto space-y-6">
+        <PageHeader
+          title={t('usersManagement.role_permission_management.roleTitle', { name: role?.name || '' })}
+          description={t('usersManagement.role_permission_management.descTitle', { desc: role?.description || '' })}
+        />
+
+        <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+          <CardContent className="p-6 space-y-6">
+            {/* Category Tabs */}
+            <Tabs
+              value={permissionCategory}
+              onValueChange={handleCategoryChange}
+              defaultValue={categories[0]}
+            >
+              <TabsList className="w-full justify-start rounded-none overflow-x-auto border-b border-gray-200 dark:border-gray-700 bg-transparent p-0 h-auto">
+                {categories.map((category) => (
+                  <TabsTrigger
+                    key={category}
+                    value={category}
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary dark:data-[state=active]:border-secondary data-[state=active]:bg-transparent data-[state=active]:text-primary dark:data-[state=active]:text-secondary text-gray-500 dark:text-gray-400 px-4 py-2"
+                  >
+                    {category.replace('_', ' ')}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+
+            {/* Permissions Table */}
+            <div className="shadow-sm rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-secondary dark:bg-secondary/80 hover:bg-secondary/90">
+                    <TableHead className="text-white font-semibold">
+                      {t('usersManagement.role_permission_management.table.permission')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold">
+                      {t('usersManagement.role_permission_management.table.description')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold text-center">
+                      {t('usersManagement.role_permission_management.table.access')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold text-center">
+                      {t('usersManagement.role_permission_management.table.create')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold text-center">
+                      {t('usersManagement.role_permission_management.table.read')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold text-center">
+                      {t('usersManagement.role_permission_management.table.update')}
+                    </TableHead>
+                    <TableHead className="text-white font-semibold text-center">
+                      {t('usersManagement.role_permission_management.table.delete')}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {permissions
+                    .filter((permission) =>
+                      permissionCategory
+                        ? permission.category === permissionCategory
+                        : true
+                    )
+                    .map((permission) => (
+                      <TableRow
+                        key={permission.id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700"
+                      >
+                        <TableCell className="font-medium dark:text-gray-200">
+                          <div className="flex items-center gap-2">
+                            {permission.permission}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-gray-600 dark:text-gray-400">
+                          {permission.description}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            disabled={true}
+                            checked={isChecked(permission.access)}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            disabled={true}
+                            checked={isChecked(permission.create)}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            disabled={true}
+                            checked={isChecked(permission.read)}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            disabled={true}
+                            checked={isChecked(permission.update)}
+                          />
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox
+                            disabled={true}
+                            checked={isChecked(permission.delete)}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </div>
+            {isSystemRole ? (
+              <div className="text-center text-gray-500 dark:text-gray-400">
+                <p className="flex w-full items-center justify-center">
+                  <FileWarningIcon className="h-4 w-4 mr-2 text-red-500" />
+                  {t('usersManagement.role_permission_management.warning')}
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-start justify-between pt-4">
+                <div className="flex justify-end w-full gap-3 items-end">
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleEdit}
+                      className="bg-secondary hover:bg-secondary/90 text-white"
+                    >
+                      {t('usersManagement.role_permission_management.editRoles') || 'Edit Roles'}
+                    </Button>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleCancel}
+                      variant="outline"
+                      className="dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
+                    >
+                      {t('usersManagement.common.cancel')}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
 
 type PermissionStatus = 'allowed' | 'denied' | 'conditional';
 
@@ -35,7 +226,7 @@ interface PermissionRow {
 const normalizeCategory = (resource: string) =>
   resource
     .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(part.startsWith(' ') ? 1 : 1))
     .join(' ');
 
 type RolePermission = Permission & {
@@ -86,190 +277,3 @@ const toPermissionRows = (permissions: RolePermission[]): PermissionRow[] => {
 };
 
 const isChecked = (status: PermissionStatus) => status === 'allowed';
-
-export default function RolePermissionManagementPage() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { data } = useRoleById(id);
-  const [permissionCategory, setPermissionCategory] = useState('');
-  const [permissions, setPermissions] = useState<PermissionRow[]>([]);
-  const isSystemRole = data?.isSystem;
-  const role = data as
-    | { permissions?: RolePermission[]; name?: string; description?: string }
-    | undefined;
-  const allPermissions = useMemo(() => role?.permissions ?? [], [role]);
-
-  const permissionRows = useMemo(
-    () => toPermissionRows(allPermissions),
-    [allPermissions]
-  );
-
-  const categories = useMemo(
-    () => Array.from(new Set(permissionRows.map((row) => row.category))),
-    [permissionRows]
-  );
-
-  useEffect(() => {
-    setPermissions(permissionRows);
-    if (!permissionCategory && categories.length > 0) {
-      setPermissionCategory(categories[0]);
-    }
-  }, [permissionRows, categories, permissionCategory]);
-
-  const handleCategoryChange = (category: string) => {
-    setPermissionCategory(category);
-  };
-
-  const handleCancel = () => {
-    navigate('/users-management', { state: { tab: 'Roles' } });
-  };
-
-  const handleEdit = () => {
-    navigate(`/users-management/edit-role/${id}`);
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
-      <div className="mx-auto space-y-6">
-        <PageHeader
-          title={`Role : ${role?.name || ''}`}
-          description={`Description: ${role?.description || ''}`}
-        />
-
-        <Card className="bg-white shadow-sm">
-          <CardContent className="p-6 space-y-6">
-            {/* Category Tabs */}
-            <Tabs
-              value={permissionCategory}
-              onValueChange={handleCategoryChange}
-              defaultValue={categories[0]}
-            >
-              <TabsList className="w-full justify-start rounded-none overflow-x-auto border-b border-gray-200  bg-transparent p-0 h-auto">
-                {categories.map((category) => (
-                  <TabsTrigger
-                    key={category}
-                    value={category}
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-4 py-2"
-                  >
-                    {category.replace('_', ' ')}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-
-            {/* Permissions Table */}
-            <div className=" shadow rounded-lg overflow-hidden">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-primary hover:bg-primary">
-                    <TableHead className="text-white font-semibold">
-                      PERMISSION
-                    </TableHead>
-                    <TableHead className="text-white font-semibold">
-                      DESCRIPTION
-                    </TableHead>
-                    <TableHead className="text-white font-semibold text-center">
-                      ACCESS
-                    </TableHead>
-                    <TableHead className="text-white font-semibold text-center">
-                      CREATE
-                    </TableHead>
-                    <TableHead className="text-white font-semibold text-center">
-                      READ
-                    </TableHead>
-                    <TableHead className="text-white font-semibold text-center">
-                      UPDATE
-                    </TableHead>
-                    <TableHead className="text-white font-semibold text-center">
-                      DELETE
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {permissions
-                    .filter((permission) =>
-                      permissionCategory
-                        ? permission.category === permissionCategory
-                        : true
-                    )
-                    .map((permission) => (
-                      <TableRow
-                        key={permission.id}
-                        className="hover:bg-gray-50"
-                      >
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            {permission.permission}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-gray-600">
-                          {permission.description}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Checkbox
-                            disabled={true}
-                            checked={isChecked(permission.access)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Checkbox
-                            disabled={true}
-                            checked={isChecked(permission.create)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Checkbox
-                            disabled={true}
-                            checked={isChecked(permission.read)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Checkbox
-                            disabled={true}
-                            checked={isChecked(permission.update)}
-                          />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Checkbox
-                            disabled={true}
-                            checked={isChecked(permission.delete)}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
-            {isSystemRole ? (
-              <div className="text-center text-gray-600">
-                {/* add warning icon */}
-                <p className="flex w-full  items-center justify-center">
-                  <FileWarningIcon className="h-4 w-4 mr-2 text-red-500 " />
-                  You cannot edit System Roles
-                </p>
-              </div>
-            ) : (
-              <div className="flex items-start justify-between pt-4">
-                {/* Legend */}
-
-                {/* Action Buttons */}
-                <div className="flex  justify-end w-full gap-3 items-end">
-                  <div className="flex gap-3">
-                    <Button onClick={handleEdit} variant="primary">
-                      Edit Roles
-                    </Button>
-                  </div>
-                  <div className="flex gap-3">
-                    <Button onClick={handleCancel} variant="outline">
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}

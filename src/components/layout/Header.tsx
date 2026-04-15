@@ -1,16 +1,5 @@
-// src/components/layout/Header.tsx - COMPLETE WITH EVERYTHING
 import { useState, useRef, useEffect } from 'react';
-import {
-  Bell,
-  User,
-  Menu,
-  Settings,
-  LogOut,
-  Sun,
-  Moon,
-  Monitor,
-  ChevronLeft,
-} from 'lucide-react';
+import { Bell, Menu, Settings, LogOut, Sun, Moon, Monitor } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRTL } from '@/hooks/useRTL';
 import { useAppStore } from '@/stores/useAppStore';
@@ -30,7 +19,8 @@ import type {
 } from '@/services/api/notifications.api';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useCurrentSubscription } from '@/features/Subscription/hooks';
-import { Button } from '../ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import userfallbackimg from '@/assets/images/user_alt.png';
 
 export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const navigate = useNavigate();
@@ -131,6 +121,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const username = user?.firstName + ' ' + user?.lastName;
   const truncatedUsername =
     username.length > 15 ? username.slice(0, 15) + '...' : username;
+
   return (
     <header
       className={cn(
@@ -184,7 +175,6 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         </div>
       </div>
 
-    
       {/* Right Section */}
       <div
         className={cn(
@@ -236,7 +226,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'light' &&
-                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Sun className="h-4 w-4" />
@@ -252,7 +242,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'dark' &&
-                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Moon className="h-4 w-4" />
@@ -268,7 +258,7 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
                   'dark:hover:bg-gray-700 transition-colors',
                   direction === 'rtl' && 'flex-row-reverse text-right',
                   theme === 'auto' &&
-                  'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
+                    'bg-gray-50 dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 font-medium'
                 )}
               >
                 <Monitor className="h-4 w-4" />
@@ -407,13 +397,22 @@ export const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
               setIsProfileOpen(true);
             }}
             className={cn(
-              'flex items-center gap-2 cursor-pointer hover:bg-gray-100',
+              'flex items-center gap-4   cursor-pointer  bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700',
               'dark:hover:bg-gray-800 rounded-lg px-3 py-2 transition-colors',
               direction === 'rtl' && 'flex-row '
             )}
           >
-            <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
-              <User className="h-4 w-4 text-white" />
+            <div className="w-8 h-8 rounded-full flex items-center justify-center">
+              <Avatar>
+                <AvatarImage
+                  src={user?.avatar || userfallbackimg}
+                  alt="User_Image"
+                />
+                <AvatarFallback className="bg-primary text-white">
+                  {(user?.firstName?.charAt(0) || '') +
+                    (user?.lastName?.charAt(0) || '')}
+                </AvatarFallback>
+              </Avatar>
             </div>
             <div
               className={cn(

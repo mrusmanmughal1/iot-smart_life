@@ -21,12 +21,14 @@ import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface UserDetailsCardProps {
   user: User | undefined;
 }
 
 export function UserDetailsCard({ user }: UserDetailsCardProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const deleteUserMutation = useDeleteUser();
   const updateUserMutation = useUpdateUser();
@@ -53,14 +55,14 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
     if (user) {
       deleteUserMutation.mutate(user.id, {
         onSuccess: () => {
-          toast.success(`User ${user.name || user.email} deleted successfully`);
+          toast.success(t('usersManagement.user_card.toasts.deleteSuccess', { name: user.name || user.email }));
           navigate('/users-management', { state: { tab: 'Users' } });
         },
         onError: (error: unknown) => {
           console.error('Failed to delete user:', error);
           const errorMessage =
             (error as { response?: { data?: { message?: string } } })?.response
-              ?.data?.message || 'Failed to delete user';
+              ?.data?.message || t('usersManagement.user_card.toasts.deleteError');
           toast.error(errorMessage);
         },
       });
@@ -93,14 +95,14 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
       { userId: user.id, data: formData },
       {
         onSuccess: () => {
-          toast.success('User updated successfully');
+          toast.success(t('usersManagement.user_card.toasts.updateSuccess'));
           setIsEditing(false);
         },
         onError: (error: unknown) => {
           console.error('Failed to update user:', error);
           const errorMessage =
             (error as { response?: { data?: { message?: string } } })?.response
-              ?.data?.message || 'Failed to update user';
+              ?.data?.message || t('usersManagement.user_card.toasts.updateError');
           toast.error(errorMessage);
         },
       }
@@ -109,7 +111,7 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
 
   return (
     <>
-      <Card className="bg-white shadow-sm border-gray-200">
+      <Card className="bg-white dark:bg-gray-800 shadow-sm border-gray-200 dark:border-gray-700">
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
             <div className="flex items-center gap-5">
@@ -127,8 +129,8 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
                       name="name"
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="text-2xl font-bold text-gray-900 dark:text-white h-10 w-64"
-                      placeholder="Enter name"
+                      className="text-2xl font-bold text-gray-900 dark:text-white h-10 w-64 bg-white dark:bg-gray-900"
+                      placeholder={t('usersManagement.user_card.placeholders.enterName')}
                     />
                   ) : (
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -141,14 +143,15 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
                         ? 'success'
                         : 'secondary'
                     }
+                    className="capitalize"
                   >
                     {user?.status || 'Unknown'}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-2 text-gray-500 text-sm">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
                   <Shield className="h-4 w-4" />
                   <span className="capitalize">
-                    {user?.roles?.[0]?.name?.replace('_', ' ') || 'No Role'}
+                    {user?.roles?.[0]?.name?.replace('_', ' ') || t('usersManagement.user_card.labels.noRole')}
                   </span>
                 </div>
               </div>
@@ -161,17 +164,17 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
                     className="bg-green-600 hover:bg-green-700 text-white"
                     isLoading={updateUserMutation.isPending}
                   >
-                    <Check className="h-4 w-4 mr-2" />
-                    Save
+                    <Check className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                    {t('usersManagement.user_card.save')}
                   </Button>
                   <Button
                     onClick={handleEditToggle}
                     variant="outline"
-                    className="text-gray-600 border-gray-200 hover:bg-gray-50"
+                    className="text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
                     disabled={updateUserMutation.isPending}
                   >
-                    <X className="h-4 w-4 mr-2" />
-                    Cancel
+                    <X className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                    {t('usersManagement.user_card.cancel')}
                   </Button>
                 </>
               ) : (
@@ -180,16 +183,16 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
                     onClick={handleEditToggle}
                     className="bg-primary hover:bg-primary/90 text-white"
                   >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit User
+                    <Edit className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                    {t('usersManagement.user_card.editUser')}
                   </Button>
                   <Button
                     onClick={() => setDeleteModalOpen(true)}
                     variant="outline"
-                    className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                    className="text-red-600 border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
+                    <Trash2 className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                    {t('usersManagement.user_card.delete')}
                   </Button>
                 </>
               )}
@@ -198,30 +201,30 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-transparent dark:border-gray-700">
                 <Mail className="h-5 w-5 text-gray-400" />
                 <div>
-                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                    Email Address
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                    {t('usersManagement.user_card.labels.emailAddress')}
                   </p>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {user?.email || 'N/A'}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-transparent dark:border-gray-700">
                 <Phone className="h-5 w-5 text-gray-400" />
                 <div className="flex-1">
-                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                    Phone Number
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                    {t('usersManagement.user_card.labels.phoneNumber')}
                   </p>
                   {isEditing ? (
                     <Input
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="h-8 mt-1 text-sm font-semibold text-gray-900 dark:text-white"
-                      placeholder="Enter phone number"
+                      className="h-8 mt-1 text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-800"
+                      placeholder={t('usersManagement.user_card.placeholders.enterPhone')}
                     />
                   ) : (
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -233,19 +236,19 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-transparent dark:border-gray-700">
                 <Building className="h-5 w-5 text-gray-400" />
                 <div className="flex-1">
-                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                    Company
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                    {t('usersManagement.user_card.labels.company')}
                   </p>
                   {isEditing ? (
                     <Input
                       name="companyName"
                       value={formData.companyName}
                       onChange={handleInputChange}
-                      className="h-8 mt-1 text-sm font-semibold text-gray-900 dark:text-white"
-                      placeholder="Enter company name"
+                      className="h-8 mt-1 text-sm font-semibold text-gray-900 dark:text-white bg-white dark:bg-gray-800"
+                      placeholder={t('usersManagement.user_card.placeholders.enterCompany')}
                     />
                   ) : (
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -254,11 +257,11 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-transparent dark:border-gray-700">
                 <Clock className="h-5 w-5 text-gray-400" />
                 <div>
-                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                    Last Login
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                    {t('usersManagement.user_card.labels.lastLogin')}
                   </p>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {user?.lastLoginAt
@@ -270,11 +273,11 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-transparent dark:border-gray-700">
                 <Calendar className="h-5 w-5 text-gray-400" />
                 <div>
-                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                    Created At
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                    {t('usersManagement.user_card.labels.createdAt')}
                   </p>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {user?.createdAt
@@ -283,11 +286,11 @@ export function UserDetailsCard({ user }: UserDetailsCardProps) {
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-900/50 border border-transparent dark:border-gray-700">
                 <Calendar className="h-5 w-5 text-gray-400" />
                 <div>
-                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wider">
-                    Last Updated
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                    {t('usersManagement.user_card.labels.lastUpdated')}
                   </p>
                   <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {user?.updatedAt

@@ -17,19 +17,10 @@ import {
   useUpdateRole,
 } from '@/features/roles/hooks';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-
-// Zod validation schema
-const createRoleSchema = z.object({
-  name: z.string().min(1, 'Role name is required').trim(),
-  description: z.string().optional(),
-  permissionIds: z
-    .array(z.string())
-    .min(1, 'At least one permission must be selected'),
-});
-
-type CreateRoleFormData = z.infer<typeof createRoleSchema>;
+import { useTranslation } from 'react-i18next';
 
 export default function CreateRolePage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const isEditMode = !!id;
   const navigate = useNavigate();
@@ -40,6 +31,17 @@ export default function CreateRolePage() {
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
     {}
   );
+
+  // Zod validation schema
+  const createRoleSchema = z.object({
+    name: z.string().min(1, t('usersManagement.create_role.validation.name')).trim(),
+    description: z.string().optional(),
+    permissionIds: z
+      .array(z.string())
+      .min(1, t('usersManagement.create_role.validation.permissions')),
+  });
+
+  type CreateRoleFormData = z.infer<typeof createRoleSchema>;
 
   const {
     register,
@@ -149,41 +151,41 @@ export default function CreateRolePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 ">
+    <div className="min-h-screen bg-transparent dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <h1 className="text-xl font-semibold text-gray-900 mb-6">
-          {isEditMode ? 'Edit Role' : 'Create Role'}
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+          {isEditMode ? t('usersManagement.create_role.editTitle') : t('usersManagement.create_role.title')}
         </h1>
 
         {/* Two Column Layout */}
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Left Column - Role Details */}
-            <Card className="shadow-lg rounded-xl border-gray-200">
+            <Card className="shadow-lg rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
               {isRoleLoading ? (
                 <div className="flex h-48 items-center justify-center">
                   <Loader2 className="h-8 w-8 animate-spin text-secondary" />
                 </div>
               ) : (
                 <CardContent className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                    Role Information
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {t('usersManagement.create_role.info')}
                   </h2>
                   <div className="space-y-4">
                     {/* Role Name */}
                     <div>
                       <label
                         htmlFor="name"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Role Name <span className="text-red-500">*</span>
+                        {t('usersManagement.create_role.placeholders.name')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="name"
                         {...register('name')}
-                        placeholder="Enter role name"
-                        className="w-full border border-gray-300 rounded-md"
+                        placeholder={t('usersManagement.create_role.placeholders.name')}
+                        className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                       />
                       {errors.name && (
                         <p className="mt-1 text-sm text-red-600">
@@ -196,36 +198,21 @@ export default function CreateRolePage() {
                     <div>
                       <label
                         htmlFor="description"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Description
+                        {t('usersManagement.common.description')}
                       </label>
                       <Textarea
                         id="description"
                         {...register('description')}
-                        placeholder="Enter role description..."
-                        className="min-h-[100px] w-full border border-gray-300 rounded-md"
+                        placeholder={t('usersManagement.create_role.placeholders.description')}
+                        className="min-h-[100px] w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                       />
                     </div>
 
-                    {/* Status */}
-                    {/* <div>
-                    <Controller
-                      name="isSystem"
-                      control={control}
-                      render={({ field }) => (
-                        <Checkbox
-                          checked={field.value as boolean}
-                          onChange={(e) => field.onChange(e.target.checked)}
-                          label=" System Role"
-                        />
-                      )}
-                    />
-                  </div> */}
-
                     {/* Required fields note */}
-                    <p className="text-xs text-gray-500 mt-4">
-                      <span className="text-red-500">*</span> Required fields
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+                      <span className="text-red-500">*</span> {t('usersManagement.common.requiredFields')}
                     </p>
                   </div>
                 </CardContent>
@@ -233,12 +220,12 @@ export default function CreateRolePage() {
             </Card>
 
             {/* Right Column - Permissions */}
-            <Card className="shadow-lg rounded-xl border-gray-200">
+            <Card className="shadow-lg rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-1">
                   <div>
-                    <h2 className="text-lg font-semibold text-gray-900">
-                      Permissions <span className="text-red-500">*</span>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {t('usersManagement.create_role.permissions')} <span className="text-red-500">*</span>
                     </h2>
                   </div>
                   <div className="flex mb-2 gap-2">
@@ -248,15 +235,15 @@ export default function CreateRolePage() {
                       onClick={handleSelectAll}
                       className="bg-secondary hover:bg-secondary/10 text-white text-xs px-3 py-1 h-8"
                     >
-                      Select All
+                      {t('usersManagement.create_role.selectAll')}
                     </Button>
                     <Button
                       type="button"
                       variant="secondary"
                       onClick={handleClearAll}
-                      className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs px-3 py-1 h-8"
+                      className="bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-3 py-1 h-8"
                     >
-                      Clear All
+                      {t('usersManagement.create_role.clearAll')}
                     </Button>
                   </div>
                 </div>
@@ -269,7 +256,7 @@ export default function CreateRolePage() {
                     name="permissionIds"
                     control={control}
                     render={({ field }) => (
-                      <div className="space-y-3 max-h-[600px] overflow-y-auto">
+                      <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
                         {permissionCategories.map((category) => {
                           const isOpen =
                             openCategories[category.category] ?? false;
@@ -280,7 +267,7 @@ export default function CreateRolePage() {
                                 onClick={() =>
                                   toggleCategory(category.category)
                                 }
-                                className="flex w-full items-center justify-between rounded p-2   text-left text-sm font-semibold text-gray-800 bg-gray-200 text-gray-700"
+                                className="flex w-full items-center justify-between rounded p-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-900"
                               >
                                 <span className="first-letter:uppercase ">
                                   {category.category.replace('_', ' ')}
@@ -292,7 +279,7 @@ export default function CreateRolePage() {
                                 )}
                               </button>
                               {isOpen && (
-                                <div className="space-y-2  bg-gray-100 p-2">
+                                <div className="space-y-2 bg-gray-100 dark:bg-gray-800/50 p-2">
                                   {category.permissions.map((permission) => {
                                     const isChecked =
                                       selectedPermissions.includes(
@@ -319,6 +306,7 @@ export default function CreateRolePage() {
                                             permission.name ||
                                             `${permission.resource}${actionText ? `: ${actionText}` : ''}`
                                           }
+                                          className="dark:text-gray-300"
                                         />
                                       </div>
                                     );
@@ -347,9 +335,9 @@ export default function CreateRolePage() {
               variant="outline"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="bg-white hover:bg-gray-50 text-gray-700 border-gray-300"
+              className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-white border-gray-300 dark:border-gray-700"
             >
-              Cancel
+              {t('usersManagement.common.cancel')}
             </Button>
             <Button
               type="submit"
@@ -360,7 +348,7 @@ export default function CreateRolePage() {
               {isSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              {isEditMode ? 'Update' : 'Save'}
+              {isEditMode ? t('usersManagement.common.update') : t('usersManagement.common.save')}
             </Button>
           </div>
         </form>

@@ -766,6 +766,462 @@
     "permissions": "الصلاحيات",
     "lastLogin": "آخر تسجيل دخول"
   },
+  "usersManagement": {
+    "title": "إدارة المستخدمين والأدوار",
+    "description": "إدارة المستخدمين وأدوارهم",
+    "tabs": {
+      "users": "المستخدمون",
+      "customers": "العملاء",
+      "roles": "الأدوار"
+    },
+    "add": {
+      "user": "إضافة مستخدم",
+      "customer": "إضافة عميل",
+      "role": "إضافة دور"
+    },
+    "common": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "رقم الهاتف",
+      "role": "الدور",
+      "status": "الحالة",
+      "description": "الوصف",
+      "city": "المدينة",
+      "state": "الولاية/المقاطعة",
+      "address": "العنوان",
+      "zip": "الرمز البريدي",
+      "country": "البلد",
+      "requiredFields": "* الحقول المطلوبة",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "update": "تحديث",
+      "actions": "الإجراءات",
+      "created": "تم الإنشاء"
+    },
+    "create_user": {
+      "title": "إضافة مستخدم جديد",
+      "userDetails": "تفاصيل المستخدم",
+      "placeholders": {
+        "name": "أدخل الاسم",
+        "email": "أدخل البريد الإلكتروني",
+        "phone": "أدخل رقم الهاتف",
+        "role": "اختر الدور",
+        "customer": "اختر العميل"
+      },
+      "validation": {
+        "name": "الاسم مطلوب",
+        "email": "البريد الإلكتروني يجب أن يكون صالحاً",
+        "phone": "رقم الهاتف مطلوب",
+        "role": "الدور مطلوب",
+        "customer": "العميل مطلوب"
+      }
+    },
+    "create_customer": {
+      "title": "إضافة عميل جديد",
+      "info": "معلومات العميل",
+      "limits": "الحدود المخصصة",
+      "actionDescription": "وصف الإجراء",
+      "saveAndAdd": "حفظ وإضافة",
+      "subscription": {
+        "title": "الاشتراك الحالي",
+        "plan": "الخطة النشطة",
+        "resources": {
+          "users": "المستخدمين",
+          "devices": "الأجهزة",
+          "assets": "الأصول",
+          "dashboards": "لوحات التحكم",
+          "floorPlans": "مخططات الطوابق",
+          "automations": "الأتمتة"
+        }
+      },
+      "placeholders": {
+        "name": "أدخل اسم العميل",
+        "email": "أدخل البريد الإلكتروني للمسؤول",
+        "phone": "أدخل رقم الهاتف",
+        "description": "أدخل الوصف",
+        "city": "أدخل المدينة",
+        "state": "أدخل الولاية/المقاطعة",
+        "address": "أدخل العنوان",
+        "zip": "أدخل الرمز البريدي",
+        "country": "أدخل البلد"
+      }
+    },
+    "create_role": {
+      "title": "إنشاء دور",
+      "editTitle": "تعديل الدور",
+      "info": "معلومات الدور",
+      "permissions": "الصلاحيات",
+      "selectAll": "تحديد الكل",
+      "clearAll": "مسح الكل",
+      "validation": {
+        "name": "اسم الدور مطلوب",
+        "permissions": "يجب اختيار صلاحية واحدة على الأقل"
+      },
+      "placeholders": {
+        "name": "أدخل اسم الدور",
+        "description": "أدخل وصف الدور..."
+      }
+    },
+    "bulk_management": {
+      "title": "إدارة جماعية للمستخدمين",
+      "description": "تنفيذ إجراءات على عدة مستخدمين في وقت واحد",
+      "selectedBanner": "إجمالي {{count}} مستخدمين مختارين",
+      "availableActions": "الإجراءات المتاحة",
+      "sections": {
+        "userStatus": "حالة المستخدم",
+        "roleManagement": "إدارة الأدوار",
+        "communication": "الاتصالات",
+        "dataManagement": "إدارة البيانات"
+      },
+      "actions": {
+        "activate": "تفعيل المستخدمين",
+        "deactivate": "إلغاء تفعيل المستخدمين",
+        "suspend": "تعليق المستخدمين",
+        "delete": "حذف المستخدمين",
+        "assignRole": "تعيين دور",
+        "removeRole": "إزالة دور",
+        "updatePermissions": "تحديث الصلاحيات",
+        "sendEmail": "إرسال بريد إلكتروني",
+        "sendNotification": "إرسال إشعار",
+        "exportData": "تصدير البيانات",
+        "bulkImport": "استيراد جماعي",
+        "readyToExecute": "جاهز للتنفيذ على {{count}} مستخدمين"
+      },
+      "modals": {
+        "status": {
+          "title": "تأكيد تغيير الحالة الجماعي",
+          "description": "هل أنت متأكد أنك تريد تغيير حالة {{count}} مستخدمين إلى {{status}}؟"
+        },
+        "delete": {
+          "title": "تأكيد الحذف الجماعي",
+          "description": "هل أنت متأكد أنك تريد حذف {{count}} مستخدمين؟ لا يمكن التراجع عن هذا الإجراء."
+        },
+        "role": {
+          "assignTitle": "تعيين دور",
+          "removeTitle": "إزالة دور",
+          "description": "اختر دوراً لـ {{action}} لـ {{count}} مستخدمين.",
+          "placeholder": "اختر دوراً"
+        },
+        "communication": {
+          "emailTitle": "إرسال بريد إلكتروني",
+          "notifTitle": "إرسال إشعار",
+          "description": "أدخل الرسالة التي تريد إرسالها إلى {{count}} مستخدمين.",
+          "subject": "الموضوع",
+          "notifTitleLabel": "العنوان",
+          "type": "النوع",
+          "priority": "الأولوية",
+          "message": "الرسالة",
+          "sending": "جاري الإرسال...",
+          "send": "إرسال {{type}}"
+        },
+        "export": {
+          "title": "تصدير المستخدمين",
+          "description": "اختر التنسيق الذي تريد تصدير بيانات المستخدمين به.",
+          "format": "التنسيق",
+          "exporting": "جاري التصدير...",
+          "exportNow": "تصدير الآن"
+        },
+        "import": {
+          "title": "استيراد جماعي للمستخدمين",
+          "description": "اختر ملف CSV أو JSON يحتوي على بيانات المستخدمين للاستيراد.",
+          "selectFile": "اختر ملفاً",
+          "selected": "المختار: {{name}} ({{size}} ك.ب)",
+          "importNow": "استيراد الآن",
+          "importing": "جاري الاستيراد..."
+        },
+        "toasts": {
+          "statusSuccess": "تم تحديث حالة المستخدمين بنجاح",
+          "statusError": "فشل تحديث حالة المستخدمين",
+          "roleSuccess": "تم {{action}} الدور بنجاح",
+          "roleError": "فشل تحديث الأدوار",
+          "deleteSuccess": "تم حذف المستخدمين بنجاح",
+          "deleteError": "فشل حذف المستخدمين",
+          "emailSuccess": "تم إرسال رسائل البريد الإلكتروني بنجاح",
+          "emailError": "فشل إرسال رسائل البريد الإلكتروني",
+          "notifSuccess": "تم إرسال الإشعارات بنجاح",
+          "notifError": "فشل إرسال الإشعارات",
+          "exportSuccess": "تم تصدير المستخدمين بنجاح",
+          "exportError": "فشل تصدير المستخدمين",
+          "importSuccess": "تم استيراد {{imported}} مستخدم بنجاح. فشل {{failed}}.",
+          "importError": "فشل استيراد المستخدمين"
+        },
+        "validation": {
+          "selectRole": "يرجى اختيار دور",
+          "enterMessage": "يرجى إدخال رسالة",
+          "enterSubject": "يرجى إدخال موضوع",
+          "enterTitle": "يرجى إدخال عنوان الإشعار",
+          "selectFile": "يرجى اختيار ملف للاستيراد",
+          "selectAction": "يرجى اختيار إجراء واحد على الأقل"
+        },
+        "feedback": {
+          "executing": "جاري تنفيذ {{actionCount}} إجراء(ات) على {{userCount}} مستخدمين",
+          "comingSoon": "ميزة المعاينة ستتوفر قريباً"
+        }
+      }
+    },
+    "role_permission_management": {
+      "roleTitle": "الدور: {{name}}",
+      "descTitle": "الوصف: {{desc}}",
+      "table": {
+        "permission": "الصلاحية",
+        "description": "الوصف",
+        "access": "الوصول",
+        "create": "إنشاء",
+        "read": "قراءة",
+        "update": "تحديث",
+        "delete": "حذف"
+      },
+      "warning": "لا يمكنك تعديل أدوار النظام"
+    },
+    "customer_details": {
+      "tabs": {
+        "permissions": "الصلاحيات",
+        "assignedUsers": "المستخدمون المعينون",
+        "devices": "الأجهزة",
+        "activityLogs": "سجلات النشاط"
+      },
+      "matrixTitle": "مصفوفة الصلاحيات",
+      "legend": {
+        "granted": "صلاحية ممنوحة",
+        "denied": "صلاحية مرفوضة"
+      }
+    },
+    "user_details": {
+      "tabs": {
+        "permissions": "الصلاحيات",
+        "devices": "الأجهزة",
+        "activityLogs": "سجل النشاط"
+      },
+      "matrix": {
+        "title": "مصفوفة الصلاحيات",
+        "description": "الصلاحيات الفردية والمستندة إلى الدور الممنوحة لهذا المستخدم.",
+        "showOnlyGranted": "إظهار الممنوحة فقط",
+        "actionsCount": "{{count}} إجراءات",
+        "granted": "تم منح الصلاحية",
+        "denied": "تم رفض الصلاحية"
+      },
+      "actions": {
+        "editPermissions": "تعديل الصلاحيات",
+        "saveChanges": "حفظ التغييرات"
+      }
+    },
+    "assign_permissions": {
+      "title": "تعيين الصلاحيات",
+      "userLabel": "المستخدم: {{email}}",
+      "search": {
+        "available": "البحث في الصلاحيات...",
+        "assigned": "البحث في المعينة..."
+      },
+      "panels": {
+        "available": "الصلاحيات المتاحة",
+        "assigned": "الصلاحيات المعينة",
+        "summary": "ملخص الصلاحيات"
+      },
+      "summary": {
+        "noAssigned": "لا توجد صلاحيات معينة",
+        "currentRole": "الدور الحالي",
+        "totalPermissions": "إجمالي الصلاحيات",
+        "assignedCount": "{{count}} معينة",
+        "level": "مستوى الصلاحية",
+        "lastModified": "آخر تعديل"
+      },
+      "levels": {
+        "high": "عالٍ",
+        "moderate": "متوسط",
+        "low": "منخفض"
+      },
+      "toasts": {
+        "selectFirst": "يرجى اختيار صلاحية لإضافتها",
+        "alreadyAssigned": "الصلاحية معينة بالفعل",
+        "added": "تمت إضافة الصلاحية: {{label}}",
+        "removed": "تمت إزالة الصلاحية: {{label}}",
+        "saved": "تم حفظ الصلاحيات بنجاح"
+      }
+    },
+    "customer_card": {
+      "editCustomer": "تعديل العميل",
+      "cancelEdit": "إلغاء التعديل",
+      "saveChanges": "حفظ التغييرات",
+      "saving": "جاري الحفظ...",
+      "delete": "حذف",
+      "labels": {
+        "name": "الاسم",
+        "status": "الحالة",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الهاتف",
+        "tenantId": "معرف المستأجر",
+        "city": "المدينة",
+        "state": "المنطقة",
+        "country": "البلد",
+        "address": "العنوان",
+        "zipCode": "الرمز البريدي",
+        "createdAt": "تاريخ الإنشاء",
+        "allocationLimits": "حدود التخصيص",
+        "usageCounters": "عدادات الاستخدام",
+        "readOnly": "(للقراءة فقط)",
+        "allocUsers": "المستخدمون المخصصون",
+        "allocAssets": "الأصول المخصصة",
+        "allocDevices": "الأجهزة المخصصة",
+        "allocDashboards": "لوحات التحكم المخصصة",
+        "allocFloorPlans": "مخططات الطوابق المخصصة",
+        "allocAutomations": "الأتمتة المخصصة"
+      },
+      "toasts": {
+        "updateSuccess": "تم تحديث العميل بنجاح",
+        "updateError": "فشل تحديث العميل",
+        "deleteSuccess": "تم حذف العميل بنجاح",
+        "deleteError": "فشل حذف العميل"
+      },
+      "modals": {
+        "deleteTitle": "حذف العميل"
+      }
+    },
+    "user_card": {
+      "editUser": "تعديل المستخدم",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "delete": "حذف",
+      "placeholders": {
+        "enterName": "أدخل الاسم",
+        "enterPhone": "أدخل رقم الهاتف",
+        "enterCompany": "أدخل اسم الشركة"
+      },
+      "labels": {
+        "emailAddress": "البريد الإلكتروني",
+        "phoneNumber": "رقم الهاتف",
+        "company": "الشركة",
+        "lastLogin": "آخر تسجيل دخول",
+        "createdAt": "تاريخ الإنشاء",
+        "lastUpdated": "آخر تحديث",
+        "noRole": "بدون دور"
+      },
+      "toasts": {
+        "updateSuccess": "تم تحديث المستخدم بنجاح",
+        "updateError": "فشل تحديث المستخدم",
+        "deleteSuccess": "تم حذف المستخدم {{name}} بنجاح",
+        "deleteError": "فشل حذف المستخدم"
+      }
+    },
+    "customer_users_list": {
+      "title": "المستخدمون المعينون",
+      "displayHierarchical": "عرض التسلسل الهرمي",
+      "noUsers": "لا يوجد مستخدمون متاحون.",
+      "selectCustomer": "اختر عميلاً لعرض المستخدمين.",
+      "table": {
+        "user": "المستخدم",
+        "email": "البريد الإلكتروني",
+        "role": "الدور",
+        "status": "الحالة",
+        "created": "تاريخ الإنشاء"
+      }
+    },
+    "activity_log": {
+      "noActivity": "لا يوجد نشاط متاح.",
+      "noUserActivity": "لا يوجد نشاط محدد متاح لهذا المستخدم.",
+      "headers": {
+        "description": "الوصف",
+        "action": "الإجراء",
+        "date": "التاريخ"
+      }
+    },
+    "hierarchy": {
+      "title": "تصريح التسلسل الهرمي للمستخدم",
+      "visualRep": "تمثيل مرئي للمستخدمين داخل {{name}}",
+      "exploreStructure": "استكشاف الهيكل التنظيمي للمستخدمين.",
+      "refining": "تحديث خريطة التسلسل الهرمي...",
+      "orgRoot": "جذر المنظمة",
+      "noData": "لا تتوفر بيانات التسلسل الهرمي",
+      "ensureUsers": "يرجى التأكد من تعيين المستخدمين لهذا العميل.",
+      "legend": {
+        "org": "المنظمة",
+        "role": "الدور الوظيفي",
+        "active": "مستخدم نشط",
+        "inactive": "غير نشط/آخر"
+      },
+      "stats": "إجمالي المستخدمين: {{count}}"
+    },
+    "users_tab": {
+      "title": "كل المستخدمين",
+      "tabs": {
+        "all": "الكُل",
+        "customer_user": "مستخدم عميل",
+        "customer": "عميل"
+      },
+      "bulkEdit": "تعديل البيانات بالجملة ({{count}})",
+      "noUsers": "لم يتم العثور على مستخدمين",
+      "tooltips": {
+        "delete": "حذف المستخدم",
+        "view": "عرض التفاصيل"
+      },
+      "toasts": {
+        "deleteSuccess": "تم حذف المستخدم {{name}} بنجاح",
+        "statusUpdated": "تم تحديث حالة المستخدم إلى {{status}}",
+        "statusUpdateError": "فشل تحديث حالة المستخدم"
+      },
+      "statusConfirm": {
+        "title": "تأكيد تغيير الحالة",
+        "description": "هل أنت متأكد أنك تريد {{action}} المستخدم {{name}}؟",
+        "activate": "تنشيط",
+        "deactivate": "إلغاء تنشيط"
+      }
+    },
+    "roles_tab": {
+      "title": "إدارة المستخدمين والأدوار",
+      "noRoles": "لم يتم العثور على أدوار",
+      "tooltips": {
+        "manage": "إدارة الدور"
+      },
+      "toasts": {
+        "deleteSuccess": "تم حذف الدور بنجاح",
+        "deleteError": "فشل حذف الدور"
+      },
+      "summary": {
+        "total": "إجمالي الأدوار",
+        "system": "أدوار النظام",
+        "custom": "أدوار مخصصة"
+      },
+      "type": {
+        "system": "نظام",
+        "custom": "مخصص"
+      }
+    },
+    "customers_tab": {
+      "title": "كل العملاء",
+      "noCustomers": "لم يتم العثور على عملاء",
+      "tooltips": {
+        "assign": "تعيين المستخدمين",
+        "view": "عرض العميل",
+        "delete": "حذف العميل"
+      },
+      "toasts": {
+        "deleteSuccess": "تم حذف العميل بنجاح",
+        "deleteError": "فشل حذف العميل"
+      }
+    },
+    "association": {
+      "title": "ربط مستخدم العميل",
+      "availableUsers": "المستخدمون المتاحون",
+      "assignedUsers": "المستخدمون المعينون",
+      "selectToAssign": "حدد المستخدم الذي تريد تعيينه",
+      "selectCustomerToAssign": "حدد العميل لتعيين المستخدم المختار",
+      "noAvailable": "لا يوجد مستخدمون متاحون",
+      "assign": "تعيين",
+      "remove": "إزالة",
+      "summary": {
+        "title": "ملخص التعيين",
+        "userStats": "إحصائيات المستخدم",
+        "availableStats": "المستخدمون المتاحون",
+        "totalAssigned": "إجمالي المعينين:",
+        "administrators": "المدراء:",
+        "managers": "المشرفون:",
+        "regularUsers": "المستخدمون العاديون:",
+        "unassigned": "غير معينين:",
+        "filtered": "نتائج البحث:",
+        "bulkAssign": "تعيين الدور بالجملة",
+        "exportList": "تصدير القائمة"
+      }
+    }
+  },
   "analytics": {
     "title": "تحليلات ومراقبة الأجهزة - المبنى {{building}}",
     "reportTemplates": "قوالب التقارير",

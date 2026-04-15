@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { useAppStore } from '@/stores/useAppStore';
 import { PageHeader } from '@/components/common/PageHeader';
 
 export default function UsersAndRolesManagementPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.tab || 'Users');
@@ -46,10 +48,10 @@ export default function UsersAndRolesManagementPage() {
 
   const addButtonLabel =
     activeTab === 'Users'
-      ? 'Add User'
+      ? t('usersManagement.add.user')
       : activeTab === 'Customers'
-        ? 'Add Customer'
-        : 'Add Role';
+        ? t('usersManagement.add.customer')
+        : t('usersManagement.add.role');
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
@@ -58,8 +60,8 @@ export default function UsersAndRolesManagementPage() {
         <div className="space-y-2">
           <div className="flex items-start justify-between">
             <PageHeader
-              title="Users and Roles Management"
-              description="Manage users and their roles"
+              title={t('usersManagement.title')}
+              description={t('usersManagement.description')}
             />
             <Button onClick={handleAddAction} variant="secondary">
               <Plus className="h-4 w-4" />
@@ -78,17 +80,23 @@ export default function UsersAndRolesManagementPage() {
               }}
             >
               <TabsList className="p-1">
-                <TabsTrigger value="Users">Users</TabsTrigger>
+                <TabsTrigger value="Users">
+                  {t('usersManagement.tabs.users')}
+                </TabsTrigger>
                 {!isCustomer && (
-                  <TabsTrigger value="Customers">Customers</TabsTrigger>
+                  <TabsTrigger value="Customers">
+                    {t('usersManagement.tabs.customers')}
+                  </TabsTrigger>
                 )}
-                <TabsTrigger value="Roles">Roles</TabsTrigger>
+                <TabsTrigger value="Roles">
+                  {t('usersManagement.tabs.roles')}
+                </TabsTrigger>
               </TabsList>
             </Tabs>
             <div className="flex-1 max-w-md">
               <Input
                 type="text"
-                placeholder="Search"
+                placeholder={t('common.search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 icon={<Search className="h-4 w-4" />}

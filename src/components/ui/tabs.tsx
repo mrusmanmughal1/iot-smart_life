@@ -22,7 +22,6 @@ export function Tabs({
   children,
   className = '',
 }: TabsProps) {
-
   const [internalValue, setInternalValue] = useState(defaultValue);
   const value = controlledValue !== undefined ? controlledValue : internalValue;
   const handleValueChange = (newValue: string) => {
@@ -47,7 +46,7 @@ interface TabsListProps {
 export function TabsList({ children, className = '' }: TabsListProps) {
   return (
     <div
-      className={`inline-flex    p-2 items-center   rounded-md !bg-gray-100   text-slate-500 dark:bg-gray-900 dark:border-gray-700 dark:text-white ${className}`}
+      className={`inline-flex    p-2 items-center   rounded-md bg-gray-100   text-slate-500 dark:bg-gray-900 dark:border-gray-700 dark:text-white ${className}`}
       role="tablist"
     >
       {children}
@@ -83,10 +82,11 @@ export function TabsTrigger({
       aria-selected={isActive}
       disabled={disabled}
       onClick={() => context.onValueChange(value)}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${isActive
-        ? 'bg-primary text-white shadow-sm dark:bg-gray-950 dark:hover:bg-gray-800 dark:text-white'
-        : 'text-slate-600 hover:text-slate-900 dark:text-white'
-        } ${className}`}
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+        isActive
+          ? 'bg-primary text-white shadow-sm dark:bg-gray-950 dark:hover:bg-gray-800 dark:text-white'
+          : 'text-slate-600 hover:text-slate-900 dark:text-white'
+      } ${className}`}
     >
       {children}
     </button>

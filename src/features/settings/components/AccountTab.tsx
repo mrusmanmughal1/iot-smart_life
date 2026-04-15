@@ -23,6 +23,7 @@ import { userService } from '@/features/users/services/usersService';
 import { usersApi } from '@/services/api';
 import { useGetCurrentUser } from '../hooks/useAccountSettings';
 import { createChangePasswordSchema, createProfileSchema } from '../Schema';
+import alt_image from '@/assets/images/user_alt.png';
 type ChangePasswordFormData = z.infer<
   ReturnType<typeof createChangePasswordSchema>
 >;
@@ -31,7 +32,7 @@ type ProfileFormData = z.input<ReturnType<typeof createProfileSchema>>;
 export function AccountTab() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { settings, isLoading } = useAccountSettings();
+  const { isLoading } = useAccountSettings();
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -233,19 +234,15 @@ export function AccountTab() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-6 flex flex-col items-center     gap-6">
+          <div className="m-6 flex  items-center     gap-6">
             <div className="relative group">
               <Avatar className="h-24 w-24 border-2 border-gray-100 dark:border-gray-800">
                 <AvatarImage
-                  src={
-                    avatarPreview === ''
-                      ? ''
-                      : avatarPreview || currentUser?.avatar || ''
-                  }
+                  src={avatarPreview ? avatarPreview : alt_image}
                   alt={currentUser?.name || ''}
                 />
                 <AvatarFallback className="text-xl font-bold bg-primary/10 text-primary">
-                  {currentUser?.name?.[0]?.toUpperCase() || 'U'}
+                  {currentUser?.name?.[0]?.toUpperCase() || ''}
                 </AvatarFallback>
               </Avatar>
               {isUploadingAvatar && (
@@ -272,7 +269,7 @@ export function AccountTab() {
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
                 {t('settings.profile.photo') || 'Profile Photo'}
               </h3>
-              <p className="text-xs text-gray-500 max-w-[240px]">
+              <p className="text-xs text-gray-500 max-w-[440px]">
                 {t('settings.profile.photoDescription') ||
                   'Recommended size: 400x400px.'}
               </p>

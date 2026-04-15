@@ -19,18 +19,10 @@ import { toast } from 'react-hot-toast';
 import { useCreateCustomerUser } from '@/features/customerUser/hooks';
 import { useCustomersByTenantId } from '@/features/customer/hooks/useCustomers';
 import { useAppStore } from '@/stores/useAppStore';
-
-const createUserSchema = z.object({
-  name: z.string().min(1, 'Contact email is required'),
-  email: z.string().email('Email must be valid').min(1, 'Email is required'),
-  roleId: z.string(),
-  phone: z.string().min(8, 'Phone number is required'),
-  customerId: z.string().min(1, 'Customer is required'),
-});
-
-type CreateUserFormData = z.infer<typeof createUserSchema>;
+import { useTranslation } from 'react-i18next';
 
 export default function CreateUserPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const createUserMutation = useCreateCustomerUser();
   const { data: rolesData } = useRoles();
@@ -38,6 +30,16 @@ export default function CreateUserPage() {
   const { user } = useAppStore();
   const isCustomerAdmin = user?.role === 'customer';
   const roles: Role[] = rolesData?.data || [];
+
+  const createUserSchema = z.object({
+    name: z.string().min(1, t('usersManagement.create_user.validation.name')),
+    email: z.string().email(t('usersManagement.create_user.validation.email')).min(1, t('usersManagement.create_user.validation.email')),
+    roleId: z.string().min(1, t('usersManagement.create_user.validation.role')),
+    phone: z.string().min(8, t('usersManagement.create_user.validation.phone')),
+    customerId: z.string().min(1, t('usersManagement.create_user.validation.customer')),
+  });
+
+  type CreateUserFormData = z.infer<typeof createUserSchema>;
 
   const customersList: Customer[] = customersData?.data || [];
   const {
@@ -64,7 +66,6 @@ export default function CreateUserPage() {
       phone: data.phone,
       roleId: data.roleId as UserRole,
       customerId: data.customerId || undefined,
-      // customerId: '',
     };
 
     createUserMutation.mutate({ userData });
@@ -75,16 +76,16 @@ export default function CreateUserPage() {
   };
 
   return (
-    <div className="min-h-screen    ">
-      <div className="  mx-auto">
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">
-          Add New User
+    <div className="min-h-screen bg-transparent dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+      <div className="mx-auto">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+          {t('usersManagement.create_user.title')}
         </h1>
 
-        <Card className="shadow-sm rounded-xl border border-gray-200">
+        <Card className="shadow-sm rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-800">
           <CardContent className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">
-              User Details
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+              {t('usersManagement.create_user.userDetails')}
             </h2>
 
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -94,16 +95,16 @@ export default function CreateUserPage() {
                   <div>
                     <label
                       htmlFor="name"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      Name <span className="text-red-500">*</span>
+                      {t('usersManagement.common.name')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       {...register('name')}
-                      placeholder="Enter customer name"
-                      className="w-full border border-gray-300 rounded-md"
+                      placeholder={t('usersManagement.create_user.placeholders.name')}
+                      className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                     />
                     {errors.name && (
                       <p className="mt-1 text-sm text-red-600">
@@ -114,16 +115,16 @@ export default function CreateUserPage() {
 
                   <div>
                     <label
-                      htmlFor="phoneNumber"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      htmlFor="phone"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      Phone Number <span className="text-red-500">*</span>
+                      {t('usersManagement.common.phone')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="phone"
                       {...register('phone')}
-                      placeholder="Enter phone number"
-                      className="w-full border border-gray-300 rounded-md"
+                      placeholder={t('usersManagement.create_user.placeholders.phone')}
+                      className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                     />
                     {errors.phone && (
                       <p className="mt-1 text-sm text-red-600">
@@ -135,16 +136,16 @@ export default function CreateUserPage() {
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      Email <span className="text-red-500">*</span>
+                      {t('usersManagement.common.email')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="email"
                       type="email"
                       {...register('email')}
-                      placeholder="Enter email address"
-                      className="w-full border border-gray-300 rounded-md"
+                      placeholder={t('usersManagement.create_user.placeholders.email')}
+                      className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                     />
                     {errors.email && (
                       <p className="mt-1 text-sm text-red-600">
@@ -155,10 +156,10 @@ export default function CreateUserPage() {
 
                   <div>
                     <label
-                      htmlFor="role"
-                      className="block text-sm font-medium text-gray-700 mb-2"
+                      htmlFor="roleId"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                     >
-                      Role
+                      {t('usersManagement.common.role')}
                     </label>
                     <Controller
                       name="roleId"
@@ -170,16 +171,17 @@ export default function CreateUserPage() {
                         >
                           <SelectTrigger
                             id="roleId"
-                            className="w-full border border-gray-300 rounded-md"
+                            className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                           >
-                            <SelectValue placeholder="Select role" />
+                            <SelectValue placeholder={t('usersManagement.create_user.placeholders.role')} />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
                             {roles.map((role) => (
                               <SelectItem
                                 key={role.id}
                                 value={role.id}
                                 textValue={role.name}
+                                className="dark:text-white dark:focus:bg-gray-800"
                               >
                                 {role.name}
                               </SelectItem>
@@ -202,9 +204,9 @@ export default function CreateUserPage() {
                     <div>
                       <label
                         htmlFor="customerId"
-                        className="block text-sm font-medium text-gray-700 mb-2"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                       >
-                        Customers List <span className="text-red-500">*</span>
+                        {t('usersAndRoles.customer')} <span className="text-red-500">*</span>
                       </label>
                       <Controller
                         name="customerId"
@@ -216,20 +218,21 @@ export default function CreateUserPage() {
                           >
                             <SelectTrigger
                               id="customerId"
-                              className="w-full border border-gray-300 rounded-md"
+                              className="w-full border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white rounded-md"
                             >
-                              <SelectValue placeholder="Select customer" />
+                              <SelectValue placeholder={t('usersManagement.create_user.placeholders.customer')} />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
                               {customersList.map((customer) => (
                                 <SelectItem
                                   key={customer.id}
                                   value={customer.id}
                                   textValue={customer.name}
+                                  className="dark:text-white dark:focus:bg-gray-800"
                                 >
                                   <div className="flex flex-col">
                                     {customer.name}
-                                    <span className="text-xs text-gray-500">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
                                       {customer.email}
                                     </span>
                                   </div>
@@ -250,14 +253,15 @@ export default function CreateUserPage() {
               </div>
 
               {/* Action buttons */}
-              <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+              <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleCancel}
                   disabled={isSubmitting || createUserMutation.isPending}
+                  className="dark:border-gray-700 dark:text-white dark:hover:bg-gray-800"
                 >
-                  Cancel
+                  {t('usersManagement.common.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -265,15 +269,15 @@ export default function CreateUserPage() {
                   isLoading={createUserMutation.isPending}
                   variant="secondary"
                 >
-                  Save
+                  {t('usersManagement.common.save')}
                 </Button>
               </div>
             </form>
           </CardContent>
         </Card>
 
-        <p className="text-xs text-gray-500 mt-4">
-          <span className="text-red-500">*</span> Required fields
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+          <span className="text-red-500">*</span> {t('usersManagement.common.requiredFields')}
         </p>
       </div>
     </div>

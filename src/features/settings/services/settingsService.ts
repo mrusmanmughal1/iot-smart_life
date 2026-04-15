@@ -2,7 +2,8 @@ import apiClient from '@/lib/axios';
 import type {
   GeneralSettings,
   SecuritySettings,
-  AccountSettings, NotificationSettings,
+  AccountSettings,
+  NotificationSettings,
 } from '../types/settings.types';
 
 export interface ApiResponse<T> {
@@ -13,12 +14,15 @@ export interface ApiResponse<T> {
 export const settingsService = {
   // Get general settings
   async getGeneralSettings(): Promise<GeneralSettings> {
-    const response = await apiClient.get<ApiResponse<GeneralSettings>>('/settings');
+    const response =
+      await apiClient.get<ApiResponse<GeneralSettings>>('/settings');
     return response.data.data;
   },
 
   // Update general settings
-  async updateGeneralSettings(settings: Partial<GeneralSettings>): Promise<GeneralSettings> {
+  async updateGeneralSettings(
+    settings: Partial<GeneralSettings>
+  ): Promise<GeneralSettings> {
     const response = await apiClient.put<ApiResponse<GeneralSettings>>(
       '/settings/general',
       settings
@@ -28,7 +32,9 @@ export const settingsService = {
 
   // Get notification settings
   async getNotificationSettings(): Promise<NotificationSettings> {
-    const response = await apiClient.get<ApiResponse<NotificationSettings>>('/settings/notifications');
+    const response = await apiClient.get<ApiResponse<NotificationSettings>>(
+      '/settings/notifications'
+    );
     return response.data.data;
   },
 
@@ -45,12 +51,15 @@ export const settingsService = {
 
   // Get security settings
   async getSecuritySettings(): Promise<SecuritySettings> {
-    const response = await apiClient.get<ApiResponse<SecuritySettings>>('/2fa/Settings');
+    const response =
+      await apiClient.get<ApiResponse<SecuritySettings>>('/2fa/Settings');
     return response.data.data;
   },
 
   // Update security settings
-  async updateSecuritySettings(settings: Partial<SecuritySettings>): Promise<SecuritySettings> {
+  async updateSecuritySettings(
+    settings: Partial<SecuritySettings>
+  ): Promise<SecuritySettings> {
     const response = await apiClient.patch<ApiResponse<SecuritySettings>>(
       '/2fa/settings',
       settings
@@ -73,7 +82,7 @@ export const settingsService = {
       };
       timestamp: string;
     }
-    
+
     const response = await apiClient.post<AuthenticatorGenerateResponse>(
       '/2fa/authenticator/generate'
     );
@@ -100,9 +109,8 @@ export const settingsService = {
   },
 
   async resendSMSCode(): Promise<{ message: string }> {
-    const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      '/2fa/sms/resend'
-    );
+    const response =
+      await apiClient.post<ApiResponse<{ message: string }>>('/2fa/sms/resend');
     return response.data.data;
   },
 
@@ -114,9 +122,8 @@ export const settingsService = {
 
   // Email 2FA
   async sendEmailCode(): Promise<{ message: string }> {
-    const response = await apiClient.post<ApiResponse<{ message: string }>>(
-      '/2fa/email/send'
-    );
+    const response =
+      await apiClient.post<ApiResponse<{ message: string }>>('/2fa/email/send');
     return response.data.data;
   },
 
@@ -143,8 +150,8 @@ export const settingsService = {
 
   // Get account settings
   async getAccountSettings(): Promise<AccountSettings> {
-    const response = await apiClient.get<ApiResponse<AccountSettings>>('/settings/account');
+    const response =
+      await apiClient.get<ApiResponse<AccountSettings>>('/settings/account');
     return response.data.data;
   },
 };
-

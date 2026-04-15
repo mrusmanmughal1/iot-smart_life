@@ -26,8 +26,10 @@ import { toast } from 'react-hot-toast';
 import { Pagination } from '@/components/common/Pagination';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 const Roles = ({ searchQuery }: { searchQuery: string }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -40,6 +42,7 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
     search: searchQuery || undefined,
   });
   const deleteRoleMutation = useDeleteRole();
+
   const handleDelete = (roleId: string) => {
     const role = roles?.data?.find((r: Role) => r.id === roleId);
     if (role) {
@@ -52,12 +55,12 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
     if (selectedRole) {
       deleteRoleMutation.mutate(selectedRole.id, {
         onSuccess: () => {
-          toast.success('Role deleted successfully');
+          toast.success(t('usersManagement.roles_tab.toasts.deleteSuccess'));
           setSelectedRole(null);
           setDeleteModalOpen(false);
         },
         onError: () => {
-          toast.error('Failed to delete role');
+          toast.error(t('usersManagement.roles_tab.toasts.deleteError'));
         },
       });
     }
@@ -77,38 +80,39 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
   const paginatedRoles = roleItems;
 
   return (
-    <div>
+    <div className="space-y-6">
       <div className="space-y-4">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Users and Roles Management
+          {t('usersManagement.roles_tab.title')}
         </h2>
-        <Card className="bg-white p-6 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-primary hover:bg-primary">
-                    <TableHead className="text-white font-semibold">
-                      ROLES
+                  <TableRow className=" ">
+                    <TableHead className=" ">
+                      {t('usersManagement.roles_tab.title').split(' ').pop()}{' '}
+                      {/* Just "Roles" if possible, or use a specific key */}
+                      {t('usersManagement.roles_tab.title').includes('Roles')
+                        ? 'Roles'
+                        : 'Roles'}
                     </TableHead>
-                    <TableHead className="text-white font-semibold">
-                      DESCRIPTION
+                    <TableHead className=" ">
+                      {t('usersManagement.common.description')}
                     </TableHead>
-                    <TableHead className="text-white font-semibold ">
-                      TYPE
+                    <TableHead className=" ">
+                      {t('usersManagement.common.type') || 'Type'}
                     </TableHead>
-                    <TableHead className="text-white font-semibold text-right">
-                      ACTIONS
+                    <TableHead className="text-right pe-4  ">
+                      {t('usersManagement.common.actions')}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell
-                        colSpan={4}
-                        className="bg-gray-50 text-center py-10"
-                      >
+                      <TableCell colSpan={4} className="text-center py-20">
                         <LoadingSpinner />
                       </TableCell>
                     </TableRow>
@@ -117,9 +121,9 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                       <TableRow>
                         <TableCell
                           colSpan={4}
-                          className="bg-gray-50 text-center py-10"
+                          className="text-center py-20 text-gray-500 dark:text-gray-400"
                         >
-                          No Roles Found
+                          {t('usersManagement.roles_tab.noRoles')}
                         </TableCell>
                       </TableRow>
                     )
@@ -127,74 +131,92 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
                   {paginatedRoles.map((role: Role) => (
                     <TableRow
                       key={role.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                      className="hover:bg-gray-50 dark:hover:bg-gray-900/50 border-gray-100 dark:border-gray-700"
                     >
-                      <TableCell className="font-medium">
+                      <TableCell className="ps-4 font-semibold text-gray-900 dark:text-gray-100 text-sm">
                         <div className="flex items-center gap-2">
                           {role.name}
                         </div>
                       </TableCell>
-                      <TableCell className="text-gray-600 truncate max-w-[600px]">
+                      <TableCell className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[600px]">
                         {role.description}
                       </TableCell>
-                      <TableCell className="text-gray-600">
-                        <Badge variant={role.isSystem ? 'default' : 'success'}>
-                          {role.isSystem ? 'System' : 'Custom'}
+                      <TableCell>
+                        <Badge
+                          variant={role.isSystem ? 'default' : 'success'}
+                          className="px-2 py-0.5 text-[10px] font-bold"
+                        >
+                          {role.isSystem
+                            ? t('usersManagement.roles_tab.type.system')
+                            : t('usersManagement.roles_tab.type.custom')}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right flex items-center  relative justify-end gap-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="hover:bg-secondary hover:text-white"
-                              onClick={() =>
-                                navigate(
-                                  `/users-management/role-permission-management/${role.id}`
-                                )
-                              }
-                            >
-                              <ShieldCheck className="h-4 w-4 " />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bottom-[70%] w-32">
-                            Manage Role
-                          </TooltipContent>
-                        </Tooltip>
-                        {!role.isSystem && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon-sm">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
+                      <TableCell className="text-right pe-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                className="text-primary hover:bg-primary/10"
                                 onClick={() =>
                                   navigate(
-                                    `/users-management/edit-role/${role.id}`
+                                    `/users-management/role-permission-management/${role.id}`
                                   )
                                 }
                               >
-                                <Edit className="h-4 w-4 mr-2" />
-                                Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={() => handleDelete(role.id)}
+                                <ShieldCheck className="h-4 w-4 " />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {t('usersManagement.roles_tab.tooltips.manage')}
+                            </TooltipContent>
+                          </Tooltip>
+                          {!role.isSystem && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  className="text-gray-500 dark:text-gray-400"
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="dark:bg-gray-800 dark:border-gray-700"
                               >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        )}
+                                <DropdownMenuItem
+                                  className="dark:text-gray-200 dark:focus:bg-gray-700"
+                                  onClick={() =>
+                                    navigate(
+                                      `/users-management/edit-role/${role.id}`
+                                    )
+                                  }
+                                >
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  {t('usersManagement.common.edit') || 'Edit'}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-red-600 dark:text-red-400 dark:focus:bg-red-900/20"
+                                  onClick={() => handleDelete(role.id)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  {t('usersManagement.common.delete') ||
+                                    'Delete'}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
+            </div>
+            <div className="p-4 border-t border-gray-100 dark:border-gray-700">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -208,44 +230,45 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 mt-8 gap-4">
-        <Card className="bg-secondary-main/20 text-white border-2 border-secondary-main shadow-sm dark:bg-gray-900 dark:border-gray-700">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-primary/5 dark:bg-primary/10 border border-primary/20 shadow-sm overflow-hidden group hover:scale-[1.02] transition-transform duration-200">
           <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
-                Total Roles
+            <div className="text-center space-y-2">
+              <p className="text-xs font-bold text-primary uppercase tracking-widest">
+                {t('usersManagement.roles_tab.summary.total')}
               </p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              <p className="text-4xl font-black text-gray-900 dark:text-white">
                 {totalRoles}
               </p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-success/20 text-white border-2 border-success shadow-sm dark:bg-gray-900 dark:border-gray-700">
+        <Card className="bg-success/5 dark:bg-success/10 border border-success/20 shadow-sm overflow-hidden group hover:scale-[1.02] transition-transform duration-200">
           <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
-                System Roles
+            <div className="text-center space-y-2">
+              <p className="text-xs font-bold text-success uppercase tracking-widest">
+                {t('usersManagement.roles_tab.summary.system')}
               </p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              <p className="text-4xl font-black text-gray-900 dark:text-white">
                 {systemRoles}
               </p>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-yellow-500/20 text-white border-2 border-yellow-500 shadow-sm dark:bg-gray-900 dark:border-gray-700">
+        <Card className="bg-yellow-500/5 dark:bg-yellow-500/10 border border-yellow-500/20 shadow-sm overflow-hidden group hover:scale-[1.02] transition-transform duration-200">
           <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-sm font-medium text-gray-600 mb-2 dark:text-white">
-                Custom Roles
+            <div className="text-center space-y-2">
+              <p className="text-xs font-bold text-yellow-600 dark:text-yellow-500 uppercase tracking-widest">
+                {t('usersManagement.roles_tab.summary.custom')}
               </p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+              <p className="text-4xl font-black text-gray-900 dark:text-white">
                 {customRoles}
               </p>
             </div>
           </CardContent>
         </Card>
       </div>
+
       {/* Delete Role Modal */}
       <DeleteRoleModal
         open={deleteModalOpen}

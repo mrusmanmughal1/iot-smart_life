@@ -128,7 +128,7 @@ export const usersApi = {
       if (data.phone) formData.append('phone', data.phone);
       if (data.companyName) formData.append('companyName', data.companyName);
       formData.append('avatar', data.avatarFile);
-      
+
       return apiClient.patch<ApiResponse<User>>('/auth/profile', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });

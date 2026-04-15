@@ -20,6 +20,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { PageHeader } from '@/components/common/PageHeader';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 export default function AlarmsPage() {
   const { t } = useTranslation();
@@ -68,8 +69,10 @@ export default function AlarmsPage() {
 
   return (
     <div className="space-y-6">
-
-      <PageHeader title={t('alarms.title')} description="Monitor and manage system alarms" />
+      <PageHeader
+        title={t('alarms.title')}
+        description="Monitor and manage system alarms"
+      />
       <div className="grid gap-6 md:grid-cols-4">
         {statusCards.map((card) => (
           <Card key={card.key} className={card.cardClassName}>
@@ -94,14 +97,10 @@ export default function AlarmsPage() {
         ))}
       </div>
 
-      <Card>
+      <Card className="py-4">
         <CardContent>
           {isLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full" />
-              ))}
-            </div>
+            <LoadingSpinner />
           ) : (
             <Table>
               <TableHeader className="bg-primary text-white">
