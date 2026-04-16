@@ -4,6 +4,7 @@ export interface User {
   firstName: string;
   lastName: string;
   role: string;
+  avatar?: string;
 }
 
 export interface SubscriptionFeatures {

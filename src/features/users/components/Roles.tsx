@@ -86,23 +86,19 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
           {t('usersManagement.roles_tab.title')}
         </h2>
         <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-          <CardContent className="p-0">
+          <CardContent className="p-6">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className=" ">
+                  <TableRow className=" uppercase">
                     <TableHead className=" ">
-                      {t('usersManagement.roles_tab.title').split(' ').pop()}{' '}
-                      {/* Just "Roles" if possible, or use a specific key */}
-                      {t('usersManagement.roles_tab.title').includes('Roles')
-                        ? 'Roles'
-                        : 'Roles'}
+                      {t('usersManagement.common.role')}
                     </TableHead>
                     <TableHead className=" ">
                       {t('usersManagement.common.description')}
                     </TableHead>
                     <TableHead className=" ">
-                      {t('usersManagement.common.type') || 'Type'}
+                      {t('usersManagement.common.type')}
                     </TableHead>
                     <TableHead className="text-right pe-4  ">
                       {t('usersManagement.common.actions')}
@@ -234,10 +230,10 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
         <Card className="bg-primary/5 dark:bg-primary/10 border border-primary/20 shadow-sm overflow-hidden group hover:scale-[1.02] transition-transform duration-200">
           <CardContent className="p-6">
             <div className="text-center space-y-2">
-              <p className="text-xs font-bold text-primary uppercase tracking-widest">
+              <p className="  font-semibold text-primary uppercase  ">
                 {t('usersManagement.roles_tab.summary.total')}
               </p>
-              <p className="text-4xl font-black text-gray-900 dark:text-white">
+              <p className="text-xl font-semibold text-gray-900 dark:text-white">
                 {totalRoles}
               </p>
             </div>
@@ -246,10 +242,10 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
         <Card className="bg-success/5 dark:bg-success/10 border border-success/20 shadow-sm overflow-hidden group hover:scale-[1.02] transition-transform duration-200">
           <CardContent className="p-6">
             <div className="text-center space-y-2">
-              <p className="text-xs font-bold text-success uppercase tracking-widest">
+              <p className="  font-semibold text-success uppercase  ">
                 {t('usersManagement.roles_tab.summary.system')}
               </p>
-              <p className="text-4xl font-black text-gray-900 dark:text-white">
+              <p className="text-xl font-semibold text-gray-900 dark:text-white">
                 {systemRoles}
               </p>
             </div>
@@ -258,10 +254,10 @@ const Roles = ({ searchQuery }: { searchQuery: string }) => {
         <Card className="bg-yellow-500/5 dark:bg-yellow-500/10 border border-yellow-500/20 shadow-sm overflow-hidden group hover:scale-[1.02] transition-transform duration-200">
           <CardContent className="p-6">
             <div className="text-center space-y-2">
-              <p className="text-xs font-bold text-yellow-600 dark:text-yellow-500 uppercase tracking-widest">
+              <p className="  font-semibold text-yellow-600 dark:text-yellow-500 uppercase  ">
                 {t('usersManagement.roles_tab.summary.custom')}
               </p>
-              <p className="text-4xl font-black text-gray-900 dark:text-white">
+              <p className="text-xl font-semibold text-gray-900 dark:text-white">
                 {customRoles}
               </p>
             </div>

@@ -212,14 +212,14 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
       </div>
 
       <Card className="bg-white  dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-        <CardContent className="px-4">
+        <CardContent className="p-6">
           {isTableLoading ? (
             <div className="p-20 flex justify-center">
               <LoadingSpinner />
             </div>
           ) : (
             <>
-              <div className="flex justify-end p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20  ">
+              <div className="flex justify-end   border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/20  ">
                 {selectedUsers.length > 0 && (
                   <Button
                     variant="secondary"
@@ -236,22 +236,22 @@ const Users = ({ searchQuery }: { searchQuery: string }) => {
                 <Table>
                   <TableHeader>
                     <TableRow className="">
-                      <TableHead className="     ">
+                      <TableHead className=" ">
                         {t('usersManagement.customer_users_list.table.user')}
                       </TableHead>
                       <TableHead className="  ">
                         {t('usersManagement.customer_users_list.table.email')}
                       </TableHead>
-                      <TableHead className="text-xs  ">
+                      <TableHead className="   ">
                         {t('usersManagement.customer_users_list.table.role')}
                       </TableHead>
-                      <TableHead className="text-xs  ">
+                      <TableHead className="   ">
                         {t('usersManagement.customer_users_list.table.status')}
                       </TableHead>
-                      <TableHead className="text-xs  ">
+                      <TableHead className="   ">
                         {t('usersManagement.customer_users_list.table.created')}
                       </TableHead>
-                      <TableHead className="text-center text-xs  ">
+                      <TableHead className="text-center    ">
                         {t('usersManagement.common.actions')}
                       </TableHead>
                     </TableRow>

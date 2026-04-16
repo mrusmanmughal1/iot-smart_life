@@ -22,10 +22,11 @@ const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
+  // on rtl i want to make it to last
   <thead
     ref={ref}
     className={cn(
-      '[&_tr]:border-b dark:text-white bg-primary text-white',
+      '[&_tr]:border-b uppercase dark:text-white bg-primary text-white  ',
       className
     )}
     {...props}
@@ -67,7 +68,7 @@ const TableRow = React.forwardRef<
   <tr
     ref={ref}
     className={cn(
-      'border-b border-gray-200 transition-colors  dark:border-gray-700  data-[state=selected]:bg-muted dark:text-white',
+      'border-b border-gray-200 transition-colors   dark:border-gray-700  data-[state=selected]:bg-muted dark:text-white',
       className
     )}
     {...props}
@@ -82,7 +83,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      'h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
+      'h-12 px-4 text-left rtl:text-right align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
       className
     )}
     {...props}

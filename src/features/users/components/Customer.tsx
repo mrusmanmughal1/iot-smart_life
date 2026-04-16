@@ -78,12 +78,12 @@ const CustomerPage = ({ searchQuery }: { searchQuery: string }) => {
         {t('usersManagement.customers_tab.title')}
       </h2>
       <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-        <CardContent className="p-0">
+        <CardContent className="p-6">
           <>
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className=" ">
+                  <TableRow className=" uppercase ">
                     <TableHead className=" ">
                       {t('usersManagement.common.customer') || 'Customer'}
                     </TableHead>
@@ -93,7 +93,7 @@ const CustomerPage = ({ searchQuery }: { searchQuery: string }) => {
                     <TableHead className=" ">
                       {t('usersManagement.common.created')}
                     </TableHead>
-                    <TableHead className=" ">
+                    <TableHead className=" text-end ">
                       {t('usersManagement.common.actions')}
                     </TableHead>
                   </TableRow>

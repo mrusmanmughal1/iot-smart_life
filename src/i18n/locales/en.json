@@ -738,7 +738,10 @@
       "actions": "Actions",
       "created": "Created",
       "customer": "Customer",
-      "type": "Type"
+      "type": "Type",
+      "user": "User",
+      "edit": "Edit",
+      "delete": "Delete"
     },
     "create_user": {
       "title": "Add New User",
