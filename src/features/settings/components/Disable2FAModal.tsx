@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ export function Disable2FAModal({
   onVerify,
   isVerifying = false,
 }: Disable2FAModalProps) {
+  const { t } = useTranslation();
   const [code, setCode] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -66,7 +68,7 @@ export function Disable2FAModal({
         handleSubmit(pastedData);
       }, 100);
     } else {
-      toast.error('Invalid code format. Please enter a 6-digit code.');
+      toast.error(t('settings.security.twoFactor.invalidCodeFormat'));
     }
   };
 
@@ -74,7 +76,7 @@ export function Disable2FAModal({
     const finalCode = verificationCode || code;
 
     if (finalCode.length !== CODE_LENGTH) {
-      toast.error('Please enter the 6-digit verification code');
+      toast.error(t('settings.security.twoFactor.enterCodeRequired'));
       return;
     }
 
@@ -95,16 +97,16 @@ export function Disable2FAModal({
       <DialogContent className="sm:max-w-lg  rounded-lg overflow-hidden  ">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            Disable Two-Factor Authentication
+            {t('settings.security.twoFactor.disable.title')}
           </DialogTitle>
           <DialogDescription>
-            Please enter your 6-digit verification code from your authenticator app to confirm disabling 2FA.
+            {t('settings.security.twoFactor.disable.description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 p-4">
           <div className="space-y-2">
-            <Label htmlFor="verification-code">Verification Code</Label>
+            <Label htmlFor="verification-code">{t('settings.security.twoFactor.enterCode')}</Label>
             <Input
               ref={inputRef}
               id="verification-code"
@@ -114,13 +116,13 @@ export function Disable2FAModal({
               value={code}
               onChange={handleChange}
               onPaste={handlePaste}
-              placeholder="Enter 6-digit code"
+              placeholder={t('settings.security.twoFactor.enterCodePlaceholder')}
               className="h-14 text-center text-2xl font-semibold tracking-widest"
               disabled={isVerifying}
               aria-label="Enter verification code"
             />
             <p className="text-xs text-slate-500 text-center">
-              Enter the code from your authenticator app
+              {t('settings.security.twoFactor.enterCodeDescription')}
             </p>
           </div>
         </div>
@@ -131,7 +133,7 @@ export function Disable2FAModal({
             onClick={() => onOpenChange(false)}
             disabled={isVerifying}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={() => handleSubmit()}
@@ -139,7 +141,7 @@ export function Disable2FAModal({
             isLoading={isVerifying}
             variant="destructive"
           >
-            {isVerifying ? 'Verifying...' : 'Disable 2FA'}
+            {isVerifying ? t('settings.security.twoFactor.verifying') : t('settings.security.twoFactor.disable.button')}
           </Button>
         </DialogFooter>
       </DialogContent>

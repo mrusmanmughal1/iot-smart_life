@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { GeneralSettings } from '../types/settings.types';
 
 interface SettingsContext {
@@ -26,6 +27,7 @@ export function NotificationsTab(props: {
   isLoading?: boolean;
   isSaving?: boolean;
 }) {
+  const { t } = useTranslation();
   const context = useOutletContext<SettingsContext>();
 
   // Use props if provided, otherwise fallback to context
@@ -72,17 +74,19 @@ export function NotificationsTab(props: {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Notification Preferences</CardTitle>
+        <CardTitle>{t('settings.notifications.preferences')}</CardTitle>
         <CardDescription>
-          Choose what notifications you want to receive
+          {t('settings.notifications.description')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label>Email Notifications</Label>
+            <Label className="text-gray-600 dark:text-white">
+              {t('settings.notifications.email')}
+            </Label>
             <p className="text-sm text-slate-500">
-              Receive notifications via email
+              {t('settings.notifications.emailDescription')}
             </p>
           </div>
           <Switch
@@ -95,9 +99,11 @@ export function NotificationsTab(props: {
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label>Alarm Notifications</Label>
+            <Label className="text-gray-600 dark:text-white">
+              {t('settings.notifications.alarms')}
+            </Label>
             <p className="text-sm text-slate-500">
-              Get notified about new alarms
+              {t('settings.notifications.alarmsDescription')}
             </p>
           </div>
           <Switch
@@ -110,9 +116,11 @@ export function NotificationsTab(props: {
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label>Device Status Changes</Label>
+            <Label className="text-gray-600 dark:text-white">
+              {t('settings.notifications.deviceStatus')}
+            </Label>
             <p className="text-sm text-slate-500">
-              Notify when devices go online/offline
+              {t('settings.notifications.deviceStatusDescription')}
             </p>
           </div>
           <Switch
@@ -125,9 +133,11 @@ export function NotificationsTab(props: {
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label>Weekly Reports</Label>
+            <Label className="text-gray-600 dark:text-white">
+              {t('settings.notifications.weeklyReports')}
+            </Label>
             <p className="text-sm text-slate-500">
-              Receive weekly summary reports
+              {t('settings.notifications.weeklyReportsDescription')}
             </p>
           </div>
           <Switch
@@ -139,8 +149,12 @@ export function NotificationsTab(props: {
         </div>
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label>Push Notifications</Label>
-            <p className="text-sm text-slate-500">Receive push notifications</p>
+            <Label className="text-gray-600 dark:text-white">
+              {t('settings.notifications.push')}
+            </Label>
+            <p className="text-sm text-slate-500">
+              {t('settings.notifications.pushDescription')}
+            </p>
           </div>
           <Switch
             checked={localSettings.pushNotifications}
@@ -153,7 +167,7 @@ export function NotificationsTab(props: {
         <Separator />
 
         <Button onClick={handleSave} disabled={isSaving} isLoading={isSaving}>
-          Save Preferences
+          {t('settings.notifications.save')}
         </Button>
       </CardContent>
     </Card>

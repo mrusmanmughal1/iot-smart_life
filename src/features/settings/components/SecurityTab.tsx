@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Mail,
   Smartphone,
@@ -28,6 +29,7 @@ import { Enable2FAModal } from './Enable2FAModal';
 import type { TwoFactorMethod } from '../types/settings.types';
 
 export function SecurityTab() {
+  const { t } = useTranslation();
   const {
     settings,
     isLoading,
@@ -131,7 +133,7 @@ export function SecurityTab() {
         handleSubmitAuthenticatorCode(pastedData);
       }, 100);
     } else {
-      toast.error('Invalid code format. Please enter a 6-digit code.');
+      toast.error(t('settings.security.twoFactor.invalidCodeFormat'));
     }
   };
 
@@ -139,7 +141,7 @@ export function SecurityTab() {
     const finalCode = code || authenticatorCode;
 
     if (finalCode.length !== 6) {
-      toast.error('Please enter the 6-digit verification code');
+      toast.error(t('settings.security.twoFactor.enterCodeRequired'));
       return;
     }
 
@@ -177,8 +179,8 @@ export function SecurityTab() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Security Settings</CardTitle>
-        <CardDescription>Manage your security preferences</CardDescription>
+        <CardTitle>{t('settings.security.title')}</CardTitle>
+        <CardDescription>{t('settings.security.subtitle')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Two-Factor Authentication Section */}
@@ -186,10 +188,10 @@ export function SecurityTab() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label className="text-base font-semibold">
-                Two-Factor Authentication
+                {t('settings.security.twoFactor.title')}
               </Label>
               <p className="text-sm text-slate-500">
-                Add an extra layer of security to your account
+                {t('settings.security.twoFactor.description')}
               </p>
             </div>
             <Switch
@@ -211,7 +213,7 @@ export function SecurityTab() {
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-4">
               <div className="space-y-3">
                 <Label className="text-sm font-semibold text-slate-900">
-                  Choose 2FA Method
+                  {t('settings.security.twoFactor.chooseMethod')}
                 </Label>
                 <div className="space-y-3">
                   {/* Email Option */}
@@ -230,10 +232,10 @@ export function SecurityTab() {
                         className="flex items-center gap-2 cursor-pointer font-medium"
                       >
                         <Mail className="h-4 w-4 text-blue-600" />
-                        Email Verification
+                        {t('settings.security.twoFactor.methods.email')}
                       </Label>
                       <p className="text-sm text-slate-500 mt-1">
-                        Receive verification codes via email
+                        {t('settings.security.twoFactor.methods.emailDescription')}
                       </p>
                       {currentSelectedMethod == 'email' && (
                         <div className="mt-2">
@@ -244,7 +246,7 @@ export function SecurityTab() {
                             disabled={isSendingEmailCode || isEnablingEmail}
                             isLoading={isSendingEmailCode}
                           >
-                            Setup Email 2FA
+                            {t('settings.security.twoFactor.methods.setupEmail')}
                           </Button>
                         </div>
                       )}
@@ -270,10 +272,10 @@ export function SecurityTab() {
                         className="flex items-center gap-2 cursor-pointer font-medium"
                       >
                         <Smartphone className="h-4 w-4 text-green-600" />
-                        SMS Verification
+                        {t('settings.security.twoFactor.methods.sms')}
                       </Label>
                       <p className="text-sm text-slate-500 mt-1">
-                        Receive verification codes via SMS
+                        {t('settings.security.twoFactor.methods.smsDescription')}
                       </p>
                       {currentSelectedMethod === 'sms' && (
                         <div className="mt-2">
@@ -284,7 +286,7 @@ export function SecurityTab() {
                             disabled={isSettingUpSMS || isEnablingSMS}
                             isLoading={isSettingUpSMS}
                           >
-                            Setup SMS 2FA
+                            {t('settings.security.twoFactor.methods.setupSms')}
                           </Button>
                         </div>
                       )}
@@ -310,10 +312,10 @@ export function SecurityTab() {
                         className="flex items-center gap-2 cursor-pointer font-medium"
                       >
                         <Key className="h-4 w-4 text-purple-600" />
-                        Google Authenticator
+                        {t('settings.security.twoFactor.methods.authenticator')}
                       </Label>
                       <p className="text-sm text-slate-500 mt-1">
-                        Use an authenticator app for time-based codes
+                        {t('settings.security.twoFactor.methods.authenticatorDescription')}
                       </p>
                       {currentSelectedMethod === 'authenticator' && (
                         <div className="mt-3 space-y-3">
@@ -322,7 +324,7 @@ export function SecurityTab() {
                               <div className="flex items-center gap-2 mb-3">
                                 <QrCode className="h-4 w-4 text-slate-600" />
                                 <Label className="text-sm font-semibold">
-                                  Scan QR Code
+                                  {t('settings.security.twoFactor.scanQr')}
                                 </Label>
                               </div>
                               <div className="flex items-center justify-center p-4 bg-white border-2 border-dashed border-slate-300 rounded-lg mb-3">
@@ -333,14 +335,14 @@ export function SecurityTab() {
                                     className="w-48 h-48 mx-auto mb-2"
                                   />
                                   <p className="text-xs text-slate-500">
-                                    Scan with Google Authenticator
+                                    {t('settings.security.twoFactor.scanQrDescription')}
                                   </p>
                                 </div>
                               </div>
                               {manualEntryKey && (
                                 <div className="space-y-2 text-xs text-slate-600">
                                   <p className="font-medium">
-                                    Manual Entry Key:
+                                    {t('settings.security.twoFactor.manualKey')}
                                   </p>
                                   <code className="block p-2 bg-slate-100 rounded font-mono text-xs break-all">
                                     {manualEntryKey}
@@ -354,7 +356,7 @@ export function SecurityTab() {
                                   htmlFor="authenticator-code"
                                   className="text-sm font-semibold"
                                 >
-                                  Enter Verification Code
+                                  {t('settings.security.twoFactor.enterCode')}
                                 </Label>
                                 <Input
                                   ref={authenticatorCodeRef}
@@ -365,13 +367,13 @@ export function SecurityTab() {
                                   value={authenticatorCode}
                                   onChange={handleAuthenticatorCodeChange}
                                   onPaste={handleAuthenticatorCodePaste}
-                                  placeholder="Enter 6-digit code"
+                                  placeholder={t('settings.security.twoFactor.enterCodePlaceholder')}
                                   className="h-12 text-center text-xl font-semibold tracking-widest"
                                   disabled={isEnablingAuthenticator}
                                   aria-label="Enter verification code from authenticator app"
                                 />
                                 <p className="text-xs text-slate-500 text-center">
-                                  Enter the code from your authenticator app
+                                  {t('settings.security.twoFactor.enterCodeDescription')}
                                 </p>
                                 <Button
                                   size="sm"
@@ -386,8 +388,8 @@ export function SecurityTab() {
                                   className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                                 >
                                   {isEnablingAuthenticator
-                                    ? 'Enabling...'
-                                    : 'Enable Authenticator 2FA'}
+                                    ? t('settings.security.twoFactor.enabling')
+                                    : t('settings.security.twoFactor.enableAuthenticator')}
                                 </Button>
                               </div>
                             </div>
@@ -402,7 +404,7 @@ export function SecurityTab() {
                               }
                               isLoading={isGeneratingQR}
                             >
-                              Generate QR Code
+                              {t('settings.security.twoFactor.methods.setupAuthenticator')}
                             </Button>
                           )}
                         </div>
@@ -421,18 +423,18 @@ export function SecurityTab() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-slate-900">
-                        Status
+                        {t('settings.security.twoFactor.status.title')}
                       </p>
                       <p className="text-xs text-slate-500 mt-1">
                         {currentSelectedMethod === 'email' &&
-                          'Email 2FA is active'}
-                        {currentSelectedMethod === 'sms' && 'SMS 2FA is active'}
+                          t('settings.security.twoFactor.status.emailActive')}
+                        {currentSelectedMethod === 'sms' && t('settings.security.twoFactor.status.smsActive')}
                         {currentSelectedMethod === 'authenticator' &&
-                          'Google Authenticator is active'}
+                          t('settings.security.twoFactor.status.authenticatorActive')}
                       </p>
                     </div>
                     <Badge className="bg-green-100 text-green-700 border-green-300">
-                      Active
+                      {t('settings.security.twoFactor.status.active')}
                     </Badge>
                   </div>
                 </div>
@@ -445,7 +447,7 @@ export function SecurityTab() {
               <div className="flex items-center gap-2 text-slate-600 dark:text-white">
                 <XCircle className="h-4 w-4" />
                 <p className="text-sm dark:text-white">
-                  Two-factor authentication is currently disabled
+                  {t('settings.security.twoFactor.disabledDescription')}
                 </p>
               </div>
             </div>

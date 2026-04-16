@@ -31,7 +31,7 @@ export default function SettingsPage() {
   if (isError) {
     return (
       <ErrorMessage
-        title="Failed to load settings"
+        title={t('common.failedToLoadSettings')}
         onRetry={() => window.location.reload()}
       />
     );

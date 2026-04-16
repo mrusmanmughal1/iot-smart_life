@@ -50,7 +50,8 @@
     "phoneRequired": "Phone number is required",
     "phoneInvalid": "Invalid phone number",
     "signup": "Signup",
-    "companyName": "Company Name"
+    "companyName": "Company Name",
+    "failedToLoadSettings": "Failed to load settings"
   },
   "pagination": {
     "showing": "Showing",
@@ -1573,9 +1574,78 @@
     "compactMode": "Compact Mode",
     "compactModeDescription": "Display more information in less space",
     "applyAndSave": "Apply & Save Preferences",
-    "notifications": "Notification Settings",
-    "security": "Security",
-    "account": "Account Settings",
+    "notifications": {
+      "title": "Notification Settings",
+      "preferences": "Notification Preferences",
+      "description": "Choose what notifications you want to receive",
+      "email": "Email Notifications",
+      "emailDescription": "Receive notifications via email",
+      "alarms": "Alarm Notifications",
+      "alarmsDescription": "Get notified about new alarms",
+      "deviceStatus": "Device Status Changes",
+      "deviceStatusDescription": "Notify when devices go online/offline",
+      "weeklyReports": "Weekly Reports",
+      "weeklyReportsDescription": "Receive weekly summary reports",
+      "push": "Push Notifications",
+      "pushDescription": "Receive push notifications",
+      "save": "Save Preferences"
+    },
+    "security": {
+      "title": "Security Settings",
+      "subtitle": "Manage your security preferences",
+      "twoFactor": {
+        "title": "Two-Factor Authentication",
+        "description": "Add an extra layer of security to your account",
+        "chooseMethod": "Choose 2FA Method",
+        "methods": {
+          "email": "Email Verification",
+          "emailDescription": "Receive verification codes via email",
+          "setupEmail": "Setup Email 2FA",
+          "sms": "SMS Verification",
+          "smsDescription": "Receive verification codes via SMS",
+          "setupSms": "Setup SMS 2FA",
+          "authenticator": "Google Authenticator",
+          "authenticatorDescription": "Use an authenticator app for time-based codes",
+          "setupAuthenticator": "Generate QR Code"
+        },
+        "scanQr": "Scan QR Code",
+        "scanQrDescription": "Scan with Google Authenticator",
+        "manualKey": "Manual Entry Key:",
+        "enterCode": "Enter Verification Code",
+        "enterCodePlaceholder": "Enter 6-digit code",
+        "enterCodeDescription": "Enter the code from your authenticator app",
+        "enableAuthenticator": "Enable Authenticator 2FA",
+        "status": {
+          "title": "Status",
+          "emailActive": "Email 2FA is active",
+          "smsActive": "SMS 2FA is active",
+          "authenticatorActive": "Google Authenticator is active",
+          "active": "Active"
+        },
+        "disabledDescription": "Two-factor authentication is currently disabled",
+        "enabling": "Enabling...",
+        "disable": {
+          "title": "Disable Two-Factor Authentication",
+          "description": "Please enter your 6-digit verification code from your authenticator app to confirm disabling 2FA.",
+          "button": "Disable 2FA"
+        },
+        "enable": {
+          "title": "Enable {{method}} Two-Factor Authentication",
+          "description": "Please enter the 6-digit verification code sent to your {{target}} to complete the setup.",
+          "authenticatorTarget": "app"
+        },
+        "resendCode": "Resend Code",
+        "resending": "Resending...",
+        "invalidCodeFormat": "Invalid code format. Please enter a 6-digit code.",
+        "enterCodeRequired": "Please enter the 6-digit verification code",
+        "verifying": "Verifying..."
+      }
+    },
+    "account": {
+      "title": "Account Settings",
+      "profileDescription": "Update your account information",
+      "passwordDescription": "Update your account password to keep your account secure"
+    },
     "profile": {
       "photo": "Profile Photo",
       "photoDescription": "Upload/change photo for your profile. Recommended size: 400x400px.",
@@ -1605,7 +1675,9 @@
       "passwordUpdatedSuccessfully": "Password updated successfully",
       "failedToUpdatePassword": "Failed to update password",
       "oldPasswordIncorrect": "Current password is incorrect",
-      "newPasswordSameAsOld": "New password must be different from current password"
+      "newPasswordSameAsOld": "New password must be different from current password",
+      "hidePassword": "Hide password",
+      "showPassword": "Show password"
     },
     "tabs": {
       "general": "General",

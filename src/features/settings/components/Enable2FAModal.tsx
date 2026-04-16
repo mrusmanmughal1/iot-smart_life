@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -33,9 +34,9 @@ const methodIcons = {
 };
 
 const methodLabels = {
-  email: 'Email',
-  sms: 'SMS',
-  authenticator: 'Authenticator',
+  email: 'email',
+  sms: 'sms',
+  authenticator: 'authenticator',
 };
 
 export function Enable2FAModal({
@@ -47,6 +48,7 @@ export function Enable2FAModal({
   onResend,
   isResending = false,
 }: Enable2FAModalProps) {
+  const { t } = useTranslation();
   const [code, setCode] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
   const Icon = methodIcons[method];
@@ -87,7 +89,7 @@ export function Enable2FAModal({
         handleSubmit(pastedData);
       }, 100);
     } else {
-      toast.error('Invalid code format. Please enter a 6-digit code.');
+      toast.error(t('settings.security.twoFactor.invalidCodeFormat'));
     }
   };
 
@@ -95,7 +97,7 @@ export function Enable2FAModal({
     const finalCode = verificationCode || code;
 
     if (finalCode.length !== CODE_LENGTH) {
-      toast.error('Please enter the 6-digit verification code');
+      toast.error(t('settings.security.twoFactor.enterCodeRequired'));
       return;
     }
 
@@ -117,17 +119,23 @@ export function Enable2FAModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Icon className="h-5 w-5 text-purple-600" />
-            Enable {methodLabels[method]} Two-Factor Authentication
+            {t('settings.security.twoFactor.enable.title', {
+              method: t(`settings.security.twoFactor.methods.${methodLabels[method]}`),
+            })}
           </DialogTitle>
           <DialogDescription>
-            Please enter the 6-digit verification code sent to your { }
-            {method === 'authenticator' && ' app'} to complete the setup.
+            {t('settings.security.twoFactor.enable.description', {
+              target:
+                method === 'authenticator'
+                  ? t('settings.security.twoFactor.enable.authenticatorTarget')
+                  : t(`settings.security.twoFactor.methods.${methodLabels[method]}`),
+            })}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 p-4">
           <div className="space-y-2">
-            <Label htmlFor="verification-code">Verification Code</Label>
+            <Label htmlFor="verification-code">{t('settings.security.twoFactor.enterCode')}</Label>
             <Input
               ref={inputRef}
               id="verification-code"
@@ -137,14 +145,13 @@ export function Enable2FAModal({
               value={code}
               onChange={handleChange}
               onPaste={handlePaste}
-              placeholder="Enter 6-digit code"
+              placeholder={t('settings.security.twoFactor.enterCodePlaceholder')}
               className="h-14 text-center text-2xl font-semibold tracking-widest"
               disabled={isVerifying}
-              aria-label="Enter verification code"
+              aria-label={t('settings.security.twoFactor.enterCode')}
             />
             <p className="text-xs text-slate-500 text-center">
-              {/* Enter the code from your {methodLabels[method].toLowerCase()} */}
-              {method === 'authenticator' && ' app'}
+              {t('settings.security.twoFactor.enterCodeDescription')}
             </p>
           </div>
 
@@ -155,7 +162,7 @@ export function Enable2FAModal({
                 disabled={isResending}
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50"
               >
-                {isResending ? 'Resending...' : 'Resend Code'}
+                {isResending ? t('settings.security.twoFactor.resending') : t('settings.security.twoFactor.resendCode')}
               </button>
             </div>
           )}
@@ -167,7 +174,7 @@ export function Enable2FAModal({
             onClick={() => onOpenChange(false)}
             disabled={isVerifying}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={() => handleSubmit()}
@@ -175,7 +182,7 @@ export function Enable2FAModal({
             isLoading={isVerifying}
             className="bg-purple-600 hover:bg-purple-700 text-white"
           >
-            {isVerifying ? 'Verifying...' : 'Enable 2FA'}
+            {isVerifying ? t('settings.security.twoFactor.verifying') : t('settings.security.twoFactor.enableAuthenticator')}
           </Button>
         </DialogFooter>
       </DialogContent>

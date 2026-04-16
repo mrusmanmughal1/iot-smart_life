@@ -33,7 +33,6 @@
     "nextBilling": "الفاتورة القادمة",
     "settings": "الإعدادات",
     "logout": "تسجيل الخروج",
-    "signup": "تسجيل الدخول",
     "profile": "الملف الشخصي",
     "updateYourProfile": "تحديث معلومات الملف الشخصي",
     "phoneNumber": "رقم الهاتف",
@@ -49,7 +48,10 @@
     "phone": "رقم الهاتف",
     "phonePlaceholder": "أدخل رقم الهاتف",
     "phoneRequired": "رقم الهاتف مطلوب",
-    "phoneInvalid": "رقم الهاتف غير صالح"
+    "phoneInvalid": "رقم الهاتف غير صالح",
+    "signup": "تسجيل جديد",
+    "companyName": "اسم الشركة",
+    "failedToLoadSettings": "فشل تحميل الإعدادات"
   },
   "pagination": {
     "showing": "عرض",
@@ -1502,9 +1504,78 @@
     "compactMode": "وضع المدمج",
     "compactModeDescription": "عرض المزيد من المعلومات في مساحة أقل",
     "applyAndSave": "تطبيق وحفظ التفضيلات",
-    "notifications": "إعدادات الإشعارات",
-    "security": "الأمان",
-    "account": "إعدادات الحساب",
+    "notifications": {
+      "title": "إعدادات الإشعارات",
+      "preferences": "تفضيلات الإشعارات",
+      "description": "اختر الإشعارات التي ترغب في تلقيها",
+      "email": "إشعارات البريد الإلكتروني",
+      "emailDescription": "تلقي الإشعارات عبر البريد الإلكتروني",
+      "alarms": "إشعارات الإنذار",
+      "alarmsDescription": "الحصول على إشعار عند حدوث إنذارات جديدة",
+      "deviceStatus": "تغيير حالة الأجهزة",
+      "deviceStatusDescription": "إشعار عند اتصال الأجهزة أو انقطاعها",
+      "weeklyReports": "التقارير الأسبوعية",
+      "weeklyReportsDescription": "تلقي تقارير ملخص أسبوعية",
+      "push": "إشعارات الدفع",
+      "pushDescription": "تلقي إشعارات الدفع",
+      "save": "حفظ التفضيلات"
+    },
+    "security": {
+      "title": "إعدادات الأمان",
+      "subtitle": "إدارة تفضيلات الأمان الخاصة بك",
+      "twoFactor": {
+        "title": "المصادقة الثنائية",
+        "description": "أضف طبقة إضافية من الأمان لحسابك",
+        "chooseMethod": "اختر وسيلة المصادقة الثنائية",
+        "methods": {
+          "email": "التحقق عبر البريد الإلكتروني",
+          "emailDescription": "تلقي رموز التحقق عبر البريد الإلكتروني",
+          "setupEmail": "إعداد المصادقة عبر البريد الإلكتروني",
+          "sms": "التحقق عبر الرسائل النصية (SMS)",
+          "smsDescription": "تلقي رموز التحقق عبر الرسائل النصية",
+          "setupSms": "إعداد المصادقة عبر الرسائل النصية",
+          "authenticator": "تطبيق المصادقة (Google Authenticator)",
+          "authenticatorDescription": "استخدم تطبيق المصادقة للحصول على رموز زمنية",
+          "setupAuthenticator": "إنشاء رمز QR"
+        },
+        "scanQr": "مسح رمز QR",
+        "scanQrDescription": "امسح الرمز باستخدام تطبيق Google Authenticator",
+        "manualKey": "مفتاح الإدخال اليدوي:",
+        "enterCode": "أدخل رمز التحقق",
+        "enterCodePlaceholder": "أدخل الرمز المكون من 6 أرقام",
+        "enterCodeDescription": "أدخل الرمز من تطبيق المصادقة الخاص بك",
+        "enableAuthenticator": "تفعيل المصادقة عبر التطبيق",
+        "status": {
+          "title": "الحالة",
+          "emailActive": "المصادقة عبر البريد الإلكتروني نشطة",
+          "smsActive": "المصادقة عبر الرسائل النصية نشطة",
+          "authenticatorActive": "تطبيق المصادقة نشط",
+          "active": "نشط"
+        },
+        "disabledDescription": "المصادقة الثنائية معطلة حالياً",
+        "enabling": "جاري التفعيل...",
+        "disable": {
+          "title": "تعطيل المصادقة الثنائية",
+          "description": "يرجى إدخال رمز التحقق المكون من 6 أرقام من تطبيق المصادقة لتأكيد التعطيل.",
+          "button": "تعطيل المصادقة الثنائية"
+        },
+        "enable": {
+          "title": "تفعيل المصادقة الثنائية عبر {{method}}",
+          "description": "يرجى إدخال رمز التحقق المكون من 6 أرقام المرسل إلى {{target}} لإكمال الإعداد.",
+          "authenticatorTarget": "التطبيق"
+        },
+        "resendCode": "إعادة إرسال الرمز",
+        "resending": "جاري إعادة الإرسال...",
+        "invalidCodeFormat": "تنسيق الرمز غير صالح. يرجى إدخال رمز مكون من 6 أرقام.",
+        "enterCodeRequired": "يرجى إدخال رمز التحقق المكون من 6 أرقام",
+        "verifying": "جاري التحقق..."
+      }
+    },
+    "account": {
+      "title": "إعدادات الحساب",
+      "profileDescription": "تحديث معلومات حسابك",
+      "passwordDescription": "قم بتحديث كلمة مرور حسابك للحفاظ على أمان حسابك"
+    },
     "profile": {
       "photo": "صورة الملف الشخصي",
       "photoDescription": "قم بتحميل صورة جديدة لتغيير صورتك الشخصية. الحجم الموصى به: 400x400 بكسل.",
@@ -1534,7 +1605,9 @@
       "passwordUpdatedSuccessfully": "تم تحديث كلمة المرور بنجاح",
       "failedToUpdatePassword": "فشل تحديث كلمة المرور",
       "oldPasswordIncorrect": "كلمة المرور الحالية غير صحيحة",
-      "newPasswordSameAsOld": "يجب أن تكون كلمة المرور الجديدة مختلفة عن الحالية"
+      "newPasswordSameAsOld": "يجب أن تكون كلمة المرور الجديدة مختلفة عن الحالية",
+      "hidePassword": "إخفاء كلمة المرور",
+      "showPassword": "إظهار كلمة المرور"
     },
     "tabs": {
       "general": "عام",

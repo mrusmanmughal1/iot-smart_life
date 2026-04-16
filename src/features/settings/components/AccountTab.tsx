@@ -228,10 +228,8 @@ export function AccountTab() {
     <>
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>{t('common.profile') || 'Profile'}</CardTitle>
-          <CardDescription>
-            {t('common.updateYourProfile') || 'Update your account information'}
-          </CardDescription>
+          <CardTitle>{t('common.profile')}</CardTitle>
+          <CardDescription>{t('common.updateYourProfile')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="m-6 flex  items-center     gap-6">
@@ -267,11 +265,10 @@ export function AccountTab() {
             </div>
             <div className="flex flex-col gap-1">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                {t('settings.profile.photo') || 'Profile Photo'}
+                {t('settings.profile.photo')}
               </h3>
               <p className="text-xs text-gray-500 max-w-[440px]">
-                {t('settings.profile.photoDescription') ||
-                  'Recommended size: 400x400px.'}
+                {t('settings.profile.photoDescription')}
               </p>
               <div className="flex items-center gap-3 mt-1">
                 <Button
@@ -284,7 +281,7 @@ export function AccountTab() {
                   disabled={isUploadingAvatar}
                 >
                   <Upload size={14} className="mr-1.5" />
-                  {t('settings.profile.changePhoto') || 'Change Photo'}
+                  {t('settings.profile.changePhoto')}
                 </Button>
                 {avatarPreview !== '' &&
                   (avatarPreview || currentUser?.avatar) && (
@@ -296,7 +293,7 @@ export function AccountTab() {
                       disabled={isUploadingAvatar}
                     >
                       <Trash2 size={14} className="mr-1.5" />
-                      {t('settings.profile.removePhoto') || 'Remove'}
+                      {t('settings.profile.removePhoto')}
                     </Button>
                   )}
               </div>
@@ -311,12 +308,10 @@ export function AccountTab() {
           >
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="profileName">
-                  {t('common.name') || 'Name'}
-                </Label>
+                <Label htmlFor="profileName">{t('common.name')}</Label>
                 <Input
                   id="profileName"
-                  placeholder={t('common.name') || 'Name'}
+                  placeholder={t('common.name')}
                   {...registerProfile('name')}
                   error={profileErrors.name?.message}
                   className="border rounded-md"
@@ -324,12 +319,10 @@ export function AccountTab() {
               </div>
 
               <div className="space-y-2 relative">
-                <Label htmlFor="profileEmail">
-                  {t('common.email') || 'Email'}
-                </Label>
+                <Label htmlFor="profileEmail">{t('common.email')}</Label>
                 <Input
                   id="profileEmail"
-                  placeholder={t('common.email') || 'Email'}
+                  placeholder={t('common.email')}
                   {...registerProfile('email')}
                   disabled
                   className="border rounded-md opacity-80 disabled:opacity-100  disabled:cursor-not-allowed disabled:text-gray-500 disabled:bg-gray-100"
@@ -346,26 +339,22 @@ export function AccountTab() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="companyName">
-                {t('common.companyName') || 'Company Name'}
-              </Label>
+              <Label htmlFor="companyName">{t('common.companyName')}</Label>
               <Input
                 type="tel"
                 id="companyName"
                 placeholder={t('common.companyName')}
                 {...registerProfile('companyName')}
-                error={profileErrors.phone?.message}
+                error={profileErrors.companyName?.message}
                 className="border rounded-md"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="profilePhone">
-                {t('common.phoneNumber') || 'Phone Number'}
-              </Label>
+              <Label htmlFor="profilePhone">{t('common.phoneNumber')}</Label>
               <Input
                 type="tel"
                 id="profilePhone"
-                placeholder={t('common.phoneNumber') || 'Phone Number'}
+                placeholder={t('common.phoneNumber')}
                 {...registerProfile('phone')}
                 error={profileErrors.phone?.message}
                 className="border rounded-md"
@@ -380,9 +369,7 @@ export function AccountTab() {
                   (!isProfileDirty && !avatarFile && avatarPreview === null)
                 }
               >
-                {isUpdatingProfile
-                  ? t('common.saving') || 'Saving...'
-                  : t('common.save') || 'Save'}
+                {isUpdatingProfile ? t('common.saving') : t('common.save')}
               </Button>
               <Button
                 type="button"
@@ -403,7 +390,7 @@ export function AccountTab() {
                   (!isProfileDirty && !avatarFile && avatarPreview === null)
                 }
               >
-                {t('common.cancel') || 'Cancel'}
+                {t('common.cancel')}
               </Button>
             </div>
           </form>
@@ -419,7 +406,7 @@ export function AccountTab() {
                 {t('settings.changePassword.title')}
               </Label>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                Update your account password to keep your account secure
+                {t('settings.account.passwordDescription')}
               </p>
             </div>
 
@@ -449,7 +436,9 @@ export function AccountTab() {
                       }
                       className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                       aria-label={
-                        showCurrentPassword ? 'Hide password' : 'Show password'
+                        showCurrentPassword
+                          ? t('settings.changePassword.hidePassword')
+                          : t('settings.changePassword.showPassword')
                       }
                     >
                       {showCurrentPassword ? (
@@ -482,7 +471,9 @@ export function AccountTab() {
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                       aria-label={
-                        showNewPassword ? 'Hide password' : 'Show password'
+                        showNewPassword
+                          ? t('settings.changePassword.hidePassword')
+                          : t('settings.changePassword.showPassword')
                       }
                     >
                       {showNewPassword ? (
@@ -517,7 +508,9 @@ export function AccountTab() {
                       }
                       className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                       aria-label={
-                        showConfirmPassword ? 'Hide password' : 'Show password'
+                        showConfirmPassword
+                          ? t('settings.changePassword.hidePassword')
+                          : t('settings.changePassword.showPassword')
                       }
                     >
                       {showConfirmPassword ? (
