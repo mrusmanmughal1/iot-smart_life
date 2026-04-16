@@ -1616,6 +1616,82 @@
       "account": "الحساب"
     }
   },
+  "subscriptions": {
+    "title": "إدارة خطط الاشتراك",
+    "description": "اختر الخطة المثالية لدعم نمو عملك. أدر اشتراكاتك بسهولة وابقَ متحكماً.",
+    "badge": "الاشتراك",
+    "currentPlan": {
+      "title": "الخطة الحالية:",
+      "active": "نشط",
+      "nextBilling": "تاريخ الفاتورة القادمة: {{date}}"
+    },
+    "billing": {
+      "monthly": "شهرياً",
+      "yearly": "سنوياً",
+      "savePercent": "وفر 17%"
+    },
+    "plans": {
+      "freeBadge": "مجاني",
+      "proBadge": "احترافي",
+      "advanceBadge": "متقدم",
+      "month": "/شهرياً",
+      "priceLabel": "$",
+      "nameSuffix": "خطة"
+    },
+    "actions": {
+      "currentPlan": "الخطة الحالية",
+      "upgrade": "ترقية الخطة",
+      "subscribe": "اشتراك"
+    },
+    "comparison": {
+      "title": "مقارنة الميزات",
+      "subtitle": "قارن الميزات عبر جميع الخطط جنباً إلى جنب",
+      "featureHeader": "الميزة",
+      "features": {
+        "devices": "الأجهزة",
+        "assets": "الأصول",
+        "users": "المستخدمين",
+        "apiCalls": "طلبات API",
+        "dataRetention": "الاحتفاظ بالبيانات",
+        "ruleChains": "سلاسل القواعد"
+      }
+    },
+    "features": {
+      "unlimited": "غير محدود",
+      "upToDevices": "حتى {{count}} أجهزة",
+      "unlimitedDevices": "أجهزة غير محدودة",
+      "upToUsers": "حتى {{count}} مستخدمين",
+      "unlimitedUsers": "مستخدمين غير محدودين",
+      "realtimeAnalytics": "تحليلات في الوقت الفعلي",
+      "advancedAutomation": "أتمتة متقدمة وسلاسل قواعد",
+      "ruleEngine": "محرك قواعد {{type}}",
+      "unlimitedIntegrations": "تكاملات مخصصة غير محدودة",
+      "upToIntegrations": "حتى {{count}} تكاملات مخصصة",
+      "whiteLabel": "علامة تجارية بيضاء بمستوى {{level}}",
+      "support": "دعم {{level}}",
+      "dataRetention": "الاحتفاظ بالبيانات لمدة {{days}}",
+      "storage": "حد تخزين {{gb}} جيجابايت",
+      "multiTenancy": "متعدد المستأجرين",
+      "customerManagement": "إدارة العملاء",
+      "roleBasedAccess": "التحكم في الوصول القائم على الأدوار",
+      "auditLogs": "سجلات التدقيق",
+      "backupRecovery": "النسخ الاحتياطي والاسترداد",
+      "geofencing": "السياج الجغرافي",
+      "dataAggregation": "تجميع البيانات",
+      "units": {
+        "day": "يوم",
+        "days": "أيام",
+        "year": "سنة",
+        "years": "سنوات"
+      }
+    },
+    "messages": {
+      "currentPlanError": "هذه هي خطتك الحالية",
+      "subscribeSuccess": "تم الاشتراك في الخطة بنجاح",
+      "subscribeError": "فشل الاشتراك في الخطة",
+      "planDescription": "خطة {{name}} لاحتياجات عملك"
+    }
+  },
   "errors": {
     "generic": "حدث خطأ",
     "notFound": "غير موجود",

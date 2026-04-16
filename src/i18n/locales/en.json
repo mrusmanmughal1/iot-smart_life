@@ -1686,6 +1686,82 @@
       "account": "Account"
     }
   },
+  "subscriptions": {
+    "title": "Manage Your Subscription Plans",
+    "description": "Choose the perfect plan to support your business growth. Manage your subscriptions easily and stay in control.",
+    "badge": "Subscription",
+    "currentPlan": {
+      "title": "Current Plan:",
+      "active": "Active",
+      "nextBilling": "Next billing date: {{date}}"
+    },
+    "billing": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "savePercent": "Save 17%"
+    },
+    "plans": {
+      "freeBadge": "FREE",
+      "proBadge": "PRO",
+      "advanceBadge": "ADVANCE",
+      "month": "/month",
+      "priceLabel": "$",
+      "nameSuffix": "Plan"
+    },
+    "actions": {
+      "currentPlan": "Current Plan",
+      "upgrade": "Upgrade Plan",
+      "subscribe": "Subscribe"
+    },
+    "comparison": {
+      "title": "Feature Comparison",
+      "subtitle": "Compare features across all plans side by side",
+      "featureHeader": "Feature",
+      "features": {
+        "devices": "Devices",
+        "assets": "Assets",
+        "users": "Users",
+        "apiCalls": "API Calls",
+        "dataRetention": "Data Retention",
+        "ruleChains": "Rule Chains"
+      }
+    },
+    "features": {
+      "unlimited": "Unlimited",
+      "upToDevices": "Up to {{count}} devices",
+      "unlimitedDevices": "Unlimited devices",
+      "upToUsers": "Up to {{count}} users",
+      "unlimitedUsers": "Unlimited users",
+      "realtimeAnalytics": "Real-time analytics",
+      "advancedAutomation": "Advanced automation & rule chains",
+      "ruleEngine": "{{type}} rule engine",
+      "unlimitedIntegrations": "Unlimited custom integrations",
+      "upToIntegrations": "Up to {{count}} custom integrations",
+      "whiteLabel": "{{level}} white-label branding",
+      "support": "{{level}} support",
+      "dataRetention": "{{days}} data retention",
+      "storage": "{{gb}}GB Storage Limit",
+      "multiTenancy": "Multi-tenancy",
+      "customerManagement": "Customer management",
+      "roleBasedAccess": "Role-based access control",
+      "auditLogs": "Audit logs",
+      "backupRecovery": "Backup & recovery",
+      "geofencing": "Geofencing",
+      "dataAggregation": "Data aggregation",
+      "units": {
+        "day": "day",
+        "days": "days",
+        "year": "year",
+        "years": "years"
+      }
+    },
+    "messages": {
+      "currentPlanError": "This is your current plan",
+      "subscribeSuccess": "Successfully subscribed to plan",
+      "subscribeError": "Failed to subscribe to plan",
+      "planDescription": "{{name}} plan for your business needs"
+    }
+  },
   "errors": {
     "generic": "An error occurred",
     "notFound": "Not found",

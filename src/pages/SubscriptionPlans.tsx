@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardContent,
@@ -18,7 +19,6 @@ import {
 } from '@/features/Subscription/services/subscriptions.api';
 import { toast } from 'react-hot-toast';
 import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
-import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { format } from 'date-fns';
 import apiClient from '@/lib/axios';
 import { useCurrentSubscription } from '@/features/Subscription/hooks';
@@ -49,29 +49,31 @@ interface Plan {
   isEnterprise?: boolean;
 }
 
-const formatLimit = (value: number): number | string => {
-  if (value === -1) return 'Unlimited';
+const formatLimit = (value: number, t: any): number | string => {
+  if (value === -1) return t('subscriptions.features.unlimited');
   return value;
 };
 
-const formatDataRetention = (days: number): string => {
-  if (days === -1) return 'Unlimited';
-  if (days >= 365)
-    return `${Math.round(days / 365)} year${days >= 730 ? 's' : ''}`;
-  return `${days} day${days !== 1 ? 's' : ''}`;
+const formatDataRetention = (days: number, t: any): string => {
+  if (days === -1) return t('subscriptions.features.unlimited');
+  if (days >= 365) {
+    const years = Math.round(days / 365);
+    return `${years} ${t(years >= 2 ? 'subscriptions.features.units.years' : 'subscriptions.features.units.year')}`;
+  }
+  return `${days} ${t(days !== 1 ? 'subscriptions.features.units.days' : 'subscriptions.features.units.day')}`;
 };
 
-const formatApiCalls = (calls: number): number | string => {
-  if (calls === -1) return 'Unlimited';
+const formatApiCalls = (calls: number, t: any): number | string => {
+  if (calls === -1) return t('subscriptions.features.unlimited');
   if (calls >= 1000000) return `${(calls / 1000000).toFixed(1)}M`;
   if (calls >= 1000) return `${(calls / 1000).toFixed(0)}K`;
   return calls;
 };
 
-const formatStorage = (gb: number): string => {
-  if (gb === -1) return 'Unlimited';
+const formatStorage = (gb: number, t: any): string => {
+  if (gb === -1) return t('subscriptions.features.unlimited');
   if (gb >= 1000) return `${(gb / 1000).toFixed(1)}TB`;
-  return `${gb}GB Storage Limit`;
+  return t('subscriptions.features.storage', { gb });
 };
 
 const getPlanIcon = (planId: string): React.ReactNode => {
@@ -89,115 +91,137 @@ const getPlanIcon = (planId: string): React.ReactNode => {
   }
 };
 
-const generateFeatures = (apiPlan: ApiPlan): string[] => {
+const generateFeatures = (apiPlan: ApiPlan, t: any): string[] => {
   const features: string[] = [];
 
   // Device limits
   if (apiPlan.limits.devices !== -1) {
-    features.push(`Up to ${apiPlan.limits.devices} devices`);
+    features.push(
+      t('subscriptions.features.upToDevices', { count: apiPlan.limits.devices })
+    );
   } else {
-    features.push('Unlimited devices');
+    features.push(t('subscriptions.features.unlimitedDevices'));
   }
 
   // User limits
   if (apiPlan.limits.users !== -1) {
-    features.push(`Up to ${apiPlan.limits.users} users`);
+    features.push(
+      t('subscriptions.features.upToUsers', { count: apiPlan.limits.users })
+    );
   } else {
-    features.push('Unlimited users');
+    features.push(t('subscriptions.features.unlimitedUsers'));
   }
 
   // Analytics
   if (apiPlan.features.realtimeAnalytics) {
-    features.push('Real-time analytics');
+    features.push(t('subscriptions.features.realtimeAnalytics'));
   }
 
   // Automation
   if (apiPlan.features.advancedAutomation) {
-    features.push('Advanced automation & rule chains');
+    features.push(t('subscriptions.features.advancedAutomation'));
   } else if (apiPlan.features.ruleEngine !== 'basic') {
-    features.push(`${apiPlan.features.ruleEngine} rule engine`);
+    features.push(
+      t('subscriptions.features.ruleEngine', {
+        type: apiPlan.features.ruleEngine,
+      })
+    );
   }
 
   // Integrations
   if (apiPlan.features.customIntegrations) {
     if (apiPlan.limits.customIntegrations === -1) {
-      features.push('Unlimited custom integrations');
+      features.push(t('subscriptions.features.unlimitedIntegrations'));
     } else if (apiPlan.limits.customIntegrations > 0) {
       features.push(
-        `Up to ${apiPlan.limits.customIntegrations} custom integrations`
+        t('subscriptions.features.upToIntegrations', {
+          count: apiPlan.limits.customIntegrations,
+        })
       );
     }
   }
 
   // White label
   if (apiPlan.features.whiteLabelBranding) {
-    features.push(`${apiPlan.features.brandingLevel} white-label branding`);
+    features.push(
+      t('subscriptions.features.whiteLabel', {
+        level: apiPlan.features.brandingLevel,
+      })
+    );
   }
 
   // Support level
-  features.push(`${apiPlan.features.supportLevel} support`);
+  features.push(
+    t('subscriptions.features.support', {
+      level: apiPlan.features.supportLevel,
+    })
+  );
 
   // Data retention
   features.push(
-    `${formatDataRetention(apiPlan.limits.dataRetentionDays)} data retention`
+    t('subscriptions.features.dataRetention', {
+      retention: formatDataRetention(apiPlan.limits.dataRetentionDays, t),
+    })
   );
 
   // Storage
-  features.push(formatStorage(apiPlan.limits.storageGB));
+  features.push(formatStorage(apiPlan.limits.storageGB, t));
 
   // Additional features
   if (apiPlan.features.multiTenancy) {
-    features.push('Multi-tenancy');
+    features.push(t('subscriptions.features.multiTenancy'));
   }
 
   if (apiPlan.features.customerManagement) {
-    features.push('Customer management');
+    features.push(t('subscriptions.features.customerManagement'));
   }
 
   if (apiPlan.features.roleBasedAccess) {
-    features.push('Role-based access control');
+    features.push(t('subscriptions.features.roleBasedAccess'));
   }
 
   if (apiPlan.features.auditLogs) {
-    features.push('Audit logs');
+    features.push(t('subscriptions.features.auditLogs'));
   }
 
   if (apiPlan.features.backupRecovery) {
-    features.push('Backup & recovery');
+    features.push(t('subscriptions.features.backupRecovery'));
   }
 
   if (apiPlan.features.geofencing) {
-    features.push('Geofencing');
+    features.push(t('subscriptions.features.geofencing'));
   }
 
   if (apiPlan.features.dataAggregation) {
-    features.push('Data aggregation');
+    features.push(t('subscriptions.features.dataAggregation'));
   }
 
   return features;
 };
 
-const transformApiPlanToPlan = (apiPlan: ApiPlan): Plan => {
+const transformApiPlanToPlan = (apiPlan: ApiPlan, t: any): Plan => {
   return {
     id: apiPlan.plan,
     name: apiPlan.name,
-    description: `${apiPlan.name} plan for your business needs`,
+    description: t('subscriptions.messages.planDescription', {
+      name: apiPlan.name,
+    }),
     price: {
       monthly: apiPlan.monthlyPrice,
       yearly: apiPlan.yearlyPrice,
     },
     icon: getPlanIcon(apiPlan.plan),
-    features: generateFeatures(apiPlan),
+    features: generateFeatures(apiPlan, t),
     limits: {
-      devices: String(formatLimit(apiPlan.limits.devices)),
-      assets: String(formatLimit(apiPlan.limits.devices)), // Using devices as proxy for assets
-      users: String(formatLimit(apiPlan.limits.users)),
-      apiCalls: String(formatApiCalls(apiPlan.limits.apiCallsPerMonth)),
-      dataRetention: formatDataRetention(apiPlan.limits.dataRetentionDays),
+      devices: String(formatLimit(apiPlan.limits.devices, t)),
+      assets: String(formatLimit(apiPlan.limits.devices, t)), // Using devices as proxy for assets
+      users: String(formatLimit(apiPlan.limits.users, t)),
+      apiCalls: String(formatApiCalls(apiPlan.limits.apiCallsPerMonth, t)),
+      dataRetention: formatDataRetention(apiPlan.limits.dataRetentionDays, t),
       ruleChains:
         apiPlan.features.advancedAutomation ||
         apiPlan.features.ruleEngine !== 'basic'
-          ? 'Unlimited'
+          ? t('subscriptions.features.unlimited')
           : '0',
     },
     isPopular: apiPlan.popular || apiPlan.plan === 'professional',
@@ -206,6 +230,7 @@ const transformApiPlanToPlan = (apiPlan: ApiPlan): Plan => {
 };
 
 export default function SubscriptionPlans() {
+  const { t } = useTranslation();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>(
     'monthly'
   );
@@ -230,8 +255,8 @@ export default function SubscriptionPlans() {
 
   const plans = useMemo(() => {
     if (!plansResponse || !Array.isArray(plansResponse)) return [];
-    return plansResponse.map(transformApiPlanToPlan);
-  }, [plansResponse]);
+    return plansResponse.map((p) => transformApiPlanToPlan(p, t));
+  }, [plansResponse, t]);
 
   // Map plan IDs to SubscriptionPlan enum
   const mapPlanIdToSubscriptionPlan = (planId: string): SubscriptionPlan => {
@@ -252,7 +277,7 @@ export default function SubscriptionPlans() {
   const handlePlanSelection = async (planId: string) => {
     // Don't allow subscribing to the current plan
     if (planId === currentPlanId) {
-      toast.error('This is your current plan');
+      toast.error(t('subscriptions.messages.currentPlanError'));
       return;
     }
     setIsSubscribing(planId);
@@ -269,11 +294,11 @@ export default function SubscriptionPlans() {
         const paymentUrl = await handlePayment(plan, billing);
         window.location.href = paymentUrl;
       } else {
-        toast.error('Successfully subscribed to plan');
+        toast.success(t('subscriptions.messages.subscribeSuccess'));
       }
     } catch (error: unknown) {
       const errorMessage =
-        getErrorMessage(error) || 'Failed to subscribe to plan';
+        getErrorMessage(error) || t('subscriptions.messages.subscribeError');
       toast.error(errorMessage);
     } finally {
       setIsSubscribing(null);
@@ -284,14 +309,11 @@ export default function SubscriptionPlans() {
     <div className="space-y-6 border bg-[#fff6fb]/50 p-6 rounded-lg border-secondary dark:bg-gray-800 dark:border-gray-700 ">
       <div className="">
         <Badge className="text-base  mb-4 font-normal px-4 py-2 bg-secondary dark:bg-gray-900 dark:border-gray-700 text-white">
-          Subscription
+          {t('subscriptions.badge')}
         </Badge>
-        <div className="text-2xl font-semibold">
-          Manage Your Subscription Plans
-        </div>
+        <div className="text-2xl font-semibold">{t('subscriptions.title')}</div>
         <div className="text-sm text-muted-foreground">
-          Choose the perfect plan to support your business growth. Manage your
-          subscriptions easily and stay in control.
+          {t('subscriptions.description')}
         </div>
       </div>
 
@@ -302,23 +324,24 @@ export default function SubscriptionPlans() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2 dark:text-white">
-                  Current Plan:{' '}
+                  {t('subscriptions.currentPlan.title')}{' '}
                   {plans.find((p) => p.id === currentPlanId)?.name ||
                     currentPlanId}
                   <Badge className="text-sm font-normal px-4 bg-secondary dark:bg-gray-900 dark:border-gray-700 text-white">
                     {currentSubscriptionResponse.status === 'active'
-                      ? 'Active'
+                      ? t('subscriptions.currentPlan.active')
                       : currentSubscriptionResponse.status}
                   </Badge>
                 </CardTitle>
                 <CardDescription className="dark:text-white">
                   {currentSubscriptionResponse.nextBillingDate && (
                     <>
-                      Next billing date:{' '}
-                      {format(
-                        new Date(currentSubscriptionResponse.nextBillingDate),
-                        'MMMM d, yyyy'
-                      )}
+                      {t('subscriptions.currentPlan.nextBilling', {
+                        date: format(
+                          new Date(currentSubscriptionResponse.nextBillingDate),
+                          'MMMM d, yyyy'
+                        ),
+                      })}
                     </>
                   )}
                 </CardDescription>
@@ -338,7 +361,7 @@ export default function SubscriptionPlans() {
               : 'text-gray-500 dark:text-white'
           }`}
         >
-          Monthly
+          {t('subscriptions.billing.monthly')}
         </Label>
         <Switch
           id="billing"
@@ -356,11 +379,11 @@ export default function SubscriptionPlans() {
                 : 'text-gray-500'
             }`}
           >
-            Yearly
+            {t('subscriptions.billing.yearly')}
           </Label>
           {billingPeriod === 'yearly' && (
             <Badge className="bg-green-100 text-green-700 border-green-300">
-              Save 17%
+              {t('subscriptions.billing.savePercent')}
             </Badge>
           )}
         </div>
@@ -389,7 +412,7 @@ export default function SubscriptionPlans() {
                     plan.isPopular ? 'text-white' : 'text-gray-900'
                   }`}
                 >
-                  {plan.name} Plan
+                  {plan.name} {t('subscriptions.plans.nameSuffix')}
                 </h3>
                 <Badge
                   className={`${
@@ -401,10 +424,10 @@ export default function SubscriptionPlans() {
                   } px-6 py-1  font-semibold uppercase`}
                 >
                   {plan.id === 'free'
-                    ? 'FREE'
+                    ? t('subscriptions.plans.freeBadge')
                     : plan.isPopular
-                      ? 'PRO'
-                      : 'ADVANCE'}
+                      ? t('subscriptions.plans.proBadge')
+                      : t('subscriptions.plans.advanceBadge')}
                 </Badge>
               </div>
               <div className="flex items-baseline gap-1">
@@ -413,7 +436,7 @@ export default function SubscriptionPlans() {
                     plan.isPopular ? 'text-white' : 'text-gray-900'
                   }`}
                 >
-                  $
+                  {t('subscriptions.plans.priceLabel')}
                   {billingPeriod === 'monthly'
                     ? plan.price.monthly
                     : Math.round(plan.price.yearly / 12)}
@@ -424,7 +447,7 @@ export default function SubscriptionPlans() {
                     plan.isPopular ? 'text-gray-300' : 'text-gray-500'
                   }`}
                 >
-                  /month
+                  {t('subscriptions.plans.month')}
                 </span>
               </div>
             </div>
@@ -452,7 +475,7 @@ export default function SubscriptionPlans() {
                       className="w-full bg-gray-100 border border-gray-300 text-black hover:bg-gray-800 font-medium"
                       disabled
                     >
-                      Current Plan
+                      {t('subscriptions.actions.currentPlan')}
                     </Button>
                   );
                 }
@@ -468,10 +491,10 @@ export default function SubscriptionPlans() {
                     {currentPlanId &&
                     plans.findIndex((p) => p.id === plan.id) >
                       plans.findIndex((p) => p.id === currentPlanId)
-                      ? 'Upgrade Plan'
+                      ? t('subscriptions.actions.upgrade')
                       : isCurrentPlan && !isBillingPeriodMatch
-                        ? 'Upgrade Plan'
-                        : 'Subscribe'}
+                        ? t('subscriptions.actions.upgrade')
+                        : t('subscriptions.actions.subscribe')}
                   </Button>
                 );
               })()}
@@ -506,10 +529,10 @@ export default function SubscriptionPlans() {
       <Card className="border-gray-200 shadow-sm">
         <CardHeader>
           <CardTitle className="text-2xl font-bold dark:text-white">
-            Feature Comparison
+            {t('subscriptions.comparison.title')}
           </CardTitle>
           <CardDescription className="dark:text-white">
-            Compare features across all plans side by side
+            {t('subscriptions.comparison.subtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -518,7 +541,7 @@ export default function SubscriptionPlans() {
               <thead>
                 <tr className="border-b-2 border-gray-200">
                   <th className="text-left py-4 pr-8 font-semibold text-gray-900 dark:text-white">
-                    Feature
+                    {t('subscriptions.comparison.featureHeader')}
                   </th>
                   {plans.map((plan) => (
                     <th
@@ -536,12 +559,32 @@ export default function SubscriptionPlans() {
               </thead>
               <tbody>
                 {[
-                  { feature: 'Devices', key: 'devices' },
-                  { feature: 'Assets', key: 'assets' },
-                  { feature: 'Users', key: 'users' },
-                  { feature: 'API Calls', key: 'apiCalls' },
-                  { feature: 'Data Retention', key: 'dataRetention' },
-                  { feature: 'Rule Chains', key: 'ruleChains' },
+                  {
+                    feature: t('subscriptions.comparison.features.devices'),
+                    key: 'devices',
+                  },
+                  {
+                    feature: t('subscriptions.comparison.features.assets'),
+                    key: 'assets',
+                  },
+                  {
+                    feature: t('subscriptions.comparison.features.users'),
+                    key: 'users',
+                  },
+                  {
+                    feature: t('subscriptions.comparison.features.apiCalls'),
+                    key: 'apiCalls',
+                  },
+                  {
+                    feature: t(
+                      'subscriptions.comparison.features.dataRetention'
+                    ),
+                    key: 'dataRetention',
+                  },
+                  {
+                    feature: t('subscriptions.comparison.features.ruleChains'),
+                    key: 'ruleChains',
+                  },
                 ].map((row) => (
                   <tr
                     key={row.key}
