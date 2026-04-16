@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { FileText, Activity } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +18,7 @@ import type { AuditLog } from '@/services/api/audit.api';
 import { PageHeader } from '@/components/common/PageHeader';
 
 export default function AuditPage() {
+  const { t } = useTranslation();
   const { data: auditData, isLoading } = useAuditLogs();
 
   // Handle nested API response structure: { data: { data: { data: AuditLog[], meta: {...} } } }
@@ -37,35 +39,41 @@ export default function AuditPage() {
 
   return (
     <div className="space-y-6">
-
-      <PageHeader title='Audit Logs' description='Track all system activities and changes' />
+      <PageHeader title={t('audit.title')} description={t('audit.subtitle')} />
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Events</CardTitle>
-            <FileText className="h-4 w-4 text-blue-600" />
+            <CardTitle className="font-medium">
+              {t('audit.totalEvents')}
+            </CardTitle>
+            <FileText className="h-8 w-8 text-blue-600" />
           </CardHeader>
           <CardContent>
-            {/* <div className="text-2xl font-bold">{logs.length}</div> */}
-            <p className="text-xs text-slate-500">In the last 30 days</p>
+            <p className=" text-sm  text-slate-500">
+              {t('audit.inLast30Days')}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <Activity className="h-4 w-4 text-green-600" />
+            <CardTitle className="font-medium">
+              {t('audit.activeUsers')}
+            </CardTitle>
+            <Activity className="h-8 w-8 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-slate-500">Currently online</p>
+            <p className="text-xs text-slate-500">
+              {t('audit.currentlyOnline')}
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle>{t('audit.recentActivity')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -78,12 +86,12 @@ export default function AuditPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Entity Type</TableHead>
-                  <TableHead>Entity Name</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Timestamp</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>{t('audit.table.action')}</TableHead>
+                  <TableHead>{t('audit.table.entityType')}</TableHead>
+                  <TableHead>{t('audit.table.entityName')}</TableHead>
+                  <TableHead>{t('audit.table.user')}</TableHead>
+                  <TableHead>{t('audit.table.timestamp')}</TableHead>
+                  <TableHead>{t('audit.table.status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -93,11 +101,11 @@ export default function AuditPage() {
                       <Badge
                         variant={
                           getActionColor(log.action) as
-                          | 'default'
-                          | 'destructive'
-                          | 'secondary'
-                          | 'outline'
-                          | 'success'
+                            | 'default'
+                            | 'destructive'
+                            | 'secondary'
+                            | 'outline'
+                            | 'success'
                         }
                       >
                         {log.action.replace('_', ' ')}
@@ -113,7 +121,9 @@ export default function AuditPage() {
                     </TableCell>
                     <TableCell>
                       <Badge variant={log.success ? 'success' : 'destructive'}>
-                        {log.success ? 'Success' : 'Failed'}
+                        {log.success
+                          ? t('audit.table.success')
+                          : t('audit.table.failed')}
                       </Badge>
                     </TableCell>
                   </TableRow>

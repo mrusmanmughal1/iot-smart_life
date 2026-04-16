@@ -56,7 +56,9 @@ export default function Subscriptioninvoices() {
   if (isError) {
     return (
       <ErrorMessage
-        message={getErrorMessage(error) || 'Failed to load billing history'}
+        message={
+          getErrorMessage(error) || t('nav.subscriptions.invoices.failedToLoad')
+        }
       />
     );
   }
@@ -77,7 +79,9 @@ export default function Subscriptioninvoices() {
             <CardTitle className="text-lg">{t('nav.invoices')}</CardTitle>
           </div>
           <CardDescription>
-            {meta?.totalItems || 0} {t('nav.invoices').toLowerCase()} found
+            {t('nav.subscriptions.invoices.found', {
+              count: meta?.totalItems || 0,
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent className="px-4">
@@ -200,7 +204,7 @@ export default function Subscriptioninvoices() {
                     >
                       <div className="flex flex-col items-center justify-center gap-2">
                         <CreditCard className="h-8 w-8 text-muted-foreground/50" />
-                        <p>No billing history available yet.</p>
+                        <p>{t('nav.subscriptions.invoices.noHistory')}</p>
                       </div>
                     </TableCell>
                   </TableRow>

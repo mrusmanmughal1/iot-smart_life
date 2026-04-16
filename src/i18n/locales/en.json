@@ -137,7 +137,10 @@
         "actions": {
           "downloadInvoice": "Invoice",
           "downloadReceipt": "Receipt"
-        }
+        },
+        "found": "{{count}} invoices found",
+        "noHistory": "No billing history available yet.",
+        "failedToLoad": "Failed to load billing history"
       }
     }
   },
@@ -1774,6 +1777,25 @@
     "updated": "Successfully updated",
     "deleted": "Successfully deleted",
     "saved": "Successfully saved"
+  },
+  "audit": {
+    "title": "Audit Logs",
+    "subtitle": "Track all system activities and changes",
+    "totalEvents": "Total Events",
+    "inLast30Days": "In the last 30 days",
+    "activeUsers": "Active Users",
+    "currentlyOnline": "Currently online",
+    "recentActivity": "Recent Activity",
+    "table": {
+      "action": "Action",
+      "entityType": "Entity Type",
+      "entityName": "Entity Name",
+      "user": "User",
+      "timestamp": "Timestamp",
+      "status": "Status",
+      "success": "Success",
+      "failed": "Failed"
+    }
   },
   "auth": {
     "login": {

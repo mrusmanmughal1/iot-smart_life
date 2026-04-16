@@ -47,7 +47,6 @@ interface NavItem {
   children?: NavItem[];
   feature?: keyof SubscriptionFeatures;
 }
-
 const getNavItems = (): NavItem[] => [
   {
     titleKey: 'nav.overview',
@@ -194,7 +193,6 @@ const getNavItems = (): NavItem[] => [
     icon: <Calendar className="h-4 w-4" />,
     feature: 'scheduleManagement',
   },
-
   {
     titleKey: 'nav.resources',
 

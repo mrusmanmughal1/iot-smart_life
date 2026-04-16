@@ -108,6 +108,35 @@
     "audit": "التدقيق",
     "activity": "النشاط",
     "subscriptionPlans": "خطط الاشتراك",
+    "invoices": "الفواتير",
+    "subscription": "الاشتراك",
+    "plans": "الخطط",
+    "subscriptions": {
+      "invoices": {
+        "title": "سجل الفواتير",
+        "subtitle": "عرض وتنزيل فواتيرك وإيصالاتك السابقة.",
+        "table": {
+          "number": "رقم الفاتورة",
+          "plan": "الخطة",
+          "date": "التاريخ",
+          "amount": "المبلغ",
+          "status": "الحالة",
+          "actions": "الإجراءات"
+        },
+        "status": {
+          "paid": "مدفوع",
+          "pending": "قيد الانتظار",
+          "failed": "فاشل"
+        },
+        "actions": {
+          "downloadInvoice": "فاتورة",
+          "downloadReceipt": "إيصال"
+        },
+        "found": "تم العثور على {{count}} فاتورة",
+        "noHistory": "لا يوجد سجل فواتير متاح بعد.",
+        "failedToLoad": "فشل تحميل سجل الفواتير"
+      }
+    },
     "settings": "الإعدادات",
     "smartLifeIoTPlatform": "منصة Smart Life IoT",
     "version": "الإصدار 1.0.0"
@@ -1704,6 +1733,25 @@
     "updated": "تم التحديث بنجاح",
     "deleted": "تم الحذف بنجاح",
     "saved": "تم الحفظ بنجاح"
+  },
+  "audit": {
+    "title": "سجلات التدقيق",
+    "subtitle": "تتبع جميع أنشطة النظام وتغييراته",
+    "totalEvents": "إجمالي الأحداث",
+    "inLast30Days": "في آخر 30 يوماً",
+    "activeUsers": "المستخدمون النشطون",
+    "currentlyOnline": "متصل حالياً",
+    "recentActivity": "النشاط الأخير",
+    "table": {
+      "action": "الإجراء",
+      "entityType": "نوع الكيان",
+      "entityName": "اسم الكيان",
+      "user": "المستخدم",
+      "timestamp": "الطابع الزمني",
+      "status": "الحالة",
+      "success": "نجاح",
+      "failed": "فشل"
+    }
   },
   "auth": {
     "login": {
