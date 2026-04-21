@@ -95,8 +95,8 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
     formData.manufacturer || ''
   );
 
-  const manufacturers = manufacturersResponse?.data || [];
-  const models = modelsResponse?.data || [];
+  const manufacturers = manufacturersResponse?.data?.data || [];
+  const models = modelsResponse?.data?.data || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -146,12 +146,24 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sensor">{t('devices.form.types.sensor')}</SelectItem>
-                  <SelectItem value="actuator">{t('devices.form.types.actuator')}</SelectItem>
-                  <SelectItem value="gateway">{t('devices.form.types.gateway')}</SelectItem>
-                  <SelectItem value="controller">{t('devices.form.types.controller')}</SelectItem>
-                  <SelectItem value="camera">{t('devices.form.types.camera')}</SelectItem>
-                  <SelectItem value="tracker">{t('devices.form.types.tracker')}</SelectItem>
+                  <SelectItem value="sensor">
+                    {t('devices.form.types.sensor')}
+                  </SelectItem>
+                  <SelectItem value="actuator">
+                    {t('devices.form.types.actuator')}
+                  </SelectItem>
+                  <SelectItem value="gateway">
+                    {t('devices.form.types.gateway')}
+                  </SelectItem>
+                  <SelectItem value="controller">
+                    {t('devices.form.types.controller')}
+                  </SelectItem>
+                  <SelectItem value="camera">
+                    {t('devices.form.types.camera')}
+                  </SelectItem>
+                  <SelectItem value="tracker">
+                    {t('devices.form.types.tracker')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -172,12 +184,24 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="wifi">{t('devices.form.connections.wifi')}</SelectItem>
-                  <SelectItem value="ethernet">{t('devices.form.connections.ethernet')}</SelectItem>
-                  <SelectItem value="bluetooth">{t('devices.form.connections.bluetooth')}</SelectItem>
-                  <SelectItem value="cellular">{t('devices.form.connections.cellular')}</SelectItem>
-                  <SelectItem value="zigbee">{t('devices.form.connections.zigbee')}</SelectItem>
-                  <SelectItem value="lora">{t('devices.form.connections.lora')}</SelectItem>
+                  <SelectItem value="wifi">
+                    {t('devices.form.connections.wifi')}
+                  </SelectItem>
+                  <SelectItem value="ethernet">
+                    {t('devices.form.connections.ethernet')}
+                  </SelectItem>
+                  <SelectItem value="bluetooth">
+                    {t('devices.form.connections.bluetooth')}
+                  </SelectItem>
+                  <SelectItem value="cellular">
+                    {t('devices.form.connections.cellular')}
+                  </SelectItem>
+                  <SelectItem value="zigbee">
+                    {t('devices.form.connections.zigbee')}
+                  </SelectItem>
+                  <SelectItem value="lora">
+                    {t('devices.form.connections.lora')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -191,7 +215,6 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 onValueChange={(value) =>
                   setFormData({ ...formData, manufacturer: value, model: '' })
                 }
-                disabled={isLoadingManufacturers}
               >
                 <SelectTrigger>
                   <SelectValue
@@ -221,7 +244,6 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 onValueChange={(value) =>
                   setFormData({ ...formData, model: value })
                 }
-                disabled={!formData.manufacturer || isLoadingModels}
               >
                 <SelectTrigger>
                   <SelectValue
@@ -243,7 +265,9 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
             </div>
 
             <div>
-              <Label htmlFor="device-description">{t('devices.form.description')}</Label>
+              <Label htmlFor="device-description">
+                {t('devices.form.description')}
+              </Label>
               <Textarea
                 id="device-description"
                 value={formData.description || ''}
@@ -284,12 +308,20 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   }
                   disabled={!enableGatewayAssignment}
                 >
-                  <SelectValue placeholder={t('devices.form.selectGatewayPlaceholder')} />
+                  <SelectValue
+                    placeholder={t('devices.form.selectGatewayPlaceholder')}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gateway-1">{t('devices.form.gateways.gateway1')}</SelectItem>
-                  <SelectItem value="gateway-2">{t('devices.form.gateways.gateway2')}</SelectItem>
-                  <SelectItem value="gateway-3">{t('devices.form.gateways.gateway3')}</SelectItem>
+                  <SelectItem value="gateway-1">
+                    {t('devices.form.gateways.gateway1')}
+                  </SelectItem>
+                  <SelectItem value="gateway-2">
+                    {t('devices.form.gateways.gateway2')}
+                  </SelectItem>
+                  <SelectItem value="gateway-3">
+                    {t('devices.form.gateways.gateway3')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
