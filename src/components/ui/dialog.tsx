@@ -149,7 +149,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
           {children}
           <button
             onClick={() => context.onOpenChange(false)}
-            className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+            className="absolute end-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
           >
             <span className="sr-only">Close</span>
           </button>
@@ -166,7 +166,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      'flex flex-col space-y-1.5 p-4  text-center rounded-t-lg bg-primary text-white sm:text-left',
+      'flex flex-col space-y-1.5 p-4  text-center rounded-t-lg bg-primary text-white sm:text-start',
       className
     )}
     {...props}

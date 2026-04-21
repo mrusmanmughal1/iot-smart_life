@@ -1,6 +1,7 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/util';
+import { useTranslation } from 'react-i18next';
 
 export interface Step {
   id: number;
@@ -21,6 +22,7 @@ export const Stepper: React.FC<StepperProps> = ({
   currentStep,
   completedSteps = [],
 }) => {
+  const { t } = useTranslation();
   const isStepCompleted = (stepId: number) => completedSteps.includes(stepId);
   const isStepActive = (stepId: number) => stepId === currentStep;
   const isStepAccessible = (stepId: number) =>
@@ -32,6 +34,7 @@ export const Stepper: React.FC<StepperProps> = ({
         {steps.map((step, index) => {
           const isCompleted = isStepCompleted(step.id);
           const isActive = isStepActive(step.id);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const isAccessible = isStepAccessible(step.id);
           const isLast = index === steps.length - 1;
 
@@ -71,7 +74,9 @@ export const Stepper: React.FC<StepperProps> = ({
                         </div>
                       )}
                       {step.optional && (
-                        <div className="text-xs text-gray-400">Optional</div>
+                        <div className="text-xs text-gray-400">
+                          {t('deviceProfiles.form.messages.optional')}
+                        </div>
                       )}
                     </div>
                   </div>

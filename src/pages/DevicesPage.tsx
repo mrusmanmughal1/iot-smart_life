@@ -75,15 +75,13 @@ export default function DevicesPage() {
       const successMessage =
         (response as { data?: { message?: string } })?.data?.message ||
         (response as { message?: string })?.message ||
-        t('success.deleted') ||
-        'Device deleted successfully';
+        t('devices.messages.deleteSuccess');
       toast.success(successMessage);
       setDeviceToDeleteId(null);
     } catch (error) {
       const errorMessage =
         getErrorMessage(error) ||
-        t('errors.generic') ||
-        'Failed to delete device';
+        t('devices.messages.deleteError');
       toast.error(errorMessage);
     }
   }, [deleteDevice, deviceToDeleteId, t]);
@@ -126,8 +124,7 @@ export default function DevicesPage() {
       const successMessage =
         (resp as { data?: { message?: string } })?.data?.message ||
         (resp as { message?: string })?.message ||
-        t('success.created') ||
-        'Device created successfully';
+        t('devices.messages.createSuccess');
       toast.success(successMessage);
 
       const credentials =
@@ -141,8 +138,7 @@ export default function DevicesPage() {
     } catch (error) {
       const errorMessage =
         getErrorMessage(error) ||
-        t('errors.generic') ||
-        'Failed to create device';
+        t('devices.messages.createError');
       toast.error(errorMessage);
     }
   };
@@ -157,16 +153,14 @@ export default function DevicesPage() {
       const successMessage =
         (response as { data?: { message?: string } })?.data?.message ||
         (response as { message?: string })?.message ||
-        t('success.updated') ||
-        'Device updated successfully';
+        t('devices.messages.updateSuccess');
       toast.success(successMessage);
       setIsEditDialogOpen(false);
       setSelectedDevice(null);
     } catch (error) {
       const errorMessage =
         getErrorMessage(error) ||
-        t('errors.generic') ||
-        'Failed to update device';
+        t('devices.messages.updateError');
       toast.error(errorMessage);
     }
   };
@@ -237,7 +231,7 @@ export default function DevicesPage() {
                       colSpan={6}
                       className="h-24 text-center bg-gray-50 text-muted-foreground"
                     >
-                      {t('devices.noDevices') || 'No devices found'}
+                      {t('devices.noDevices')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -263,8 +257,8 @@ export default function DevicesPage() {
                           } text-white`}
                         >
                           {device.status === 'active'
-                            ? t('common.active') || 'Active'
-                            : t('common.inactive') || 'Inactive'}
+                            ? t('common.active')
+                            : t('common.inactive')}
                         </Badge>
                       </TableCell>
                       <TableCell className="   ">
@@ -293,7 +287,7 @@ export default function DevicesPage() {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="bottom-[70%] max-w-36">
-                            View Device
+                            {t('devices.tooltips.view')}
                           </TooltipContent>
                         </Tooltip>
                         <Tooltip>
@@ -308,7 +302,7 @@ export default function DevicesPage() {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="bottom-[70%] max-w-36">
-                            Edit Device
+                            {t('devices.tooltips.edit')}
                           </TooltipContent>
                         </Tooltip>
                         <Tooltip>
@@ -326,7 +320,7 @@ export default function DevicesPage() {
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent className="bottom-[70%] max-w-36">
-                            Delete Device
+                            {t('devices.tooltips.delete')}
                           </TooltipContent>
                         </Tooltip>
                       </TableCell>
@@ -395,9 +389,9 @@ export default function DevicesPage() {
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        title="Delete Device"
+        title={t('devices.tooltips.delete')}
         itemName={
-          devices.find((d: any) => d.id === deviceToDeleteId)?.name || 'Device'
+          devices.find((d: any) => d.id === deviceToDeleteId)?.name || t('common.name')
         }
         isLoading={deleteDevice.isPending}
       />

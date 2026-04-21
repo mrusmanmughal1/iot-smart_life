@@ -1,5 +1,6 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   FormControl,
   FormField,
@@ -25,16 +26,18 @@ interface Step2TransportConfigurationProps {
 export const Step2TransportConfiguration: React.FC<
   Step2TransportConfigurationProps
 > = ({ form }) => {
+  const { t } = useTranslation();
   const transportType = form.watch('transportType');
 
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold  text-primary  mb-1">
-          Transport Configuration
+          {t('deviceProfiles.form.steps.transport.title')}
         </h3>
         <p className="text-sm text-gray-500">
-          Configure the transport protocol settings (Optional)
+          {t('deviceProfiles.form.steps.transport.description')}{' '}
+          {t('deviceProfiles.form.steps.transport.optional')}
         </p>
       </div>
 
@@ -44,19 +47,33 @@ export const Step2TransportConfiguration: React.FC<
           name="transportType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Transport Type</FormLabel>
+              <FormLabel>{t('deviceProfiles.form.fields.transportType')}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select transport type" />
+                    <SelectValue
+                      placeholder={t(
+                        'deviceProfiles.form.fields.transportPlaceholder'
+                      )}
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="mqtt">MQTT</SelectItem>
-                  <SelectItem value="http">HTTP</SelectItem>
-                  <SelectItem value="coap">CoAP</SelectItem>
-                  <SelectItem value="lwm2m">LWM2M</SelectItem>
-                  <SelectItem value="snmp">SNMP</SelectItem>
+                  <SelectItem value="mqtt">
+                    {t('deviceProfiles.form.options.mqtt')}
+                  </SelectItem>
+                  <SelectItem value="http">
+                    {t('deviceProfiles.form.options.http')}
+                  </SelectItem>
+                  <SelectItem value="coap">
+                    {t('deviceProfiles.form.options.coap')}
+                  </SelectItem>
+                  <SelectItem value="lwm2m">
+                    {t('deviceProfiles.form.options.lwm2m')}
+                  </SelectItem>
+                  <SelectItem value="snmp">
+                    {t('deviceProfiles.form.options.snmp')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -71,16 +88,20 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.mqttConfig.deviceTelemetryTopic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Device Telemetry Topic</FormLabel>
+                  <FormLabel>
+                    {t('deviceProfiles.form.fields.telemetryTopic')}
+                  </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., v1/devices/me/telemetry"
+                      placeholder={t(
+                        'deviceProfiles.form.fields.telemetryPlaceholder'
+                      )}
                       {...field}
                       value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormDescription>
-                    MQTT topic for device telemetry data
+                    {t('deviceProfiles.form.fields.telemetryDescription')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -91,10 +112,14 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.mqttConfig.deviceAttributesTopic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Device Attributes Topic</FormLabel>
+                  <FormLabel>
+                    {t('deviceProfiles.form.fields.attributesTopic')}
+                  </FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., v1/devices/me/attributes"
+                      placeholder={t(
+                        'deviceProfiles.form.fields.attributesPlaceholder'
+                      )}
                       {...field}
                       value={field.value ?? ''}
                     />
@@ -113,10 +138,10 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.httpConfig.baseUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Base URL</FormLabel>
+                  <FormLabel>{t('deviceProfiles.form.fields.baseUrl')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., https://api.example.com"
+                      placeholder={t('deviceProfiles.form.fields.baseUrlPlaceholder')}
                       {...field}
                       value={field.value ?? ''}
                     />
@@ -130,7 +155,7 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.httpConfig.timeout"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Timeout (seconds)</FormLabel>
+                  <FormLabel>{t('deviceProfiles.form.fields.timeout')}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -154,7 +179,7 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.coapConfig.port"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Port</FormLabel>
+                  <FormLabel>{t('deviceProfiles.form.fields.port')}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -178,7 +203,7 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.modbusConfig.port"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Port</FormLabel>
+                  <FormLabel>{t('deviceProfiles.form.fields.port')}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -197,7 +222,7 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.modbusConfig.baudRate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Baud Rate</FormLabel>
+                  <FormLabel>{t('deviceProfiles.form.fields.baudRate')}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -221,10 +246,10 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.loraWanConfig.region"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Region</FormLabel>
+                  <FormLabel>{t('deviceProfiles.form.fields.region')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., EU868"
+                      placeholder={t('deviceProfiles.form.fields.regionPlaceholder')}
                       {...field}
                       value={field.value ?? ''}
                     />
@@ -238,7 +263,7 @@ export const Step2TransportConfiguration: React.FC<
               name="transportConfiguration.loraWanConfig.appEui"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Application EUI</FormLabel>
+                  <FormLabel>{t('deviceProfiles.form.fields.appEui')}</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g., 0000000000000000"

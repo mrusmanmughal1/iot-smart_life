@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
   Edit,
@@ -31,6 +32,7 @@ interface DeviceAlarmsTabProps {
 export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
   deviceId,
 }) => {
+  const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [timeRangeFilter, setTimeRangeFilter] = useState<string>('24h');
@@ -112,17 +114,17 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
   const handleEditAlarm = (alarmId: string) => {
     // TODO: Implement edit alarm
     console.log('Edit alarm:', alarmId);
-    toast('Edit alarm functionality coming soon', { icon: 'ℹ️' });
+    toast(t('devices.details.alarms.messages.editComingSoon'), { icon: 'ℹ️' });
   };
 
   const handleDeleteAlarm = async (alarmId: string) => {
-    if (window.confirm('Are you sure you want to delete this alarm?')) {
+    if (window.confirm(t('devices.details.alarms.messages.deleteConfirm'))) {
       try {
         await alarmsApi.delete(alarmId);
-        toast.success('Alarm deleted successfully');
+        toast.success(t('devices.details.alarms.messages.deleteSuccess'));
         refetch();
       } catch {
-        toast.error('Failed to delete alarm');
+        toast.error(t('devices.details.alarms.messages.deleteError'));
       }
     }
   };
@@ -133,7 +135,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
       <div className="grid grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
-            <div className="text-sm text-gray-500">Active Alarms</div>
+            <div className="text-sm text-gray-500">{t('devices.details.alarms.summary.active')}</div>
             <div className="text-2xl font-bold text-gray-900 mt-1">
               {alarmStats.active}
             </div>
@@ -141,7 +143,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-sm text-gray-500">Critical</div>
+            <div className="text-sm text-gray-500">{t('devices.details.alarms.summary.critical')}</div>
             <div className="text-2xl font-bold text-gray-900 mt-1">
               {alarmStats.critical}
             </div>
@@ -149,7 +151,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-sm text-gray-500">Major</div>
+            <div className="text-sm text-gray-500">{t('devices.details.alarms.summary.major')}</div>
             <div className="text-2xl font-bold text-gray-900 mt-1">
               {alarmStats.major}
             </div>
@@ -157,7 +159,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-sm text-gray-500">Warning</div>
+            <div className="text-sm text-gray-500">{t('devices.details.alarms.summary.warning')}</div>
             <div className="text-2xl font-bold text-gray-900 mt-1">
               {alarmStats.warning}
             </div>
@@ -169,9 +171,9 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-gray-700">Filters:</span>
+            <span className="text-sm font-medium text-gray-700">{t('devices.details.alarms.filters.label')}</span>
             <div className="flex items-center gap-2">
-              <Label className="text-sm text-gray-600">Status:</Label>
+              <Label className="text-sm text-gray-600">{t('devices.details.alarms.filters.status')}</Label>
               <Select
                 value={statusFilter}
                 onValueChange={setStatusFilter}
@@ -181,17 +183,17 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value={AlarmStatus.ACTIVE}>Active</SelectItem>
+                  <SelectItem value="all">{t('devices.details.alarms.filters.statusOptions.all')}</SelectItem>
+                  <SelectItem value={AlarmStatus.ACTIVE}>{t('devices.details.alarms.filters.statusOptions.active')}</SelectItem>
                   <SelectItem value={AlarmStatus.ACKNOWLEDGED}>
-                    Acknowledged
+                    {t('devices.details.alarms.filters.statusOptions.acknowledged')}
                   </SelectItem>
-                  <SelectItem value={AlarmStatus.CLEARED}>Cleared</SelectItem>
+                  <SelectItem value={AlarmStatus.CLEARED}>{t('devices.details.alarms.filters.statusOptions.cleared')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex items-center gap-2">
-              <Label className="text-sm text-gray-600">Severity:</Label>
+              <Label className="text-sm text-gray-600">{t('devices.details.alarms.filters.severity')}</Label>
               <Select
                 value={severityFilter}
                 onValueChange={setSeverityFilter}
@@ -201,18 +203,18 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Severities</SelectItem>
+                  <SelectItem value="all">{t('devices.details.alarms.filters.severityOptions.all')}</SelectItem>
                   <SelectItem value={AlarmSeverity.CRITICAL}>
-                    Critical
+                    {t('devices.details.alarms.filters.severityOptions.critical')}
                   </SelectItem>
-                  <SelectItem value={AlarmSeverity.MAJOR}>Major</SelectItem>
-                  <SelectItem value={AlarmSeverity.MINOR}>Minor</SelectItem>
-                  <SelectItem value={AlarmSeverity.WARNING}>Warning</SelectItem>
+                  <SelectItem value={AlarmSeverity.MAJOR}>{t('devices.details.alarms.filters.severityOptions.major')}</SelectItem>
+                  <SelectItem value={AlarmSeverity.MINOR}>{t('devices.details.alarms.filters.severityOptions.minor')}</SelectItem>
+                  <SelectItem value={AlarmSeverity.WARNING}>{t('devices.details.alarms.filters.severityOptions.warning')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex items-center gap-2">
-              <Label className="text-sm text-gray-600">Time Range:</Label>
+              <Label className="text-sm text-gray-600">{t('devices.details.alarms.filters.timeRange')}</Label>
               <Select
                 value={timeRangeFilter}
                 onValueChange={setTimeRangeFilter}
@@ -222,10 +224,10 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="24h">Last 24 Hours</SelectItem>
-                  <SelectItem value="7d">Last 7 Days</SelectItem>
-                  <SelectItem value="30d">Last 30 Days</SelectItem>
-                  <SelectItem value="all">All Time</SelectItem>
+                  <SelectItem value="24h">{t('devices.details.alarms.filters.timeRangeOptions.24h')}</SelectItem>
+                  <SelectItem value="7d">{t('devices.details.alarms.filters.timeRangeOptions.7d')}</SelectItem>
+                  <SelectItem value="30d">{t('devices.details.alarms.filters.timeRangeOptions.30d')}</SelectItem>
+                  <SelectItem value="all">{t('devices.details.alarms.filters.timeRangeOptions.all')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -235,7 +237,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
               className="bg-primary hover:bg-primary/90 text-white"
               onClick={() => refetch()}
             >
-              Apply
+              {t('devices.details.alarms.filters.apply')}
             </Button>
           </div>
         </CardContent>
@@ -255,28 +257,28 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                   <thead className="bg-primary">
                     <tr>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                        SEVERITY
+                        {t('devices.details.alarms.table.severity')}
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                        TYPE
+                        {t('devices.details.alarms.table.type')}
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                        STATUS
+                        {t('devices.details.alarms.table.status')}
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                        CREATED TIME
+                        {t('devices.details.alarms.table.created')}
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                        UPDATED TIME
+                        {t('devices.details.alarms.table.updated')}
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                        MESSAGE
+                        {t('devices.details.alarms.table.message')}
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                        ACKNOWLEDGED
+                        {t('devices.details.alarms.table.acknowledged')}
                       </th>
                       <th className="text-left py-3 px-4 text-sm font-semibold text-white">
-                        ACTIONS
+                        {t('devices.details.alarms.table.actions')}
                       </th>
                     </tr>
                   </thead>
@@ -287,7 +289,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                           colSpan={8}
                           className="py-8 px-4 text-center text-gray-500"
                         >
-                          No alarms found
+                          {t('devices.details.alarms.table.noData')}
                         </td>
                       </tr>
                     ) : (
@@ -344,7 +346,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                               {alarm.details?.message || alarm.type || '-'}
                             </td>
                             <td className="py-4 px-4 text-sm text-gray-600">
-                              {alarm.ackTime ? 'YES' : 'NO'}
+                              {alarm.ackTime ? t('devices.details.alarms.table.yes') : t('devices.details.alarms.table.no')}
                             </td>
                             <td className="py-4 px-4">
                               <div className="flex items-center gap-2">
@@ -355,7 +357,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                                   className="h-8 px-3"
                                 >
                                   <Edit className="h-4 w-4 mr-1" />
-                                  EDIT
+                                  {t('devices.details.alarms.summary.active') === 'Active Alarms' ? 'EDIT' : t('devices.details.telemetry.buttons.edit')}
                                 </Button>
                                 <Button
                                   variant="ghost"
@@ -364,7 +366,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                                   className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50"
                                 >
                                   <Trash2 className="h-4 w-4 mr-1" />
-                                  DELETE
+                                  {t('devices.details.alarms.summary.active') === 'Active Alarms' ? 'DELETE' : t('devices.details.telemetry.buttons.delete')}
                                 </Button>
                               </div>
                             </td>
@@ -397,7 +399,7 @@ export const DeviceAlarmsTab: React.FC<DeviceAlarmsTabProps> = ({
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <span className="text-sm text-gray-600 px-4">
-                    Page {currentPage}
+                    {t('devices.details.telemetry.pagination', { page: currentPage })}
                   </span>
                   <Button
                     variant="ghost"

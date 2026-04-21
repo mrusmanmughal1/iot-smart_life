@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -50,6 +51,7 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
   onSubmit,
   isLoading,
 }) => {
+  const { t } = useTranslation();
   const form = useForm<AssetProfileFormData>({
     resolver: zodResolver(assetProfileFormSchema),
     defaultValues: DEFAULT_ASSET_PROFILE_FORM_DATA,
@@ -70,9 +72,9 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] rounded-3xl pb-10  overflow-hidden dark:bg-gray-950 dark:border-gray-700 ">
         <DialogHeader className="dark:text-white dark:bg-gray-950 dark:border-gray-700 dark:border-b">
-          <DialogTitle>Add Asset Profile</DialogTitle>
+          <DialogTitle>{t('assetProfiles.form.createTitle')}</DialogTitle>
           <DialogDescription>
-            Create a new asset profile configuration
+            {t('assetProfiles.form.createDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -87,10 +89,10 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name *</FormLabel>
+                    <FormLabel>{t('assetProfiles.form.name')}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter asset profile name"
+                        placeholder={t('assetProfiles.form.namePlaceholder')}
                         {...field}
                         className="border-2 rounded-md"
                       />
@@ -105,10 +107,12 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>{t('assetProfiles.form.description')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Enter asset profile description"
+                        placeholder={t(
+                          'assetProfiles.form.descriptionPlaceholder'
+                        )}
                         {...field}
                         className="border-2 rounded-md min-h-[100px]"
                       />
@@ -123,31 +127,37 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
                 name="defaultRuleChain"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Default Rule Chain</FormLabel>
+                    <FormLabel>
+                      {t('assetProfiles.form.defaultRuleChain')}
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value || ''}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select default rule chain" />
+                          <SelectValue
+                            placeholder={t(
+                              'assetProfiles.form.ruleChainPlaceholder'
+                            )}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Root Rule Chain">
-                          Root Rule Chain
+                          {t('assetProfiles.form.ruleChains.root')}
                         </SelectItem>
                         <SelectItem value="Industrial Processing">
-                          Industrial Processing
+                          {t('assetProfiles.form.ruleChains.industrial')}
                         </SelectItem>
                         <SelectItem value="Building Management">
-                          Building Management
+                          {t('assetProfiles.form.ruleChains.building')}
                         </SelectItem>
                         <SelectItem value="Residential Processing">
-                          Residential Processing
+                          {t('assetProfiles.form.ruleChains.residential')}
                         </SelectItem>
                         <SelectItem value="Warehouse Processing">
-                          Warehouse Processing
+                          {t('assetProfiles.form.ruleChains.warehouse')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -161,19 +171,23 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
                 name="defaultQueueName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Queue</FormLabel>
+                    <FormLabel>{t('assetProfiles.form.queue')}</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value || ''}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select queue" />
+                          <SelectValue
+                            placeholder={t(
+                              'assetProfiles.form.queuePlaceholder'
+                            )}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Root Rule Chain">
-                          Root queue Chain
+                          {t('assetProfiles.form.queues.root')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -188,34 +202,39 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
                 name="defaultEdgeRuleChain"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Default Edge Rule Chain</FormLabel>
+                    <FormLabel>
+                      {t('assetProfiles.form.defaultEdgeRuleChain')}
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value || ''}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select default edge rule chain" />
+                          <SelectValue
+                            placeholder={t(
+                              'assetProfiles.form.edgeRuleChainPlaceholder'
+                            )}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Root Rule Chain">
-                          Root Rule Chain
+                          {t('assetProfiles.form.ruleChains.root')}
                         </SelectItem>
                         <SelectItem value="Edge Processing">
-                          Edge Processing
+                          {t('assetProfiles.form.ruleChains.edge')}
                         </SelectItem>
                         <SelectItem value="Gateway Processing">
-                          Gateway Processing
+                          {t('assetProfiles.form.ruleChains.gateway')}
                         </SelectItem>
                         <SelectItem value="Industrial Processing">
-                          Industrial Processing
+                          {t('assetProfiles.form.ruleChains.industrial')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormDescription className="text-xs text-gray-600">
-                      Used on edge as rule chain to process incoming data for
-                      assets of this asset profile
+                      {t('assetProfiles.form.edgeRuleChainDescription')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -225,10 +244,12 @@ export const AssetProfileForm: React.FC<AssetProfileFormProps> = ({
 
             <DialogFooter className="p-4 absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 ">
               <Button type="button" variant="outline" onClick={handleClose}>
-                Cancel
+                {t('assetProfiles.form.cancel')}
               </Button>
               <Button type="submit" isLoading={isLoading}>
-                {isLoading ? 'Creating...' : 'Create Profile'}
+                {isLoading
+                  ? t('assetProfiles.form.creating')
+                  : t('assetProfiles.form.create')}
               </Button>
             </DialogFooter>
           </form>

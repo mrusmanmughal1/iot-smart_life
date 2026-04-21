@@ -1,5 +1,6 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   FormControl,
   FormField,
@@ -24,14 +25,17 @@ interface Step4DeviceProvisioningProps {
 export const Step4DeviceProvisioning: React.FC<
   Step4DeviceProvisioningProps
 > = ({ form }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold  text-primary  mb-1">
-          Device Provisioning
+          {t('deviceProfiles.form.steps.provisioning.title')}
         </h3>
         <p className="text-sm text-gray-500">
-          Configure device provisioning settings (Optional)
+          {t('deviceProfiles.form.steps.provisioning.description')}{' '}
+          {t('deviceProfiles.form.steps.transport.optional')}
         </p>
       </div>
 
@@ -41,25 +45,31 @@ export const Step4DeviceProvisioning: React.FC<
           name="provisionType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Provision Strategy</FormLabel>
+              <FormLabel>{t('deviceProfiles.form.fields.provisionStrategy')}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select provision strategy" />
+                    <SelectValue
+                      placeholder={t(
+                        'deviceProfiles.form.fields.provisionPlaceholder'
+                      )}
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="allow_create_new">
-                    Allow creating new devices
+                    {t('deviceProfiles.form.options.allowCreateNew')}
                   </SelectItem>
                   <SelectItem value="check_pre_provisioned">
-                    Check pre-provisioned devices
+                    {t('deviceProfiles.form.options.checkPreProvisioned')}
                   </SelectItem>
-                  <SelectItem value="disabled">Disabled</SelectItem>
+                  <SelectItem value="disabled">
+                    {t('deviceProfiles.form.options.disabled')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormDescription>
-                Choose how devices are provisioned using this profile
+                {t('deviceProfiles.form.fields.provisionDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -71,11 +81,15 @@ export const Step4DeviceProvisioning: React.FC<
           name="defaultRuleChainId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Default Rule Chain</FormLabel>
+              <FormLabel>
+                {t('deviceProfiles.form.fields.defaultRuleChain')}
+              </FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select rule chain" />
+                    <SelectValue
+                      placeholder={t('deviceProfiles.form.fields.ruleChainPlaceholder')}
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -94,7 +108,7 @@ export const Step4DeviceProvisioning: React.FC<
                 </SelectContent>
               </Select>
               <FormDescription>
-                Default rule chain to process device data
+                {t('deviceProfiles.form.fields.ruleChainDescription')}
               </FormDescription>
               <FormMessage />
             </FormItem>

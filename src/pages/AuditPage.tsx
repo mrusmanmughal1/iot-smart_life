@@ -13,19 +13,20 @@ import {
 import { useAuditLogs } from '@/features/audit/hooks';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
-
 import type { AuditLog } from '@/services/api/audit.api';
 import { PageHeader } from '@/components/common/PageHeader';
 
 export default function AuditPage() {
   const { t } = useTranslation();
+
   const { data: auditData, isLoading } = useAuditLogs();
 
-  // Handle nested API response structure: { data: { data: { data: AuditLog[], meta: {...} } } }
   const apiResponse = auditData?.data as unknown as
     | { data?: { data?: AuditLog[] } }
     | undefined;
+
   const logs = apiResponse?.data?.data || [];
+
   const getActionColor = (action: string) => {
     const colors: Record<string, string> = {
       CREATE: 'success',
@@ -40,7 +41,6 @@ export default function AuditPage() {
   return (
     <div className="space-y-6">
       <PageHeader title={t('audit.title')} description={t('audit.subtitle')} />
-
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

@@ -89,14 +89,13 @@ export default function AssetProfiles() {
   const handleCreateProfile = async (data: AssetProfileFormData) => {
     try {
       await createAssetProfileMutation.mutateAsync(data);
-      toast.success('Asset profile created successfully');
+      toast.success(t('assetProfiles.messages.createSuccess'));
       setIsCreateOpen(false);
     } catch (error) {
       console.error('Error creating asset profile:', error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message ||
-        'Failed to create asset profile. Please try again.';
+          ?.data?.message || t('assetProfiles.messages.createError');
       toast.error(errorMessage);
     }
   };
@@ -111,20 +110,23 @@ export default function AssetProfiles() {
 
     try {
       await deleteAssetProfileMutation.mutateAsync(selectedProfile.id);
-      toast.success('Asset profile deleted successfully');
+      toast.success(t('assetProfiles.messages.deleteSuccess'));
       setDeleteDialogOpen(false);
       setSelectedProfile(null);
     } catch (error) {
       console.error('Error deleting asset profile:', error);
       const errorMessage =
         (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message ||
-        'Failed to delete asset profile. Please try again.';
+          ?.data?.message || t('assetProfiles.messages.deleteError');
       toast.error(errorMessage);
     }
   };
 
-  const tableHeaders = ['Name', 'Default', 'Created'];
+  const tableHeaders = [
+    t('assetProfiles.table.name'),
+    t('assetProfiles.table.default'),
+    t('assetProfiles.table.created'),
+  ];
 
   if (isAssetProfilesLoading) {
     return <LoadingOverlay />;
@@ -225,7 +227,9 @@ export default function AssetProfiles() {
                 {tableHeaders.map((val, i) => {
                   return <TableHead key={i}>{val}</TableHead>;
                 })}
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right">
+                  {t('assetProfiles.table.actions')}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -235,7 +239,7 @@ export default function AssetProfiles() {
                     colSpan={6}
                     className="h-24 text-center text-muted-foreground"
                   >
-                    {t('devices.noDevices') || 'No devices found'}
+                    {t('assetProfiles.noProfiles')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -249,7 +253,7 @@ export default function AssetProfiles() {
                     <TableCell>
                       <p className="capitalize">
                         {assetProfile.default ? (
-                          <Badge>Default</Badge>
+                          <Badge>{t('assetProfiles.table.default')}</Badge>
                         ) : (
                           <Badge variant="secondary">-</Badge>
                         )}
@@ -268,14 +272,14 @@ export default function AssetProfiles() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem>
                             <Edit className="h-4 w-4 mr-2" />
-                            Edit
+                            {t('common.edit')}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-600"
                             onClick={() => handleDeleteClick(assetProfile)}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
+                            {t('common.delete')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -308,9 +312,11 @@ export default function AssetProfiles() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleDeleteConfirm}
-        title="Delete Asset Profile"
+        title={t('assetProfiles.messages.deleteTitle')}
         itemName={selectedProfile?.name}
-        description={`Are you sure you want to delete "${selectedProfile?.name}"? This action cannot be undone and will affect all assets using this profile.`}
+        description={t('assetProfiles.messages.deleteDescription', {
+          name: selectedProfile?.name,
+        })}
         isLoading={deleteAssetProfileMutation.isPending}
       />
     </div>

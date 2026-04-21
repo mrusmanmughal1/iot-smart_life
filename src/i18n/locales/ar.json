@@ -51,7 +51,15 @@
     "phoneInvalid": "رقم الهاتف غير صالح",
     "signup": "تسجيل جديد",
     "companyName": "اسم الشركة",
-    "failedToLoadSettings": "فشل تحميل الإعدادات"
+    "failedToLoadSettings": "فشل تحميل الإعدادات",
+    "deleteConfirmation": {
+      "title": "حذف العنصر",
+      "confirm": "حذف",
+      "cancel": "إلغاء",
+      "description": "هل أنت متأكد أنك تريد حذف \"{{itemName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "descriptionGeneric": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
+      "deleting": "جاري الحذف..."
+    }
   },
   "pagination": {
     "showing": "عرض",
@@ -173,6 +181,14 @@
     "criticalAlarms": "التنبيهات الحرجة",
     "recentActivity": "النشاط الأخير",
     "systemHealth": "صحة النظام",
+    "storageAndAssets": "التخزين والأصول",
+    "storage": "التخزين",
+    "assets": "الأصول",
+    "customers": "العملاء",
+    "floorPlans": "مخططات الطوابق",
+    "automations": "الأتمتة",
+    "projectsLocations": "مواقع المشاريع",
+    "activeDashboards": "لوحات التحكم النشطة",
     "quickActions": "إجراءات سريعة",
     "solutionCategories": {
       "smartCity": "المدينة الذكية",
@@ -217,6 +233,22 @@
       "smartBuildingOverview": "نظرة عامة على المبنى الذكي",
       "smartBuildingMetrics": "مقاييس المبنى الذكي",
       "smartHomeControl": "التحكم في المنزل الذكي"
+    },
+    "liveUpdates": "تحديثات مباشرة",
+    "lastUpdate": "آخر تحديث: {{time}}",
+    "waiting": "في الانتظار...",
+    "stats": {
+      "activeCount": "{{count}} نشط",
+      "totalCount": "{{count}} إجمالي",
+      "onlineCount": "● {{count}} متصل",
+      "offlineCount": "● {{count}} غير متصل",
+      "usersCount": "{{count}} مستخدمين"
+    },
+    "realtimeActivity": "النشاط في الوقت الحقيقي",
+    "activities": {
+      "wentOnline": "أصبح الجهاز متصلاً",
+      "wentOffline": "أصبح الجهاز غير متصل",
+      "telemetry": "درجة الحرارة: {{temp}}°C، الرطوبة: {{hum}}%"
     }
   },
   "solutionDashboards": {
@@ -626,6 +658,10 @@
     "deviceName": "اسم الجهاز",
     "deviceType": "نوع الجهاز",
     "deviceProfile": "ملف الجهاز",
+    "manufacturer": "الشركة المصنعة",
+    "selectManufacturer": "اختر الشركة المصنعة",
+    "modelNumber": "رقم الموديل",
+    "selectModelNumber": "اختر رقم الموديل",
     "lastActivity": "آخر نشاط",
     "telemetry": "القياسات عن بعد",
     "attributes": "الخصائص",
@@ -639,9 +675,219 @@
       "customer": "اسم العميل",
       "actions": "الإجراءات"
     },
+    "form": {
+      "addDescription": "أضف جهازًا جديدًا إلى منصة إنترنت الأشياء الخاصة بك",
+      "editDescription": "تحديث معلومات الجهاز",
+      "namePlaceholder": "أدخل اسم الجهاز",
+      "selectType": "اختر النوع",
+      "types": {
+        "sensor": "مستشعر",
+        "actuator": "مشغل",
+        "gateway": "بوابة",
+        "controller": "تحكم",
+        "camera": "كاميرا",
+        "tracker": "متتبع"
+      },
+      "selectConnectionType": "اختر نوع الاتصال",
+      "connections": {
+        "wifi": "واي فاي",
+        "ethernet": "إيثرنت",
+        "bluetooth": "بلوتوث",
+        "cellular": "خلوي",
+        "zigbee": "زيجبي",
+        "lora": "لورا"
+      },
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف الجهاز (اختياري)",
+      "gatewayAssignment": "تعيين البوابة",
+      "selectGatewayPlaceholder": "اختر البوابة (معطل)",
+      "gateways": {
+        "gateway1": "البوابة 1",
+        "gateway2": "البوابة 2",
+        "gateway3": "البوابة 3"
+      }
+    },
+    "credentials": {
+      "title": "أوراق اعتماد الجهاز",
+      "description": "يرجى نسخ أوراق الاعتماد هذه الآن. لأسباب أمنية، لن يتم عرض رمز الوصول مرة أخرى.",
+      "tabs": {
+        "credentials": "أوراق الاعتماد",
+        "setup": "إعداد",
+        "examples": "أمثلة"
+      },
+      "fields": {
+        "deviceKey": "مفتاح الجهاز",
+        "accessToken": "رمز الوصول",
+        "mqttBroker": "وسيط MQTT",
+        "telemetryTopic": "موضوع القياس عن بعد",
+        "gatewayConfig": "تكوين البوابة",
+        "clientId": "معرف العميل:",
+        "username": "اسم المستخدم:",
+        "host": "المضيف:",
+        "instructions": "التعليمات"
+      },
+      "actions": {
+        "copy": "نسخ",
+        "copied": "تم النسخ",
+        "done": "تم"
+      }
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء الجهاز بنجاح",
+      "createError": "فشل في إنشاء الجهاز",
+      "updateSuccess": "تم تحديث الجهاز بنجاح",
+      "updateError": "فشل في تحديث الجهاز",
+      "deleteSuccess": "تم حذف الجهاز بنجاح",
+      "deleteError": "فشل في حذف الجهاز"
+    },
+    "tooltips": {
+      "view": "عرض الجهاز",
+      "edit": "تعديل الجهاز",
+      "delete": "حذف الجهاز"
+    },
     "status": {
       "active": "نشط",
       "inactive": "غير نشط"
+    },
+    "details": {
+      "fallbackTitle": "تفاصيل الجهاز",
+      "subtitle": "إدارة قوالب تكوين الأصول والتسلسلات الهرمية.",
+      "statusActive": "نشط",
+      "statusInactive": "غير نشط",
+      "export": "تصدير",
+      "import": "استيراد",
+      "add": "إضافة",
+      "tabs": {
+        "details": "التفاصيل",
+        "attributes": "الخصائص",
+        "telemetry": "القياسات عن بعد",
+        "alarms": "التنبيهات",
+        "relations": "العلاقات"
+      },
+      "general": {
+        "title": "الإعدادات العامة",
+        "sectionDevice": "تفاصيل الجهاز",
+        "name": "اسم الجهاز",
+        "namePlaceholder": "أدخل اسم الجهاز",
+        "label": "ملصق الجهاز",
+        "labelPlaceholder": "أدخل ملصق الجهاز",
+        "type": "نوع الجهاز",
+        "typePlaceholder": "اختر نوع الجهاز",
+        "profile": "ملف تعريف الجهاز",
+        "profilePlaceholder": "اختر ملف تعريف الجهاز",
+        "description": "الوصف",
+        "descriptionPlaceholder": "أدخل وصف للجهاز",
+        "sectionLocation": "إعدادات الموقع",
+        "building": "المبنى",
+        "buildingPlaceholder": "اختر المبنى",
+        "floor": "الطابق",
+        "floorPlaceholder": "اختر الطابق",
+        "room": "الغرفة",
+        "roomPlaceholder": "اختر الغرفة",
+        "gpsCoordinates": "إحداثيات GPS",
+        "latitudePlaceholder": "خط العرض (مثلاً 40.7128)",
+        "longitudePlaceholder": "خط الطول (مثلاً -74.0060)",
+        "cancel": "إلغاء",
+        "saveChanges": "حفظ التغييرات",
+        "messages": {
+          "success": "تم حفظ إعدادات الجهاز بنجاح",
+          "error": "فشل في حفظ إعدادات الجهاز",
+          "cancelled": "تم إلغاء التغييرات"
+        }
+      },
+      "telemetry": {
+        "searchPlaceholder": "البحث في الخصائص...",
+        "scopes": {
+          "server": "من الخادم",
+          "client": "من العميل",
+          "shared": "مشترك"
+        },
+        "addAttribute": "إضافة خاصية",
+        "table": {
+          "key": "المفتاح",
+          "value": "القيمة",
+          "lastUpdate": "آخر تحديث",
+          "actions": "الإجراءات",
+          "noData": "لم يتم العثور على خصائص"
+        },
+        "buttons": {
+          "edit": "تعديل",
+          "delete": "حذف"
+        },
+        "pagination": "صفحة {{page}}",
+        "messages": {
+          "editComingSoon": "ميزة تعديل الخصائص ستتوفر قريباً",
+          "deleteConfirm": "هل أنت متأكد أنك تريد حذف الخاصية \"{{key}}\"؟",
+          "deleteSuccess": "تم حذف الخاصية بنجاح",
+          "deleteError": "فشل في حذف الخاصية",
+          "addComingSoon": "ميزة إضافة الخصائص ستتوفر قريباً"
+        },
+        "details": {
+          "latestTitle": "آخر القيم",
+          "title": "آخر القيم",
+          "noTelemetry": "لا يوجد بيانات قياس متوفرة",
+          "keys": "مفاتيح القياس:",
+          "graphTitle": "معدل الرسائل (آخر 24 ساعة)",
+          "graphX": "الشهر",
+          "graphY": "القيمة",
+          "refresh": "تحديث",
+          "addProfile": "إضافة ملف تعريف"
+        }
+      },
+      "alarms": {
+        "summary": {
+          "active": "التنبيهات النشطة",
+          "critical": "حرج",
+          "major": "كبير",
+          "warning": "تحذير"
+        },
+        "filters": {
+          "label": "تصفية:",
+          "status": "الحالة:",
+          "severity": "الخطورة:",
+          "timeRange": "النطاق الزمني:",
+          "apply": "تطبيق",
+          "statusOptions": {
+            "all": "جميع الحالات",
+            "active": "نشط",
+            "acknowledged": "تم الإقرار به",
+            "cleared": "تم مسحه"
+          },
+          "severityOptions": {
+            "all": "جميع المستويات",
+            "critical": "حرج",
+            "major": "كبير",
+            "minor": "صغير",
+            "warning": "تحذير"
+          },
+          "timeRangeOptions": {
+            "1h": "آخر ساعة",
+            "24h": "آخر 24 ساعة",
+            "7d": "آخر 7 أيام",
+            "30d": "آخر 30 يوم",
+            "all": "كل الوقت"
+          }
+        },
+        "table": {
+          "severity": "الخطورة",
+          "type": "النوع",
+          "status": "الحالة",
+          "created": "وقت الإنشاء",
+          "updated": "وقت التحديث",
+          "message": "الرسالة",
+          "acknowledged": "تم الإقرار",
+          "actions": "الإجراءات",
+          "noData": "لم يتم العثور على تنبيهات",
+          "yes": "نعم",
+          "no": "لا"
+        },
+        "messages": {
+          "editComingSoon": "ميزة تعديل التنبيهات ستتوفر قريباً",
+          "deleteConfirm": "هل أنت متأكد أنك تريد حذف هذا التنبيه؟",
+          "deleteSuccess": "تم حذف التنبيه بنجاح",
+          "deleteError": "فشل في حذف التنبيه"
+        }
+      }
     }
   },
   "deviceProfiles": {
@@ -673,7 +919,52 @@
     "facilities": "مرافق",
     "commercial": "تجاري",
     "buildings": "مباني",
-    "createProfile": "إنشاء ملف تعريف جديد"
+    "createProfile": "إنشاء ملف تعريف جديد",
+    "noProfiles": "لم يتم العثور على ملفات تعريف الأصول",
+    "table": {
+      "name": "الاسم",
+      "default": "افتراضي",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء ملف تعريف الأصل بنجاح",
+      "createError": "فشل في إنشاء ملف تعريف الأصل. يرجى المحاولة مرة أخرى.",
+      "deleteSuccess": "تم حذف ملف تعريف الأصل بنجاح",
+      "deleteError": "فشل في حذف ملف تعريف الأصل. يرجى المحاولة مرة أخرى.",
+      "deleteTitle": "حذف ملف تعريف الأصل",
+      "deleteDescription": "هل أنت متأكد أنك تريد حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء وسيؤثر على جميع الأصول التي تستخدم هذا الملف التعريفي."
+    },
+    "form": {
+      "createTitle": "إضافة ملف تعريف الأصل",
+      "createDescription": "إنشاء تكوين ملف تعريف أصل جديد",
+      "name": "الاسم *",
+      "namePlaceholder": "أدخل اسم ملف تعريف الأصل",
+      "description": "الوصف",
+      "descriptionPlaceholder": "أدخل وصف ملف تعريف الأصل",
+      "defaultRuleChain": "سلسلة القواعد الافتراضية",
+      "ruleChainPlaceholder": "اختر سلسلة القواعد الافتراضية",
+      "queue": "الطابور",
+      "queuePlaceholder": "اختر الطابور",
+      "defaultEdgeRuleChain": "سلسلة قواعد الحافة الافتراضية",
+      "edgeRuleChainPlaceholder": "اختر سلسلة قواعد الحافة الافتراضية",
+      "edgeRuleChainDescription": "تستخدم على الحافة كسلسلة قواعد لمعالجة البيانات الواردة للأصول التابعة لملف تعريف الأصل هذا",
+      "cancel": "إلغاء",
+      "creating": "جاري الإنشاء...",
+      "create": "إنشاء ملف التعريف",
+      "ruleChains": {
+        "root": "سلسلة القواعد الجذرية",
+        "industrial": "المعالجة الصناعية",
+        "building": "إدارة المباني",
+        "residential": "المعالجة السكنية",
+        "warehouse": "معالجة المستودعات",
+        "edge": "معالجة الحافة",
+        "gateway": "معالجة البوابة"
+      },
+      "queues": {
+        "root": "طابور الجذر"
+      }
+    }
   },
   "assets": {
     "title": "الأصول",
@@ -1753,6 +2044,55 @@
       "failed": "فشل"
     }
   },
+  "overview2": {
+    "title": "نظرة عامة",
+    "recentActivities": {
+      "title": "الأنشطة الأخيرة",
+      "viewAll": "إظهار كافة سجلات الأنشطة",
+      "addedCustomer": "أضاف عميلاً جديداً",
+      "updatedConfig": "حدث تكوين الجهاز",
+      "resolvedAlarm": "تم حل المنبه #A-1024",
+      "minsAgo": "منذ {{count}} دقائق",
+      "hourAgo": "منذ {{count}} ساعة"
+    },
+    "quickActions": {
+      "title": "إجراءات سريعة",
+      "addDevice": "إضافة جهاز",
+      "setAlarmRule": "ضبط قاعدة التنبيه",
+      "createDashboard": "إنشاء لوحة التحكم",
+      "importData": "استيراد البيانات",
+      "configureRuleEngine": "تكوين محرك القواعد",
+      "inviteUser": "دعوة مستخدم"
+    },
+    "trends": {
+      "title": "تحليلات اتجاهات الأجهزة",
+      "days": "{{count}} يوم"
+    },
+    "liveData": {
+      "title": "نظرة عامة على البيانات الحية",
+      "metrics": {
+        "temperature": "درجة الحرارة",
+        "humidity": "الرطوبة",
+        "occupancy": "الإشغال",
+        "co2": "مستويات ثاني أكسيد الكربون"
+      }
+    },
+    "documentation": {
+      "title": "مساعدة التوثيق",
+      "gettingStarted": "دليل البدء",
+      "apiReference": "مرجع API",
+      "alarmRules": "إعداد قواعد التنبيه",
+      "faqs": "الأسئلة الشائعة والدروس"
+    },
+    "onboarding": {
+      "title": "دليل البدء",
+      "addDevice": "إضافة جهاز",
+      "connectGateway": "توصيل البوابة الخاصة بك",
+      "buildDashboard": "بناء أول لوحة تحكم",
+      "setUpAlarms": "إعداد التنبيهات",
+      "progress": "التقدم"
+    }
+  },
   "auth": {
     "login": {
       "title": "تسجيل الدخول",
@@ -1894,6 +2234,116 @@
       "roleRequired": "يرجى اختيار دور",
       "roleSelectedSuccessfully": "تم اختيار الدور بنجاح",
       "failedToSelectRole": "فشل اختيار الدور"
+    }
+  },
+  "deviceProfiles": {
+    "title": "ملفات تعريف الأجهزة",
+    "subtitle": "إدارة قوالب تكوين الأجهزة",
+    "totalProfiles": "إجمالي ملفات التعريف",
+    "totalDevices": "إجمالي الأجهزة",
+    "createProfile": "إنشاء ملف تعريف",
+    "deviceConfigurations": "تكوينات الأجهزة",
+    "usingTheseProfiles": "باستخدام هذه الملفات التعريفية",
+    "defaultProfiles": "ملفات التعريف الافتراضية",
+    "gatewayProfiles": "ملفات تعريف البوابات",
+    "table": {
+      "name": "الاسم",
+      "type": "النوع",
+      "transport": "وسيلة النقل",
+      "devices": "الأجهزة",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "form": {
+      "createTitle": "إنشاء ملف تعريف الجهاز",
+      "createDescription": "اتبع الخطوات لإنشاء ملف تعريف جهاز جديد",
+      "steps": {
+        "details": {
+          "title": "تفاصيل ملف تعريف الجهاز",
+          "description": "معلومات ملف تعريف الجهاز الأساسية"
+        },
+        "transport": {
+          "title": "تكوين النقل",
+          "description": "تكوين بروتوكول النقل",
+          "optional": "(اختياري)"
+        },
+        "alarms": {
+          "title": "قواعد التنبيه",
+          "description": "تحديد قواعد التنبيه"
+        },
+        "provisioning": {
+          "title": "تهيئة الجهاز",
+          "description": "تكوين إعدادات التهيئة"
+        }
+      },
+      "fields": {
+        "name": "اسم ملف التعريف *",
+        "namePlaceholder": "مثال: مستشعر درجة الحرارة",
+        "description": "الوصف",
+        "descriptionPlaceholder": "وصف ملف التعريف...",
+        "type": "نوع الجهاز *",
+        "typePlaceholder": "اختر نوع الجهاز",
+        "defaultRuleChain": "سلسلة القواعد الافتراضية",
+        "ruleChainPlaceholder": "اختر سلسلة القواعد الافتراضية",
+        "queue": "زمام الانتظار",
+        "queuePlaceholder": "مثال: زمام الانتظار الرئيسي",
+        "transportType": "نوع النقل",
+        "transportPlaceholder": "اختر نوع النقل",
+        "telemetryTopic": "موضوع القياس عن بعد للجهاز",
+        "telemetryPlaceholder": "مثال: v1/devices/me/telemetry",
+        "attributesTopic": "موضوع سمات الجهاز",
+        "attributesPlaceholder": "مثال: v1/devices/me/attributes",
+        "baseUrl": "رابط الأساس",
+        "baseUrlPlaceholder": "مثال: https://api.example.com",
+        "timeout": "المهلة (بالثواني)",
+        "port": "المنفذ",
+        "baudRate": "معدل الباود",
+        "region": "المنطقة",
+        "regionPlaceholder": "مثال: EU868",
+        "appEui": "معرف التطبيق EUI",
+        "provisionStrategy": "إستراتيجية التهيئة",
+        "provisionPlaceholder": "اختر إستراتيجية التهيئة",
+        "provisionDescription": "إستراتيجية التهيئة",
+        "ruleChainDescription": "سلسلة القواعد الافتراضية",
+        "queueDescription": "سلسلة القواعد الافتراضية"
+      },
+      "buttons": {
+        "previous": "السابق",
+        "next": "التالي",
+        "cancel": "إلغاء",
+        "create": "إنشاء ملف تعريف",
+        "addAlarm": "إضافة قاعدة تنبيه",
+        "addAnotherAlarm": "إضافة قاعدة تنبيه أخرى"
+      },
+      "messages": {
+        "noAlarms": "لم يتم تحديد قواعد تنبيه",
+        "alarmRule": "قاعدة التنبيه",
+        "optional": "اختياري",
+        "createSuccess": "تم إنشاء ملف تعريف الجهاز بنجاح",
+        "createError": "فشل إنشاء ملف تعريف الجهاز. يرجى المحاولة مرة أخرى.",
+        "deleteSuccess": "تم حذف ملف تعريف الجهاز بنجاح",
+        "deleteError": "فشل حذف ملف تعريف الجهاز. يرجى المحاولة مرة أخرى.",
+        "create": "إنشاء ملف تعريف"
+      },
+      "options": {
+        "sensor": "مستشعر",
+        "gateway": "بوابة",
+        "meter": "عداد",
+        "actuator": "مشغل",
+        "mqtt": "MQTT",
+        "http": "HTTP",
+        "coap": "CoAP",
+        "lwm2m": "LWM2M",
+        "snmp": "SNMP",
+        "critical": "حرج",
+        "major": "رئيسي",
+        "minor": "ثانوي",
+        "warning": "تحذير",
+        "indeterminate": "غير محدد",
+        "allowCreateNew": "السماح بإنشاء أجهزة جديدة",
+        "checkPreProvisioned": "التحقق من الأجهزة المهيأة مسبقاً",
+        "disabled": "معطل"
+      }
     }
   },
   "CommonPrifleSchema": {

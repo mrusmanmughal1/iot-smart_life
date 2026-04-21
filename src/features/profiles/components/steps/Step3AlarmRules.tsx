@@ -1,5 +1,6 @@
 import React from 'react';
 import { UseFormReturn, useFieldArray } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   FormControl,
   FormField,
@@ -24,6 +25,7 @@ interface Step3AlarmRulesProps {
 }
 
 export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
+  const { t } = useTranslation();
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: 'alarmRules',
@@ -40,16 +42,21 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold  text-primary  mb-1">Alarm Rules</h3>
+        <h3 className="text-lg font-semibold  text-primary  mb-1">
+          {t('deviceProfiles.form.steps.alarms.title')}
+        </h3>
         <p className="text-sm text-gray-500">
-          Define alarm rules for device monitoring (Optional)
+          {t('deviceProfiles.form.steps.alarms.description')}{' '}
+          {t('deviceProfiles.form.steps.transport.optional')}
         </p>
       </div>
 
       <div className="space-y-4">
         {fields.length === 0 ? (
           <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
-            <p className="text-gray-500 mb-4">No alarm rules defined</p>
+            <p className="text-gray-500 mb-4">
+              {t('deviceProfiles.form.messages.noAlarms')}
+            </p>
             <Button
               type="button"
               variant="outline"
@@ -57,7 +64,7 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
               className="gap-2"
             >
               <Plus className="h-4 w-4" />
-              Add Alarm Rule
+              {t('deviceProfiles.form.buttons.addAlarm')}
             </Button>
           </div>
         ) : (
@@ -68,7 +75,9 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
                 className="p-4 border border-gray-200 rounded-lg space-y-4 bg-gray-50"
               >
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium">Alarm Rule {index + 1}</h4>
+                  <h4 className="font-medium">
+                    {t('deviceProfiles.form.messages.alarmRule')} {index + 1}
+                  </h4>
                   <Button
                     type="button"
                     variant="ghost"
@@ -86,10 +95,14 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
                     name={`alarmRules.${index}.name`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Rule Name</FormLabel>
+                        <FormLabel>
+                          {t('deviceProfiles.form.fields.ruleName')}
+                        </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="e.g., High Temperature Alert"
+                            placeholder={t(
+                              'deviceProfiles.form.fields.ruleNamePlaceholder'
+                            )}
                             {...field}
                           />
                         </FormControl>
@@ -103,7 +116,9 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
                     name={`alarmRules.${index}.severity`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Severity</FormLabel>
+                        <FormLabel>
+                          {t('deviceProfiles.form.fields.severity')}
+                        </FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
@@ -114,12 +129,20 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="CRITICAL">Critical</SelectItem>
-                            <SelectItem value="MAJOR">Major</SelectItem>
-                            <SelectItem value="MINOR">Minor</SelectItem>
-                            <SelectItem value="WARNING">Warning</SelectItem>
+                            <SelectItem value="CRITICAL">
+                              {t('deviceProfiles.form.options.critical')}
+                            </SelectItem>
+                            <SelectItem value="MAJOR">
+                              {t('deviceProfiles.form.options.major')}
+                            </SelectItem>
+                            <SelectItem value="MINOR">
+                              {t('deviceProfiles.form.options.minor')}
+                            </SelectItem>
+                            <SelectItem value="WARNING">
+                              {t('deviceProfiles.form.options.warning')}
+                            </SelectItem>
                             <SelectItem value="INDETERMINATE">
-                              Indeterminate
+                              {t('deviceProfiles.form.options.indeterminate')}
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -134,10 +157,14 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
                   name={`alarmRules.${index}.condition`}
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Condition</FormLabel>
+                      <FormLabel>
+                        {t('deviceProfiles.form.fields.condition')}
+                      </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="e.g., temperature > 80"
+                          placeholder={t(
+                            'deviceProfiles.form.fields.conditionPlaceholder'
+                          )}
                           {...field}
                         />
                       </FormControl>
@@ -155,7 +182,7 @@ export const Step3AlarmRules: React.FC<Step3AlarmRulesProps> = ({ form }) => {
               className="w-full gap-2"
             >
               <Plus className="h-4 w-4" />
-              Add Another Alarm Rule
+              {t('deviceProfiles.form.buttons.addAnotherAlarm')}
             </Button>
           </div>
         )}

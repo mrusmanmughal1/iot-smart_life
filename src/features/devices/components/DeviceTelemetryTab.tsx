@@ -1,13 +1,26 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 import { attributesApi } from '@/services/api';
-import { EntityType, AttributeScope as ApiAttributeScope } from '@/services/api/attributes.api';
+import {
+  EntityType,
+  AttributeScope as ApiAttributeScope,
+} from '@/services/api/attributes.api';
 import { TelemetryDetails } from './TelemetryDetails';
 
 type AttributeScope = 'server' | 'client' | 'shared';
@@ -16,20 +29,38 @@ interface DeviceTelemetryTabProps {
   deviceId: string;
 }
 
-export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId }) => {
+export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({
+  deviceId,
+}) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedScopes, setSelectedScopes] = useState<AttributeScope[]>(['client', 'shared']);
+  const [selectedScopes, setSelectedScopes] = useState<AttributeScope[]>([
+    'client',
+    'shared',
+  ]);
   const [attributesPage, setAttributesPage] = useState(1);
 
   // Fetch device attributes
-  const { data: attributesData, isLoading: attributesLoading, refetch: refetchAttributes } = useQuery({
+  const {
+    data: attributesData,
+    isLoading: attributesLoading,
+    refetch: refetchAttributes,
+  } = useQuery({
     queryKey: ['device-attributes', deviceId, selectedScopes],
     queryFn: async () => {
       if (!deviceId) return null;
       // Fetch attributes for each scope using attributesApi
-      const scopes = selectedScopes.length > 0 ? selectedScopes : ['server', 'client', 'shared'];
-      const promises = scopes.map(scope => 
-        attributesApi.getAttributes(EntityType.DEVICE, deviceId, scope.toUpperCase() as ApiAttributeScope)
+      const scopes =
+        selectedScopes.length > 0
+          ? selectedScopes
+          : ['server', 'client', 'shared'];
+      const promises = scopes.map((scope) =>
+        attributesApi
+          .getAttributes(
+            EntityType.DEVICE,
+            deviceId,
+            scope.toUpperCase() as ApiAttributeScope
+          )
           .catch(() => ({ data: { data: [] } }))
       );
       const results = await Promise.all(promises);
@@ -41,25 +72,36 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
   // Transform attributes data for table
   const attributes = useMemo(() => {
     if (!attributesData || !Array.isArray(attributesData)) return [];
-    
-    const allAttributes: Array<{ key: string; value: string; lastUpdate: string; scope: string }> = [];
-    
+
+    const allAttributes: Array<{
+      key: string;
+      value: string;
+      lastUpdate: string;
+      scope: string;
+    }> = [];
+
     attributesData.forEach((response, index) => {
       const scope = selectedScopes[index] || 'server';
       const attrs = response?.data?.data || [];
-      
+
       // Handle array of attributes
       if (Array.isArray(attrs)) {
-        attrs.forEach((attr: { key: string; value: string | number | boolean; lastUpdateTs?: number }) => {
-          allAttributes.push({
-            key: attr.key,
-            value: String(attr.value),
-            lastUpdate: attr.lastUpdateTs 
-              ? new Date(attr.lastUpdateTs).toISOString()
-              : new Date().toISOString(),
-            scope,
-          });
-        });
+        attrs.forEach(
+          (attr: {
+            key: string;
+            value: string | number | boolean;
+            lastUpdateTs?: number;
+          }) => {
+            allAttributes.push({
+              key: attr.key,
+              value: String(attr.value),
+              lastUpdate: attr.lastUpdateTs
+                ? new Date(attr.lastUpdateTs).toISOString()
+                : new Date().toISOString(),
+              scope,
+            });
+          }
+        );
       } else if (typeof attrs === 'object') {
         // Handle object format (key-value pairs)
         Object.entries(attrs).forEach(([key, value]) => {
@@ -76,9 +118,10 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      return allAttributes.filter(attr => 
-        attr.key.toLowerCase().includes(query) || 
-        attr.value.toLowerCase().includes(query)
+      return allAttributes.filter(
+        (attr) =>
+          attr.key.toLowerCase().includes(query) ||
+          attr.value.toLowerCase().includes(query)
       );
     }
 
@@ -86,35 +129,46 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
   }, [attributesData, searchQuery, selectedScopes]);
 
   const handleScopeToggle = (scope: AttributeScope) => {
-    setSelectedScopes(prev => 
-      prev.includes(scope) 
-        ? prev.filter(s => s !== scope)
-        : [...prev, scope]
+    setSelectedScopes((prev) =>
+      prev.includes(scope) ? prev.filter((s) => s !== scope) : [...prev, scope]
     );
   };
 
   const handleEditAttribute = () => {
     // TODO: Implement edit attribute
-    toast('Edit attribute functionality coming soon', { icon: 'ℹ️' });
+    toast(t('devices.details.telemetry.messages.editComingSoon'), {
+      icon: 'ℹ️',
+    });
   };
 
   const handleDeleteAttribute = async (key: string, scope: string) => {
-    if (window.confirm(`Are you sure you want to delete attribute "${key}"?`)) {
+    if (
+      window.confirm(
+        t('devices.details.telemetry.messages.deleteConfirm', { key })
+      )
+    ) {
       try {
         if (deviceId) {
-          await attributesApi.deleteAttribute(EntityType.DEVICE, deviceId, key, scope.toUpperCase() as ApiAttributeScope);
-          toast.success('Attribute deleted successfully');
+          await attributesApi.deleteAttribute(
+            EntityType.DEVICE,
+            deviceId,
+            key,
+            scope.toUpperCase() as ApiAttributeScope
+          );
+          toast.success(t('devices.details.telemetry.messages.deleteSuccess'));
           refetchAttributes();
         }
       } catch {
-        toast.error('Failed to delete attribute');
+        toast.error(t('devices.details.telemetry.messages.deleteError'));
       }
     }
   };
 
   const handleAddAttribute = () => {
     // TODO: Implement add attribute modal
-    toast('Add attribute functionality coming soon', { icon: 'ℹ️' });
+    toast(t('devices.details.telemetry.messages.addComingSoon'), {
+      icon: 'ℹ️',
+    });
   };
 
   return (
@@ -126,7 +180,7 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
             <div className="flex-1 relative">
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search attributes.."
+                placeholder={t('devices.details.telemetry.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pr-10"
@@ -134,28 +188,46 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
             </div>
             <div className="flex items-center gap-2">
               <Button
-                variant={selectedScopes.includes('server') ? 'default' : 'outline'}
+                variant={
+                  selectedScopes.includes('server') ? 'default' : 'outline'
+                }
                 size="sm"
                 onClick={() => handleScopeToggle('server')}
-                className={selectedScopes.includes('server') ? 'bg-primary text-white' : ''}
+                className={
+                  selectedScopes.includes('server')
+                    ? 'bg-primary text-white'
+                    : ''
+                }
               >
-                Server
+                {t('devices.details.telemetry.scopes.server')}
               </Button>
               <Button
-                variant={selectedScopes.includes('client') ? 'default' : 'outline'}
+                variant={
+                  selectedScopes.includes('client') ? 'default' : 'outline'
+                }
                 size="sm"
                 onClick={() => handleScopeToggle('client')}
-                className={selectedScopes.includes('client') ? 'bg-primary text-white' : ''}
+                className={
+                  selectedScopes.includes('client')
+                    ? 'bg-primary text-white'
+                    : ''
+                }
               >
-                Client
+                {t('devices.details.telemetry.scopes.client')}
               </Button>
               <Button
-                variant={selectedScopes.includes('shared') ? 'default' : 'outline'}
+                variant={
+                  selectedScopes.includes('shared') ? 'default' : 'outline'
+                }
                 size="sm"
                 onClick={() => handleScopeToggle('shared')}
-                className={selectedScopes.includes('shared') ? 'bg-primary text-white' : ''}
+                className={
+                  selectedScopes.includes('shared')
+                    ? 'bg-primary text-white'
+                    : ''
+                }
               >
-                Shared
+                {t('devices.details.telemetry.scopes.shared')}
               </Button>
               <Button
                 size="sm"
@@ -163,7 +235,7 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
                 className="bg-primary hover:bg-primary/90 text-white"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Attribute
+                {t('devices.details.telemetry.addAttribute')}
               </Button>
             </div>
           </div>
@@ -183,17 +255,28 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
                 <table className="w-full">
                   <thead className="bg-primary">
                     <tr>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-white">KEY</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-white">VALUE</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-white">LAST UPDATE</th>
-                      <th className="text-left py-3 px-4 text-sm font-semibold text-white">ACTIONS</th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                        {t('devices.details.telemetry.table.key')}
+                      </th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                        {t('devices.details.telemetry.table.value')}
+                      </th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                        {t('devices.details.telemetry.table.lastUpdate')}
+                      </th>
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-white">
+                        {t('devices.details.telemetry.table.actions')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {attributes.length === 0 ? (
                       <tr>
-                        <td colSpan={4} className="py-8 px-4 text-center text-gray-500">
-                          No attributes found
+                        <td
+                          colSpan={4}
+                          className="py-8 px-4 text-center text-gray-500"
+                        >
+                          {t('devices.details.telemetry.table.noData')}
                         </td>
                       </tr>
                     ) : (
@@ -209,7 +292,12 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
                             {attr.value}
                           </td>
                           <td className="py-4 px-4 text-sm text-gray-600">
-                            {attr.lastUpdate ? format(new Date(attr.lastUpdate), 'yyyy-MM-dd HH:mm:ss') : '-'}
+                            {attr.lastUpdate
+                              ? format(
+                                  new Date(attr.lastUpdate),
+                                  'yyyy-MM-dd HH:mm:ss'
+                                )
+                              : '-'}
                           </td>
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-2">
@@ -220,16 +308,18 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
                                 className="h-8 px-3"
                               >
                                 <Edit className="h-4 w-4 mr-1" />
-                                EDIT
+                                {t('devices.details.telemetry.buttons.edit')}
                               </Button>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleDeleteAttribute(attr.key, attr.scope)}
+                                onClick={() =>
+                                  handleDeleteAttribute(attr.key, attr.scope)
+                                }
                                 className="h-8 px-3 text-red-600 hover:text-red-700 hover:bg-red-50"
                               >
                                 <Trash2 className="h-4 w-4 mr-1" />
-                                DELETE
+                                {t('devices.details.telemetry.buttons.delete')}
                               </Button>
                             </div>
                           </td>
@@ -261,7 +351,9 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <span className="text-sm text-gray-600 px-4">
-                    Page {attributesPage}
+                    {t('devices.details.telemetry.pagination', {
+                      page: attributesPage,
+                    })}
                   </span>
                   <Button
                     variant="ghost"
@@ -271,11 +363,7 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                  >
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
                     <ChevronsRight className="h-4 w-4" />
                   </Button>
                 </div>
@@ -288,4 +376,3 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({ deviceId
     </div>
   );
 };
-

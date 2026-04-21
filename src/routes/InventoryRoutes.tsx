@@ -3,12 +3,9 @@ import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
 import DeviceDetailsPage from '@/pages/DeviceDetailsPage';
 
-// Import inventory page components lazily
 const DevicesPage = Loadable(lazy(() => import('@/pages/DevicesPage.tsx')));
 const AssetsPage = Loadable(lazy(() => import('@/pages/AssetsPage.tsx')));
-const IndividualDeviceAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/IndividualDeviceAnalyticsPage.tsx'))
-);
+
 const AssetDetailsPage = Loadable(
   lazy(() => import('@/pages/AssetDetailsPage.tsx'))
 );

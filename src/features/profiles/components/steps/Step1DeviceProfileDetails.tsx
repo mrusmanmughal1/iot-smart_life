@@ -1,5 +1,6 @@
 import React from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   FormControl,
   FormField,
@@ -25,14 +26,16 @@ interface Step1DeviceProfileDetailsProps {
 export const Step1DeviceProfileDetails: React.FC<
   Step1DeviceProfileDetailsProps
 > = ({ form }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-lg text-primary font-semibold mb-1 dark:text-white">
-          Device Profile Details
+          {t('deviceProfiles.form.steps.details.title')}
         </h3>
         <p className="text-sm text-gray-500 dark:text-white">
-          Provide basic information about the device profile
+          {t('deviceProfiles.form.steps.details.description')}
         </p>
       </div>
       <div className="space-y-4">
@@ -41,10 +44,10 @@ export const Step1DeviceProfileDetails: React.FC<
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Profile Name *</FormLabel>
+              <FormLabel>{t('deviceProfiles.form.fields.name')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="e.g., Temperature Sensor"
+                  placeholder={t('deviceProfiles.form.fields.namePlaceholder')}
                   {...field}
                   className="border-2 rounded-md"
                 />
@@ -59,10 +62,12 @@ export const Step1DeviceProfileDetails: React.FC<
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>{t('deviceProfiles.form.fields.description')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Profile description..."
+                  placeholder={t(
+                    'deviceProfiles.form.fields.descriptionPlaceholder'
+                  )}
                   rows={3}
                   {...field}
                 />
@@ -77,18 +82,28 @@ export const Step1DeviceProfileDetails: React.FC<
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Device Type *</FormLabel>
+              <FormLabel>{t('deviceProfiles.form.fields.type')}</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select device type" />
+                    <SelectValue
+                      placeholder={t('deviceProfiles.form.fields.typePlaceholder')}
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Sensor">Sensor</SelectItem>
-                  <SelectItem value="Gateway">Gateway</SelectItem>
-                  <SelectItem value="Meter">Meter</SelectItem>
-                  <SelectItem value="Actuator">Actuator</SelectItem>
+                  <SelectItem value="Sensor">
+                    {t('deviceProfiles.form.options.sensor')}
+                  </SelectItem>
+                  <SelectItem value="Gateway">
+                    {t('deviceProfiles.form.options.gateway')}
+                  </SelectItem>
+                  <SelectItem value="Meter">
+                    {t('deviceProfiles.form.options.meter')}
+                  </SelectItem>
+                  <SelectItem value="Actuator">
+                    {t('deviceProfiles.form.options.actuator')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -101,11 +116,17 @@ export const Step1DeviceProfileDetails: React.FC<
           name="defaultRuleChainId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Default Rule Chain</FormLabel>
+              <FormLabel>
+                {t('deviceProfiles.form.fields.defaultRuleChain')}
+              </FormLabel>
               <Select onValueChange={field.onChange} value={field.value || ''}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select default rule chain" />
+                    <SelectValue
+                      placeholder={t(
+                        'deviceProfiles.form.fields.ruleChainPlaceholder'
+                      )}
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -133,10 +154,10 @@ export const Step1DeviceProfileDetails: React.FC<
           name="defaultQueueName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Queue</FormLabel>
+              <FormLabel>{t('deviceProfiles.form.fields.queue')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="e.g., Main Queue"
+                  placeholder={t('deviceProfiles.form.fields.queuePlaceholder')}
                   {...field}
                   className="border-2 rounded-md"
                 />
@@ -145,38 +166,6 @@ export const Step1DeviceProfileDetails: React.FC<
             </FormItem>
           )}
         />
-
-        {/* <FormField
-          control={form.control}
-          name="defaultEdgeRuleChain"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Default Edge Rule Chain</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value || ''}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select default edge rule chain" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Root Rule Chain">
-                    Root Rule Chain
-                  </SelectItem>
-                  <SelectItem value="Edge Processing">
-                    Edge Processing
-                  </SelectItem>
-                  <SelectItem value="Gateway Processing">
-                    Gateway Processing
-                  </SelectItem>
-                  <SelectItem value="Energy Processing">
-                    Energy Processing
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */}
       </div>
     </div>
   );

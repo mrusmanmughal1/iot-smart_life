@@ -117,7 +117,7 @@ export const DashboardPage = () => {
                   <div>
                     <div className="flex justify-between text-sm mb-1">
                       <span className="text-gray-600">
-                        {t('dashboard.customers', 'Customers')}
+                        {t('dashboard.customers')}
                       </span>
                       <span className="font-semibold">
                         {SubscriptionUsage?.current?.customers || 0}/
@@ -132,7 +132,7 @@ export const DashboardPage = () => {
                   <div>
                     <div className="flex justify-between text-sm  mb-1">
                       <span className="text-gray-600">
-                        {t('dashboard.floorPlans', 'Floor Plans')}
+                        {t('dashboard.floorPlans')}
                       </span>
                       <span className="font-semibold text-gray-900">
                         {SubscriptionUsage?.current?.floorPlans || 0}/
@@ -147,7 +147,7 @@ export const DashboardPage = () => {
                   <div>
                     <div className="flex justify-between text-sm  mb-1">
                       <span className="text-gray-600">
-                        {t('dashboard.automations', 'Automations')}
+                        {t('dashboard.automations')}
                       </span>
                       <span className="font-semibold text-gray-900">
                         {SubscriptionUsage?.current?.automations || 0}/
@@ -232,7 +232,7 @@ export const DashboardPage = () => {
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg font-semibold text-gray-600">
-                    {t('dashboard.storageAndAssets', 'Storage & Assets')}
+                    {t('dashboard.storageAndAssets')}
                   </CardTitle>
                 </div>
               </CardHeader>
@@ -240,7 +240,7 @@ export const DashboardPage = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">
-                      {t('dashboard.storage', 'Storage')}
+                      {t('dashboard.storage')}
                     </span>
                     <span className="font-semibold">
                       {SubscriptionUsage?.current?.storageGB || 0} /{' '}
@@ -255,7 +255,7 @@ export const DashboardPage = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">
-                      {t('dashboard.assets', 'Assets')}
+                      {t('dashboard.assets')}
                     </span>
                     <span className="font-semibold">
                       {SubscriptionUsage?.current?.assets || 0} /{' '}
@@ -304,7 +304,7 @@ export const DashboardPage = () => {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg font-semibold  text-gray-600">
-                    {t('dashboard.activeDashboards', 'Active Dashboards')}
+                    {t('dashboard.activeDashboards')}
                   </CardTitle>
                 </div>
 

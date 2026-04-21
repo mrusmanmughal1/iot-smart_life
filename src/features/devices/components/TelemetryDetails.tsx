@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,6 +43,7 @@ interface LatestValue {
 }
 
 export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }) => {
+  const { t } = useTranslation();
   const { data: deviceData } = useDevice(deviceId);
   const device = deviceData?.data?.data;
   
@@ -96,9 +98,9 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
 
   // Available telemetry keys
   const telemetryKeys: TelemetryKey[] = [
-    { key: 'temperature', label: 'Temperature', checked: selectedKeys.includes('temperature') },
-    { key: 'humidity', label: 'Humidity', checked: selectedKeys.includes('humidity') },
-    { key: 'pressure', label: 'Pressure', checked: selectedKeys.includes('pressure') },
+    { key: 'temperature', label: t('deviceProfiles.fields.telemetry.temperature') || 'Temperature', checked: selectedKeys.includes('temperature') },
+    { key: 'humidity', label: t('deviceProfiles.fields.telemetry.humidity') || 'Humidity', checked: selectedKeys.includes('humidity') },
+    { key: 'pressure', label: t('deviceProfiles.fields.telemetry.pressure') || 'Pressure', checked: selectedKeys.includes('pressure') },
   ];
 
   // Mock message rate data (replace with actual API call)
@@ -167,16 +169,16 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
       {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Label className="text-sm font-medium text-gray-700">Time Range:</Label>
+          <Label className="text-sm font-medium text-gray-700">{t('devices.details.telemetry.details.keys')}</Label>
           <Select value={timeRange} onValueChange={setTimeRange} className="w-40"  >
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1h">Last Hour</SelectItem>
-              <SelectItem value="24h">Last 24 Hours</SelectItem>
-              <SelectItem value="7d">Last 7 Days</SelectItem>
-              <SelectItem value="30d">Last 30 Days</SelectItem>
+              <SelectItem value="1h">{t('devices.details.alarms.filters.timeRangeOptions.1h') || 'Last Hour'}</SelectItem>
+              <SelectItem value="24h">{t('devices.details.alarms.filters.timeRangeOptions.24h')}</SelectItem>
+              <SelectItem value="7d">{t('devices.details.alarms.filters.timeRangeOptions.7d')}</SelectItem>
+              <SelectItem value="30d">{t('devices.details.alarms.filters.timeRangeOptions.30d')}</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -186,7 +188,7 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
             className="bg-primary hover:bg-primary/90 text-white"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+            {t('devices.details.telemetry.details.refresh')}
           </Button>
         </div>
         <Button
@@ -195,13 +197,13 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
           className="bg-secondary hover:bg-secondary/90 text-white"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Add Profile
+          {t('devices.details.telemetry.details.addProfile')}
         </Button>
       </div>
 
       {/* Telemetry Keys */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-gray-700">Telemetry Keys:</Label>
+        <Label className="text-sm font-medium text-gray-700">{t('devices.details.telemetry.details.keys')}</Label>
         <div className="flex items-center gap-6">
           {telemetryKeys.map((telemetryKey) => (
             <div key={telemetryKey.key} className="flex items-center gap-2">
@@ -225,7 +227,7 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
       <Card className="border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Message Rate (Last 24 Hours)
+            {t('devices.details.telemetry.details.graphTitle')}
           </h3>
           <div className="relative">
             <ResponsiveContainer width="100%" height={300}>
@@ -289,14 +291,14 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
       {/* Latest Values Table */}
       <Card className="border-gray-200 shadow-sm">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Latest Values</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('devices.details.telemetry.details.latestTitle') || 'Latest Values'}</h3>
           {telemetryLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : latestValues.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              No telemetry data available
+              {t('devices.details.telemetry.details.noTelemetry')}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -304,13 +306,13 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Key
+                      {t('devices.details.telemetry.table.key')}
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Value
+                      {t('devices.details.telemetry.table.value')}
                     </th>
                     <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                      Timestamp
+                      {t('devices.details.telemetry.table.lastUpdate')}
                     </th>
                   </tr>
                 </thead>

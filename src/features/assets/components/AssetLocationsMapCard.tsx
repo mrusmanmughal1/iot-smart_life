@@ -9,6 +9,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAssets } from '@/features/assets/hooks';
 import type { Asset } from '@/services/api/assets.api';
+import { useTranslation } from 'react-i18next';
 
 interface GoogleMarker {
   setMap: (map: unknown | null) => void;
@@ -52,6 +53,7 @@ declare global {
 }
 
 export default function AssetLocationsMapCard() {
+  const { t } = useTranslation();
   const { data: assetsResponse, isLoading: isAssetsLoading } = useAssets({
     page: 1,
     limit: 200,
@@ -341,7 +343,7 @@ export default function AssetLocationsMapCard() {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold text-gray-600">
-          Projects Locations
+          {t('dashboard.projectsLocations')}
         </CardTitle>
         <CardDescription>
           Showing {mapAssets.length} Projects on map

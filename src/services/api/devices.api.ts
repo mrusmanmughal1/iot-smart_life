@@ -184,4 +184,13 @@ export const devicesApi = {
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
   },
+  // Get all manufacturers
+  getManufacturers: () =>
+    apiClient.get<ApiResponse<string[]>>('/devices/manufacturers'),
+
+  // Get models by manufacturer
+  getModels: (manufacturer: string) =>
+    apiClient.get<ApiResponse<string[]>>('/devices/models', {
+      params: { manufacturer },
+    }),
 };

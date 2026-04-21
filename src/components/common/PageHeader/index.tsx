@@ -1,8 +1,9 @@
 import React from 'react';
 import { cn } from '@/lib/util';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronLeft } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useRTL } from '@/hooks/useRTL';
 
 export interface PageHeaderAction {
   label: string;
@@ -30,6 +31,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   children,
 }) => {
   const navigate = useNavigate();
+  const { isRTL } = useRTL();
   return (
     <div className={cn('space-y-4 ', className)}>
       <div className="flex items-start justify-between gap-4">
@@ -38,9 +40,16 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             variant="social"
             size="sm"
             onClick={() => navigate(-1)}
-            className=" p-1 px-2 rounded-full absolute -left-9 top-0"
+            className={cn(
+              'p-1 px-2 rounded-full absolute top-0',
+              isRTL ? '-right-10' : '-left-10'
+            )}
           >
-            <ChevronLeft className="h-4 w-4" />
+            {isRTL ? (
+              <ChevronRight className="h-4 w-4" />
+            ) : (
+              <ChevronLeft className="h-4 w-4" />
+            )}
           </Button>
 
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">

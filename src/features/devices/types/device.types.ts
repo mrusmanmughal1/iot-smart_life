@@ -7,6 +7,8 @@ export interface DeviceFormData {
   gatewayId?: string;
   description?: string;
   connectionType?: string;
+  manufacturer?: string;
+  model?: string;
 }
 
 export interface DeviceFilters {

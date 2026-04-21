@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -28,13 +29,18 @@ export const DeleteConfirmationDialog: React.FC<
   open,
   onOpenChange,
   onConfirm,
-  title = 'Delete Item',
+  title,
   description,
   itemName, 
   isLoading = false,
-  confirmText = 'Delete',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
 }) => {
+  const { t } = useTranslation();
+  
+  const displayTitle = title || t('common.deleteConfirmation.title');
+  const displayConfirmText = confirmText || t('common.deleteConfirmation.confirm');
+  const displayCancelText = cancelText || t('common.deleteConfirmation.cancel');
   const handleConfirm = async () => {
     try {
       await onConfirm();
@@ -46,8 +52,8 @@ export const DeleteConfirmationDialog: React.FC<
   };
 
   const defaultDescription = itemName
-    ? `Are you sure you want to delete "${itemName}"? This action cannot be undone.`
-    : 'Are you sure you want to delete this item? This action cannot be undone.';
+    ? t('common.deleteConfirmation.description', { itemName })
+    : t('common.deleteConfirmation.descriptionGeneric');
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -58,7 +64,7 @@ export const DeleteConfirmationDialog: React.FC<
               <AlertTriangle className="h-5 w-5 text-red-600" />
             </div>
             <DialogTitle className="text-lg  font-semibold">
-              {title}
+              {displayTitle}
             </DialogTitle>
           </div>
           <DialogDescription className="pt-2 bg-white text-black">
@@ -72,7 +78,7 @@ export const DeleteConfirmationDialog: React.FC<
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
           >
-            {cancelText}
+            {displayCancelText}
           </Button>
           <Button
             type="button"
@@ -81,7 +87,7 @@ export const DeleteConfirmationDialog: React.FC<
             disabled={isLoading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isLoading ? 'Deleting...' : confirmText}
+            {isLoading ? t('common.deleteConfirmation.deleting') : displayConfirmText}
           </Button>
         </DialogFooter>
       </DialogContent>

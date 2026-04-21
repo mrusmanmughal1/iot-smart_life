@@ -72,14 +72,17 @@ export default function DeviceProfiles() {
       toast.error(errorMessage);
     }
   };
-  const tableHeaders = [
-    'Name',
-    'Type',
-    'Transport',
-    'Devices',
-    'Created',
-    'Actions',
-  ];
+  const tableHeaders = useMemo(
+    () => [
+      t('deviceProfiles.table.name'),
+      t('deviceProfiles.table.type'),
+      t('deviceProfiles.table.transport'),
+      t('deviceProfiles.table.devices'),
+      t('deviceProfiles.table.created'),
+      t('deviceProfiles.table.actions'),
+    ],
+    [t]
+  );
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };

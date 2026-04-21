@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
 import {
   LineChart,
@@ -31,128 +32,6 @@ import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 const accent = 'bg-[#b366a4] hover:bg-[#9d5590] text-white border-0';
 
-const recentActivities = [
-  {
-    id: '1',
-    name: 'John',
-    action: 'Added a new customer',
-    time: '3 mins ago',
-    dotClass: 'bg-emerald-500',
-  },
-  {
-    id: '2',
-    name: 'Sarah',
-    action: 'Updated device configuration',
-    time: '12 mins ago',
-    dotClass: 'bg-blue-500',
-  },
-  {
-    id: '3',
-    name: 'Mike',
-    action: 'Resolved alarm #A-1024',
-    time: '1 hour ago',
-    dotClass: 'bg-amber-500',
-  },
-  {
-    id: '3',
-    name: 'Mike',
-    action: 'Resolved alarm #A-1024',
-    time: '1 hour ago',
-    dotClass: 'bg-amber-500',
-  },
-  {
-    id: '3',
-    name: 'Mike',
-    action: 'Resolved alarm #A-1024',
-    time: '1 hour ago',
-    dotClass: 'bg-amber-500',
-  },
-  {
-    id: '3',
-    name: 'Mike',
-    action: 'Resolved alarm #A-1024',
-    time: '1 hour ago',
-    dotClass: 'bg-amber-500',
-  },
-];
-
-const quickActions = [
-  { label: 'Add Device', icon: Smartphone },
-  { label: 'Set Alarm Rule', icon: Bell },
-  { label: 'Create Dashboard', icon: LayoutDashboard },
-  { label: 'Import Data', icon: Upload },
-  { label: 'Configure Rule Engine', icon: Cog },
-  { label: 'Invite User', icon: UserPlus },
-];
-
-const trendByRange: Record<string, { name: string; value: number }[]> = {
-  '7': [
-    { name: 'Mon', value: 12 },
-    { name: 'Tue', value: 19 },
-    { name: 'Wed', value: 15 },
-    { name: 'Thu', value: 22 },
-    { name: 'Fri', value: 28 },
-    { name: 'Sat', value: 24 },
-    { name: 'Sun', value: 30 },
-  ],
-  '30': [
-    { name: 'W1', value: 45 },
-    { name: 'W2', value: 52 },
-    { name: 'W3', value: 48 },
-    { name: 'W4', value: 61 },
-  ],
-  '90': [
-    { name: 'M1', value: 120 },
-    { name: 'M2', value: 135 },
-    { name: 'M3', value: 128 },
-  ],
-};
-
-const liveMetrics = [
-  {
-    label: 'Temperature',
-    value: '28.5°C',
-    border: 'border-pink-100',
-    spark: [2, 24, 100, 26, 28, 90, 28.5],
-    lineColor: '#b366a4',
-  },
-  {
-    label: 'Humidity',
-    value: '65%',
-    border: 'border-blue-400',
-    spark: [58, 60, 62, 63, 64, 65, 65],
-    lineColor: '#3b82f6',
-  },
-  {
-    label: 'Occupancy',
-    value: '73%',
-    border: 'border-blue-100',
-    spark: [5, 68, 70, 71, 72, 73, 93],
-    lineColor: '#22c55e',
-  },
-  {
-    label: 'CO2 Levels',
-    value: '450 ppm',
-    border: 'border-amber-100',
-    spark: [200, 230, 240, 25, 248, 20, 250],
-    lineColor: '#eab308',
-  },
-];
-
-const docLinks = [
-  { label: 'Getting Started Guide', active: true },
-  { label: 'API Reference', active: false },
-  { label: 'Alarm Rules Setup', active: false },
-  { label: 'FAQs & Tutorials', active: false },
-];
-
-const onboardingSteps = [
-  { id: '1', label: 'Add a Device', done: true },
-  { id: '2', label: 'Connect Your Gateway', done: true },
-  { id: '3', label: 'Build Your First Dashboard', done: false },
-  { id: '4', label: 'Set Up Alarms', done: false },
-];
-
 function MiniSparkline({ data, color }: { data: number[]; color: string }) {
   const chartData = data.map((v, i) => ({ i, v }));
   return (
@@ -176,7 +55,151 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }) {
 }
 
 export default function Overview2Page() {
+  const { t } = useTranslation();
   const [trendDays, setTrendDays] = useState<'7' | '30' | '90'>('7');
+
+  const recentActivities = useMemo(
+    () => [
+      {
+        id: '1',
+        name: 'John',
+        action: t('overview2.recentActivities.addedCustomer'),
+        time: t('overview2.recentActivities.minsAgo', { count: 3 }),
+        dotClass: 'bg-emerald-500',
+      },
+      {
+        id: '2',
+        name: 'Sarah',
+        action: t('overview2.recentActivities.updatedConfig'),
+        time: t('overview2.recentActivities.minsAgo', { count: 12 }),
+        dotClass: 'bg-blue-500',
+      },
+      {
+        id: '3',
+        name: 'Mike',
+        action: t('overview2.recentActivities.resolvedAlarm'),
+        time: t('overview2.recentActivities.hourAgo', { count: 1 }),
+        dotClass: 'bg-amber-500',
+      },
+      {
+        id: '4',
+        name: 'Mike',
+        action: t('overview2.recentActivities.resolvedAlarm'),
+        time: t('overview2.recentActivities.hourAgo', { count: 1 }),
+        dotClass: 'bg-amber-500',
+      },
+      {
+        id: '5',
+        name: 'Mike',
+        action: t('overview2.recentActivities.resolvedAlarm'),
+        time: t('overview2.recentActivities.hourAgo', { count: 1 }),
+        dotClass: 'bg-amber-500',
+      },
+      {
+        id: '6',
+        name: 'Mike',
+        action: t('overview2.recentActivities.resolvedAlarm'),
+        time: t('overview2.recentActivities.hourAgo', { count: 1 }),
+        dotClass: 'bg-amber-500',
+      },
+    ],
+    [t]
+  );
+
+  const quickActions = useMemo(
+    () => [
+      { label: t('overview2.quickActions.addDevice'), icon: Smartphone },
+      { label: t('overview2.quickActions.setAlarmRule'), icon: Bell },
+      { label: t('overview2.quickActions.createDashboard'), icon: LayoutDashboard },
+      { label: t('overview2.quickActions.importData'), icon: Upload },
+      { label: t('overview2.quickActions.configureRuleEngine'), icon: Cog },
+      { label: t('overview2.quickActions.inviteUser'), icon: UserPlus },
+    ],
+    [t]
+  );
+
+  const trendByRange = useMemo<
+    Record<string, { name: string; value: number }[]>
+  >(
+    () => ({
+      '7': [
+        { name: 'Mon', value: 12 },
+        { name: 'Tue', value: 19 },
+        { name: 'Wed', value: 15 },
+        { name: 'Thu', value: 22 },
+        { name: 'Fri', value: 28 },
+        { name: 'Sat', value: 24 },
+        { name: 'Sun', value: 30 },
+      ],
+      '30': [
+        { name: 'W1', value: 45 },
+        { name: 'W2', value: 52 },
+        { name: 'W3', value: 48 },
+        { name: 'W4', value: 61 },
+      ],
+      '90': [
+        { name: 'M1', value: 120 },
+        { name: 'M2', value: 135 },
+        { name: 'M3', value: 128 },
+      ],
+    }),
+    []
+  );
+
+  const liveMetrics = useMemo(
+    () => [
+      {
+        label: t('overview2.liveData.metrics.temperature'),
+        value: '28.5°C',
+        border: 'border-pink-100',
+        spark: [2, 24, 100, 26, 28, 90, 28.5],
+        lineColor: '#b366a4',
+      },
+      {
+        label: t('overview2.liveData.metrics.humidity'),
+        value: '65%',
+        border: 'border-blue-400',
+        spark: [58, 60, 62, 63, 64, 65, 65],
+        lineColor: '#3b82f6',
+      },
+      {
+        label: t('overview2.liveData.metrics.occupancy'),
+        value: '73%',
+        border: 'border-blue-100',
+        spark: [5, 68, 70, 71, 72, 73, 93],
+        lineColor: '#22c55e',
+      },
+      {
+        label: t('overview2.liveData.metrics.co2'),
+        value: '450 ppm',
+        border: 'border-amber-100',
+        spark: [200, 230, 240, 25, 248, 20, 250],
+        lineColor: '#eab308',
+      },
+    ],
+    [t]
+  );
+
+  const docLinks = useMemo(
+    () => [
+      { label: t('overview2.documentation.gettingStarted'), active: true },
+      { label: t('overview2.documentation.apiReference'), active: false },
+      { label: t('overview2.documentation.alarmRules'), active: false },
+      { label: t('overview2.documentation.faqs'), active: false },
+    ],
+    [t]
+  );
+
+  const onboardingSteps = useMemo(
+    () => [
+      { id: '1', label: t('overview2.onboarding.addDevice'), done: true },
+      { id: '2', label: t('overview2.onboarding.connectGateway'), done: true },
+      { id: '3', label: t('overview2.onboarding.buildDashboard'), done: false },
+      { id: '4', label: t('overview2.onboarding.setUpAlarms'), done: false },
+    ],
+    [t]
+  );
+
   const trendData = trendByRange[trendDays];
 
   const guideProgress = useMemo(() => {
@@ -188,7 +211,7 @@ export default function Overview2Page() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-slate-900 dark:text-white">
-          Overview
+          {t('overview2.title')}
         </h1>
       </div>
 
@@ -198,10 +221,10 @@ export default function Overview2Page() {
             <Card className="shadow-sm border-slate-200/80">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
                 <CardTitle className="text-base font-semibold">
-                  Recent Activities
+                  {t('overview2.recentActivities.title')}
                 </CardTitle>
                 <Button variant="primary" size="sm" asChild>
-                  <Link to="/analytics">View All Activity Logs</Link>
+                  <Link to="/analytics">{t('overview2.recentActivities.viewAll')}</Link>
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4  h-[270px] overflow-y-auto  sidebar-scroll ">
@@ -238,7 +261,7 @@ export default function Overview2Page() {
             <Card className="shadow-sm border-slate-200/80">
               <CardHeader>
                 <CardTitle className="text-base font-semibold">
-                  Quick Actions
+                  {t('overview2.quickActions.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -264,7 +287,7 @@ export default function Overview2Page() {
             <Card className="shadow-sm border-slate-200/80">
               <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 space-y-0 pb-2">
                 <CardTitle className="text-base font-semibold">
-                  Device Trends Analytics
+                  {t('overview2.trends.title')}
                 </CardTitle>
                 <div className="flex rounded-md border border-slate-200 p-0.5 text-xs dark:border-slate-700">
                   {(['7', '30', '90'] as const).map((d) => (
@@ -279,7 +302,7 @@ export default function Overview2Page() {
                           : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300'
                       )}
                     >
-                      {d === '7' ? '7' : d === '30' ? '30' : '90'} Days
+                      {t('overview2.trends.days', { count: parseInt(d) })}
                     </button>
                   ))}
                 </div>
@@ -309,7 +332,7 @@ export default function Overview2Page() {
             <Card className="shadow-sm border-slate-200/80">
               <CardHeader>
                 <CardTitle className="text-base font-semibold">
-                  Live Data Overview
+                  {t('overview2.liveData.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -318,8 +341,9 @@ export default function Overview2Page() {
                     <div
                       key={m.label}
                       className={cn(
-                        'rounded-lg border  border-slate-100 hover:border-slate-200 transition-all bg-white p-4 dark:bg-slate-900/40'
-                        , m.border)}
+                        'rounded-lg border  border-slate-100 hover:border-slate-200 transition-all bg-white p-4 dark:bg-slate-900/40',
+                        m.border
+                      )}
                     >
                       <p className="text-xs text-slate-500">{m.label}</p>
                       <p className="text-lg font-semibold text-slate-900 dark:text-white">
@@ -335,7 +359,7 @@ export default function Overview2Page() {
             <Card className="shadow-sm border-slate-200/80">
               <CardHeader>
                 <CardTitle className="text-base font-semibold">
-                  Documentation Help
+                  {t('overview2.documentation.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -361,7 +385,7 @@ export default function Overview2Page() {
             <Card className="shadow-sm border-slate-200/80">
               <CardHeader>
                 <CardTitle className="text-base font-semibold">
-                  Get Started Guide
+                  {t('overview2.onboarding.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -399,7 +423,7 @@ export default function Overview2Page() {
                 </div>
                 <div className="space-y-2 pt-2">
                   <div className="flex justify-between text-xs text-slate-500">
-                    <span>Progress</span>
+                    <span>{t('overview2.onboarding.progress')}</span>
                     <span>{guideProgress}%</span>
                   </div>
                   <Progress value={guideProgress} className="h-2" />
@@ -409,7 +433,10 @@ export default function Overview2Page() {
           </div>
         </div>
 
-        <DashboardNavigation previousRoute="/dashboard" nextRoute="/dashboard/overview-2" />
+        <DashboardNavigation
+          previousRoute="/dashboard"
+          nextRoute="/dashboard/overview-2"
+        />
       </div>
     </div>
   );

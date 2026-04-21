@@ -61,10 +61,18 @@ const getWidgetPerformanceData = (t: TFunction) => [
 
 // Helper function to get localized recent activity
 const getRecentActivity = (t: TFunction) => [
-  t('productionOverview.activityMessages.dashboardLoaded', { user: 'admin@company.com' }),
-  t('productionOverview.activityMessages.widgetRefresh', { widgetName: t('productionOverview.widgetNames.temperatureChart') }),
-  t('productionOverview.activityMessages.newDeviceConnected', { deviceName: 'Sensor-012' }),
-  t('productionOverview.activityMessages.alertResolved', { alertMessage: 'High pressure warning' }),
+  t('productionOverview.activityMessages.dashboardLoaded', {
+    user: 'admin@company.com',
+  }),
+  t('productionOverview.activityMessages.widgetRefresh', {
+    widgetName: t('productionOverview.widgetNames.temperatureChart'),
+  }),
+  t('productionOverview.activityMessages.newDeviceConnected', {
+    deviceName: 'Sensor-012',
+  }),
+  t('productionOverview.activityMessages.alertResolved', {
+    alertMessage: 'High pressure warning',
+  }),
 ];
 
 // Mock data for data consumption by device (device names don't need translation)
@@ -99,13 +107,23 @@ export default function ProductionOverviewPage() {
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[220px] bg-white border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-            <SelectValue placeholder={t('productionOverview.timeRangeLast7Days')} />
+            <SelectValue
+              placeholder={t('productionOverview.timeRangeLast7Days')}
+            />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="24h">{t('productionOverview.timeRangeLast24Hours')}</SelectItem>
-            <SelectItem value="7d">{t('productionOverview.timeRangeLast7Days')}</SelectItem>
-            <SelectItem value="30d">{t('productionOverview.timeRangeLast30Days')}</SelectItem>
-            <SelectItem value="90d">{t('productionOverview.timeRangeLast90Days')}</SelectItem>
+            <SelectItem value="24h">
+              {t('productionOverview.timeRangeLast24Hours')}
+            </SelectItem>
+            <SelectItem value="7d">
+              {t('productionOverview.timeRangeLast7Days')}
+            </SelectItem>
+            <SelectItem value="30d">
+              {t('productionOverview.timeRangeLast30Days')}
+            </SelectItem>
+            <SelectItem value="90d">
+              {t('productionOverview.timeRangeLast90Days')}
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -125,7 +143,9 @@ export default function ProductionOverviewPage() {
             </div>
             <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>{t('productionOverview.trendUpPercent', { percent: 12 })}</span>
+              <span>
+                {t('productionOverview.trendUpPercent', { percent: 12 })}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -143,7 +163,9 @@ export default function ProductionOverviewPage() {
             </div>
             <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>{t('productionOverview.trendUpPercent', { percent: 18 })}</span>
+              <span>
+                {t('productionOverview.trendUpPercent', { percent: 18 })}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -161,7 +183,9 @@ export default function ProductionOverviewPage() {
             </div>
             <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>{t('productionOverview.trendUpPercent', { percent: 5 })}</span>
+              <span>
+                {t('productionOverview.trendUpPercent', { percent: 5 })}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -179,7 +203,9 @@ export default function ProductionOverviewPage() {
             </div>
             <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400 mt-1">
               <TrendingUp className="h-4 w-4" />
-              <span>{t('productionOverview.trendUpPercent', { percent: 0.2 })}</span>
+              <span>
+                {t('productionOverview.trendUpPercent', { percent: 0.2 })}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -309,25 +335,33 @@ export default function ProductionOverviewPage() {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {t('productionOverview.statusSummary.online', { count: 10 })}
+                    {t('productionOverview.statusSummary.online', {
+                      count: 10,
+                    })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-orange-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {t('productionOverview.statusSummary.warning', { count: 2 })}
+                    {t('productionOverview.statusSummary.warning', {
+                      count: 2,
+                    })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {t('productionOverview.statusSummary.offline', { count: 0 })}
+                    {t('productionOverview.statusSummary.offline', {
+                      count: 0,
+                    })}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-red-500" />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {t('productionOverview.statusSummary.maintenance', { count: 1 })}
+                    {t('productionOverview.statusSummary.maintenance', {
+                      count: 1,
+                    })}
                   </span>
                 </div>
               </div>
@@ -339,7 +373,8 @@ export default function ProductionOverviewPage() {
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          {t('productionOverview.footer.lastUpdated', { time: 2 })} • {t('productionOverview.footer.autoRefresh', { interval: 30 })}
+          {t('productionOverview.footer.lastUpdated', { time: 2 })} •{' '}
+          {t('productionOverview.footer.autoRefresh', { interval: 30 })}
         </div>
         <Button
           onClick={handleRefresh}

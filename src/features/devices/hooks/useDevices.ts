@@ -154,3 +154,18 @@ export const useBulkProvision = () => {
     },
   });
 };
+
+export const useManufacturers = () => {
+  return useQuery({
+    queryKey: ['devices', 'manufacturers'],
+    queryFn: () => devicesApi.getManufacturers(),
+  });
+};
+
+export const useModels = (manufacturer: string) => {
+  return useQuery({
+    queryKey: ['devices', 'models', manufacturer],
+    queryFn: () => devicesApi.getModels(manufacturer),
+    enabled: !!manufacturer,
+  });
+};

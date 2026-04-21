@@ -12,7 +12,6 @@ interface AppLayoutProps {
 export const AppLayout = ({ children }: AppLayoutProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isRTL } = useRTL();
-  // Initialize settings from API on first render only
   useInitializeSettings();
 
   return (

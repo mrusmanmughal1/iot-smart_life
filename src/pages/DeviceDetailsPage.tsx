@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Download, Upload, Plus, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,21 +14,28 @@ type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms' | 'relations';
 
 export default function DeviceDetailsPage() {
   const { id } = useParams<{ id: string }>();
+
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
+
   const [activeTab, setActiveTab] = useState<TabType>('details');
+
   const { data: deviceData } = useDevice(id || '');
+
   const device = deviceData?.data?.data;
+
   const deviceStatus =
     device?.status === 'online' || device?.status === 'idle'
       ? 'ACTIVE'
       : 'INACTIVE';
 
   const tabs: { id: TabType; label: string }[] = [
-    { id: 'details', label: 'Details' },
-    { id: 'attributes', label: 'Attributes' },
-    { id: 'telemetry', label: 'Telemetry' },
-    { id: 'alarms', label: 'Alarms' },
-    { id: 'relations', label: 'Relations' },
+    { id: 'details', label: t('devices.details.tabs.details') },
+    { id: 'attributes', label: t('devices.details.tabs.attributes') },
+    { id: 'telemetry', label: t('devices.details.tabs.telemetry') },
+    { id: 'alarms', label: t('devices.details.tabs.alarms') },
+    { id: 'relations', label: t('devices.details.tabs.relations') },
   ];
 
   return (
@@ -46,24 +54,26 @@ export default function DeviceDetailsPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-3xl font-bold text-slate-900">
-                {device?.name || 'Device Details'}
+                {device?.name || t('devices.details.fallbackTitle')}
               </h1>
               <Badge
                 variant={deviceStatus === 'ACTIVE' ? 'success' : 'secondary'}
                 className="rounded-full px-3 py-1"
               >
-                {deviceStatus}
+                {deviceStatus === 'ACTIVE'
+                  ? t('devices.details.statusActive')
+                  : t('devices.details.statusInactive')}
               </Badge>
             </div>
             <p className="text-slate-500 mt-1 text-sm">
-              Manage asset configuration templates and hierarchies.
+              {t('devices.details.subtitle')}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm">
             <Download className="h-4 w-4 mr-2" />
-            Export
+            {t('devices.details.export')}
           </Button>
           <Button
             variant="secondary"
@@ -71,14 +81,14 @@ export default function DeviceDetailsPage() {
             className="bg-secondary hover:bg-secondary/90 text-white"
           >
             <Upload className="h-4 w-4 mr-2" />
-            Import
+            {t('devices.details.import')}
           </Button>
           <Button
             size="sm"
             className="bg-primary hover:bg-primary/90 text-white"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add
+            {t('devices.details.add')}
           </Button>
         </div>
       </div>

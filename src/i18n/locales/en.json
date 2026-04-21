@@ -51,7 +51,15 @@
     "phoneInvalid": "Invalid phone number",
     "signup": "Signup",
     "companyName": "Company Name",
-    "failedToLoadSettings": "Failed to load settings"
+    "failedToLoadSettings": "Failed to load settings",
+    "deleteConfirmation": {
+      "title": "Delete Item",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "description": "Are you sure you want to delete \"{{itemName}}\"? This action cannot be undone.",
+      "descriptionGeneric": "Are you sure you want to delete this item? This action cannot be undone.",
+      "deleting": "Deleting..."
+    }
   },
   "pagination": {
     "showing": "Showing",
@@ -177,6 +185,14 @@
     "recentActivity": "Recent Activity",
     "systemHealth": "System Health",
     "quickActions": "Quick Actions",
+    "storageAndAssets": "Storage & Assets",
+    "storage": "Storage",
+    "assets": "Assets",
+    "customers": "Customers",
+    "floorPlans": "Floor Plans",
+    "automations": "Automations",
+    "projectsLocations": "Projects Locations",
+    "activeDashboards": "Active Dashboards",
     "solutionCategories": {
       "smartCity": "Smart City",
       "smartAgriculture": "Smart Agriculture",
@@ -220,6 +236,22 @@
       "smartBuildingOverview": "Smart Building Overview",
       "smartBuildingMetrics": "Smart Building Metrics",
       "smartHomeControl": "Smart Home Control"
+    },
+    "liveUpdates": "Live Updates",
+    "lastUpdate": "Last update: {{time}}",
+    "waiting": "Waiting...",
+    "stats": {
+      "activeCount": "{{count}} Active",
+      "totalCount": "{{count}} Total",
+      "onlineCount": "● {{count}} Online",
+      "offlineCount": "● {{count}} Offline",
+      "usersCount": "{{count}} Users"
+    },
+    "realtimeActivity": "Real-time Activity",
+    "activities": {
+      "wentOnline": "Device went online",
+      "wentOffline": "Device went offline",
+      "telemetry": "Temperature: {{temp}}°C, Humidity: {{hum}}%"
     }
   },
   "solutionDashboards": {
@@ -519,6 +551,10 @@
     "deviceName": "Device Name",
     "deviceType": "Device Type",
     "deviceProfile": "Device Profile",
+    "manufacturer": "Manufacturer",
+    "selectManufacturer": "Select Manufacturer",
+    "modelNumber": "Model Number",
+    "selectModelNumber": "Select Model Number",
     "lastActivity": "Last Activity",
     "telemetry": "Telemetry",
     "attributes": "Attributes",
@@ -534,9 +570,219 @@
       "customer": "Customer name",
       "actions": "Actions"
     },
+    "form": {
+      "addDescription": "Add a new device to your IoT platform",
+      "editDescription": "Update device information",
+      "namePlaceholder": "Enter device name",
+      "selectType": "Select type",
+      "types": {
+        "sensor": "Sensor",
+        "actuator": "Actuator",
+        "gateway": "Gateway",
+        "controller": "Controller",
+        "camera": "Camera",
+        "tracker": "Tracker"
+      },
+      "selectConnectionType": "Select connection type",
+      "connections": {
+        "wifi": "Wifi",
+        "ethernet": "Ethernet",
+        "bluetooth": "Bluetooth",
+        "cellular": "Cellular",
+        "zigbee": "Zigbee",
+        "lora": "Lora"
+      },
+      "description": "Description",
+      "descriptionPlaceholder": "Device description (optional)",
+      "gatewayAssignment": "Gateway Assignment",
+      "selectGatewayPlaceholder": "Select gateway (disabled)",
+      "gateways": {
+        "gateway1": "Gateway 1",
+        "gateway2": "Gateway 2",
+        "gateway3": "Gateway 3"
+      }
+    },
+    "credentials": {
+      "title": "Device Credentials",
+      "description": "Please copy these credentials now. For security reasons, the Access Token will not be shown again.",
+      "tabs": {
+        "credentials": "Credentials",
+        "setup": "Setup",
+        "examples": "Examples"
+      },
+      "fields": {
+        "deviceKey": "Device Key",
+        "accessToken": "Access Token",
+        "mqttBroker": "MQTT Broker",
+        "telemetryTopic": "Telemetry Topic",
+        "gatewayConfig": "Gateway Configuration",
+        "clientId": "Client ID:",
+        "username": "Username:",
+        "host": "Host:",
+        "instructions": "Instructions"
+      },
+      "actions": {
+        "copy": "Copy",
+        "copied": "Copied",
+        "done": "Done"
+      }
+    },
+    "messages": {
+      "createSuccess": "Device created successfully",
+      "createError": "Failed to create device",
+      "updateSuccess": "Device updated successfully",
+      "updateError": "Failed to update device",
+      "deleteSuccess": "Device deleted successfully",
+      "deleteError": "Failed to delete device"
+    },
+    "tooltips": {
+      "view": "View Device",
+      "edit": "Edit Device",
+      "delete": "Delete Device"
+    },
     "status": {
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "details": {
+      "fallbackTitle": "Device Details",
+      "subtitle": "Manage asset configuration templates and hierarchies.",
+      "statusActive": "ACTIVE",
+      "statusInactive": "INACTIVE",
+      "export": "Export",
+      "import": "Import",
+      "add": "Add",
+      "tabs": {
+        "details": "Details",
+        "attributes": "Attributes",
+        "telemetry": "Telemetry",
+        "alarms": "Alarms",
+        "relations": "Relations"
+      },
+      "general": {
+        "title": "General Settings",
+        "sectionDevice": "Device Details",
+        "name": "Device Name",
+        "namePlaceholder": "Enter device name",
+        "label": "Device Label",
+        "labelPlaceholder": "Enter device label",
+        "type": "Device Type",
+        "typePlaceholder": "Select device type",
+        "profile": "Device Profile",
+        "profilePlaceholder": "Select device profile",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter device description",
+        "sectionLocation": "Location Settings",
+        "building": "Building",
+        "buildingPlaceholder": "Select building",
+        "floor": "Floor",
+        "floorPlaceholder": "Select floor",
+        "room": "Room",
+        "roomPlaceholder": "Select room",
+        "gpsCoordinates": "GPS Coordinates",
+        "latitudePlaceholder": "Latitude (e.g., 40.7128)",
+        "longitudePlaceholder": "Longitude (e.g., -74.0060)",
+        "cancel": "Cancel",
+        "saveChanges": "Save Changes",
+        "messages": {
+          "success": "Device settings saved successfully",
+          "error": "Failed to save device settings",
+          "cancelled": "Changes cancelled"
+        }
+      },
+      "telemetry": {
+        "searchPlaceholder": "Search attributes..",
+        "scopes": {
+          "server": "Server",
+          "client": "Client",
+          "shared": "Shared"
+        },
+        "addAttribute": "Add Attribute",
+        "table": {
+          "key": "KEY",
+          "value": "VALUE",
+          "lastUpdate": "LAST UPDATE",
+          "actions": "ACTIONS",
+          "noData": "No attributes found"
+        },
+        "buttons": {
+          "edit": "EDIT",
+          "delete": "DELETE"
+        },
+        "pagination": "Page {{page}}",
+        "messages": {
+          "editComingSoon": "Edit attribute functionality coming soon",
+          "deleteConfirm": "Are you sure you want to delete attribute \"{{key}}\"?",
+          "deleteSuccess": "Attribute deleted successfully",
+          "deleteError": "Failed to delete attribute",
+          "addComingSoon": "Add attribute functionality coming soon"
+        },
+        "details": {
+          "latestTitle": "Latest Values",
+          "title": "Latest Values",
+          "noTelemetry": "No telemetry data available",
+          "keys": "Telemetry Keys:",
+          "graphTitle": "Message Rate (Last 24 Hours)",
+          "graphX": "month",
+          "graphY": "value",
+          "refresh": "Refresh",
+          "addProfile": "Add Profile"
+        }
+      },
+      "alarms": {
+        "summary": {
+          "active": "Active Alarms",
+          "critical": "Critical",
+          "major": "Major",
+          "warning": "Warning"
+        },
+        "filters": {
+          "label": "Filters:",
+          "status": "Status:",
+          "severity": "Severity:",
+          "timeRange": "Time Range:",
+          "apply": "Apply",
+          "statusOptions": {
+            "all": "All Statuses",
+            "active": "Active",
+            "acknowledged": "Acknowledged",
+            "cleared": "Cleared"
+          },
+          "severityOptions": {
+            "all": "All Severities",
+            "critical": "Critical",
+            "major": "Major",
+            "minor": "Minor",
+            "warning": "Warning"
+          },
+          "timeRangeOptions": {
+            "1h": "Last Hour",
+            "24h": "Last 24 Hours",
+            "7d": "Last 7 Days",
+            "30d": "Last 30 Days",
+            "all": "All Time"
+          }
+        },
+        "table": {
+          "severity": "SEVERITY",
+          "type": "TYPE",
+          "status": "STATUS",
+          "created": "CREATED TIME",
+          "updated": "UPDATED TIME",
+          "message": "MESSAGE",
+          "acknowledged": "ACKNOWLEDGED",
+          "actions": "ACTIONS",
+          "noData": "No alarms found",
+          "yes": "YES",
+          "no": "NO"
+        },
+        "messages": {
+          "editComingSoon": "Edit alarm functionality coming soon",
+          "deleteConfirm": "Are you sure you want to delete this alarm?",
+          "deleteSuccess": "Alarm deleted successfully",
+          "deleteError": "Failed to delete alarm"
+        }
+      }
     }
   },
   "deviceProfiles": {
@@ -551,10 +797,102 @@
     "gatewayProfiles": "Gateway profiles",
     "table": {
       "name": "Name",
-      "createdTime": "Created time",
-      "status": "State",
-      "customer": "Customer name",
+      "type": "Type",
+      "transport": "Transport",
+      "devices": "Devices",
+      "created": "Created",
       "actions": "Actions"
+    },
+    "form": {
+      "createTitle": "Create Device Profile",
+      "createDescription": "Follow the steps to create a new device profile",
+      "steps": {
+        "details": {
+          "title": "Device profile details",
+          "description": "Basic device profile information"
+        },
+        "transport": {
+          "title": "Transport configuration",
+          "description": "Configure transport protocol",
+          "optional": "(Optional)"
+        },
+        "alarms": {
+          "title": "Alarm rules",
+          "description": "Define alarm rules"
+        },
+        "provisioning": {
+          "title": "Device provisioning",
+          "description": "Configure provisioning settings"
+        }
+      },
+      "fields": {
+        "name": "Profile Name *",
+        "namePlaceholder": "e.g., Temperature Sensor",
+        "description": "Description",
+        "descriptionPlaceholder": "Profile description...",
+        "type": "Device Type *",
+        "typePlaceholder": "Select device type",
+        "defaultRuleChain": "Default Rule Chain",
+        "ruleChainPlaceholder": "Select default rule chain",
+        "queue": "Queue",
+        "queuePlaceholder": "e.g., Main Queue",
+        "transportType": "Transport Type",
+        "transportPlaceholder": "Select transport type",
+        "telemetryTopic": "Device Telemetry Topic",
+        "telemetryPlaceholder": "e.g., v1/devices/me/telemetry",
+        "attributesTopic": "Device Attributes Topic",
+        "attributesPlaceholder": "e.g., v1/devices/me/attributes",
+        "baseUrl": "Base URL",
+        "baseUrlPlaceholder": "e.g., https://api.example.com",
+        "timeout": "Timeout (seconds)",
+        "port": "Port",
+        "baudRate": "Baud Rate",
+        "region": "Region",
+        "regionPlaceholder": "e.g., EU868",
+        "appEui": "Application EUI",
+        "provisionStrategy": "Provision Strategy",
+        "provisionPlaceholder": "Select provision strategy",
+        "provisionDescription": "Provision Strategy",
+        "ruleChainDescription": "Default Rule Chain",
+        "queueDescription": "Default Rule Chain"
+      },
+      "buttons": {
+        "previous": "Previous",
+        "next": "Next",
+        "cancel": "Cancel",
+        "create": "Create Profile",
+        "addAlarm": "Add Alarm Rule",
+        "addAnotherAlarm": "Add Another Alarm Rule"
+      },
+      "messages": {
+        "noAlarms": "No alarm rules defined",
+        "alarmRule": "Alarm Rule",
+        "optional": "Optional",
+        "createSuccess": "Device profile created successfully",
+        "createError": "Failed to create device profile. Please try again.",
+        "deleteSuccess": "Device profile deleted successfully",
+        "deleteError": "Failed to delete device profile. Please try again.",
+        "create": "Create Profile"
+      },
+      "options": {
+        "sensor": "Sensor",
+        "gateway": "Gateway",
+        "meter": "Meter",
+        "actuator": "Actuator",
+        "mqtt": "MQTT",
+        "http": "HTTP",
+        "coap": "CoAP",
+        "lwm2m": "LWM2M",
+        "snmp": "SNMP",
+        "critical": "Critical",
+        "major": "Major",
+        "minor": "Minor",
+        "warning": "Warning",
+        "indeterminate": "Indeterminate",
+        "allowCreateNew": "Allow creating new devices",
+        "checkPreProvisioned": "Check pre-provisioned devices",
+        "disabled": "Disabled"
+      }
     }
   },
   "assetProfiles": {
@@ -568,7 +906,52 @@
     "facilities": "Facilities",
     "commercial": "Commercial",
     "buildings": "Buildings",
-    "createProfile": "Create Profile"
+    "createProfile": "Create Profile",
+    "noProfiles": "No asset profiles found",
+    "table": {
+      "name": "Name",
+      "default": "Default",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "messages": {
+      "createSuccess": "Asset profile created successfully",
+      "createError": "Failed to create asset profile. Please try again.",
+      "deleteSuccess": "Asset profile deleted successfully",
+      "deleteError": "Failed to delete asset profile. Please try again.",
+      "deleteTitle": "Delete Asset Profile",
+      "deleteDescription": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone and will affect all assets using this profile."
+    },
+    "form": {
+      "createTitle": "Add Asset Profile",
+      "createDescription": "Create a new asset profile configuration",
+      "name": "Name *",
+      "namePlaceholder": "Enter asset profile name",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter asset profile description",
+      "defaultRuleChain": "Default Rule Chain",
+      "ruleChainPlaceholder": "Select default rule chain",
+      "queue": "Queue",
+      "queuePlaceholder": "Select queue",
+      "defaultEdgeRuleChain": "Default Edge Rule Chain",
+      "edgeRuleChainPlaceholder": "Select default edge rule chain",
+      "edgeRuleChainDescription": "Used on edge as rule chain to process incoming data for assets of this asset profile",
+      "cancel": "Cancel",
+      "creating": "Creating...",
+      "create": "Create Profile",
+      "ruleChains": {
+        "root": "Root Rule Chain",
+        "industrial": "Industrial Processing",
+        "building": "Building Management",
+        "residential": "Residential Processing",
+        "warehouse": "Warehouse Processing",
+        "edge": "Edge Processing",
+        "gateway": "Gateway Processing"
+      },
+      "queues": {
+        "root": "Root queue Chain"
+      }
+    }
   },
   "assets": {
     "title": "Assets",
@@ -1795,6 +2178,55 @@
       "status": "Status",
       "success": "Success",
       "failed": "Failed"
+    }
+  },
+  "overview2": {
+    "title": "Overview",
+    "recentActivities": {
+      "title": "Recent Activities",
+      "viewAll": "View All Activity Logs",
+      "addedCustomer": "Added a new customer",
+      "updatedConfig": "Updated device configuration",
+      "resolvedAlarm": "Resolved alarm #A-1024",
+      "minsAgo": "{{count}} mins ago",
+      "hourAgo": "{{count}} hour ago"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "addDevice": "Add Device",
+      "setAlarmRule": "Set Alarm Rule",
+      "createDashboard": "Create Dashboard",
+      "importData": "Import Data",
+      "configureRuleEngine": "Configure Rule Engine",
+      "inviteUser": "Invite User"
+    },
+    "trends": {
+      "title": "Device Trends Analytics",
+      "days": "{{count}} Days"
+    },
+    "liveData": {
+      "title": "Live Data Overview",
+      "metrics": {
+        "temperature": "Temperature",
+        "humidity": "Humidity",
+        "occupancy": "Occupancy",
+        "co2": "CO2 Levels"
+      }
+    },
+    "documentation": {
+      "title": "Documentation Help",
+      "gettingStarted": "Getting Started Guide",
+      "apiReference": "API Reference",
+      "alarmRules": "Alarm Rules Setup",
+      "faqs": "FAQs & Tutorials"
+    },
+    "onboarding": {
+      "title": "Get Started Guide",
+      "addDevice": "Add a Device",
+      "connectGateway": "Connect Your Gateway",
+      "buildDashboard": "Build Your First Dashboard",
+      "setUpAlarms": "Set Up Alarms",
+      "progress": "Progress"
     }
   },
   "auth": {

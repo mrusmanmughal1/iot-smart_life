@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -26,37 +27,41 @@ interface DeviceProfileMultiStepFormProps {
   onSubmit: (data: DeviceProfileMultiStepFormData) => void;
 }
 
-const STEPS: Step[] = [
-  {
-    id: 1,
-    title: 'Device profile details',
-    description: 'Basic device profile information',
-  },
-  {
-    id: 2,
-    title: 'Transport configuration',
-    description: 'Configure transport protocol',
-    optional: true,
-  },
-  {
-    id: 3,
-    title: 'Alarm rules',
-    description: 'Define alarm rules',
-    optional: true,
-  },
-  {
-    id: 4,
-    title: 'Device provisioning',
-    description: 'Configure provisioning settings',
-    optional: true,
-  },
-];
-
 export const DeviceProfileMultiStepForm: React.FC<
   DeviceProfileMultiStepFormProps
 > = ({ open, onOpenChange, onSubmit }) => {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+
+  const STEPS: Step[] = useMemo(
+    () => [
+      {
+        id: 1,
+        title: t('deviceProfiles.form.steps.details.title'),
+        description: t('deviceProfiles.form.steps.details.description'),
+      },
+      {
+        id: 2,
+        title: t('deviceProfiles.form.steps.transport.title'),
+        description: t('deviceProfiles.form.steps.transport.description'),
+        optional: true,
+      },
+      {
+        id: 3,
+        title: t('deviceProfiles.form.steps.alarms.title'),
+        description: t('deviceProfiles.form.steps.alarms.description'),
+        optional: true,
+      },
+      {
+        id: 4,
+        title: t('deviceProfiles.form.steps.provisioning.title'),
+        description: t('deviceProfiles.form.steps.provisioning.description'),
+        optional: true,
+      },
+    ],
+    [t]
+  );
 
   const form = useForm<DeviceProfileMultiStepFormData>({
     resolver: zodResolver(deviceProfileMultiStepFormSchema),
@@ -235,7 +240,6 @@ export const DeviceProfileMultiStepForm: React.FC<
     <Dialog
       open={open}
       onOpenChange={(isOpen) => {
-        // Only close if explicitly set to false (not from internal state changes)
         if (!isOpen) {
           handleClose();
         }
@@ -243,9 +247,9 @@ export const DeviceProfileMultiStepForm: React.FC<
     >
       <DialogContent className="max-w-4xl max-h-[90vh] rounded-3xl  overflow-hidden dark:bg-gray-950 dark:border-gray-700 ">
         <DialogHeader className="dark:text-white dark:bg-gray-950 dark:border-gray-700 dark:border-b">
-          <DialogTitle>Create Device Profile</DialogTitle>
+          <DialogTitle>{t('deviceProfiles.form.createTitle')}</DialogTitle>
           <DialogDescription className="dark:text-white">
-            Follow the steps to create a new device profile
+            {t('deviceProfiles.form.createDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -268,7 +272,7 @@ export const DeviceProfileMultiStepForm: React.FC<
                 {renderStepContent()}
               </div>
 
-              <DialogFooter className="flex p-4 justify-between absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 dark:bg-gray-950 dark:border-gray-700">
+              <DialogFooter className="flex p-4 justify-between absolute bottom-0 inset-x-0 bg-white border-t border-gray-200 dark:bg-gray-950 dark:border-gray-700">
                 <div>
                   {currentStep > 1 && (
                     <Button
@@ -276,13 +280,13 @@ export const DeviceProfileMultiStepForm: React.FC<
                       variant="outline"
                       onClick={handlePrevious}
                     >
-                      Previous
+                      {t('deviceProfiles.form.buttons.previous')}
                     </Button>
                   )}
                 </div>
                 <div className="flex gap-2">
                   <Button type="button" variant="outline" onClick={handleClose}>
-                    Cancel
+                    {t('deviceProfiles.form.buttons.cancel')}
                   </Button>
                   {currentStep < STEPS.length ? (
                     <Button
@@ -293,10 +297,12 @@ export const DeviceProfileMultiStepForm: React.FC<
                         handleNext(e);
                       }}
                     >
-                      Next
+                      {t('deviceProfiles.form.buttons.next')}
                     </Button>
                   ) : (
-                    <Button type="submit">Create Profile</Button>
+                    <Button type="submit">
+                      {t('deviceProfiles.form.messages.create')}
+                    </Button>
                   )}
                 </div>
               </DialogFooter>

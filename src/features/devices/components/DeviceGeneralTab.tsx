@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ interface DeviceGeneralTabProps {
 export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
   deviceId,
 }) => {
+  const { t } = useTranslation();
   const { data: deviceData } = useDevice(deviceId);
   const device = deviceData?.data?.data;
 
@@ -103,10 +105,10 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
       };
 
       // await devicesApi.update(deviceId, updateData);
-      toast.success('Device settings saved successfully');
+      toast.success(t('devices.details.general.messages.success'));
     } catch (error) {
       console.error('Failed to save device settings:', error);
-      toast.error('Failed to save device settings');
+      toast.error(t('devices.details.general.messages.error'));
     }
   };
 
@@ -128,7 +130,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
           device.metadata?.gpsLongitude || device.location?.split(',')[1] || '',
       });
     }
-    toast('Changes cancelled', { icon: 'ℹ️' });
+    toast(t('devices.details.general.messages.cancelled'), { icon: 'ℹ️' });
   };
 
   // Mock data for dropdowns (replace with actual API calls)
@@ -152,13 +154,13 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
       <Card className="border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">
-            General Settings
+            {t('devices.details.general.title')}
           </h2>
 
           {/* Device Details Section */}
           <div className="space-y-6 mb-8">
             <h3 className="text-lg font-semibold text-gray-900">
-              Device Details
+              {t('devices.details.general.sectionDevice')}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -167,14 +169,14 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="deviceName"
                   className="text-sm font-medium text-gray-700 mb-2 block"
                 >
-                  Device Name
+                  {t('devices.details.general.name')}
                 </Label>
                 <Input
                   id="deviceName"
                   name="deviceName"
                   value={formData.deviceName}
                   onChange={handleInputChange}
-                  placeholder="Enter device name"
+                  placeholder={t('devices.details.general.namePlaceholder')}
                   className="w-full"
                 />
               </div>
@@ -184,14 +186,14 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="deviceLabel"
                   className="text-sm font-medium text-gray-700 mb-2 block"
                 >
-                  Device Label
+                  {t('devices.details.general.label')}
                 </Label>
                 <Input
                   id="deviceLabel"
                   name="deviceLabel"
                   value={formData.deviceLabel}
                   onChange={handleInputChange}
-                  placeholder="Enter device label"
+                  placeholder={t('devices.details.general.labelPlaceholder')}
                   className="w-full"
                 />
               </div>
@@ -201,7 +203,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="deviceType"
                   className="text-sm font-medium text-gray-700 mb-2 block"
                 >
-                  Device Type
+                  {t('devices.details.general.type')}
                 </Label>
                 <Select
                   value={formData.deviceType}
@@ -210,7 +212,9 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select device type" />
+                    <SelectValue
+                      placeholder={t('devices.details.general.typePlaceholder')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {deviceTypes.map((type) => (
@@ -227,7 +231,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="deviceProfile"
                   className="text-sm font-medium text-gray-700 mb-2 block"
                 >
-                  Device Profile
+                  {t('devices.details.general.profile')}
                 </Label>
                 {/* <Select
                   value={formData.deviceProfile}
@@ -256,14 +260,14 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                 htmlFor="description"
                 className="text-sm font-medium text-gray-700 mb-2 block"
               >
-                Description
+                {t('devices.details.general.description')}
               </Label>
               <Textarea
                 id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Enter device description"
+                placeholder={t('devices.details.general.descriptionPlaceholder')}
                 className="w-full min-h-[100px]"
                 rows={4}
               />
@@ -273,7 +277,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
           {/* Location Settings Section */}
           <div className="space-y-6 border-t border-gray-200 pt-6">
             <h3 className="text-lg font-semibold text-gray-900">
-              Location Settings
+              {t('devices.details.general.sectionLocation')}
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -282,7 +286,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="building"
                   className="text-sm font-medium text-gray-700 mb-2 block"
                 >
-                  Building
+                  {t('devices.details.general.building')}
                 </Label>
                 <Select
                   value={formData.building}
@@ -291,7 +295,9 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   }
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select building" />
+                    <SelectValue
+                      placeholder={t('devices.details.general.buildingPlaceholder')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {buildings.map((building) => (
@@ -308,14 +314,16 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="floor"
                   className="text-sm font-medium text-gray-700 mb-2 block"
                 >
-                  Floor
+                  {t('devices.details.general.floor')}
                 </Label>
                 <Select
                   value={formData.floor}
                   onValueChange={(value) => handleSelectChange('floor', value)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select floor" />
+                    <SelectValue
+                      placeholder={t('devices.details.general.floorPlaceholder')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {floors.map((floor) => (
@@ -332,14 +340,16 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="room"
                   className="text-sm font-medium text-gray-700 mb-2 block"
                 >
-                  Room
+                  {t('devices.details.general.room')}
                 </Label>
                 <Select
                   value={formData.room}
                   onValueChange={(value) => handleSelectChange('room', value)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select room" />
+                    <SelectValue
+                      placeholder={t('devices.details.general.roomPlaceholder')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {rooms.map((room) => (
@@ -358,7 +368,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="gpsLatitude"
                   className="text-sm font-medium text-gray-700 mb-2 block"
                 >
-                  GPS Coordinates
+                  {t('devices.details.general.gpsCoordinates')}
                 </Label>
                 <Input
                   id="gpsLatitude"
@@ -367,7 +377,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   step="any"
                   value={formData.gpsLatitude}
                   onChange={handleInputChange}
-                  placeholder="Latitude (e.g., 40.7128)"
+                  placeholder={t('devices.details.general.latitudePlaceholder')}
                   className="w-full"
                 />
               </div>
@@ -377,7 +387,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   htmlFor="gpsLongitude"
                   className="text-sm font-medium text-gray-700 mb-2 block opacity-0"
                 >
-                  GPS Longitude
+                  {t('devices.details.general.gpsCoordinates')}
                 </Label>
                 <Input
                   id="gpsLongitude"
@@ -386,7 +396,7 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   step="any"
                   value={formData.gpsLongitude}
                   onChange={handleInputChange}
-                  placeholder="Longitude (e.g., -74.0060)"
+                  placeholder={t('devices.details.general.longitudePlaceholder')}
                   className="w-full "
                 />
               </div>
@@ -400,13 +410,13 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
           onClick={handleCancel}
           className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
         >
-          Cancel
+          {t('devices.details.general.cancel')}
         </Button>
         <Button
           onClick={handleSave}
           className="bg-secondary hover:bg-secondary/90 text-white"
         >
-          Save Changes
+          {t('devices.details.general.saveChanges')}
         </Button>
       </div>
     </div>

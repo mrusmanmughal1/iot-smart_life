@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ interface DeviceCredentialsDialogProps {
 export const DeviceCredentialsDialog: React.FC<
   DeviceCredentialsDialogProps
 > = ({ open, onOpenChange, credentials }) => {
+  const { t } = useTranslation();
   const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
 
   if (!credentials) return null;
@@ -71,11 +73,10 @@ export const DeviceCredentialsDialog: React.FC<
         <DialogHeader className="dark:text-white dark:bg-gray-950 dark:border-gray-700 dark:border-b">
           <DialogTitle className="flex items-center gap-2">
             <KeyRound className="h-5 w-5 text-indigo-500" />
-            Device Credentials
+            {t('devices.credentials.title')}
           </DialogTitle>
           <DialogDescription>
-            Please copy these credentials now. For security reasons, the Access
-            Token will not be shown again.
+            {t('devices.credentials.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -86,40 +87,40 @@ export const DeviceCredentialsDialog: React.FC<
                 value="credentials"
                 className="flex items-center justify-center gap-2"
               >
-                <KeyRound className="h-4 w-4" /> Credentials
+                <KeyRound className="h-4 w-4" /> {t('devices.credentials.tabs.credentials')}
               </TabsTrigger>
               <TabsTrigger
                 value="setup"
                 className="flex items-center justify-center gap-2"
               >
-                <Info className="h-4 w-4" /> Setup
+                <Info className="h-4 w-4" /> {t('devices.credentials.tabs.setup')}
               </TabsTrigger>
               <TabsTrigger
                 value="code"
                 className="flex items-center justify-center gap-2"
               >
-                <Terminal className="h-4 w-4" /> Examples
+                <Terminal className="h-4 w-4" /> {t('devices.credentials.tabs.examples')}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="credentials" className="space-y-3">
               {renderCredentialRow(
-                'Device Key',
+                t('devices.credentials.fields.deviceKey'),
                 credentials.deviceKey,
                 'deviceKey'
               )}
               {renderCredentialRow(
-                'Access Token',
+                t('devices.credentials.fields.accessToken'),
                 credentials.accessToken,
                 'accessToken'
               )}
               {renderCredentialRow(
-                'MQTT Broker',
+                t('devices.credentials.fields.mqttBroker'),
                 credentials.mqttBroker,
                 'mqttBroker'
               )}
               {renderCredentialRow(
-                'Telemetry Topic',
+                t('devices.credentials.fields.telemetryTopic'),
                 credentials.telemetryTopic,
                 'telemetryTopic'
               )}
@@ -129,11 +130,11 @@ export const DeviceCredentialsDialog: React.FC<
               {credentials.gatewayConfig && (
                 <div className="p-4 rounded-lg bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/50">
                   <h4 className="text-sm font-semibold mb-3 text-indigo-900 dark:text-indigo-300">
-                    Gateway Configuration
+                    {t('devices.credentials.fields.gatewayConfig')}
                   </h4>
                   <div className="space-y-2 text-sm text-indigo-800 dark:text-indigo-200">
                     <div className="flex justify-between items-center group">
-                      <span className="opacity-70">Client ID:</span>
+                      <span className="opacity-70">{t('devices.credentials.fields.clientId')}</span>
                       <div className="flex items-center gap-2">
                         <span className="font-mono">
                           {credentials.gatewayConfig.clientId}
@@ -145,7 +146,7 @@ export const DeviceCredentialsDialog: React.FC<
                       </div>
                     </div>
                     <div className="flex justify-between items-center group">
-                      <span className="opacity-70">Username:</span>
+                      <span className="opacity-70">{t('devices.credentials.fields.username')}</span>
                       <div className="flex items-center gap-2">
                         <span className="font-mono truncate max-w-[200px]">
                           {credentials.gatewayConfig.username}
@@ -157,7 +158,7 @@ export const DeviceCredentialsDialog: React.FC<
                       </div>
                     </div>
                     <div className="flex justify-between">
-                      <span className="opacity-70">Host:</span>
+                      <span className="opacity-70">{t('devices.credentials.fields.host')}</span>
                       <span className="font-mono">
                         {credentials.gatewayConfig.host}:
                         {credentials.gatewayConfig.port}
@@ -169,7 +170,7 @@ export const DeviceCredentialsDialog: React.FC<
 
               {credentials.setupInstructions?.steps && (
                 <div>
-                  <h4 className="text-sm font-semibold mb-2">Instructions</h4>
+                  <h4 className="text-sm font-semibold mb-2">{t('devices.credentials.fields.instructions')}</h4>
                   <ul className="text-sm space-y-1.5 text-slate-600 dark:text-gray-300">
                     {credentials.setupInstructions.steps.map(
                       (step: string, i: number) => (
@@ -220,7 +221,7 @@ export const DeviceCredentialsDialog: React.FC<
                               ) : (
                                 <Copy className="h-4 w-4 mr-1" />
                               )}
-                              {copiedStates[`code-${lang}`] ? 'Copied' : 'Copy'}
+                              {copiedStates[`code-${lang}`] ? t('devices.credentials.actions.copied') : t('devices.credentials.actions.copy')}
                             </Button>
                           </div>
                         </div>
@@ -239,7 +240,7 @@ export const DeviceCredentialsDialog: React.FC<
             onClick={() => onOpenChange(false)}
             className="w-full sm:w-auto"
           >
-            Done
+            {t('devices.credentials.actions.done')}
           </Button>
         </DialogFooter>
       </DialogContent>

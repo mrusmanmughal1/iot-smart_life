@@ -20,7 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { DeviceFormData } from '../types';
+import { useManufacturers, useModels } from '../hooks/useDevices';
+import type { DeviceFormData } from '../types/device.types';
 
 export interface DeviceDialogProps {
   open: boolean;
@@ -46,6 +47,8 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
     description: '',
     gatewayId: '',
     connectionType: '',
+    manufacturer: '',
+    model: '',
     ...initialData,
   });
   const [enableGatewayAssignment, setEnableGatewayAssignment] = useState(false);
@@ -58,6 +61,8 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
         description: initialData?.description || '',
         gatewayId: initialData?.gatewayId || '',
         connectionType: initialData?.connectionType || '',
+        manufacturer: initialData?.manufacturer || '',
+        model: initialData?.model || '',
       });
       setEnableGatewayAssignment(!!initialData?.gatewayId);
     }
@@ -76,11 +81,22 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
       description: '',
       gatewayId: '',
       connectionType: '',
+      manufacturer: '',
+      model: '',
     });
     setEnableGatewayAssignment(false);
   };
 
   const isCreateMode = mode === 'create';
+
+  const { data: manufacturersResponse, isLoading: isLoadingManufacturers } =
+    useManufacturers();
+  const { data: modelsResponse, isLoading: isLoadingModels } = useModels(
+    formData.manufacturer || ''
+  );
+
+  const manufacturers = manufacturersResponse?.data || [];
+  const models = modelsResponse?.data || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -91,13 +107,13 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
           </DialogTitle>
           <DialogDescription>
             {isCreateMode
-              ? 'Add a new device to your IoT platform'
-              : 'Update device information'}
+              ? t('devices.form.addDescription')
+              : t('devices.form.editDescription')}
           </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={handleSubmit}
-          className="max-h-[90vh] px-6 pb-6 overflow-y-auto"
+          className="max-h-[80vh] px-6 pb-6 overflow-y-auto"
         >
           <div className="space-y-4">
             <div>
@@ -108,7 +124,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="Enter device name"
+                placeholder={t('devices.form.namePlaceholder')}
                 required
                 className="border-2 rounded-md"
               />
@@ -126,16 +142,16 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 <SelectTrigger>
                   <SelectValue
                     className="placeholder:text-slate-100"
-                    placeholder="Select type"
+                    placeholder={t('devices.form.selectType')}
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sensor">Sensor</SelectItem>
-                  <SelectItem value="actuator">Actuator</SelectItem>
-                  <SelectItem value="gateway">Gateway</SelectItem>
-                  <SelectItem value="controller">Controller</SelectItem>
-                  <SelectItem value="camera">Camera</SelectItem>
-                  <SelectItem value="tracker">tracker</SelectItem>
+                  <SelectItem value="sensor">{t('devices.form.types.sensor')}</SelectItem>
+                  <SelectItem value="actuator">{t('devices.form.types.actuator')}</SelectItem>
+                  <SelectItem value="gateway">{t('devices.form.types.gateway')}</SelectItem>
+                  <SelectItem value="controller">{t('devices.form.types.controller')}</SelectItem>
+                  <SelectItem value="camera">{t('devices.form.types.camera')}</SelectItem>
+                  <SelectItem value="tracker">{t('devices.form.types.tracker')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -152,29 +168,89 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 <SelectTrigger>
                   <SelectValue
                     className="placeholder:text-slate-100"
-                    placeholder="Select connection type"
+                    placeholder={t('devices.form.selectConnectionType')}
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="wifi">Wifi</SelectItem>
-                  <SelectItem value="ethernet">Ethernet</SelectItem>
-                  <SelectItem value="bluetooth">Bluetooth</SelectItem>
-                  <SelectItem value="cellular">Cellular</SelectItem>
-                  <SelectItem value="zigbee">Zigbee</SelectItem>
-                  <SelectItem value="lora">Lora</SelectItem>
+                  <SelectItem value="wifi">{t('devices.form.connections.wifi')}</SelectItem>
+                  <SelectItem value="ethernet">{t('devices.form.connections.ethernet')}</SelectItem>
+                  <SelectItem value="bluetooth">{t('devices.form.connections.bluetooth')}</SelectItem>
+                  <SelectItem value="cellular">{t('devices.form.connections.cellular')}</SelectItem>
+                  <SelectItem value="zigbee">{t('devices.form.connections.zigbee')}</SelectItem>
+                  <SelectItem value="lora">{t('devices.form.connections.lora')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <Label htmlFor="device-description">Description</Label>
+              <Label htmlFor="device-manufacturer-select">
+                {t('devices.manufacturer')}
+              </Label>
+              <Select
+                value={formData.manufacturer || undefined}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, manufacturer: value, model: '' })
+                }
+                disabled={isLoadingManufacturers}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      isLoadingManufacturers
+                        ? t('common.loading')
+                        : t('devices.selectManufacturer')
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {manufacturers.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="device-model-select">
+                {t('devices.modelNumber')}
+              </Label>
+              <Select
+                value={formData.model || undefined}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, model: value })
+                }
+                disabled={!formData.manufacturer || isLoadingModels}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      isLoadingModels
+                        ? t('common.loading')
+                        : t('devices.selectModelNumber')
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {models.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="device-description">{t('devices.form.description')}</Label>
               <Textarea
                 id="device-description"
                 value={formData.description || ''}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Device description (optional)"
+                placeholder={t('devices.form.descriptionPlaceholder')}
                 rows={4}
               />
             </div>
@@ -191,7 +267,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   }}
                 />
                 <Label htmlFor="gateway-assignment" className="cursor-pointer">
-                  Gateway Assignment
+                  {t('devices.form.gatewayAssignment')}
                 </Label>
               </div>
               <Select
@@ -208,12 +284,12 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   }
                   disabled={!enableGatewayAssignment}
                 >
-                  <SelectValue placeholder="Select gateway (disabled)" />
+                  <SelectValue placeholder={t('devices.form.selectGatewayPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gateway-1">Gateway 1</SelectItem>
-                  <SelectItem value="gateway-2">Gateway 2</SelectItem>
-                  <SelectItem value="gateway-3">Gateway 3</SelectItem>
+                  <SelectItem value="gateway-1">{t('devices.form.gateways.gateway1')}</SelectItem>
+                  <SelectItem value="gateway-2">{t('devices.form.gateways.gateway2')}</SelectItem>
+                  <SelectItem value="gateway-3">{t('devices.form.gateways.gateway3')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
