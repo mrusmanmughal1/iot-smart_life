@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Download, Upload, Plus, ChevronLeft } from 'lucide-react';
+import { Download, Upload, Plus, ChevronLeft, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-import { useDevice } from '@/features/devices/hooks';
+import { useDevice, useDeviceCredentials } from '@/features/devices/hooks';
 import { DeviceTelemetryTab } from '@/features/devices/components/DeviceTelemetryTab';
 import { DeviceAlarmsTab } from '@/features/devices/components/DeviceAlarmsTab';
 import { DeviceGeneralTab } from '@/features/devices/components/DeviceGeneralTab';
+import { DeviceCredentialsDialog } from '@/features/devices/components/DeviceCredentialsDialog';
 
 type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms' | 'relations';
 
@@ -20,10 +21,20 @@ export default function DeviceDetailsPage() {
   const { t } = useTranslation();
 
   const [activeTab, setActiveTab] = useState<TabType>('details');
+  const [isCredentialsOpen, setIsCredentialsOpen] = useState(false);
+  const [fetchCredentials, setFetchCredentials] = useState(false);
 
   const { data: deviceData } = useDevice(id || '');
+  const { data: credentialsResponse, isLoading: isLoadingCredentials } =
+    useDeviceCredentials(id || '', fetchCredentials);
 
+  const credentials = credentialsResponse?.data?.data;
   const device = deviceData?.data?.data;
+
+  const handleCredentialsClick = () => {
+    setFetchCredentials(true);
+    setIsCredentialsOpen(true);
+  };
 
   const deviceStatus =
     device?.status === 'online' || device?.status === 'idle'
@@ -71,18 +82,22 @@ export default function DeviceDetailsPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Button
+            size="sm"
+            className="bg-success hover:bg-success/90 text-white"
+            onClick={handleCredentialsClick}
+            disabled={isLoadingCredentials}
+          >
+            <Key className="h-4 w-4 mr-2" />
+            {isLoadingCredentials
+              ? t('common.loading')
+              : t('devices.details.credentials')}
+          </Button>
+          <Button variant="secondary" size="sm">
             <Download className="h-4 w-4 mr-2" />
             {t('devices.details.export')}
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="bg-secondary hover:bg-secondary/90 text-white"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            {t('devices.details.import')}
-          </Button>
+
           <Button
             size="sm"
             className="bg-primary hover:bg-primary/90 text-white"
@@ -120,6 +135,13 @@ export default function DeviceDetailsPage() {
 
       {/* Details/General Tab */}
       {activeTab === 'details' && id && <DeviceGeneralTab deviceId={id} />}
+
+      {/* Credentials Dialog */}
+      <DeviceCredentialsDialog
+        open={isCredentialsOpen}
+        onOpenChange={setIsCredentialsOpen}
+        credentials={credentials || null}
+      />
     </div>
   );
 }

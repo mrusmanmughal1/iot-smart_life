@@ -9,6 +9,17 @@ export interface DeviceFormData {
   connectionType?: string;
   manufacturer?: string;
   model?: string;
+  protocol?: string;
+  codecId?: string;
+  devEUI?: string;
+  serialNumber?: string;
+  installationDate?: string;
+  firmwareVersion?: string;
+  hardwareVersion?: string;
+  latitude?: number;
+  longitude?: number;
+  location?: string;
+  protocol?: string;
 }
 
 export interface DeviceFilters {

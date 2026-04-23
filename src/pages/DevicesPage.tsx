@@ -80,8 +80,7 @@ export default function DevicesPage() {
       setDeviceToDeleteId(null);
     } catch (error) {
       const errorMessage =
-        getErrorMessage(error) ||
-        t('devices.messages.deleteError');
+        getErrorMessage(error) || t('devices.messages.deleteError');
       toast.error(errorMessage);
     }
   }, [deleteDevice, deviceToDeleteId, t]);
@@ -121,10 +120,7 @@ export default function DevicesPage() {
   const handleCreate = async (data: DeviceFormData) => {
     try {
       const resp = await createDevice.mutateAsync(data);
-      const successMessage =
-        (resp as { data?: { message?: string } })?.data?.message ||
-        (resp as { message?: string })?.message ||
-        t('devices.messages.createSuccess');
+      const successMessage = t('devices.messages.createSuccess');
       toast.success(successMessage);
 
       const credentials =
@@ -137,8 +133,7 @@ export default function DevicesPage() {
       setIsCreateDialogOpen(false);
     } catch (error) {
       const errorMessage =
-        getErrorMessage(error) ||
-        t('devices.messages.createError');
+        getErrorMessage(error) || t('devices.messages.createError');
       toast.error(errorMessage);
     }
   };
@@ -159,8 +154,7 @@ export default function DevicesPage() {
       setSelectedDevice(null);
     } catch (error) {
       const errorMessage =
-        getErrorMessage(error) ||
-        t('devices.messages.updateError');
+        getErrorMessage(error) || t('devices.messages.updateError');
       toast.error(errorMessage);
     }
   };
@@ -391,7 +385,8 @@ export default function DevicesPage() {
         onConfirm={handleDeleteConfirm}
         title={t('devices.tooltips.delete')}
         itemName={
-          devices.find((d: any) => d.id === deviceToDeleteId)?.name || t('common.name')
+          devices.find((d: any) => d.id === deviceToDeleteId)?.name ||
+          t('common.name')
         }
         isLoading={deleteDevice.isPending}
       />

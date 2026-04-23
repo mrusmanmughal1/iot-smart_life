@@ -114,8 +114,8 @@ export const DeviceTelemetryTab: React.FC<DeviceTelemetryTabProps> = ({
         });
       }
     });
-
-    // Filter by search query
+    // asdasfasf
+    // Filter by search queryey
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       return allAttributes.filter(

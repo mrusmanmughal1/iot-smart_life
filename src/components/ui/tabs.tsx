@@ -117,7 +117,7 @@ export function TabsContent({
   return (
     <div
       role="tabpanel"
-      className={`mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 ${className}`}
+      className={`mt-2 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2  ${className}`}
     >
       {children}
     </div>

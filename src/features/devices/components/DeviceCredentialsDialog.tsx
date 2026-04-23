@@ -61,7 +61,9 @@ export const DeviceCredentialsDialog: React.FC<
         <span className="text-xs text-slate-500 dark:text-gray-400 font-medium mb-1">
           {label}
         </span>
-        <span className="text-sm font-mono truncate">{value}</span>
+        <span className="text-sm font-mono truncate">
+          {value.length > 90 ? value.substring(0, 90) + '...' : value}
+        </span>
       </div>
       {renderCopyButton(value, copyKey)}
     </div>
@@ -87,19 +89,15 @@ export const DeviceCredentialsDialog: React.FC<
                 value="credentials"
                 className="flex items-center justify-center gap-2"
               >
-                <KeyRound className="h-4 w-4" /> {t('devices.credentials.tabs.credentials')}
+                <KeyRound className="h-4 w-4" />{' '}
+                {t('devices.credentials.tabs.credentials')}
               </TabsTrigger>
               <TabsTrigger
                 value="setup"
                 className="flex items-center justify-center gap-2"
               >
-                <Info className="h-4 w-4" /> {t('devices.credentials.tabs.setup')}
-              </TabsTrigger>
-              <TabsTrigger
-                value="code"
-                className="flex items-center justify-center gap-2"
-              >
-                <Terminal className="h-4 w-4" /> {t('devices.credentials.tabs.examples')}
+                <Info className="h-4 w-4" />{' '}
+                {t('devices.credentials.tabs.setup')}
               </TabsTrigger>
             </TabsList>
 
@@ -134,7 +132,9 @@ export const DeviceCredentialsDialog: React.FC<
                   </h4>
                   <div className="space-y-2 text-sm text-indigo-800 dark:text-indigo-200">
                     <div className="flex justify-between items-center group">
-                      <span className="opacity-70">{t('devices.credentials.fields.clientId')}</span>
+                      <span className="opacity-70">
+                        {t('devices.credentials.fields.clientId')}
+                      </span>
                       <div className="flex items-center gap-2">
                         <span className="font-mono">
                           {credentials.gatewayConfig.clientId}
@@ -146,7 +146,9 @@ export const DeviceCredentialsDialog: React.FC<
                       </div>
                     </div>
                     <div className="flex justify-between items-center group">
-                      <span className="opacity-70">{t('devices.credentials.fields.username')}</span>
+                      <span className="opacity-70">
+                        {t('devices.credentials.fields.username')}
+                      </span>
                       <div className="flex items-center gap-2">
                         <span className="font-mono truncate max-w-[200px]">
                           {credentials.gatewayConfig.username}
@@ -158,7 +160,9 @@ export const DeviceCredentialsDialog: React.FC<
                       </div>
                     </div>
                     <div className="flex justify-between">
-                      <span className="opacity-70">{t('devices.credentials.fields.host')}</span>
+                      <span className="opacity-70">
+                        {t('devices.credentials.fields.host')}
+                      </span>
                       <span className="font-mono">
                         {credentials.gatewayConfig.host}:
                         {credentials.gatewayConfig.port}
@@ -170,7 +174,9 @@ export const DeviceCredentialsDialog: React.FC<
 
               {credentials.setupInstructions?.steps && (
                 <div>
-                  <h4 className="text-sm font-semibold mb-2">{t('devices.credentials.fields.instructions')}</h4>
+                  <h4 className="text-sm font-semibold mb-2">
+                    {t('devices.credentials.fields.instructions')}
+                  </h4>
                   <ul className="text-sm space-y-1.5 text-slate-600 dark:text-gray-300">
                     {credentials.setupInstructions.steps.map(
                       (step: string, i: number) => (
@@ -179,56 +185,6 @@ export const DeviceCredentialsDialog: React.FC<
                     )}
                   </ul>
                 </div>
-              )}
-            </TabsContent>
-
-            <TabsContent value="code">
-              {credentials.codeExamples && (
-                <Tabs
-                  defaultValue={Object.keys(credentials.codeExamples)[0] || ''}
-                  className="w-full"
-                >
-                  <TabsList className="w-full justify-start border-b rounded-none bg-transparent p-0 mb-4 h-auto overflow-x-auto">
-                    {Object.keys(credentials.codeExamples).map((lang) => (
-                      <TabsTrigger
-                        key={lang}
-                        value={lang}
-                        className="rounded-none border-b-2 border-transparent data-[state=active]:border-indigo-500 data-[state=active]:bg-transparent capitalize pb-2 pt-1"
-                      >
-                        {lang}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                  {Object.entries(credentials.codeExamples).map(
-                    ([lang, code]) => (
-                      <TabsContent key={lang} value={lang}>
-                        <div className="relative group">
-                          <pre className="p-4 rounded-lg bg-slate-950 text-slate-50 overflow-x-auto text-xs font-mono">
-                            <code>{code as string}</code>
-                          </pre>
-                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Button
-                              type="button"
-                              variant="secondary"
-                              size="sm"
-                              className="h-8 bg-white/10 hover:bg-white/20 text-white border-0"
-                              onClick={() =>
-                                handleCopy(code as string, `code-${lang}`)
-                              }
-                            >
-                              {copiedStates[`code-${lang}`] ? (
-                                <Check className="h-4 w-4 mr-1 text-green-400" />
-                              ) : (
-                                <Copy className="h-4 w-4 mr-1" />
-                              )}
-                              {copiedStates[`code-${lang}`] ? t('devices.credentials.actions.copied') : t('devices.credentials.actions.copy')}
-                            </Button>
-                          </div>
-                        </div>
-                      </TabsContent>
-                    )
-                  )}
-                </Tabs>
               )}
             </TabsContent>
           </Tabs>

@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   LineChart,
   Line,
@@ -42,20 +48,29 @@ interface LatestValue {
   timestamp: string;
 }
 
-export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }) => {
+export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({
+  deviceId,
+}) => {
   const { t } = useTranslation();
   const { data: deviceData } = useDevice(deviceId);
   const device = deviceData?.data?.data;
-  
+
   const [timeRange, setTimeRange] = useState<string>('1h');
-  const [selectedKeys, setSelectedKeys] = useState<string[]>(['temperature', 'humidity']);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([
+    'temperature',
+    'humidity',
+  ]);
 
   // Fetch device telemetry
-  const { data: telemetryData, isLoading: telemetryLoading, refetch } = useQuery({
+  const {
+    data: telemetryData,
+    isLoading: telemetryLoading,
+    refetch,
+  } = useQuery({
     queryKey: ['device-telemetry', deviceId, selectedKeys, timeRange],
     queryFn: async () => {
       if (!deviceId) return null;
-      
+
       // Calculate time range
       const now = Date.now();
       let startTs: number;
@@ -98,9 +113,21 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
 
   // Available telemetry keys
   const telemetryKeys: TelemetryKey[] = [
-    { key: 'temperature', label: t('deviceProfiles.fields.telemetry.temperature') || 'Temperature', checked: selectedKeys.includes('temperature') },
-    { key: 'humidity', label: t('deviceProfiles.fields.telemetry.humidity') || 'Humidity', checked: selectedKeys.includes('humidity') },
-    { key: 'pressure', label: t('deviceProfiles.fields.telemetry.pressure') || 'Pressure', checked: selectedKeys.includes('pressure') },
+    {
+      key: 'temperature',
+      label: t('deviceProfiles.fields.telemetry.temperature') || 'Temperature',
+      checked: selectedKeys.includes('temperature'),
+    },
+    {
+      key: 'humidity',
+      label: t('deviceProfiles.fields.telemetry.humidity') || 'Humidity',
+      checked: selectedKeys.includes('humidity'),
+    },
+    {
+      key: 'pressure',
+      label: t('deviceProfiles.fields.telemetry.pressure') || 'Pressure',
+      checked: selectedKeys.includes('pressure'),
+    },
   ];
 
   // Mock message rate data (replace with actual API call)
@@ -116,7 +143,7 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
   // Transform latest telemetry data
   const latestValues: LatestValue[] = useMemo(() => {
     if (!latestTelemetryData?.data?.data) return [];
-    
+
     const telemetry = latestTelemetryData.data.data;
     const values: LatestValue[] = [];
 
@@ -124,9 +151,11 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
       const keyData = telemetry[key];
       if (keyData && Array.isArray(keyData) && keyData.length > 0) {
         const latest = keyData[keyData.length - 1];
-        const timestamp = latest.ts ? new Date(latest.ts).toISOString() : new Date().toISOString();
+        const timestamp = latest.ts
+          ? new Date(latest.ts).toISOString()
+          : new Date().toISOString();
         let formattedValue = String(latest.value || '-');
-        
+
         // Format value with units
         if (key === 'temperature') {
           formattedValue = `${latest.value}°C`;
@@ -149,9 +178,7 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
 
   const handleKeyToggle = (key: string) => {
     setSelectedKeys((prev) =>
-      prev.includes(key)
-        ? prev.filter((k) => k !== key)
-        : [...prev, key]
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
   };
 
@@ -169,16 +196,31 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
       {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Label className="text-sm font-medium text-gray-700">{t('devices.details.telemetry.details.keys')}</Label>
-          <Select value={timeRange} onValueChange={setTimeRange} className="w-40"  >
+          <Label className="text-sm font-medium text-gray-700">
+            {t('devices.details.telemetry.details.keys')}
+          </Label>
+          <Select
+            value={timeRange}
+            onValueChange={setTimeRange}
+            className="w-40"
+          >
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1h">{t('devices.details.alarms.filters.timeRangeOptions.1h') || 'Last Hour'}</SelectItem>
-              <SelectItem value="24h">{t('devices.details.alarms.filters.timeRangeOptions.24h')}</SelectItem>
-              <SelectItem value="7d">{t('devices.details.alarms.filters.timeRangeOptions.7d')}</SelectItem>
-              <SelectItem value="30d">{t('devices.details.alarms.filters.timeRangeOptions.30d')}</SelectItem>
+              <SelectItem value="1h">
+                {t('devices.details.alarms.filters.timeRangeOptions.1h') ||
+                  'Last Hour'}
+              </SelectItem>
+              <SelectItem value="24h">
+                {t('devices.details.alarms.filters.timeRangeOptions.24h')}
+              </SelectItem>
+              <SelectItem value="7d">
+                {t('devices.details.alarms.filters.timeRangeOptions.7d')}
+              </SelectItem>
+              <SelectItem value="30d">
+                {t('devices.details.alarms.filters.timeRangeOptions.30d')}
+              </SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -203,7 +245,9 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
 
       {/* Telemetry Keys */}
       <div className="space-y-2">
-        <Label className="text-sm font-medium text-gray-700">{t('devices.details.telemetry.details.keys')}</Label>
+        <Label className="text-sm font-medium text-gray-700">
+          {t('devices.details.telemetry.details.keys')}
+        </Label>
         <div className="flex items-center gap-6">
           {telemetryKeys.map((telemetryKey) => (
             <div key={telemetryKey.key} className="flex items-center gap-2">
@@ -231,7 +275,10 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
           </h3>
           <div className="relative">
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={messageRateData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+              <LineChart
+                data={messageRateData}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
                   dataKey="month"
@@ -291,7 +338,10 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
       {/* Latest Values Table */}
       <Card className="border-gray-200 shadow-sm">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('devices.details.telemetry.details.latestTitle') || 'Latest Values'}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            {t('devices.details.telemetry.details.latestTitle') ||
+              'Latest Values'}
+          </h3>
           {telemetryLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -325,10 +375,15 @@ export const TelemetryDetails: React.FC<DeviceTelemetryTabProps> = ({ deviceId }
                       <td className="py-4 px-4 text-sm font-medium text-gray-900">
                         {item.key}
                       </td>
-                      <td className="py-4 px-4 text-sm text-gray-600">{item.value}</td>
+                      <td className="py-4 px-4 text-sm text-gray-600">
+                        {item.value}
+                      </td>
                       <td className="py-4 px-4 text-sm text-gray-600">
                         {item.timestamp
-                          ? format(new Date(item.timestamp), 'yyyy-MM-dd HH:mm:ss')
+                          ? format(
+                              new Date(item.timestamp),
+                              'yyyy-MM-dd HH:mm:ss'
+                            )
                           : '-'}
                       </td>
                     </tr>

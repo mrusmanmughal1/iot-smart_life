@@ -651,6 +651,7 @@
       "statusInactive": "INACTIVE",
       "export": "Export",
       "import": "Import",
+      "credentials": "Credentials",
       "add": "Add",
       "tabs": {
         "details": "Details",
@@ -2376,5 +2377,97 @@
   "CommonPrifleSchema": {
     "name": "Name Must have atleast 2 characters",
     "invalidPhone": "Invalid phone number"
+  },
+  "automation": {
+    "title": "Automation",
+    "description": "Create automated workflows and device interactions",
+    "buttons": {
+      "create": "Create Automation",
+      "cancel": "Cancel",
+      "save": "Save Changes",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "edit": "Edit",
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "stats": {
+      "total": "Total Automations",
+      "totalDesc": "Configured rules",
+      "active": "Active",
+      "activeDesc": "Currently running",
+      "executions": "Total Executions",
+      "executionsDesc": "All time",
+      "errors": "Errors",
+      "errorsDesc": "Need attention"
+    },
+    "table": {
+      "title": "Automation Rules",
+      "searchPlaceholder": "Search automations...",
+      "columns": {
+        "name": "Name",
+        "trigger": "Trigger",
+        "action": "Action",
+        "executions": "Executions",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "noResults": "No automations found."
+    },
+    "dialog": {
+      "createTitle": "Create Automation",
+      "editTitle": "Edit Automation",
+      "description": "Define triggers and actions for your automation",
+      "sections": {
+        "basic": "Basic Information",
+        "trigger": "Trigger (When)",
+        "action": "Action (Then)",
+        "options": "Options"
+      },
+      "fields": {
+        "name": "Automation Name *",
+        "namePlaceholder": "e.g., Temperature Control",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe what this automation does...",
+        "triggerType": "Trigger Type *",
+        "device": "Select Device *",
+        "attribute": "Attribute",
+        "operator": "Operator",
+        "value": "Value",
+        "actionType": "Action Type *",
+        "targetDevice": "Target Device *",
+        "command": "Command *",
+        "enable": "Enable Automation",
+        "enableDesc": "Start automation immediately",
+        "log": "Enable Logging",
+        "logDesc": "Log all executions"
+      },
+      "options": {
+        "triggerType": {
+          "threshold": "Device Threshold",
+          "state": "Device State Change",
+          "schedule": "Time Schedule",
+          "event": "Custom Event"
+        },
+        "operator": {
+          "greater": "> Greater than",
+          "less": "< Less than",
+          "equals": "= Equals",
+          "notEquals": "!= Not equals"
+        },
+        "actionType": {
+          "control": "Control Device",
+          "setValue": "Set Attribute Value",
+          "notification": "Send Notification",
+          "webhook": "Call Webhook"
+        },
+        "command": {
+          "on": "Turn ON",
+          "off": "Turn OFF",
+          "toggle": "Toggle",
+          "custom": "Custom Value"
+        }
+      }
+    }
   }
 }

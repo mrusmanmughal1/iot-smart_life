@@ -24,10 +24,12 @@ export interface Device {
   lastActivityTime: any;
   id: string;
   name: string;
+  protocol?: string;
   type: DeviceType;
   status: DeviceStatus;
   model?: string;
   manufacturer?: string;
+  codecId?: string;
   firmwareVersion?: string;
   location?: string;
   description?: string;
@@ -186,11 +188,18 @@ export const devicesApi = {
   },
   // Get all manufacturers
   getManufacturers: () =>
-    apiClient.get<ApiResponse<string[]>>('/devices/manufacturers'),
+    apiClient.get<ApiResponse<{ data: string[] }>>('/codecs/manufacturers'),
 
   // Get models by manufacturer
   getModels: (manufacturer: string) =>
-    apiClient.get<ApiResponse<string[]>>('/devices/models', {
-      params: { manufacturer },
-    }),
+    apiClient.get<
+      ApiResponse<{
+        manufacturer: string;
+        data: Array<{ model: string; codecId: string; protocol: string }>;
+      }>
+    >(`/codecs/manufacturers/${manufacturer}/models`),
+
+  // Get device credentials
+  getCredentials: (deviceId: string) =>
+    apiClient.get<ApiResponse<any>>(`/devices/${deviceId}/credentials`),
 };

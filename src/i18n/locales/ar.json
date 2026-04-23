@@ -892,20 +892,112 @@
   },
   "deviceProfiles": {
     "title": "ملفات تعريف الأجهزة",
-    "subtitle": "إدارة ملفات تعريف الأجهزة",
-    "totalProfiles": "إجمالي ملفات تعريف الأجهزة",
+    "subtitle": "إدارة قوالب تكوين الأجهزة",
+    "totalProfiles": "إجمالي ملفات التعريف",
     "totalDevices": "إجمالي الأجهزة",
-    "createProfile": "إنشاء ملف تعريف جديد",
+    "createProfile": "إنشاء ملف تعريف",
     "deviceConfigurations": "تكوينات الأجهزة",
-    "usingTheseProfiles": "باستخدام هذه الملفات الشخصية",
-    "defaultProfiles": "ملفات تعريف الأجهزة الافتراضية",
-    "gatewayProfiles": "ملفات تعريف الأجهزة المنفذة",
+    "usingTheseProfiles": "باستخدام هذه الملفات التعريفية",
+    "defaultProfiles": "ملفات التعريف الافتراضية",
+    "gatewayProfiles": "ملفات تعريف البوابات",
     "table": {
       "name": "الاسم",
-      "createdTime": "وقت الإنشاء",
-      "status": "الحالة",
-      "customer": "اسم العميل",
+      "type": "النوع",
+      "transport": "وسيلة النقل",
+      "devices": "الأجهزة",
+      "created": "تاريخ الإنشاء",
       "actions": "الإجراءات"
+    },
+    "form": {
+      "createTitle": "إنشاء ملف تعريف الجهاز",
+      "createDescription": "اتبع الخطوات لإنشاء ملف تعريف جهاز جديد",
+      "steps": {
+        "details": {
+          "title": "تفاصيل ملف تعريف الجهاز",
+          "description": "معلومات ملف تعريف الجهاز الأساسية"
+        },
+        "transport": {
+          "title": "تكوين النقل",
+          "description": "تكوين بروتوكول النقل",
+          "optional": "(اختياري)"
+        },
+        "alarms": {
+          "title": "قواعد التنبيه",
+          "description": "تحديد قواعد التنبيه"
+        },
+        "provisioning": {
+          "title": "تهيئة الجهاز",
+          "description": "تكوين إعدادات التهيئة"
+        }
+      },
+      "fields": {
+        "name": "اسم ملف التعريف *",
+        "namePlaceholder": "مثال: مستشعر درجة الحرارة",
+        "description": "الوصف",
+        "descriptionPlaceholder": "وصف ملف التعريف...",
+        "type": "نوع الجهاز *",
+        "typePlaceholder": "اختر نوع الجهاز",
+        "defaultRuleChain": "سلسلة القواعد الافتراضية",
+        "ruleChainPlaceholder": "اختر سلسلة القواعد الافتراضية",
+        "queue": "زمام الانتظار",
+        "queuePlaceholder": "مثال: زمام الانتظار الرئيسي",
+        "transportType": "نوع النقل",
+        "transportPlaceholder": "اختر نوع النقل",
+        "telemetryTopic": "موضوع القياس عن بعد للجهاز",
+        "telemetryPlaceholder": "مثال: v1/devices/me/telemetry",
+        "attributesTopic": "موضوع سمات الجهاز",
+        "attributesPlaceholder": "مثال: v1/devices/me/attributes",
+        "baseUrl": "رابط الأساس",
+        "baseUrlPlaceholder": "مثال: https://api.example.com",
+        "timeout": "المهلة (بالثواني)",
+        "port": "المنفذ",
+        "baudRate": "معدل الباود",
+        "region": "المنطقة",
+        "regionPlaceholder": "مثال: EU868",
+        "appEui": "معرف التطبيق EUI",
+        "provisionStrategy": "إستراتيجية التهيئة",
+        "provisionPlaceholder": "اختر إستراتيجية التهيئة",
+        "provisionDescription": "إستراتيجية التهيئة",
+        "ruleChainDescription": "سلسلة القواعد الافتراضية",
+        "queueDescription": "سلسلة القواعد الافتراضية"
+      },
+      "buttons": {
+        "previous": "السابق",
+        "next": "التالي",
+        "cancel": "إلغاء",
+        "create": "إنشاء ملف تعريف",
+        "addAlarm": "إضافة قاعدة تنبيه",
+        "addAnotherAlarm": "إضافة قاعدة تنبيه أخرى"
+      },
+      "messages": {
+        "noAlarms": "لم يتم تحديد قواعد تنبيه",
+        "alarmRule": "قاعدة التنبيه",
+        "optional": "اختياري",
+        "createSuccess": "تم إنشاء ملف تعريف الجهاز بنجاح",
+        "createError": "فشل إنشاء ملف تعريف الجهاز. يرجى المحاولة مرة أخرى.",
+        "deleteSuccess": "تم حذف ملف تعريف الجهاز بنجاح",
+        "deleteError": "فشل حذف ملف تعريف الجهاز. يرجى المحاولة مرة أخرى.",
+        "create": "إنشاء ملف تعريف"
+      },
+      "options": {
+        "sensor": "مستشعر",
+        "gateway": "بوابة",
+        "meter": "عداد",
+        "actuator": "مشغل",
+        "mqtt": "MQTT",
+        "http": "HTTP",
+        "coap": "CoAP",
+        "lwm2m": "LWM2M",
+        "snmp": "SNMP",
+        "critical": "حرج",
+        "major": "رئيسي",
+        "minor": "ثانوي",
+        "warning": "تحذير",
+        "indeterminate": "غير محدد",
+        "allowCreateNew": "السماح بإنشاء أجهزة جديدة",
+        "checkPreProvisioned": "التحقق من الأجهزة المهيأة مسبقاً",
+        "disabled": "معطل"
+      }
     }
   },
   "assetProfiles": {
@@ -2236,118 +2328,100 @@
       "failedToSelectRole": "فشل اختيار الدور"
     }
   },
-  "deviceProfiles": {
-    "title": "ملفات تعريف الأجهزة",
-    "subtitle": "إدارة قوالب تكوين الأجهزة",
-    "totalProfiles": "إجمالي ملفات التعريف",
-    "totalDevices": "إجمالي الأجهزة",
-    "createProfile": "إنشاء ملف تعريف",
-    "deviceConfigurations": "تكوينات الأجهزة",
-    "usingTheseProfiles": "باستخدام هذه الملفات التعريفية",
-    "defaultProfiles": "ملفات التعريف الافتراضية",
-    "gatewayProfiles": "ملفات تعريف البوابات",
-    "table": {
-      "name": "الاسم",
-      "type": "النوع",
-      "transport": "وسيلة النقل",
-      "devices": "الأجهزة",
-      "created": "تاريخ الإنشاء",
-      "actions": "الإجراءات"
-    },
-    "form": {
-      "createTitle": "إنشاء ملف تعريف الجهاز",
-      "createDescription": "اتبع الخطوات لإنشاء ملف تعريف جهاز جديد",
-      "steps": {
-        "details": {
-          "title": "تفاصيل ملف تعريف الجهاز",
-          "description": "معلومات ملف تعريف الجهاز الأساسية"
-        },
-        "transport": {
-          "title": "تكوين النقل",
-          "description": "تكوين بروتوكول النقل",
-          "optional": "(اختياري)"
-        },
-        "alarms": {
-          "title": "قواعد التنبيه",
-          "description": "تحديد قواعد التنبيه"
-        },
-        "provisioning": {
-          "title": "تهيئة الجهاز",
-          "description": "تكوين إعدادات التهيئة"
-        }
-      },
-      "fields": {
-        "name": "اسم ملف التعريف *",
-        "namePlaceholder": "مثال: مستشعر درجة الحرارة",
-        "description": "الوصف",
-        "descriptionPlaceholder": "وصف ملف التعريف...",
-        "type": "نوع الجهاز *",
-        "typePlaceholder": "اختر نوع الجهاز",
-        "defaultRuleChain": "سلسلة القواعد الافتراضية",
-        "ruleChainPlaceholder": "اختر سلسلة القواعد الافتراضية",
-        "queue": "زمام الانتظار",
-        "queuePlaceholder": "مثال: زمام الانتظار الرئيسي",
-        "transportType": "نوع النقل",
-        "transportPlaceholder": "اختر نوع النقل",
-        "telemetryTopic": "موضوع القياس عن بعد للجهاز",
-        "telemetryPlaceholder": "مثال: v1/devices/me/telemetry",
-        "attributesTopic": "موضوع سمات الجهاز",
-        "attributesPlaceholder": "مثال: v1/devices/me/attributes",
-        "baseUrl": "رابط الأساس",
-        "baseUrlPlaceholder": "مثال: https://api.example.com",
-        "timeout": "المهلة (بالثواني)",
-        "port": "المنفذ",
-        "baudRate": "معدل الباود",
-        "region": "المنطقة",
-        "regionPlaceholder": "مثال: EU868",
-        "appEui": "معرف التطبيق EUI",
-        "provisionStrategy": "إستراتيجية التهيئة",
-        "provisionPlaceholder": "اختر إستراتيجية التهيئة",
-        "provisionDescription": "إستراتيجية التهيئة",
-        "ruleChainDescription": "سلسلة القواعد الافتراضية",
-        "queueDescription": "سلسلة القواعد الافتراضية"
-      },
-      "buttons": {
-        "previous": "السابق",
-        "next": "التالي",
-        "cancel": "إلغاء",
-        "create": "إنشاء ملف تعريف",
-        "addAlarm": "إضافة قاعدة تنبيه",
-        "addAnotherAlarm": "إضافة قاعدة تنبيه أخرى"
-      },
-      "messages": {
-        "noAlarms": "لم يتم تحديد قواعد تنبيه",
-        "alarmRule": "قاعدة التنبيه",
-        "optional": "اختياري",
-        "createSuccess": "تم إنشاء ملف تعريف الجهاز بنجاح",
-        "createError": "فشل إنشاء ملف تعريف الجهاز. يرجى المحاولة مرة أخرى.",
-        "deleteSuccess": "تم حذف ملف تعريف الجهاز بنجاح",
-        "deleteError": "فشل حذف ملف تعريف الجهاز. يرجى المحاولة مرة أخرى.",
-        "create": "إنشاء ملف تعريف"
-      },
-      "options": {
-        "sensor": "مستشعر",
-        "gateway": "بوابة",
-        "meter": "عداد",
-        "actuator": "مشغل",
-        "mqtt": "MQTT",
-        "http": "HTTP",
-        "coap": "CoAP",
-        "lwm2m": "LWM2M",
-        "snmp": "SNMP",
-        "critical": "حرج",
-        "major": "رئيسي",
-        "minor": "ثانوي",
-        "warning": "تحذير",
-        "indeterminate": "غير محدد",
-        "allowCreateNew": "السماح بإنشاء أجهزة جديدة",
-        "checkPreProvisioned": "التحقق من الأجهزة المهيأة مسبقاً",
-        "disabled": "معطل"
-      }
-    }
-  },
   "CommonPrifleSchema": {
     "name": "يجب أن يحتوي الاسم على حرفين على الأقل",
     "invalidPhone": "رقم الهاتف غير صالح"
+  },
+  "automation": {
+    "title": "الأتمتة",
+    "description": "إنشاء سير عمل آلي وتفاعلات الأجهزة",
+    "buttons": {
+      "create": "إنشاء أتمتة",
+      "cancel": "إلغاء",
+      "save": "حفظ التغييرات",
+      "duplicate": "تكرار",
+      "delete": "حذف",
+      "edit": "تعديل",
+      "enable": "تفعيل",
+      "disable": "تعطيل"
+    },
+    "stats": {
+      "total": "إجمالي الأتمتة",
+      "totalDesc": "القواعد المكونة",
+      "active": "نشط",
+      "activeDesc": "قيد التشغيل حالياً",
+      "executions": "إجمالي التنفيذات",
+      "executionsDesc": "في كل الأوقات",
+      "errors": "أخطاء",
+      "errorsDesc": "تحتاج للانتباه"
+    },
+    "table": {
+      "title": "قواعد الأتمتة",
+      "searchPlaceholder": "البحث في الأتمتة...",
+      "columns": {
+        "name": "الاسم",
+        "trigger": "المشغل",
+        "action": "الإجراء",
+        "executions": "التنفيذات",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      },
+      "noResults": "لم يتم العثور على أتمتة."
+    },
+    "dialog": {
+      "createTitle": "إنشاء أتمتة",
+      "editTitle": "تعديل الأتمتة",
+      "description": "تحديد المشغلات والإجراءات للأتمتة الخاصة بك",
+      "sections": {
+        "basic": "المعلومات الأساسية",
+        "trigger": "المشغل (متى)",
+        "action": "الإجراء (ثم)",
+        "options": "خيارات"
+      },
+      "fields": {
+        "name": "اسم الأتمتة *",
+        "namePlaceholder": "مثال، التحكم في درجة الحرارة",
+        "description": "الوصف",
+        "descriptionPlaceholder": "صف ما تفعله هذه الأتمتة...",
+        "triggerType": "نوع المشغل *",
+        "device": "تحديد الجهاز *",
+        "attribute": "السمة",
+        "operator": "المعامل",
+        "value": "القيمة",
+        "actionType": "نوع الإجراء *",
+        "targetDevice": "الجهاز المستهدف *",
+        "command": "الأمر *",
+        "enable": "تفعيل الأتمتة",
+        "enableDesc": "بدء الأتمتة على الفور",
+        "log": "تفعيل التسجيل",
+        "logDesc": "تسجيل كافة التنفيذات"
+      },
+      "options": {
+        "triggerType": {
+          "threshold": "حد الجهاز",
+          "state": "تغيير حالة الجهاز",
+          "schedule": "جدول زمني",
+          "event": "حدث مخصص"
+        },
+        "operator": {
+          "greater": "> أكبر من",
+          "less": "< أصغر من",
+          "equals": "= يساوي",
+          "notEquals": "!= لا يساوي"
+        },
+        "actionType": {
+          "control": "التحكم في الجهاز",
+          "setValue": "تعيين قيمة السمة",
+          "notification": "إرسال إشعار",
+          "webhook": "استدعاء Webhook"
+        },
+        "command": {
+          "on": "تشغيل",
+          "off": "إيقاف",
+          "toggle": "تبديل",
+          "custom": "قيمة مخصصة"
+        }
+      }
+    }
   }
 }

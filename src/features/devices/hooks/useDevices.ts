@@ -169,3 +169,11 @@ export const useModels = (manufacturer: string) => {
     enabled: !!manufacturer,
   });
 };
+
+export const useDeviceCredentials = (deviceId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ['devices', deviceId, 'credentials'],
+    queryFn: () => devicesApi.getCredentials(deviceId),
+    enabled: !!deviceId && enabled,
+  });
+};

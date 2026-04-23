@@ -15,19 +15,28 @@ export const deviceService = {
    * Provision a new device with validation and setup
    */
   async provisionDevice(data: DeviceFormData | Partial<Device>) {
-    // 1. Validate required fields
-    if (!data.name || !data.type) {
-      throw new Error('Device name and type are required');
-    }
-
-    // 2. Convert DeviceFormData to Device format if needed
-    const deviceData: Partial<Device> = {
+    // 2. Convert DeviceFormData to Device format
+    const deviceData: any = {
       name: data.name,
-      type: data.type as DeviceType, // Convert string to DeviceType enum
+      type: data.type,
       description: data.description,
       connectionType: data.connectionType,
-      // Map other fields as needed
+      manufacturer: data.manufacturer,
+      model: data.model,
+      protocol: 'http',
+      metadata: {
+        manufacturer: data.manufacturer,
+        model: data.model,
+        codecId: data.codecId,
+      },
     };
+
+    // Clean up undefined fields in metadata
+    Object.keys(deviceData.metadata).forEach((key) => {
+      if (deviceData.metadata[key] === undefined) {
+        delete deviceData.metadata[key];
+      }
+    });
 
     // 3. Create device
     const response = await devicesApi.create(deviceData);

@@ -49,8 +49,11 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
     connectionType: '',
     manufacturer: '',
     model: '',
+    protocol: 'lorawan_milesight',
+
     ...initialData,
   });
+
   const [enableGatewayAssignment, setEnableGatewayAssignment] = useState(false);
   // Reset form when dialog opens/closes or initialData changes
   useEffect(() => {
@@ -67,10 +70,20 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
       setEnableGatewayAssignment(!!initialData?.gatewayId);
     }
   }, [open, initialData]);
+  const { data: manufacturersResponse, isLoading: isLoadingManufacturers } =
+    useManufacturers();
+  const { data: modelsResponse, isLoading: isLoadingModels } = useModels(
+    formData.manufacturer || ''
+  );
+
+  const manufacturers = manufacturersResponse?.data?.data.data || [];
+  const models = modelsResponse?.data?.data.data || [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    const finalData = { ...formData };
+
+    await onSubmit(finalData);
   };
 
   const handleCancel = () => {
@@ -83,20 +96,12 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
       connectionType: '',
       manufacturer: '',
       model: '',
+      protocol: 'lorawan_milesight',
     });
     setEnableGatewayAssignment(false);
   };
 
   const isCreateMode = mode === 'create';
-
-  const { data: manufacturersResponse, isLoading: isLoadingManufacturers } =
-    useManufacturers();
-  const { data: modelsResponse, isLoading: isLoadingModels } = useModels(
-    formData.manufacturer || ''
-  );
-
-  const manufacturers = manufacturersResponse?.data?.data || [];
-  const models = modelsResponse?.data?.data || [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -226,7 +231,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {manufacturers.map((m) => (
+                  {manufacturers?.map((m) => (
                     <SelectItem key={m} value={m}>
                       {m}
                     </SelectItem>
@@ -255,11 +260,14 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   />
                 </SelectTrigger>
                 <SelectContent>
-                  {models.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
+                  {models?.map((m: any) => {
+                    const uniqueKey = `${m.model}`;
+                    return (
+                      <SelectItem key={uniqueKey + m.codecId} value={uniqueKey}>
+                        {m.model}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -278,6 +286,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 rows={4}
               />
             </div>
+
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Checkbox

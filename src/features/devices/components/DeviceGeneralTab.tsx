@@ -267,7 +267,9 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder={t('devices.details.general.descriptionPlaceholder')}
+                placeholder={t(
+                  'devices.details.general.descriptionPlaceholder'
+                )}
                 className="w-full min-h-[100px]"
                 rows={4}
               />
@@ -296,7 +298,9 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue
-                      placeholder={t('devices.details.general.buildingPlaceholder')}
+                      placeholder={t(
+                        'devices.details.general.buildingPlaceholder'
+                      )}
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -322,7 +326,9 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue
-                      placeholder={t('devices.details.general.floorPlaceholder')}
+                      placeholder={t(
+                        'devices.details.general.floorPlaceholder'
+                      )}
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -396,7 +402,9 @@ export const DeviceGeneralTab: React.FC<DeviceGeneralTabProps> = ({
                   step="any"
                   value={formData.gpsLongitude}
                   onChange={handleInputChange}
-                  placeholder={t('devices.details.general.longitudePlaceholder')}
+                  placeholder={t(
+                    'devices.details.general.longitudePlaceholder'
+                  )}
                   className="w-full "
                 />
               </div>
