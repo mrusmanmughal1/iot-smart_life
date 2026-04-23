@@ -13,6 +13,8 @@ export enum DeviceStatus {
   IDLE = 'idle',
   ERROR = 'error',
   MAINTENANCE = 'maintenance',
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
 }
 
 export interface Device {

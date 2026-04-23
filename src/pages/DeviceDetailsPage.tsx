@@ -4,7 +4,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Download, Upload, Plus, ChevronLeft, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
 import { useDevice, useDeviceCredentials } from '@/features/devices/hooks';
 import { DeviceStatus } from '@/services/api/devices.api';
 import { DeviceTelemetryTab } from '@/features/devices/components/DeviceTelemetryTab';
@@ -38,7 +37,7 @@ export default function DeviceDetailsPage() {
   };
 
   const deviceStatus =
-    device?.status === DeviceStatus.ONLINE || device?.status === DeviceStatus.IDLE
+    device?.status === 'active' || device?.status === 'idle'
       ? 'ACTIVE'
       : 'INACTIVE';
 
@@ -97,14 +96,6 @@ export default function DeviceDetailsPage() {
           <Button variant="secondary" size="sm">
             <Download className="h-4 w-4 mr-2" />
             {t('devices.details.export')}
-          </Button>
-
-          <Button
-            size="sm"
-            className="bg-primary hover:bg-primary/90 text-white"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t('devices.details.add')}
           </Button>
         </div>
       </div>
