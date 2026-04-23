@@ -7,7 +7,7 @@ export enum DeviceType {
   ACTUATOR = 'actuator',
 }
 
-export enum DeviceStatus {
+export enum any {
   ONLINE = 'online',
   OFFLINE = 'offline',
   IDLE = 'idle',
@@ -26,7 +26,7 @@ export interface Device {
   name: string;
   protocol?: string;
   type: DeviceType;
-  status: DeviceStatus;
+  status: any;
   model?: string;
   manufacturer?: string;
   codecId?: string;

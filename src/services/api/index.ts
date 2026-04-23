@@ -26,6 +26,7 @@ export * from './queues.api';
 export * from './rules-chain.api';
 export * from './default-rule-chains.api';
 export * from './customers.api';
+export * from './telemetry.api';
 
 import { alarmsApi } from './alarms.api';
 import { analyticsApi } from './analytics.api';
@@ -54,6 +55,7 @@ import { queuesApi } from './queues.api';
 import { rulesChainApi } from './rules-chain.api';
 import { defaultRuleChainsApi } from './default-rule-chains.api';
 import { customersApi } from './customers.api';
+import { telemetryApi } from './telemetry.api';
 
 export const api = {
   alarms: alarmsApi,
@@ -83,6 +85,7 @@ export const api = {
   users: usersApi,
   widgets: widgetsApi,
   customers: customersApi,
+  telemetry: telemetryApi,
 };
 
 export default api;

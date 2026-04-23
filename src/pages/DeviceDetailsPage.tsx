@@ -30,14 +30,14 @@ export default function DeviceDetailsPage() {
 
   const credentials = credentialsResponse?.data?.data;
   const device = deviceData?.data?.data;
-
+  console.log(device);
   const handleCredentialsClick = () => {
     setFetchCredentials(true);
     setIsCredentialsOpen(true);
   };
 
   const deviceStatus =
-    device?.status === 'online' || device?.status === 'idle'
+    device?.status === 'active' || device?.status === 'idle'
       ? 'ACTIVE'
       : 'INACTIVE';
 

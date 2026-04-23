@@ -19,7 +19,6 @@ export interface DeviceFormData {
   latitude?: number;
   longitude?: number;
   location?: string;
-  protocol?: string;
 }
 
 export interface DeviceFilters {
