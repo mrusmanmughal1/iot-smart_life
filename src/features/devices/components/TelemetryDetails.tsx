@@ -116,7 +116,7 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
 
       {telemetry && (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {/* Payload data section */}
             <Card className="border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden flex flex-col">
               <CardHeader className="pb-3 border-b border-gray-50 dark:border-gray-900 bg-gray-50/30 dark:bg-gray-900/10">
