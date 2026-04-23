@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 import { useDevice, useDeviceCredentials } from '@/features/devices/hooks';
+import { DeviceStatus } from '@/services/api/devices.api';
 import { DeviceTelemetryTab } from '@/features/devices/components/DeviceTelemetryTab';
 import { DeviceAlarmsTab } from '@/features/devices/components/DeviceAlarmsTab';
 import { DeviceGeneralTab } from '@/features/devices/components/DeviceGeneralTab';
@@ -37,7 +38,7 @@ export default function DeviceDetailsPage() {
   };
 
   const deviceStatus =
-    device?.status === 'active' || device?.status === 'idle'
+    device?.status === DeviceStatus.ONLINE || device?.status === DeviceStatus.IDLE
       ? 'ACTIVE'
       : 'INACTIVE';
 
