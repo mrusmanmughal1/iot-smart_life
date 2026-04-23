@@ -54,6 +54,9 @@ export default function DevicesPage() {
     type: string;
     connectionType: string;
     description: string;
+    manufacturer: string;
+    model: string;
+    gatewayId: string;
   } | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deviceToDeleteId, setDeviceToDeleteId] = useState<string | null>(null);
@@ -112,6 +115,9 @@ export default function DevicesPage() {
       type: device.type || '',
       connectionType: device.connectionType || '',
       description: device.description || '',
+      manufacturer: device.manufacturer || '',
+      model: device.model || '',
+      gatewayId: device.gatewayId || '',
     });
     setIsEditDialogOpen(true);
   }, []);
@@ -119,7 +125,15 @@ export default function DevicesPage() {
   // Handle form submissions
   const handleCreate = async (data: DeviceFormData) => {
     try {
-      const resp = await createDevice.mutateAsync(data);
+      const cleanedData = Object.fromEntries(
+        Object.entries(data).filter(
+          ([_, v]) => v !== '' && v !== null && v !== undefined
+        )
+      );
+
+      const resp = await createDevice.mutateAsync(
+        cleanedData as DeviceFormData
+      );
       const successMessage = t('devices.messages.createSuccess');
       toast.success(successMessage);
 
@@ -141,9 +155,16 @@ export default function DevicesPage() {
   const handleEdit = async (data: DeviceFormData) => {
     if (!selectedDevice) return;
     try {
+      // Clean up the data: remove empty strings, but keep valid zeros or booleans
+      const cleanedData = Object.fromEntries(
+        Object.entries(data).filter(
+          ([_, v]) => v !== '' && v !== null && v !== undefined
+        )
+      );
+
       const response = await updateDevice.mutateAsync({
         id: selectedDevice.id,
-        data,
+        data: cleanedData as DeviceFormData,
       });
       const successMessage =
         (response as { data?: { message?: string } })?.data?.message ||
@@ -364,6 +385,9 @@ export default function DevicesPage() {
                 type: selectedDevice.type,
                 connectionType: selectedDevice.connectionType,
                 description: selectedDevice.description,
+                manufacturer: (selectedDevice as any).manufacturer,
+                model: (selectedDevice as any).model,
+                gatewayId: (selectedDevice as any).gatewayId,
               }
             : undefined
         }
