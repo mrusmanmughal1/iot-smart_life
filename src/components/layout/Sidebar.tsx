@@ -153,9 +153,20 @@ const getNavItems = (): NavItem[] => [
   },
   {
     titleKey: 'nav.alerts',
-    href: '/alarms',
     icon: <Bell className="h-5 w-5" />,
     feature: 'alerts',
+    children: [
+      {
+        titleKey: 'nav.alarms',
+        href: '/alarms',
+        icon: <Bell className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.analytics',
+        href: '/alarms/analytics',
+        icon: <BarChart3 className="h-4 w-4" />,
+      },
+    ],
   },
   {
     titleKey: 'nav.analytics',

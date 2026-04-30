@@ -50,15 +50,11 @@ export const Stepper: React.FC<StepperProps> = ({
                         isCompleted
                           ? 'bg-primary text-white'
                           : isActive
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-300 text-white'
+                            ? 'bg-primary text-white'
+                            : 'bg-gray-300 text-white'
                       )}
                     >
-                      {isCompleted ? (
-                        <Check className="h-5 w-5" />
-                      ) : (
-                        step.id
-                      )}
+                      {isCompleted ? <Check className="h-5 w-5" /> : step.id}
                     </div>
                     {/* Step Info */}
                     <div
@@ -87,7 +83,7 @@ export const Stepper: React.FC<StepperProps> = ({
                 <div
                   className={cn(
                     'flex-1 h-0.5 mx-2 mt-[-20px]',
-                    isCompleted || (index < currentStep - 1)
+                    isCompleted || index < currentStep - 1
                       ? 'bg-primary'
                       : 'bg-gray-300'
                   )}
@@ -100,4 +96,3 @@ export const Stepper: React.FC<StepperProps> = ({
     </div>
   );
 };
-

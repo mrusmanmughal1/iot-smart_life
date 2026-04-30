@@ -31,15 +31,16 @@ export const DeleteConfirmationDialog: React.FC<
   onConfirm,
   title,
   description,
-  itemName, 
+  itemName,
   isLoading = false,
   confirmText,
   cancelText,
 }) => {
   const { t } = useTranslation();
-  
+
   const displayTitle = title || t('common.deleteConfirmation.title');
-  const displayConfirmText = confirmText || t('common.deleteConfirmation.confirm');
+  const displayConfirmText =
+    confirmText || t('common.deleteConfirmation.confirm');
   const displayCancelText = cancelText || t('common.deleteConfirmation.cancel');
   const handleConfirm = async () => {
     try {
@@ -87,7 +88,9 @@ export const DeleteConfirmationDialog: React.FC<
             disabled={isLoading}
             className="bg-red-600 hover:bg-red-700"
           >
-            {isLoading ? t('common.deleteConfirmation.deleting') : displayConfirmText}
+            {isLoading
+              ? t('common.deleteConfirmation.deleting')
+              : displayConfirmText}
           </Button>
         </DialogFooter>
       </DialogContent>

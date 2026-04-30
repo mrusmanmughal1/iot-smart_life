@@ -52,6 +52,7 @@
     "signup": "تسجيل جديد",
     "companyName": "اسم الشركة",
     "failedToLoadSettings": "فشل تحميل الإعدادات",
+    "noResults": "لم يتم العثور على نتائج",
     "deleteConfirmation": {
       "title": "حذف العنصر",
       "confirm": "حذف",
@@ -795,6 +796,17 @@
           "cancelled": "تم إلغاء التغييرات"
         }
       },
+      "attributes": {
+        "title": "خصائص الجهاز",
+        "subtitle": "بيانات تعريف النظام وخصائص الجهاز المبلغ عنها",
+        "countSuffix": "خصائص",
+        "refresh": "تحديث",
+        "error": "فشل في تحميل بيانات الخصائص.",
+        "noData": "لم يتم الإبلاغ عن أي خصائص لهذا الجهاز بعد.",
+        "systemBadge": "النظام",
+        "lastHeartbeat": "آخر نبض للقلب:",
+        "id": "المعرف:"
+      },
       "telemetry": {
         "searchPlaceholder": "البحث في الخصائص...",
         "scopes": {
@@ -808,7 +820,7 @@
           "value": "القيمة",
           "lastUpdate": "آخر تحديث",
           "actions": "الإجراءات",
-          "noData": "لم يتم العثور على خصائص"
+          "noData": "لم يتم العثور على بيانات قياس"
         },
         "buttons": {
           "edit": "تعديل",
@@ -820,7 +832,8 @@
           "deleteConfirm": "هل أنت متأكد أنك تريد حذف الخاصية \"{{key}}\"؟",
           "deleteSuccess": "تم حذف الخاصية بنجاح",
           "deleteError": "فشل في حذف الخاصية",
-          "addComingSoon": "ميزة إضافة الخصائص ستتوفر قريباً"
+          "addComingSoon": "ميزة إضافة الخصائص ستتوفر قريباً",
+          "error": "فشل في تحميل بيانات القياس عن بعد. ربما لم يقم الجهاز بالإبلاغ بعد."
         },
         "details": {
           "latestTitle": "آخر القيم",
@@ -831,7 +844,10 @@
           "graphX": "الشهر",
           "graphY": "القيمة",
           "refresh": "تحديث",
-          "addProfile": "إضافة ملف تعريف"
+          "addProfile": "إضافة ملف تعريف",
+          "payloadData": "بيانات الحمولة",
+          "lastUpdated": "آخر تحديث:",
+          "reportedAt": "تم الإبلاغ في:"
         }
       },
       "alarms": {
@@ -1157,17 +1173,28 @@
     "typeRequired": "نوع الأصل مطلوب"
   },
   "alarms": {
-    "title": "التنبيهات",
+    "title": "الإنذارات",
+    "description": "مراقبة وإدارة إنذارات النظام",
     "acknowledge": "إقرار",
     "clear": "مسح",
     "severity": "الخطورة",
     "critical": "حرج",
-    "major": "رئيسي",
-    "minor": "ثانوي",
+    "major": "كبير",
+    "minor": "صغير",
     "warning": "تحذير",
-    "activeAlarms": "التنبيهات النشطة",
-    "acknowledgedAlarms": "التنبيهات المقرة",
-    "clearedAlarms": "التنبيهات الممسوحة"
+    "activeAlarms": "الإنذارات النشطة",
+    "acknowledgedAlarms": "تم الإقرار بها",
+    "clearedAlarms": "تم مسحها",
+    "resolvedAlarms": "تم حلها",
+    "table": {
+      "severity": "الخطورة",
+      "type": "النوع",
+      "originator": "المصدر",
+      "status": "الحالة",
+      "created": "تم الإنشاء",
+      "actions": "الإجراءات",
+      "noData": "لا توجد بيانات متاحة"
+    }
   },
   "users": {
     "title": "المستخدمون والأدوار",
@@ -2423,5 +2450,27 @@
         }
       }
     }
+  },
+  "alertAnalytics": {
+    "title": "تحليلات التنبيهات",
+    "searchPlaceholder": "البحث في القواعد...",
+    "createRule": "إنشاء قاعدة",
+    "criticalAlerts": "التنبيهات الحرجة",
+    "warningAlerts": "تنبيهات التحذير",
+    "infoAlerts": "تنبيهات المعلومات",
+    "resolvedToday": "تم حلها اليوم",
+    "fromYesterday": "{{amount}} من أمس",
+    "trendsTitle": "اتجاهات التنبيهات (آخر 7 أيام)",
+    "legend": {
+      "critical": "تحذير حرج",
+      "warning": "تحذير",
+      "info": "معلومات"
+    },
+    "topSources": "أهم مصادر التنبيهات",
+    "responseTime": "وقت الاستجابة",
+    "avg": "المتوسط",
+    "critical": "حرج",
+    "minutes": "دقائق",
+    "alertsCount": "{{count}} تنبيه"
   }
 }

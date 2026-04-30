@@ -1,8 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/util';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useRTL } from '@/hooks/useRTL';
 
 export interface PageHeaderAction {
@@ -26,7 +26,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   description,
   actions,
-
   className,
   children,
 }) => {
@@ -42,7 +41,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             onClick={() => navigate(-1)}
             className={cn(
               'p-1 px-2 rounded-full absolute top-0',
-              isRTL ? '-right-10' : '-left-10'
+              isRTL ? '-right-10' : '-left-8.5'
             )}
           >
             {isRTL ? (
@@ -59,7 +58,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             <p className="text-muted-foreground">{description}</p>
           )}
         </div>
-
         {actions && actions.length > 0 && (
           <div className="flex items-center gap-2">
             {actions.map((action, index) => (

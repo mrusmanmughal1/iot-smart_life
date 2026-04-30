@@ -1,128 +1,71 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Zap, Plus, Search, Play, AlertTriangle } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
+import { AutomationStats } from '@/features/automation/AutomationStats';
 import { AutomationTable } from '@/features/automation/AutomationTable';
 import { AutomationDialog } from '@/features/automation/AutomationDialog';
 import { Automation } from '@/features/automation/types';
-
-// Mock data (moving status to the top for consistency with the component)
-const initialAutomations: Automation[] = [
-  {
-    id: '1',
-    name: 'Temperature Control',
-    description: 'Turn on AC when temperature exceeds 25°C',
-    enabled: true,
-    trigger: {
-      type: 'Threshold',
-      device: 'Temperature Sensor #1',
-      condition: 'temperature > 25',
-    },
-    action: {
-      type: 'Control Device',
-      target: 'AC Unit #1',
-      value: 'Turn ON',
-    },
-    lastTriggered: new Date('2025-01-30T14:15:00'),
-    executionCount: 45,
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Motion Light Control',
-    description: 'Turn on lights when motion detected',
-    enabled: true,
-    trigger: {
-      type: 'Device State',
-      device: 'Motion Sensor #3',
-      condition: 'motion = detected',
-    },
-    action: {
-      type: 'Control Device',
-      target: 'Smart Lights - Hallway',
-      value: 'Turn ON',
-    },
-    lastTriggered: new Date('2025-01-30T13:45:00'),
-    executionCount: 128,
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'Low Battery Alert',
-    description: 'Send email when device battery is low',
-    enabled: true,
-    trigger: {
-      type: 'Threshold',
-      device: 'All Devices',
-      condition: 'battery < 20%',
-    },
-    action: {
-      type: 'Send Notification',
-      target: 'admin@company.com',
-      value: 'Email Alert',
-    },
-    lastTriggered: new Date('2025-01-29T10:30:00'),
-    executionCount: 12,
-    status: 'active',
-  },
-  {
-    id: '4',
-    name: 'Evening Energy Saver',
-    description: 'Reduce heating after 10 PM',
-    enabled: false,
-    trigger: {
-      type: 'Schedule',
-      device: 'Time-based',
-      condition: 'time = 22:00',
-    },
-    action: {
-      type: 'Set Value',
-      target: 'Thermostat - Main',
-      value: 'Set to 18°C',
-    },
-    executionCount: 89,
-    status: 'inactive',
-  },
-  {
-    id: '5',
-    name: 'Water Leak Detection',
-    description: 'Alert and shut valve on water leak',
-    enabled: true,
-    trigger: {
-      type: 'Device State',
-      device: 'Water Sensor #2',
-      condition: 'leak = detected',
-    },
-    action: {
-      type: 'Multiple Actions',
-      target: 'Water Valve + Alert',
-      value: 'Close valve & Send alert',
-    },
-    lastTriggered: new Date('2025-01-29T10:30:00'),
-    executionCount: 2,
-    status: 'active',
-  },
-];
+import {
+  useAutomations,
+  useCreateAutomation,
+  useDeleteAutomation,
+} from '@/features/automation/hooks/useAutomation';
+import toast from 'react-hot-toast';
+import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog/DeleteConfirmationDialog';
 
 export default function AutomationPage() {
   const { t } = useTranslation();
-  const [automations, setAutomations] =
-    useState<Automation[]>(initialAutomations);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+    useState(false);
+  const [automationToDelete, setAutomationToDelete] = useState<string | null>(
+    null
+  );
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
   const [selectedAutomation, setSelectedAutomation] =
     useState<Automation | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const { register, watch } = useForm({
+    defaultValues: {
+      search: '',
+    },
+  });
+  const createAutomation = useCreateAutomation();
+  const deleteAutomation = useDeleteAutomation();
+
+  const searchQuery = watch('search');
+
+  const { data: automationsData } = useAutomations({
+    page: currentPage,
+    limit: itemsPerPage,
+    search: searchQuery,
+  });
+
+  const responseData = automationsData?.data;
+  const automations = responseData?.data || [];
+  const meta = responseData
+    ? {
+        total: responseData.total,
+        page: responseData.page,
+        limit: responseData.limit,
+        totalPages: responseData.totalPages,
+      }
+    : {
+        total: 0,
+        page: currentPage,
+        limit: itemsPerPage,
+        totalPages: 0,
+      };
 
   const filteredAutomations = useMemo(() => {
-    return automations.filter(
-      (a) =>
-        a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        a.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [automations, searchQuery]);
+    return automations;
+  }, [automations]);
 
   const handleCreate = () => {
     setDialogMode('create');
@@ -136,60 +79,43 @@ export default function AutomationPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDuplicate = (automation: Automation) => {
-    const newAutomation = {
-      ...automation,
-      id: Math.random().toString(36).substr(2, 9),
-      name: `${automation.name} (Copy)`,
-      executionCount: 0,
-    };
-    setAutomations([...automations, newAutomation]);
-  };
-
   const handleDelete = (id: string) => {
-    setAutomations(automations.filter((a) => a.id !== id));
+    setAutomationToDelete(id);
+    setIsConfirmDeleteDialogOpen(true);
   };
 
-  const handleToggle = (id: string, enabled: boolean) => {
-    setAutomations(
-      automations.map((a) =>
-        a.id === id
-          ? { ...a, enabled, status: enabled ? 'active' : 'inactive' }
-          : a
-      )
-    );
+  const confirmDelete = () => {
+    if (!automationToDelete) return;
+
+    deleteAutomation.mutate(automationToDelete, {
+      onSuccess: () => {
+        setIsConfirmDeleteDialogOpen(false);
+        setAutomationToDelete(null);
+        toast.success('Automation deleted successfully');
+      },
+      onError: (error) => {
+        toast.error('Error deleting automation');
+        console.error('Error deleting automation:', error);
+      },
+    });
   };
+
+  const handleToggle = (id: string, enabled: boolean) => {};
 
   const handleDialogSubmit = (data: Partial<Automation>) => {
-    if (dialogMode === 'edit' && selectedAutomation) {
-      setAutomations(
-        automations.map((a) =>
-          a.id === selectedAutomation.id ? { ...a, ...data } : a
-        )
-      );
-    } else {
-      const newAutomation: Automation = {
-        id: Math.random().toString(36).substr(2, 9),
-        name: data.name || 'New Automation',
-        description: data.description || '',
-        enabled: true,
-        trigger: data.trigger || {
-          type: 'Threshold',
-          device: 'Unknown',
-          condition: '',
-        },
-        action: data.action || {
-          type: 'Control Device',
-          target: 'Unknown',
-          value: '',
-        },
-        executionCount: 0,
-        status: 'active',
-        ...data,
-      };
-      setAutomations([...automations, newAutomation]);
-    }
+    createAutomation.mutate(data, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+        toast.success('Automation created successfully');
+      },
+      onError: (error: any) => {
+        setIsDialogOpen(true);
+        toast.error(error.message);
+      },
+    });
   };
+
+  const handleDuplicate = (automation: Automation) => {};
 
   return (
     <div className="space-y-6">
@@ -206,65 +132,7 @@ export default function AutomationPage() {
       />
 
       {/* Stats */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card className="bg-primary text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              {t('automation.stats.total')}
-            </CardTitle>
-            <Zap className="h-8 w-8 text-white/20" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{automations.length}</div>
-            <p className="text-xs text-white/70">{t('automation.stats.totalDesc')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-secondary text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              {t('automation.stats.active')}
-            </CardTitle>
-            <Play className="h-6 w-6 text-white" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {automations.filter((a) => a.enabled).length}
-            </div>
-            <p className="text-xs text-white/70">{t('automation.stats.activeDesc')}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t('automation.stats.executions')}
-            </CardTitle>
-            <Zap className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {automations.reduce((sum, a) => sum + a.executionCount, 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">{t('automation.stats.executionsDesc')}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-red-600/80 text-white">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">
-              {t('automation.stats.errors')}
-            </CardTitle>
-            <AlertTriangle className="h-6 w-6 text-white" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {automations.filter((a) => a.status === 'error').length}
-            </div>
-            <p className="text-xs text-white/70">{t('automation.stats.errorsDesc')}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <AutomationStats />
 
       {/* Main Content */}
       <Card>
@@ -274,10 +142,9 @@ export default function AutomationPage() {
             <div className="relative w-72">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                {...register('search')}
                 placeholder={t('automation.table.searchPlaceholder')}
                 className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
@@ -285,10 +152,14 @@ export default function AutomationPage() {
         <CardContent>
           <AutomationTable
             data={filteredAutomations}
+            meta={meta!}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
             onToggle={handleToggle}
             onEdit={handleEdit}
-            onDuplicate={handleDuplicate}
             onDelete={handleDelete}
+            onDuplicate={handleDuplicate}
           />
         </CardContent>
       </Card>
@@ -299,6 +170,19 @@ export default function AutomationPage() {
         mode={dialogMode}
         initialData={selectedAutomation}
         onSubmit={handleDialogSubmit}
+      />
+
+      <DeleteConfirmationDialog
+        open={isConfirmDeleteDialogOpen}
+        onOpenChange={setIsConfirmDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        isLoading={deleteAutomation.isPending}
+        title={t('automation.delete.title', 'Delete Automation')}
+        description={t(
+          'automation.delete.description',
+          'Are you sure you want to delete this automation? This action cannot be undone.'
+        )}
+        itemName={automations.find((a) => a.id === automationToDelete)?.name}
       />
     </div>
   );

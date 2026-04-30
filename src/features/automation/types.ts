@@ -3,19 +3,75 @@ export interface Automation {
   name: string;
   description: string;
   enabled: boolean;
+  status: 'active' | 'inactive' | 'error';
   trigger: {
     type: string;
-    device: string;
-    condition: string;
+    value?: number;
+    value2?: number;
+    debounce?: number;
+    deviceId?: string;
+    operator?: string;
+    schedule?: string;
+    attributeKey?: string;
+    telemetryKey?: string;
+    // Keep these for backward compatibility if needed, but mark as optional
+    device?: string;
+    condition?: string;
   };
   action: {
     type: string;
-    target: string;
-    value: string;
+    value?: any;
+    command?: string;
+    message?: string;
+    deviceId?: string;
+    target?: string;
+    recipients?: string[];
+    webhookUrl?: string;
+    webhookBody?: any;
+    webhookMethod?: string;
+    webhookHeaders?: any;
+    delay?: number;
+    priority?: 'low' | 'medium' | 'high';
+    channel?: string;
   };
-  lastTriggered?: Date;
+  actions?: Array<{
+    id: string;
+    type: string;
+    deviceId?: string;
+    command?: string;
+    value?: any;
+    message?: string;
+    recipients?: string[];
+    delay?: number;
+    priority?: 'low' | 'medium' | 'high';
+    channel?: string;
+    params?: string;
+  }>;
+  execution?: {
+    sequence: boolean;
+    parallel: boolean;
+    stopOnError: boolean;
+    retryCount: number;
+  };
   executionCount: number;
-  status: 'active' | 'inactive' | 'error';
+  lastTriggered?: string | null;
+  lastExecuted?: string | null;
+  lastError?: string | null;
+  settings?: {
+    cooldown: number;
+    activeDays: number[];
+    maxRetries: number;
+    activeHours?: {
+      start: string;
+      end: string;
+    };
+    retryOnFailure: boolean;
+    maxExecutionsPerDay: number;
+  };
+  tags?: string[];
+  additionalInfo?: any;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type TriggerType = 'threshold' | 'state' | 'schedule' | 'event';

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { devicesApi } from '@/services/api/index.ts';
+import { devicesApi, telemetryApi } from '@/services/api/index.ts';
 
 export const useDeviceTelemetry = (deviceId: string, keys?: string[]) => {
   return useQuery({
@@ -21,7 +21,7 @@ export const useDeviceAttributes = (deviceId: string) => {
 export const useDeviceLatestTelemetry = (deviceId: string) => {
   return useQuery({
     queryKey: ['devices', deviceId, 'telemetry', 'latest'],
-    queryFn: () => devicesApi.getTelemetry(deviceId),
+    queryFn: () => telemetryApi.getLatest(deviceId),
     enabled: !!deviceId,
     refetchInterval: 3000, // Refresh every 3 seconds
   });

@@ -10,26 +10,23 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
-import {
-  ArrowRight,
-  Edit,
-  Copy,
-  Trash2,
-  Pause,
-  Play,
-  MoreHorizontal,
-} from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { ArrowRight, Copy, Edit, Eye, Trash2 } from 'lucide-react';
 import { Automation } from './types';
+import { Pagination } from '@/components/common/Pagination';
+import { Button } from '@/components/ui/button';
 
 interface AutomationTableProps {
   data: Automation[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    totalItems?: number;
+  };
+  currentPage: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
   onToggle: (id: string, enabled: boolean) => void;
   onEdit: (automation: Automation) => void;
   onDuplicate: (automation: Automation) => void;
@@ -38,40 +35,51 @@ interface AutomationTableProps {
 
 export const AutomationTable: React.FC<AutomationTableProps> = ({
   data,
+  meta,
+  currentPage,
+  itemsPerPage,
+  onPageChange,
   onToggle,
   onEdit,
   onDuplicate,
   onDelete,
 }) => {
+  const autodata = data || [];
   const { t } = useTranslation();
   return (
     <div className="rounded-md border border-gray-200 dark:border-gray-700">
-      <Table>
+      <Table className="">
         <TableHeader className="bg-primary hover:bg-primary">
           <TableRow className="hover:bg-transparent border-none">
-            <TableHead className="text-white font-medium">{t('automation.table.columns.name')}</TableHead>
-            <TableHead className="text-white font-medium">{t('automation.table.columns.trigger')}</TableHead>
+            <TableHead className="text-white font-medium">
+              {t('automation.table.columns.name')}
+            </TableHead>
+            <TableHead className="text-white font-medium">
+              {t('automation.table.columns.trigger')}
+            </TableHead>
             <TableHead className="text-white font-medium w-[50px]"></TableHead>
-            <TableHead className="text-white font-medium">{t('automation.table.columns.action')}</TableHead>
+            <TableHead className="text-white font-medium">
+              {t('automation.table.columns.action')}
+            </TableHead>
             <TableHead className="text-white font-medium text-center">
               {t('automation.table.columns.executions')}
             </TableHead>
             <TableHead className="text-white font-medium text-center">
               {t('automation.table.columns.status')}
             </TableHead>
-            <TableHead className="text-white font-medium text-right">
+            <TableHead className="text-white font-medium  ">
               {t('automation.table.columns.actions')}
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody>
-          {data.length > 0 ? (
-            data.map((automation) => (
+        <TableBody className=" min-h-[500px] ">
+          {data ? (
+            autodata.map((automation) => (
               <TableRow key={automation.id} className="dark:text-white">
                 <TableCell>
                   <div>
                     <div className="font-medium">{automation.name}</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                       {automation.description}
                     </div>
                   </div>
@@ -79,8 +87,11 @@ export const AutomationTable: React.FC<AutomationTableProps> = ({
                 <TableCell>
                   <div className="space-y-1">
                     <Badge variant="outline">{automation.trigger.type}</Badge>
-                    <div className="text-sm text-muted-foreground">
-                      {automation.trigger.device}: {automation.trigger.condition}
+                    <div className="text-sm capitalize text-muted-foreground">
+                      {automation.trigger.condition ||
+                        (automation.trigger.telemetryKey
+                          ? `${automation.trigger.telemetryKey} ${automation.trigger.operator || ''} ${automation.trigger.value || ''}`
+                          : 'No condition')}
                     </div>
                   </div>
                 </TableCell>
@@ -90,8 +101,19 @@ export const AutomationTable: React.FC<AutomationTableProps> = ({
                 <TableCell>
                   <div className="space-y-1">
                     <Badge variant="secondary">{automation.action.type}</Badge>
-                    <div className="text-sm text-muted-foreground">
-                      {automation.action.target}: {automation.action.value}
+                    <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                      {automation.action.deviceId && (
+                        <span className="font-medium mr-1">
+                          [{automation.action.deviceId.slice(-6)}]
+                        </span>
+                      )}
+                      {automation.action.command ||
+                        automation.action.message ||
+                        'Execute'}
+                      :{' '}
+                      {typeof automation.action.value === 'object'
+                        ? JSON.stringify(automation.action.value)
+                        : String(automation.action.value || '')}
                     </div>
                   </div>
                 </TableCell>
@@ -106,41 +128,31 @@ export const AutomationTable: React.FC<AutomationTableProps> = ({
                     }
                   />
                 </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => onToggle(automation.id, !automation.enabled)}
-                      >
-                        {automation.enabled ? (
-                          <Pause className="mr-2 h-4 w-4" />
-                        ) : (
-                          <Play className="mr-2 h-4 w-4" />
-                        )}
-                        {automation.enabled ? t('automation.buttons.disable') : t('automation.buttons.enable')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onEdit(automation)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        {t('automation.buttons.edit')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onDuplicate(automation)}>
-                        <Copy className="mr-2 h-4 w-4" />
-                        {t('automation.buttons.duplicate')}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={() => onDelete(automation.id)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        {t('automation.buttons.delete')}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                <TableCell className="text-right flex ">
+                  <Button
+                    size="icon-sm"
+                    variant="ghost"
+                    className="hover:bg-secondary hover:text-white"
+                    onClick={() => onEdit(automation)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon-sm"
+                    className="hover:bg-secondary hover:text-white"
+                    variant="ghost"
+                    onClick={() => onDelete(automation.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon-sm"
+                    className="hover:bg-secondary hover:text-white"
+                    variant="ghost"
+                    onClick={() => onDuplicate(automation)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
@@ -153,6 +165,17 @@ export const AutomationTable: React.FC<AutomationTableProps> = ({
           )}
         </TableBody>
       </Table>
+      {meta && meta.totalPages > 1 && (
+        <div className="mt-4 px-4 pb-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={meta.totalPages}
+            totalItems={meta.totalItems || meta.total || 0}
+            itemsPerPage={itemsPerPage}
+            onPageChange={onPageChange}
+          />
+        </div>
+      )}
     </div>
   );
 };

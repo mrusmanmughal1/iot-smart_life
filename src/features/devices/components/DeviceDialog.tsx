@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Dialog,
@@ -20,6 +20,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/pop-over';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import { cn } from '@/lib/util';
+import { Check, ChevronDown, Loader2 } from 'lucide-react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { useManufacturers, useModels } from '../hooks/useDevices';
 import type { DeviceFormData } from '../types/device.types';
 
@@ -32,6 +50,19 @@ export interface DeviceDialogProps {
   isLoading?: boolean;
 }
 
+const deviceSchema = z.object({
+  name: z.string().min(1, 'Device name is required'),
+  type: z.string().min(1, 'Device type is required'),
+  description: z.string().optional(),
+  gatewayId: z.string().optional(),
+  connectionType: z.string().min(1, 'Connection type is required'),
+  manufacturer: z.string().min(1, 'Manufacturer is required'),
+  model: z.string().min(1, 'Model is required'),
+  protocol: z.string().optional(),
+});
+
+type DeviceSchema = z.infer<typeof deviceSchema>;
+
 export const DeviceDialog: React.FC<DeviceDialogProps> = ({
   open,
   onOpenChange,
@@ -41,54 +72,27 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
   isLoading = false,
 }) => {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState<DeviceFormData>({
-    name: '',
-    type: '',
-    description: '',
-    gatewayId: '',
-    connectionType: '',
-    manufacturer: '',
-    model: '',
-    protocol: 'lorawan_milesight',
-
-    ...initialData,
-  });
-
   const [enableGatewayAssignment, setEnableGatewayAssignment] = useState(false);
-  // Reset form when dialog opens/closes or initialData changes
-  useEffect(() => {
-    if (open) {
-      setFormData({
-        name: initialData?.name || '',
-        type: initialData?.type || '',
-        description: initialData?.description || '',
-        gatewayId: initialData?.gatewayId || '',
-        connectionType: initialData?.connectionType || '',
-        manufacturer: initialData?.manufacturer || '',
-        model: initialData?.model || '',
-      });
-      setEnableGatewayAssignment(!!initialData?.gatewayId);
-    }
-  }, [open, initialData]);
-  const { data: manufacturersResponse, isLoading: isLoadingManufacturers } =
-    useManufacturers();
-  const { data: modelsResponse, isLoading: isLoadingModels } = useModels(
-    formData.manufacturer || ''
-  );
+  const [isManufacturersOpen, setIsManufacturersOpen] = useState(false);
+  const [manufacturersSearch, setManufacturersSearch] = useState('');
+  const [isModelsOpen, setIsModelsOpen] = useState(false);
+  const [modelsSearch, setModelsSearch] = useState('');
+  const [manufacturerWidth, setManufacturerWidth] = useState(0);
+  const [modelWidth, setModelWidth] = useState(0);
+  const manufacturerRef = useRef<HTMLButtonElement>(null);
+  const modelRef = useRef<HTMLButtonElement>(null);
 
-  const manufacturers = manufacturersResponse?.data?.data.data || [];
-  const models = modelsResponse?.data?.data.data || [];
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const finalData = { ...formData };
-
-    await onSubmit(finalData);
-  };
-
-  const handleCancel = () => {
-    onOpenChange(false);
-    setFormData({
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<DeviceSchema>({
+    resolver: zodResolver(deviceSchema),
+    defaultValues: {
       name: '',
       type: '',
       description: '',
@@ -97,11 +101,70 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
       manufacturer: '',
       model: '',
       protocol: 'lorawan_milesight',
-    });
+    },
+  });
+
+  const watchManufacturer = watch('manufacturer');
+  const watchModel = watch('model');
+
+  useEffect(() => {
+    if (open) {
+      reset({
+        name: initialData?.name || '',
+        type: initialData?.type || '',
+        description: initialData?.description || '',
+        gatewayId: initialData?.gatewayId || '',
+        connectionType: initialData?.connectionType || '',
+        manufacturer: initialData?.manufacturer || '',
+        model: initialData?.model || '',
+        protocol: initialData?.protocol || 'lorawan_milesight',
+      });
+      setEnableGatewayAssignment(!!initialData?.gatewayId);
+      setManufacturersSearch('');
+      setModelsSearch('');
+    }
+  }, [open, initialData, reset]);
+
+  const { data: manufacturersResponse, isLoading: isLoadingManufacturers } =
+    useManufacturers();
+  const { data: modelsResponse, isLoading: isLoadingModels } = useModels(
+    watchManufacturer || ''
+  );
+
+  const manufacturers = manufacturersResponse?.data?.data.data || [];
+  const models = modelsResponse?.data?.data.data || [];
+
+  const onFormSubmit = async (data: DeviceSchema) => {
+    await onSubmit(data as DeviceFormData);
+  };
+
+  const handleCancel = () => {
+    onOpenChange(false);
+    reset();
     setEnableGatewayAssignment(false);
   };
 
   const isCreateMode = mode === 'create';
+
+  const filteredManufacturers = manufacturers.filter((m) =>
+    m.toLowerCase().includes(manufacturersSearch.toLowerCase())
+  );
+
+  const filteredModels = models.filter((m: any) =>
+    m.model.toLowerCase().includes(modelsSearch.toLowerCase())
+  );
+
+  useEffect(() => {
+    if (manufacturerRef.current) {
+      setManufacturerWidth(manufacturerRef.current.offsetWidth);
+    }
+  }, [isManufacturersOpen]);
+
+  useEffect(() => {
+    if (modelRef.current) {
+      setModelWidth(modelRef.current.offsetWidth);
+    }
+  }, [isModelsOpen]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -117,160 +180,324 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onFormSubmit)}
           className="max-h-[80vh] px-6 pb-6 overflow-y-auto"
         >
-          <div className="space-y-4">
+          <div className="space-y-4 pt-4">
             <div>
               <Label htmlFor="device-name">{t('devices.deviceName')} *</Label>
               <Input
                 id="device-name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
+                {...register('name')}
                 placeholder={t('devices.form.namePlaceholder')}
-                required
-                className="border-2 rounded-md"
+                className={cn(
+                  'border-2  rounded-md',
+                  errors.name && 'border-destructive'
+                )}
               />
+              {errors.name && (
+                <p className="text-xs text-red-500 mt-1">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="device-type-select">
                 {t('devices.deviceType')} *
               </Label>
-              <Select
-                value={formData.type?.toLowerCase() || undefined}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, type: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    className="placeholder:text-slate-100"
-                    placeholder={t('devices.form.selectType')}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sensor">
-                    {t('devices.form.types.sensor')}
-                  </SelectItem>
-                  <SelectItem value="actuator">
-                    {t('devices.form.types.actuator')}
-                  </SelectItem>
-                  <SelectItem value="gateway">
-                    {t('devices.form.types.gateway')}
-                  </SelectItem>
-                  <SelectItem value="controller">
-                    {t('devices.form.types.controller')}
-                  </SelectItem>
-                  <SelectItem value="camera">
-                    {t('devices.form.types.camera')}
-                  </SelectItem>
-                  <SelectItem value="tracker">
-                    {t('devices.form.types.tracker')}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value?.toLowerCase() || undefined}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      className={cn(errors.type && 'border-destructive')}
+                    >
+                      <SelectValue placeholder={t('devices.form.selectType')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sensor">
+                        {t('devices.form.types.sensor')}
+                      </SelectItem>
+                      <SelectItem value="actuator">
+                        {t('devices.form.types.actuator')}
+                      </SelectItem>
+                      <SelectItem value="gateway">
+                        {t('devices.form.types.gateway')}
+                      </SelectItem>
+                      <SelectItem value="controller">
+                        {t('devices.form.types.controller')}
+                      </SelectItem>
+                      <SelectItem value="camera">
+                        {t('devices.form.types.camera')}
+                      </SelectItem>
+                      <SelectItem value="tracker">
+                        {t('devices.form.types.tracker')}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.type && (
+                <p className="text-xs text-destructive mt-1">
+                  {errors.type.message}
+                </p>
+              )}
             </div>
             <div>
               <Label htmlFor="device-connection-select">
                 {t('devices.connectionType')} *
               </Label>
-              <Select
-                value={formData.connectionType?.toLowerCase() || undefined}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, connectionType: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    className="placeholder:text-slate-100"
-                    placeholder={t('devices.form.selectConnectionType')}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="wifi">
-                    {t('devices.form.connections.wifi')}
-                  </SelectItem>
-                  <SelectItem value="ethernet">
-                    {t('devices.form.connections.ethernet')}
-                  </SelectItem>
-                  <SelectItem value="bluetooth">
-                    {t('devices.form.connections.bluetooth')}
-                  </SelectItem>
-                  <SelectItem value="cellular">
-                    {t('devices.form.connections.cellular')}
-                  </SelectItem>
-                  <SelectItem value="zigbee">
-                    {t('devices.form.connections.zigbee')}
-                  </SelectItem>
-                  <SelectItem value="lora">
-                    {t('devices.form.connections.lora')}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="connectionType"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value?.toLowerCase() || undefined}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        errors.connectionType && 'border-destructive'
+                      )}
+                    >
+                      <SelectValue
+                        placeholder={t('devices.form.selectConnectionType')}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="wifi">
+                        {t('devices.form.connections.wifi')}
+                      </SelectItem>
+                      <SelectItem value="ethernet">
+                        {t('devices.form.connections.ethernet')}
+                      </SelectItem>
+                      <SelectItem value="bluetooth">
+                        {t('devices.form.connections.bluetooth')}
+                      </SelectItem>
+                      <SelectItem value="cellular">
+                        {t('devices.form.connections.cellular')}
+                      </SelectItem>
+                      <SelectItem value="zigbee">
+                        {t('devices.form.connections.zigbee')}
+                      </SelectItem>
+                      <SelectItem value="lora">
+                        {t('devices.form.connections.lora')}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.connectionType && (
+                <p className="text-xs text-destructive mt-1">
+                  {errors.connectionType.message}
+                </p>
+              )}
             </div>
 
             <div>
               <Label htmlFor="device-manufacturer-select">
                 {t('devices.manufacturer')}
               </Label>
-              <Select
-                value={formData.manufacturer || undefined}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, manufacturer: value, model: '' })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    placeholder={
-                      isLoadingManufacturers
-                        ? t('common.loading')
-                        : t('devices.selectManufacturer')
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {manufacturers?.map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="manufacturer"
+                control={control}
+                render={({ field }) => (
+                  <Popover
+                    open={isManufacturersOpen}
+                    onOpenChange={setIsManufacturersOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        ref={manufacturerRef}
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          'w-full justify-between font-normal rounded-md border-2 h-10 px-3 hover:bg-transparent'
+                        )}
+                      >
+                        <span className="truncate">
+                          {field.value || t('devices.selectManufacturer')}
+                        </span>
+                        <div className="flex items-center">
+                          {isLoadingManufacturers && (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin text-primary" />
+                          )}
+                          <ChevronDown
+                            className={cn(
+                              'ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform duration-200',
+                              isManufacturersOpen && 'rotate-180'
+                            )}
+                          />
+                        </div>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="p-0 border-primary/10"
+                      style={{ width: manufacturerWidth }}
+                      align="start"
+                    >
+                      <Command>
+                        <CommandInput
+                          placeholder={t('common.search')}
+                          value={manufacturersSearch}
+                          onInput={(e: any) =>
+                            setManufacturersSearch(e.target.value)
+                          }
+                          autoFocus
+                        />
+                        <CommandList className="max-h-[250px]">
+                          {filteredManufacturers.length === 0 && (
+                            <CommandEmpty className="py-6 text-sm text-center text-muted-foreground">
+                              {t('common.noResults')}
+                            </CommandEmpty>
+                          )}
+                          <CommandGroup>
+                            {filteredManufacturers.map((m) => (
+                              <CommandItem
+                                key={m}
+                                onClick={() => {
+                                  field.onChange(m);
+                                  setValue('model', '');
+                                  setIsManufacturersOpen(false);
+                                  setManufacturersSearch('');
+                                }}
+                                className="cursor-pointer hover:bg-primary/5 transition-colors"
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4 text-primary',
+                                    field.value === m
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                                {m}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
             </div>
 
             <div>
               <Label htmlFor="device-model-select">
                 {t('devices.modelNumber')}
               </Label>
-              <Select
-                value={formData.model || undefined}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, model: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue
-                    placeholder={
-                      isLoadingModels
-                        ? t('common.loading')
-                        : t('devices.selectModelNumber')
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {models?.map((m: any) => {
-                    const uniqueKey = `${m.model}`;
-                    return (
-                      <SelectItem key={uniqueKey + m.codecId} value={uniqueKey}>
-                        {m.model}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
+              <Controller
+                name="model"
+                control={control}
+                render={({ field }) => (
+                  <Popover open={isModelsOpen} onOpenChange={setIsModelsOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        ref={modelRef}
+                        variant="outline"
+                        role="combobox"
+                        disabled={!watchManufacturer}
+                        className={cn(
+                          'w-full justify-between rounded-md font-normal border-2 h-10 px-3 hover:bg-transparent',
+                          !watchManufacturer &&
+                            'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        )}
+                      >
+                        <span className="truncate">
+                          {field.value || t('devices.selectModelNumber')}
+                        </span>
+                        <div className="flex items-center">
+                          {isLoadingModels && (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          )}
+                          <ChevronDown
+                            className={cn(
+                              'ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform duration-200',
+                              isModelsOpen && 'rotate-180'
+                            )}
+                          />
+                        </div>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="p-0 border-primary/20"
+                      style={{ width: modelWidth }}
+                      align="start"
+                    >
+                      <Command>
+                        <CommandInput
+                          placeholder={t('common.search')}
+                          value={modelsSearch}
+                          onInput={(e: any) => setModelsSearch(e.target.value)}
+                          autoFocus
+                        />
+                        <CommandList className="max-h-[250px]">
+                          {filteredModels.length === 0 && (
+                            <CommandEmpty className="py-6 text-sm text-center text-muted-foreground">
+                              {t('common.noResults')}
+                            </CommandEmpty>
+                          )}
+                          <CommandGroup>
+                            {filteredModels.map((m: any) => {
+                              const uniqueKey = `${m.model}`;
+                              return (
+                                <CommandItem
+                                  key={uniqueKey + m.codecId}
+                                  onClick={() => {
+                                    field.onChange(uniqueKey);
+                                    setIsModelsOpen(false);
+                                    setModelsSearch('');
+                                  }}
+                                  className="cursor-pointer hover:bg-primary/5 transition-colors"
+                                >
+                                  <Check
+                                    className={cn(
+                                      'mr-2 h-4 w-4 text-primary',
+                                      field.value === uniqueKey
+                                        ? 'opacity-100'
+                                        : 'opacity-0'
+                                    )}
+                                  />
+                                  {m.model}
+                                </CommandItem>
+                              );
+                            })}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
             </div>
+
+            {watchModel && (
+              <div className="bg-gray-100 flex gap-2 p-4 rounded-md space-y-2">
+                <div className=" w-96 h-32 object-cover">
+                  <img
+                    src="https://connectedthings.store/726-large_default/milesight-scene-lorawan-smart-button-eu868.jpg"
+                    className="w-full h-full"
+                    alt="device"
+                  />
+                </div>
+                <div className=" space-y-2 pt-2">
+                  <h3 className="text-sm font-medium">
+                    {watchModel} Model : WS 101
+                  </h3>
+                  <p className="text-xs">
+                    <span className="font-medium">Description : </span>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Vero esse earum autem maxime dicta nemo enim sapiente sit
+                    cupiditate omnis incidunt...
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div>
               <Label htmlFor="device-description">
@@ -278,10 +505,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
               </Label>
               <Textarea
                 id="device-description"
-                value={formData.description || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
+                {...register('description')}
                 placeholder={t('devices.form.descriptionPlaceholder')}
                 rows={4}
               />
@@ -292,47 +516,50 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                 <Checkbox
                   id="gateway-assignment"
                   checked={enableGatewayAssignment}
-                  onChange={(e) => {
-                    setEnableGatewayAssignment(e.target.checked);
-                    if (!e.target.checked) {
-                      setFormData({ ...formData, gatewayId: '' });
-                    }
-                  }}
+                  // onCheckedChange={(checked) => {
+                  //   setEnableGatewayAssignment(!!checked);
+                  //   if (!checked) {
+                  //     setValue('gatewayId', '');
+                  //   }
+                  // }}
                 />
                 <Label htmlFor="gateway-assignment" className="cursor-pointer">
                   {t('devices.form.gatewayAssignment')}
                 </Label>
               </div>
-              <Select
-                value={formData.gatewayId || ''}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, gatewayId: value })
-                }
-              >
-                <SelectTrigger
-                  className={
-                    !enableGatewayAssignment
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : ''
-                  }
-                  disabled={!enableGatewayAssignment}
-                >
-                  <SelectValue
-                    placeholder={t('devices.form.selectGatewayPlaceholder')}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="gateway-1">
-                    {t('devices.form.gateways.gateway1')}
-                  </SelectItem>
-                  <SelectItem value="gateway-2">
-                    {t('devices.form.gateways.gateway2')}
-                  </SelectItem>
-                  <SelectItem value="gateway-3">
-                    {t('devices.form.gateways.gateway3')}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <Controller
+                name="gatewayId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || ''}
+                    onValueChange={field.onChange}
+                    // disabled={!enableGatewayAssignment}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        !enableGatewayAssignment &&
+                          'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      )}
+                    >
+                      <SelectValue
+                        placeholder={t('devices.form.selectGatewayPlaceholder')}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gateway-1">
+                        {t('devices.form.gateways.gateway1')}
+                      </SelectItem>
+                      <SelectItem value="gateway-2">
+                        {t('devices.form.gateways.gateway2')}
+                      </SelectItem>
+                      <SelectItem value="gateway-3">
+                        {t('devices.form.gateways.gateway3')}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
           <DialogFooter className=" pt-4">
@@ -344,7 +571,8 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
             >
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={isLoading} isLoading={isLoading}>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isCreateMode ? t('common.create') : t('common.save')}
             </Button>
           </DialogFooter>

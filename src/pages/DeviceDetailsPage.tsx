@@ -10,6 +10,7 @@ import { DeviceTelemetryTab } from '@/features/devices/components/DeviceTelemetr
 import { DeviceAlarmsTab } from '@/features/devices/components/DeviceAlarmsTab';
 import { DeviceGeneralTab } from '@/features/devices/components/DeviceGeneralTab';
 import { DeviceCredentialsDialog } from '@/features/devices/components/DeviceCredentialsDialog';
+import { DeviceAttributesTab } from '@/features/devices/components/DeviceAttributesTab';
 
 type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms' | 'relations';
 
@@ -84,7 +85,7 @@ export default function DeviceDetailsPage() {
         <div className="flex items-center gap-2">
           <Button
             size="sm"
-            className="bg-success hover:bg-success/90 text-white"
+            className="bg-primary hover:bg-primary/90 text-white"
             onClick={handleCredentialsClick}
             disabled={isLoadingCredentials}
           >
@@ -92,10 +93,6 @@ export default function DeviceDetailsPage() {
             {isLoadingCredentials
               ? t('common.loading')
               : t('devices.details.credentials')}
-          </Button>
-          <Button variant="secondary" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            {t('devices.details.export')}
           </Button>
         </div>
       </div>
@@ -119,6 +116,9 @@ export default function DeviceDetailsPage() {
         </nav>
       </div>
 
+      {activeTab === 'attributes' && id && (
+        <DeviceAttributesTab deviceId={id} />
+      )}
       {/* Telemetry/Attributes Tab */}
       {activeTab === 'telemetry' && id && <DeviceTelemetryTab deviceId={id} />}
 

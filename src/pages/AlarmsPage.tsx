@@ -17,7 +17,6 @@ import {
   useClearAlarm,
   useGetStatsAlaram,
 } from '@/features/alarms/hooks';
-import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { PageHeader } from '@/components/common/PageHeader';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -37,33 +36,33 @@ export default function AlarmsPage() {
     };
     return colors[severity] || 'default';
   };
-  const { data: stats, isLoading: loadingstats } = useGetStatsAlaram();
+  const { data: stats } = useGetStatsAlaram();
   const statsDataByStatus = stats?.data?.byStatus;
 
   const statusCards = [
     {
       key: 'active' as const,
-      label: 'Active Alarms',
-      icon: <AlertTriangle className="h-6 w-6 text-yellow-600" />,
-      cardClassName: '',
+      label: t('alarms.activeAlarms'),
+      icon: <AlertTriangle className="h-6 w-6 text-white" />,
+      cardClassName: 'bg-primary text-white',
     },
     {
       key: 'acknowledged' as const,
-      label: 'Acknowledged',
-      icon: <CheckCircle className="h-6 w-6 text-blue-600" />,
-      cardClassName: '',
+      label: t('alarms.acknowledgedAlarms'),
+      icon: <CheckCircle className="h-6 w-6 text-white" />,
+      cardClassName: 'bg-secondary text-white',
     },
     {
       key: 'cleared' as const,
-      label: 'Cleared',
-      icon: <XCircle className="h-6 w-6 text-green-600" />,
-      cardClassName: '',
+      label: t('alarms.clearedAlarms'),
+      icon: <XCircle className="h-6 w-6 text-white" />,
+      cardClassName: 'bg-success text-white',
     },
     {
       key: 'resolved' as const,
-      label: 'Resolved',
-      icon: <CheckCircle className="h-6 w-6 text-green-600" />,
-      cardClassName: '',
+      label: t('alarms.resolvedAlarms'),
+      icon: <CheckCircle className="h-6 w-6 text-white" />,
+      cardClassName: 'bg-neutral-500 text-white',
     },
   ] as const;
 
@@ -71,27 +70,21 @@ export default function AlarmsPage() {
     <div className="space-y-6">
       <PageHeader
         title={t('alarms.title')}
-        description="Monitor and manage system alarms"
+        description={t('alarms.description')}
       />
       <div className="grid gap-6 md:grid-cols-4">
         {statusCards.map((card) => (
           <Card key={card.key} className={card.cardClassName}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm font-medium text-white">
                 {card.label}
               </CardTitle>
               {card.icon}
             </CardHeader>
             <CardContent>
-              {loadingstats ? (
-                <div className="p-6 space-y-3">
-                  <Skeleton className="h-8 w-full" />
-                </div>
-              ) : (
-                <div className="text-2xl font-bold">
-                  {statsDataByStatus?.[card.key]}
-                </div>
-              )}
+              <div className="text-2xl font-bold">
+                {statsDataByStatus?.[card.key] || 0}
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -105,12 +98,12 @@ export default function AlarmsPage() {
             <Table>
               <TableHeader className="bg-primary text-white">
                 <TableRow>
-                  <TableHead>Severity</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Originator</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>{t('alarms.table.severity')}</TableHead>
+                  <TableHead>{t('alarms.table.type')}</TableHead>
+                  <TableHead>{t('alarms.table.originator')}</TableHead>
+                  <TableHead>{t('alarms.table.status')}</TableHead>
+                  <TableHead>{t('alarms.table.created')}</TableHead>
+                  <TableHead>{t('alarms.table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -120,7 +113,7 @@ export default function AlarmsPage() {
                       colSpan={6}
                       className="text-center py-10 text-slate-500"
                     >
-                      No data available
+                      {t('alarms.table.noData')}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -161,7 +154,7 @@ export default function AlarmsPage() {
                                 acknowledgeAlarm.mutate({ alarmId: alarm.id })
                               }
                             >
-                              Acknowledge
+                              {t('alarms.acknowledge')}
                             </Button>
                           )}
                           {alarm.status === 'ACKNOWLEDGED' && (
@@ -172,7 +165,7 @@ export default function AlarmsPage() {
                                 clearAlarm.mutate({ alarmId: alarm.id })
                               }
                             >
-                              Clear
+                              {t('alarms.clear')}
                             </Button>
                           )}
                         </div>

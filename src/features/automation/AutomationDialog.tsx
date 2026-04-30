@@ -1,27 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
 import { Automation } from './types';
+import { Stepper } from '@/features/profiles/components/Stepper';
+import { BasicInfoStep } from './components/BasicInfoStep';
+import { TriggerStep } from './components/TriggerStep';
+import { ActionStep } from './components/ActionStep';
+import { ReviewStep } from './components/ReviewStep';
+import { automationSchema } from './Schema';
 
 interface AutomationDialogProps {
   open: boolean;
@@ -31,6 +26,15 @@ interface AutomationDialogProps {
   initialData?: Automation | null;
 }
 
+type AutomationFormValues = z.infer<typeof automationSchema>;
+
+const STEPS = [
+  { id: 1, title: 'Basic Information' },
+  { id: 2, title: 'Device Trigger' },
+  { id: 3, title: 'Device Actions' },
+  { id: 4, title: 'Review' },
+];
+
 export const AutomationDialog: React.FC<AutomationDialogProps> = ({
   open,
   onOpenChange,
@@ -39,247 +43,211 @@ export const AutomationDialog: React.FC<AutomationDialogProps> = ({
   initialData,
 }) => {
   const { t } = useTranslation();
-  const [selectedTriggerType, setSelectedTriggerType] = useState('threshold');
+  const [currentStep, setCurrentStep] = useState(1);
+
+  const methods = useForm<AutomationFormValues>({
+    resolver: zodResolver(automationSchema) as any,
+    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      description: '',
+      enabled: true,
+      status: 'active',
+      trigger: {
+        type: 'threshold',
+        enableDebounce: false,
+        activeHoursEnabled: false,
+        activeDays: [1, 2, 3, 4, 5],
+      },
+      actions: [
+        {
+          id: '1',
+          type: 'control',
+          deviceId: '',
+          command: 'Turn On',
+          params: 'Temp=22',
+          delay: 0,
+          priority: 'high',
+        },
+      ],
+      execution: {
+        sequence: true,
+        parallel: false,
+        stopOnError: false,
+        retryCount: 3,
+      },
+    },
+  });
+
+  const { reset, trigger, handleSubmit, watch } = methods;
+  const formData = watch();
 
   useEffect(() => {
-    if (initialData?.trigger?.type) {
-      setSelectedTriggerType(initialData.trigger.type.toLowerCase());
-    } else {
-      setSelectedTriggerType('threshold');
+    if (open) {
+      if (initialData) {
+        reset(initialData as any);
+      } else {
+        reset({
+          name: '',
+          description: '',
+          enabled: true,
+          status: 'active',
+          trigger: { type: 'threshold' },
+          actions: [
+            {
+              id: '1',
+              type: 'control',
+              deviceId: '',
+              command: 'Turn On',
+              params: 'Temp=22',
+              delay: 0,
+              priority: 'high',
+            },
+          ],
+          execution: {
+            sequence: true,
+            parallel: false,
+            stopOnError: false,
+            retryCount: 3,
+          },
+        });
+      }
+      setCurrentStep(1);
     }
-  }, [initialData, open]);
+  }, [initialData, open, reset]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, we'd collect all form data here
-    onSubmit({}); 
-    onOpenChange(false);
+  const handleNext = async () => {
+    let fieldsToValidate: any[] = [];
+    if (currentStep === 1) fieldsToValidate = ['name', 'description'];
+    if (currentStep === 2)
+      fieldsToValidate = ['trigger.deviceId', 'trigger.telemetryKey'];
+    if (currentStep === 3) fieldsToValidate = ['actions'];
+
+    const isValid = await trigger(fieldsToValidate);
+    if (isValid) {
+      if (currentStep < STEPS.length) {
+        setCurrentStep((prev) => prev + 1);
+      } else {
+        // Final Step: Submit
+        console.log('Final Step: Calling handleSubmit');
+        handleSubmit(
+          (data) => {
+            console.log('Form data before transformation:', data);
+            // Transform plural actions to singular action as requested
+            const firstAction = data.actions?.[0] || {};
+
+            // Map the specific structure the user wants
+            const payload = {
+              name: data.name,
+              description:
+                data.description ||
+                `When ${data.trigger?.telemetryKey} ${data.trigger?.operator} ${data.trigger?.value}, ${firstAction.type}`,
+              enabled: data.enabled ?? true,
+              trigger: {
+                type: 'state',
+                deviceId: data.trigger?.deviceId,
+                telemetryKey: data.trigger?.telemetryKey,
+                operator: data.trigger?.operator || 'eq',
+                value: 'short press',
+                debounce: data.trigger?.debounce || 0,
+              },
+              action: {
+                type: firstAction.type || 'control',
+                deviceId: firstAction.deviceId,
+                command: 'control_switch',
+                // Default value for switch if not provided
+                value: firstAction.value || { switches: { switch_3: 'off' } },
+              },
+              settings: {
+                cooldown: data.settings?.cooldown || 60,
+              },
+            };
+
+            console.log('Submitting Automation Payload:', payload);
+            onSubmit(payload as any);
+            onOpenChange(false);
+          },
+          (errors) => {
+            console.error('Form Validation Errors:', errors);
+            // Alert user of errors if they are hidden
+            alert('Form validation failed. Please check your inputs.');
+          }
+        )();
+      }
+    } else {
+      console.log('Step validation failed for:', fieldsToValidate);
+    }
   };
 
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <BasicInfoStep />;
+      case 2:
+        return <TriggerStep />;
+      case 3:
+        return <ActionStep onNext={handleNext} onBack={handleBack} />;
+      case 4:
+        return <ReviewStep formData={formData} />;
+      default:
+        return null;
+    }
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>
-            {mode === 'create' ? t('automation.dialog.createTitle') : t('automation.dialog.editTitle')}
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="px-6 pt-6">
+          <DialogTitle className="text-2xl font-bold">
+            {mode === 'create'
+              ? t('automation.dialog.createTitle', 'Create New Automation Rule')
+              : t('automation.dialog.editTitle', 'Edit Automation Rule')}
           </DialogTitle>
-          <DialogDescription>
-            {t('automation.dialog.description')}
-          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-6 py-2 p-6 max-h-[70vh] overflow-y-auto">
-            {/* Basic Info */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t('automation.dialog.sections.basic')}</h3>
-              <div className="space-y-2">
-                <Label htmlFor="auto-name">{t('automation.dialog.fields.name')}</Label>
-                <Input
-                  id="auto-name"
-                  placeholder={t('automation.dialog.fields.namePlaceholder')}
-                  defaultValue={initialData?.name}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="auto-description">{t('automation.dialog.fields.description')}</Label>
-                <Textarea
-                  id="auto-description"
-                  placeholder={t('automation.dialog.fields.descriptionPlaceholder')}
-                  defaultValue={initialData?.description}
-                  rows={2}
-                />
-              </div>
-            </div>
-
-            {/* Trigger Configuration */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                {t('automation.dialog.sections.trigger')}
-              </h3>
-              <div className="space-y-2">
-                <Label htmlFor="trigger-type">{t('automation.dialog.fields.triggerType')}</Label>
-                <Select
-                  value={selectedTriggerType}
-                  onValueChange={setSelectedTriggerType}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="threshold">{t('automation.dialog.options.triggerType.threshold')}</SelectItem>
-                    <SelectItem value="state">{t('automation.dialog.options.triggerType.state')}</SelectItem>
-                    <SelectItem value="schedule">{t('automation.dialog.options.triggerType.schedule')}</SelectItem>
-                    <SelectItem value="event">{t('automation.dialog.options.triggerType.event')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedTriggerType === 'threshold' && (
-                <>
-                  <div className="space-y-2">
-                    <Label htmlFor="trigger-device">{t('automation.dialog.fields.device')}</Label>
-                    <Select defaultValue={initialData?.trigger?.device}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose device" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="temp-1">
-                          Temperature Sensor #1
-                        </SelectItem>
-                        <SelectItem value="temp-2">
-                          Temperature Sensor #2
-                        </SelectItem>
-                        <SelectItem value="humidity-1">
-                          Humidity Sensor #1
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="trigger-attribute">{t('automation.dialog.fields.attribute')}</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="temperature">
-                            Temperature
-                          </SelectItem>
-                          <SelectItem value="humidity">Humidity</SelectItem>
-                          <SelectItem value="battery">Battery</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="trigger-operator">{t('automation.dialog.fields.operator')}</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value=">">{t('automation.dialog.options.operator.greater')}</SelectItem>
-                          <SelectItem value="<">{t('automation.dialog.options.operator.less')}</SelectItem>
-                          <SelectItem value="=">{t('automation.dialog.options.operator.equals')}</SelectItem>
-                          <SelectItem value="!=">{t('automation.dialog.options.operator.notEquals')}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="trigger-value">{t('automation.dialog.fields.value')}</Label>
-                      <Input
-                        id="trigger-value"
-                        type="number"
-                        placeholder="25"
-                      />
-                    </div>
-                  </div>
-                </>
+        <FormProvider {...methods}>
+          <div className="px-6 py-1">
+            <Stepper
+              steps={STEPS}
+              currentStep={currentStep}
+              completedSteps={Array.from(
+                { length: currentStep - 1 },
+                (_, i) => i + 1
               )}
-            </div>
-
-            {/* Action Configuration */}
-            <div className="space-y-4">
-              <h3 className="text-md font-semibold flex items-center gap-2">
-                {t('automation.dialog.sections.action')}
-              </h3>
-
-              <div className="space-y-2">
-                <Label htmlFor="action-type">{t('automation.dialog.fields.actionType')}</Label>
-                <Select defaultValue={initialData?.action?.type}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose action" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="control">{t('automation.dialog.options.actionType.control')}</SelectItem>
-                    <SelectItem value="set-value">
-                      {t('automation.dialog.options.actionType.setValue')}
-                    </SelectItem>
-                    <SelectItem value="notification">
-                      {t('automation.dialog.options.actionType.notification')}
-                    </SelectItem>
-                    <SelectItem value="webhook">{t('automation.dialog.options.actionType.webhook')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="action-target">{t('automation.dialog.fields.targetDevice')}</Label>
-                <Select defaultValue={initialData?.action?.target}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose device" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="ac-1">AC Unit #1</SelectItem>
-                    <SelectItem value="lights-1">
-                      Smart Lights - Hallway
-                    </SelectItem>
-                    <SelectItem value="valve-1">Water Valve #1</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="action-command">{t('automation.dialog.fields.command')}</Label>
-                <Select defaultValue={initialData?.action?.value}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose command" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="on">{t('automation.dialog.options.command.on')}</SelectItem>
-                    <SelectItem value="off">{t('automation.dialog.options.command.off')}</SelectItem>
-                    <SelectItem value="toggle">{t('automation.dialog.options.command.toggle')}</SelectItem>
-                    <SelectItem value="custom">{t('automation.dialog.options.command.custom')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Options */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{t('automation.dialog.sections.options')}</h3>
-
-              <div className="flex items-center justify-between p-3 rounded-lg">
-                <div>
-                  <Label htmlFor="enable">{t('automation.dialog.fields.enable')}</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t('automation.dialog.fields.enableDesc')}
-                  </p>
-                </div>
-                <Switch id="enable" defaultChecked={initialData?.enabled ?? true} />
-              </div>
-
-              <div className="flex items-center justify-between p-3 rounded-lg">
-                <div>
-                  <Label htmlFor="log">{t('automation.dialog.fields.log')}</Label>
-                  <p className="text-sm text-muted-foreground">
-                    {t('automation.dialog.fields.logDesc')}
-                  </p>
-                </div>
-                <Switch id="log" defaultChecked />
-              </div>
-            </div>
+            />
           </div>
 
-          <DialogFooter className="border-t border-gray-200 pt-4">
+          <div className="flex-1 overflow-y-auto px-6">{renderStep()}</div>
+
+          <div className="flex justify-between items-center border-gray-200 px-6 py-4 border-t mt-4">
             <Button
-              type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() =>
+                currentStep === 1 ? onOpenChange(false) : handleBack()
+              }
+              className="px-8"
             >
-              {t('automation.buttons.cancel')}
+              {currentStep === 1
+                ? t('automation.buttons.cancel', 'Cancel')
+                : t('automation.buttons.back', 'Back')}
             </Button>
-            <Button type="submit">
-              {mode === 'create' ? t('automation.buttons.create') : t('automation.buttons.save')}
+            <Button
+              onClick={handleNext}
+              className="px-8 bg-slate-900 hover:bg-slate-800 text-white"
+            >
+              {currentStep === STEPS.length
+                ? mode === 'create'
+                  ? t('automation.buttons.create', 'Create Rule')
+                  : t('automation.buttons.save', 'Save Changes')
+                : t('automation.buttons.next', 'Next')}
             </Button>
-          </DialogFooter>
-        </form>
+          </div>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

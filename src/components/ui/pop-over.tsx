@@ -6,7 +6,9 @@ interface PopoverContextValue {
   onOpenChange: (open: boolean) => void;
 }
 
-const PopoverContext = React.createContext<PopoverContextValue | undefined>(undefined);
+const PopoverContext = React.createContext<PopoverContextValue | undefined>(
+  undefined
+);
 
 interface PopoverProps {
   open?: boolean;
@@ -15,23 +17,34 @@ interface PopoverProps {
   children: React.ReactNode;
 }
 
-const Popover = ({ open: controlledOpen, onOpenChange, defaultOpen = false, children }: PopoverProps) => {
+const Popover = ({
+  open: controlledOpen,
+  onOpenChange,
+  defaultOpen = false,
+  children,
+}: PopoverProps) => {
   const [internalOpen, setInternalOpen] = React.useState(defaultOpen);
   const containerRef = React.useRef<HTMLDivElement>(null);
-  
+
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
-  const handleOpenChange = React.useCallback((newOpen: boolean) => {
-    if (controlledOpen === undefined) {
-      setInternalOpen(newOpen);
-    }
-    onOpenChange?.(newOpen);
-  }, [controlledOpen, onOpenChange]);
+  const handleOpenChange = React.useCallback(
+    (newOpen: boolean) => {
+      if (controlledOpen === undefined) {
+        setInternalOpen(newOpen);
+      }
+      onOpenChange?.(newOpen);
+    },
+    [controlledOpen, onOpenChange]
+  );
 
   React.useEffect(() => {
     if (!open) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         handleOpenChange(false);
       }
     };
@@ -67,7 +80,7 @@ interface PopoverTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonEleme
 const PopoverTrigger = React.forwardRef<HTMLButtonElement, PopoverTriggerProps>(
   ({ children, asChild, ...props }, ref) => {
     const context = React.useContext(PopoverContext);
-    
+
     if (!context) {
       throw new Error('PopoverTrigger must be used within Popover');
     }
@@ -99,7 +112,17 @@ interface PopoverContentProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
-  ({ className, align = 'center', sideOffset = 4, side = 'bottom', children, ...props }, ref) => {
+  (
+    {
+      className,
+      align = 'center',
+      sideOffset = 4,
+      side = 'bottom',
+      children,
+      ...props
+    },
+    ref
+  ) => {
     const context = React.useContext(PopoverContext);
 
     if (!context || !context.open) return null;
@@ -121,7 +144,7 @@ const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
       <div
         ref={ref}
         className={cn(
-          'z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95',
+          'z-50 rounded-md border bg-popover p-1 text-popover-foreground shadow-md outline-none animate-in fade-in-0 zoom-in-95',
           alignClasses[align],
           sideClasses[side],
           className

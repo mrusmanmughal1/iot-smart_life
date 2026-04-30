@@ -1,4 +1,5 @@
 import apiClient from '@/lib/axios';
+import { Automation } from '@/features/automation/types';
 
 export enum TriggerType {
   THRESHOLD = 'threshold',
@@ -34,21 +35,6 @@ export interface AutomationAction {
   body?: any;
 }
 
-export interface Automation {
-  id: string;
-  name: string;
-  description?: string;
-  enabled: boolean;
-  trigger: AutomationTrigger;
-  action: AutomationAction;
-  userId: string;
-  tenantId?: string;
-  lastExecuted?: string;
-  executionCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface AutomationQuery {
   search?: string;
   enabled?: boolean;
@@ -57,10 +43,10 @@ export interface AutomationQuery {
   limit?: number;
 }
 
-export interface PaginatedResponse<T> {
+export interface ApiResponse<T> {
   message: string;
-  data: T[];
-  meta: {
+  data: {
+    data: T;
     total: number;
     page: number;
     limit: number;
@@ -68,15 +54,19 @@ export interface PaginatedResponse<T> {
   };
 }
 
-export interface ApiResponse<T> {
-  message: string;
-  data: T;
+export interface AutomationStatistics {
+  total: number;
+  active: number;
+  totalExecutions: number;
+  errors: number;
 }
 
 export const automationApi = {
   // Get all automations
   getAll: (params?: AutomationQuery) =>
-    apiClient.get<PaginatedResponse<Automation>>('/automation', { params }),
+    apiClient.get<ApiResponse<Automation[]>>('/automations', {
+      params,
+    }),
 
   // Get automation by ID
   getById: (id: string) =>
@@ -84,14 +74,14 @@ export const automationApi = {
 
   // Create automation
   create: (data: Partial<Automation>) =>
-    apiClient.post<ApiResponse<Automation>>('/automation', data),
+    apiClient.post<ApiResponse<Automation>>('/automations', data),
 
   // Update automation
   update: (id: string, data: Partial<Automation>) =>
     apiClient.patch<ApiResponse<Automation>>(`/automation/${id}`, data),
 
   // Delete automation
-  delete: (id: string) => apiClient.delete(`/automation/${id}`),
+  delete: (id: string) => apiClient.delete(`/automations/${id}`),
 
   // Toggle automation
   toggle: (id: string) =>
@@ -103,13 +93,13 @@ export const automationApi = {
 
   // Get execution history
   getHistory: (id: string, page?: number, limit?: number) =>
-    apiClient.get<PaginatedResponse<any>>(`/automation/${id}/history`, {
+    apiClient.get<ApiResponse<any[]>>(`/automation/${id}/history`, {
       params: { page, limit },
     }),
 
   // Get statistics
   getStatistics: () =>
-    apiClient.get<ApiResponse<any>>('/automation/statistics'),
+    apiClient.get<ApiResponse<AutomationStatistics>>('/automations/statistics'),
 
   // Bulk enable/disable
   bulkToggle: (ids: string[], enabled: boolean) =>

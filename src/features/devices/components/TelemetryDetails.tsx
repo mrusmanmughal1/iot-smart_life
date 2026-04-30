@@ -1,9 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
-import { RefreshCw, Wifi, Tag, Clock } from 'lucide-react';
+import { RefreshCw, Tag, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { telemetryApi, type TelemetryData } from '@/services/api/telemetry.api';
 import { format } from 'date-fns';
@@ -36,7 +35,6 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
   deviceId,
 }) => {
   const { t } = useTranslation();
-
   const {
     data: response,
     isLoading,
@@ -70,11 +68,12 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-            Latest Telemetry
+            {t('devices.details.telemetry.details.latestTitle')}
           </h3>
           {dataUpdatedAt > 0 && (
             <p className="text-xs text-gray-400 mt-0.5">
-              Last updated: {format(new Date(dataUpdatedAt), 'HH:mm:ss')}
+              {t('devices.details.telemetry.details.lastUpdated')}{' '}
+              {format(new Date(dataUpdatedAt), 'HH:mm:ss')}
             </p>
           )}
         </div>
@@ -88,7 +87,7 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
           <RefreshCw
             className={`h-3.5 w-3.5 mr-2 ${isLoading ? 'animate-spin' : ''}`}
           />
-          Refresh
+          {t('devices.details.telemetry.details.refresh')}
         </Button>
       </div>
 
@@ -101,7 +100,7 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
       {isError && (
         <Card className="border-red-200 bg-red-50 dark:bg-red-950/20">
           <CardContent className="p-6 text-center text-red-600 dark:text-red-400">
-            Failed to load telemetry data. The device may not have reported yet.
+            {t('devices.details.telemetry.messages.error')}
           </CardContent>
         </Card>
       )}
@@ -109,7 +108,7 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
       {!isLoading && !isError && !telemetry && (
         <Card>
           <CardContent className="p-12 text-center text-gray-400 text-sm">
-            No telemetry data available for this device yet.
+            {t('devices.details.telemetry.details.noTelemetry')}
           </CardContent>
         </Card>
       )}
@@ -122,10 +121,10 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
               <CardHeader className="pb-3 border-b border-gray-50 dark:border-gray-900 bg-gray-50/30 dark:bg-gray-900/10">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <Tag className="h-4 w-4 text-primary" />
-                  Payload Data
+                  {t('devices.details.telemetry.details.payloadData')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-0 flex-1 overflow-auto max-h-[450px]">
+              <CardContent className="p-0 flex-1 overflow-auto max-h-[600px]">
                 {flatDataEntries.length > 0 ? (
                   <div className="divide-y divide-gray-50 dark:divide-gray-900">
                     {flatDataEntries.map(([key, val]) => (
@@ -144,58 +143,18 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
                   </div>
                 ) : (
                   <div className="text-center py-10 text-gray-400 text-sm italic">
-                    No payload data fields available
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Metadata section */}
-            <Card className="border-gray-100 dark:border-gray-800 shadow-sm flex flex-col overflow-hidden">
-              <CardHeader className="pb-3 border-b border-gray-50 dark:border-gray-900 bg-gray-50/30 dark:bg-gray-900/10">
-                <CardTitle className="text-sm font-semibold flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                  <Wifi className="h-4 w-4 text-primary" />
-                  Device Metadata
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 flex-1 overflow-auto max-h-[450px]">
-                {telemetry.metadata &&
-                Object.keys(telemetry.metadata).length > 0 ? (
-                  <div className="divide-y divide-gray-50 dark:divide-gray-900">
-                    {Object.entries(telemetry.metadata).map(([key, val]) =>
-                      val !== undefined && val !== null ? (
-                        <div
-                          key={key}
-                          className="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-900/40 transition-colors"
-                        >
-                          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 capitalize">
-                            {key.replace(/([A-Z])/g, ' $1').trim()}
-                          </span>
-                          <Badge
-                            variant="secondary"
-                            className="font-mono text-[10px] px-2 py-0 h-5"
-                          >
-                            {String(val)}
-                          </Badge>
-                        </div>
-                      ) : null
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-10 text-gray-400 text-sm italic">
-                    No metadata available
+                    {t('devices.details.telemetry.table.noData')}
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
 
-          {/* Footer status row */}
           <div className="flex flex-col sm:flex-row items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-800 mt-2 gap-2 text-gray-400">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
               <Clock className="h-3 w-3" />
               <span>
-                Reported at:{' '}
+                {t('devices.details.telemetry.details.reportedAt')}{' '}
                 {format(new Date(telemetry.timestamp), 'yyyy-MM-dd HH:mm:ss')}
               </span>
             </div>

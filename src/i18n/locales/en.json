@@ -52,6 +52,7 @@
     "signup": "Signup",
     "companyName": "Company Name",
     "failedToLoadSettings": "Failed to load settings",
+    "noResults": "No results found",
     "deleteConfirmation": {
       "title": "Delete Item",
       "confirm": "Delete",
@@ -691,6 +692,17 @@
           "cancelled": "Changes cancelled"
         }
       },
+      "attributes": {
+        "title": "Device Attributes",
+        "subtitle": "System metadata and reported device attributes",
+        "countSuffix": "Attributes",
+        "refresh": "Refresh",
+        "error": "Failed to load attributes data.",
+        "noData": "No attributes reported for this device yet.",
+        "systemBadge": "SYSTEM",
+        "lastHeartbeat": "Last Heartbeat:",
+        "id": "ID:"
+      },
       "telemetry": {
         "searchPlaceholder": "Search attributes..",
         "scopes": {
@@ -704,7 +716,7 @@
           "value": "VALUE",
           "lastUpdate": "LAST UPDATE",
           "actions": "ACTIONS",
-          "noData": "No attributes found"
+          "noData": "No telemetry data found"
         },
         "buttons": {
           "edit": "EDIT",
@@ -716,7 +728,8 @@
           "deleteConfirm": "Are you sure you want to delete attribute \"{{key}}\"?",
           "deleteSuccess": "Attribute deleted successfully",
           "deleteError": "Failed to delete attribute",
-          "addComingSoon": "Add attribute functionality coming soon"
+          "addComingSoon": "Add attribute functionality coming soon",
+          "error": "Failed to load telemetry data. The device may not have reported yet."
         },
         "details": {
           "latestTitle": "Latest Values",
@@ -727,7 +740,10 @@
           "graphX": "month",
           "graphY": "value",
           "refresh": "Refresh",
-          "addProfile": "Add Profile"
+          "addProfile": "Add Profile",
+          "payloadData": "Payload Data",
+          "lastUpdated": "Last updated:",
+          "reportedAt": "Reported at:"
         }
       },
       "alarms": {
@@ -1072,6 +1088,7 @@
   },
   "alarms": {
     "title": "Alarms",
+    "description": "Monitor and manage system alarms",
     "acknowledge": "Acknowledge",
     "clear": "Clear",
     "severity": "Severity",
@@ -1080,8 +1097,18 @@
     "minor": "Minor",
     "warning": "Warning",
     "activeAlarms": "Active Alarms",
-    "acknowledgedAlarms": "Acknowledged Alarms",
-    "clearedAlarms": "Cleared Alarms"
+    "acknowledgedAlarms": "Acknowledged",
+    "clearedAlarms": "Cleared",
+    "resolvedAlarms": "Resolved",
+    "table": {
+      "severity": "Severity",
+      "type": "Type",
+      "originator": "Originator",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions",
+      "noData": "No data available"
+    }
   },
   "users": {
     "title": "Users & Roles",
@@ -2469,5 +2496,27 @@
         }
       }
     }
+  },
+  "alertAnalytics": {
+    "title": "Alert Analytics",
+    "searchPlaceholder": "Search rules...",
+    "createRule": "Create Rule",
+    "criticalAlerts": "Critical Alerts",
+    "warningAlerts": "Warning Alerts",
+    "infoAlerts": "Info Alerts",
+    "resolvedToday": "Resolved Today",
+    "fromYesterday": "{{amount}} from yesterday",
+    "trendsTitle": "Alert Trends (Last 7 Days)",
+    "legend": {
+      "critical": "Critical Warning",
+      "warning": "Warning",
+      "info": "Info"
+    },
+    "topSources": "Top Alert Sources",
+    "responseTime": "Response Time",
+    "avg": "Avg",
+    "critical": "Critical",
+    "minutes": "minutes",
+    "alertsCount": "{{count}} alerts"
   }
 }

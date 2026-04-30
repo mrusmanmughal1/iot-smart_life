@@ -21,7 +21,10 @@ const CommandInput = React.forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement>
 >(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+  <div
+    className="flex items-center border-b border-gray-200 px-3"
+    cmdk-input-wrapper=""
+  >
     <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
     <input
       ref={ref}
@@ -51,11 +54,7 @@ const CommandEmpty = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >((props, ref) => (
-  <div
-    ref={ref}
-    className="py-6 text-center text-sm"
-    {...props}
-  />
+  <div ref={ref} className="py-6 text-center text-sm" {...props} />
 ));
 CommandEmpty.displayName = 'CommandEmpty';
 
@@ -65,10 +64,7 @@ const CommandGroup = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      'overflow-hidden p-1 text-foreground',
-      className
-    )}
+    className={cn('overflow-hidden p-1 text-foreground', className)}
     {...props}
   />
 ));
