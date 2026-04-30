@@ -33,7 +33,7 @@ export const AutomationStats: React.FC = () => {
           <Zap className="h-8 w-8 text-white " />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats?.data.total || 0}</div>
+          <div className="text-2xl font-bold">{stats?.data?.total || 0}</div>
           <p className="text-xs text-white ">
             {t('automation.stats.totalDesc')}
           </p>
@@ -48,7 +48,7 @@ export const AutomationStats: React.FC = () => {
           <Play className="h-8 w-8 text-white" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats?.data.active || 0}</div>
+          <div className="text-2xl font-bold">{stats?.data?.active || 0}</div>
           <p className="text-xs text-white ">
             {t('automation.stats.activeDesc')}
           </p>
@@ -63,7 +63,7 @@ export const AutomationStats: React.FC = () => {
           <AlertTriangle className="h-8 w-8 text-white" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats?.data.errors || 0}</div>
+          <div className="text-2xl font-bold">{stats?.data?.errors || 0}</div>
           <p className="text-xs text-white ">
             {t('automation.stats.errorsDesc')}
           </p>
@@ -78,7 +78,7 @@ export const AutomationStats: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {stats?.data.totalExecutions || 0}
+            {stats?.data?.totalExecutions || 0}
           </div>
           <p className="text-xs text-muted-foreground">
             {t('automation.stats.executionsDesc')}
