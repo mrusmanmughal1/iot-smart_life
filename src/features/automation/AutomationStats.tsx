@@ -11,7 +11,7 @@ export const AutomationStats: React.FC = () => {
   if (isError) {
     return (
       <div className="p-4 bg-red-50 text-red-500 rounded-md border border-red-200">
-        Failed to load automation statistics.
+        Failed to load automation statistics.s
       </div>
     );
   }
