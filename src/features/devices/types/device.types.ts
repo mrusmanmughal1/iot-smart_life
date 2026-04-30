@@ -1,5 +1,19 @@
 import type { Device } from '@/services/api/devices.api.ts';
 
+export interface DeviceVariant {
+  model: string;
+  codecId: string;
+  protocol: string;
+}
+
+export interface DeviceFamily {
+  family: string;
+  variants: DeviceVariant[];
+  category: string;
+  imageUrl: string;
+  description?: string;
+}
+
 export interface DeviceFormData {
   name: string;
   type: string;

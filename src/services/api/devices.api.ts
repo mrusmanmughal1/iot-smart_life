@@ -1,4 +1,5 @@
 import apiClient from '@/lib/axios';
+import { DeviceFamily } from '@/features/devices/types/device.types';
 
 export enum DeviceType {
   SENSOR = 'sensor',
@@ -209,7 +210,7 @@ export const devicesApi = {
 
   // Get families by manufacturer and category
   getFamilies: (manufacturer: string, category: string) =>
-    apiClient.get<ApiResponse<{ data: string[] }>>(
+    apiClient.get<ApiResponse<{ data: DeviceFamily[] }>>(
       `/codecs/manufacturers/${manufacturer}/families`,
       { params: { category } }
     ),

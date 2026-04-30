@@ -44,21 +44,11 @@ import {
   useCategories,
   useFamilies,
 } from '../hooks/useDevices';
-import type { DeviceFormData } from '../types/device.types';
-
-interface DeviceVariant {
-  model: string;
-  codecId: string;
-  protocol: string;
-}
-
-interface DeviceFamily {
-  family: string;
-  variants: DeviceVariant[];
-  category: string;
-  imageUrl: string;
-  description?: string;
-}
+import type {
+  DeviceFormData,
+  DeviceFamily,
+  DeviceVariant,
+} from '../types/device.types';
 
 export interface DeviceDialogProps {
   open: boolean;
@@ -199,10 +189,10 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
   const filteredManufacturers = manufacturers.filter((m) =>
     m.toLowerCase().includes(manufacturersSearch.toLowerCase())
   );
-  const filteredCategories = categories.filter((c) =>
+  const filteredCategories = categories.filter((c: string) =>
     c.toLowerCase().includes(categoriesSearch.toLowerCase())
   );
-  const filteredFamilies = families.filter((f) =>
+  const filteredFamilies = families.filter((f: DeviceFamily) =>
     f.family.toLowerCase().includes(familiesSearch.toLowerCase())
   );
 
@@ -616,7 +606,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                             </CommandEmpty>
                           )}
                           <CommandGroup>
-                            {filteredFamilies.map((f) => (
+                            {filteredFamilies.map((f: DeviceFamily) => (
                               <CommandItem
                                 key={f.family}
                                 onClick={() => {
@@ -765,13 +755,15 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                           <span className="font-semibold">
                             {t('devices.codecId', 'Codec ID')}:
                           </span>{' '}
-                          {models.find((m) => m.model === watchModel)?.codecId}
+                          {models.find((m: DeviceVariant) => m.model === watchModel)
+                            ?.codecId}
                         </p>
                         <p>
                           <span className="font-semibold">
                             {t('common.protocol')}:
                           </span>{' '}
-                          {models.find((m) => m.model === watchModel)?.protocol}
+                          {models.find((m: DeviceVariant) => m.model === watchModel)
+                            ?.protocol}
                         </p>
                       </>
                     )}
