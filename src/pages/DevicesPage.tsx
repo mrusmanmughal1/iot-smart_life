@@ -4,11 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, Plus, Search } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DeviceDialog } from '@/features/devices/components/DeviceDialog';
+import { DeviceCredentialsDialog } from '@/features/devices/components/DeviceCredentialsDialog';
+import { Switch } from '@/components/ui/switch';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import {
   useDevices,
   useCreateDevice,
   useUpdateDevice,
   useDeleteDevice,
+  useActivateDevice,
+  useDeactivateDevice,
 } from '@/features/devices/hooks';
 import {
   Table,
@@ -20,8 +26,6 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2 } from 'lucide-react';
-import { DeviceDialog } from '@/features/devices/components/DeviceDialog';
-import { DeviceCredentialsDialog } from '@/features/devices/components/DeviceCredentialsDialog';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { getErrorMessage } from '@/utils/helpers/apiErrorHandler';
@@ -69,6 +73,11 @@ export default function DevicesPage() {
   const createDevice = useCreateDevice();
   const updateDevice = useUpdateDevice();
   const deleteDevice = useDeleteDevice();
+  const activateDevice = useActivateDevice();
+  const deactivateDevice = useDeactivateDevice();
+
+  const [isStatusConfirmOpen, setIsStatusConfirmOpen] = useState(false);
+  const [deviceToToggle, setDeviceToToggle] = useState<any>(null);
 
   // Handle delete device
   const handleDeleteConfirm = useCallback(async () => {
@@ -89,6 +98,30 @@ export default function DevicesPage() {
   }, [deleteDevice, deviceToDeleteId, t]);
 
   // Handle status toggle
+  const handleStatusToggleRequest = (e: React.MouseEvent, device: any) => {
+    e.stopPropagation();
+    setDeviceToToggle(device);
+    setIsStatusConfirmOpen(true);
+  };
+
+  const handleStatusConfirm = async () => {
+    if (!deviceToToggle) return;
+    const isActivating = deviceToToggle.status !== 'active';
+    try {
+      if (isActivating) {
+        await activateDevice.mutateAsync(deviceToToggle.id);
+        toast.success(t('devices.messages.activateSuccess'));
+      } else {
+        await deactivateDevice.mutateAsync(deviceToToggle.id);
+        toast.success(t('devices.messages.deactivateSuccess'));
+      }
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsStatusConfirmOpen(false);
+      setDeviceToToggle(null);
+    }
+  };
 
   // Extract devices and pagination info from API response
   const { devices, meta } = useMemo(() => {
@@ -264,18 +297,17 @@ export default function DevicesPage() {
                       <TableCell>
                         <p className="font-normal capitalize">{device.type}</p>
                       </TableCell>
-                      <TableCell>
-                        <Badge
-                          className={`${
-                            device.status === 'active'
-                              ? 'bg-green-500 hover:bg-green-600'
-                              : 'bg-red-500 hover:bg-red-600'
-                          } text-white`}
-                        >
-                          {device.status === 'active'
-                            ? t('common.active')
-                            : t('common.inactive')}
-                        </Badge>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={device.status === 'active'}
+                            onCheckedChange={() => {}}
+                            onClick={(e) =>
+                              handleStatusToggleRequest(e, device)
+                            }
+                            className="data-[state=checked]:bg-green-500"
+                          />
+                        </div>
                       </TableCell>
                       <TableCell className="   ">
                         <p className="capitalize">
@@ -414,6 +446,37 @@ export default function DevicesPage() {
           t('common.name')
         }
         isLoading={deleteDevice.isPending}
+      />
+
+      {/* Status Toggle Confirmation */}
+      <ConfirmDialog
+        open={isStatusConfirmOpen}
+        onOpenChange={setIsStatusConfirmOpen}
+        title={
+          deviceToToggle?.status === 'active'
+            ? t('devices.status.deactivateTitle', 'Deactivate Device')
+            : t('devices.status.activateTitle', 'Activate Device')
+        }
+        description={
+          deviceToToggle?.status === 'active'
+            ? t(
+                'devices.status.deactivateDescription',
+                'Are you sure you want to deactivate this device? It will stop sending data.'
+              )
+            : t(
+                'devices.status.activateDescription',
+                'Are you sure you want to activate this device?'
+              )
+        }
+        confirmLabel={
+          deviceToToggle?.status === 'active'
+            ? t('common.deactivate', 'Deactivate')
+            : t('common.activate', 'Activate')
+        }
+        onConfirm={handleStatusConfirm}
+        variant={
+          deviceToToggle?.status === 'active' ? 'destructive' : 'default'
+        }
       />
     </div>
   );

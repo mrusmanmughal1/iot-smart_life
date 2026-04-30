@@ -8,6 +8,8 @@ export interface DeviceFormData {
   description?: string;
   connectionType?: string;
   manufacturer?: string;
+  category?: string;
+  family?: string;
   model?: string;
   protocol?: string;
   codecId?: string;

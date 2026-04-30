@@ -38,8 +38,27 @@ import { Check, ChevronDown, Loader2 } from 'lucide-react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useManufacturers, useModels } from '../hooks/useDevices';
+import {
+  useManufacturers,
+  useModels,
+  useCategories,
+  useFamilies,
+} from '../hooks/useDevices';
 import type { DeviceFormData } from '../types/device.types';
+
+interface DeviceVariant {
+  model: string;
+  codecId: string;
+  protocol: string;
+}
+
+interface DeviceFamily {
+  family: string;
+  variants: DeviceVariant[];
+  category: string;
+  imageUrl: string;
+  description?: string;
+}
 
 export interface DeviceDialogProps {
   open: boolean;
@@ -57,7 +76,10 @@ const deviceSchema = z.object({
   gatewayId: z.string().optional(),
   connectionType: z.string().min(1, 'Connection type is required'),
   manufacturer: z.string().min(1, 'Manufacturer is required'),
+  category: z.string().min(1, 'Category is required'),
+  family: z.string().optional(),
   model: z.string().min(1, 'Model is required'),
+  codecId: z.string().optional(),
   protocol: z.string().optional(),
 });
 
@@ -74,12 +96,20 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
   const { t } = useTranslation();
   const [enableGatewayAssignment, setEnableGatewayAssignment] = useState(false);
   const [isManufacturersOpen, setIsManufacturersOpen] = useState(false);
-  const [manufacturersSearch, setManufacturersSearch] = useState('');
+  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
+  const [isFamiliesOpen, setIsFamiliesOpen] = useState(false);
   const [isModelsOpen, setIsModelsOpen] = useState(false);
+  const [manufacturersSearch, setManufacturersSearch] = useState('');
+  const [categoriesSearch, setCategoriesSearch] = useState('');
+  const [familiesSearch, setFamiliesSearch] = useState('');
   const [modelsSearch, setModelsSearch] = useState('');
   const [manufacturerWidth, setManufacturerWidth] = useState(0);
+  const [categoryWidth, setCategoryWidth] = useState(0);
+  const [familyWidth, setFamilyWidth] = useState(0);
   const [modelWidth, setModelWidth] = useState(0);
   const manufacturerRef = useRef<HTMLButtonElement>(null);
+  const categoryRef = useRef<HTMLButtonElement>(null);
+  const familyRef = useRef<HTMLButtonElement>(null);
   const modelRef = useRef<HTMLButtonElement>(null);
 
   const {
@@ -99,12 +129,17 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
       gatewayId: '',
       connectionType: '',
       manufacturer: '',
+      category: '',
+      family: '',
       model: '',
+      codecId: '',
       protocol: 'lorawan_milesight',
     },
   });
 
   const watchManufacturer = watch('manufacturer');
+  const watchCategory = watch('category');
+  const watchFamily = watch('family');
   const watchModel = watch('model');
 
   useEffect(() => {
@@ -116,24 +151,39 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
         gatewayId: initialData?.gatewayId || '',
         connectionType: initialData?.connectionType || '',
         manufacturer: initialData?.manufacturer || '',
+        category: initialData?.category || '',
+        family: initialData?.family || '',
         model: initialData?.model || '',
+        codecId: initialData?.codecId || '',
         protocol: initialData?.protocol || 'lorawan_milesight',
       });
       setEnableGatewayAssignment(!!initialData?.gatewayId);
       setManufacturersSearch('');
+      setCategoriesSearch('');
+      setFamiliesSearch('');
       setModelsSearch('');
     }
   }, [open, initialData, reset]);
 
   const { data: manufacturersResponse, isLoading: isLoadingManufacturers } =
     useManufacturers();
-  const { data: modelsResponse, isLoading: isLoadingModels } = useModels(
-    watchManufacturer || ''
+  const { data: categoriesResponse, isLoading: isLoadingCategories } =
+    useCategories(watchManufacturer || '');
+  const { data: familiesResponse, isLoading: isLoadingFamilies } = useFamilies(
+    watchManufacturer || '',
+    watchCategory || ''
   );
 
   const manufacturers = manufacturersResponse?.data?.data.data || [];
-  const models = modelsResponse?.data?.data.data || [];
+  const categories = categoriesResponse?.data?.data.data || [];
+  const families: DeviceFamily[] = familiesResponse?.data?.data.data || [];
 
+  const selectedFamilyData = families.find((f) => f.family === watchFamily);
+  const models = selectedFamilyData?.variants || [];
+
+  console.log('categories', categories);
+  console.log('families', families);
+  console.log('models', models);
   const onFormSubmit = async (data: DeviceSchema) => {
     await onSubmit(data as DeviceFormData);
   };
@@ -149,19 +199,37 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
   const filteredManufacturers = manufacturers.filter((m) =>
     m.toLowerCase().includes(manufacturersSearch.toLowerCase())
   );
+  const filteredCategories = categories.filter((c) =>
+    c.toLowerCase().includes(categoriesSearch.toLowerCase())
+  );
+  const filteredFamilies = families.filter((f) =>
+    f.family.toLowerCase().includes(familiesSearch.toLowerCase())
+  );
 
-  const filteredModels = models.filter((m: any) =>
+  const filteredModels = models.filter((m: DeviceVariant) =>
     m.model.toLowerCase().includes(modelsSearch.toLowerCase())
   );
 
   useEffect(() => {
-    if (manufacturerRef.current) {
+    if (isManufacturersOpen && manufacturerRef.current) {
       setManufacturerWidth(manufacturerRef.current.offsetWidth);
     }
   }, [isManufacturersOpen]);
 
   useEffect(() => {
-    if (modelRef.current) {
+    if (isCategoriesOpen && categoryRef.current) {
+      setCategoryWidth(categoryRef.current.offsetWidth);
+    }
+  }, [isCategoriesOpen]);
+
+  useEffect(() => {
+    if (isFamiliesOpen && familyRef.current) {
+      setFamilyWidth(familyRef.current.offsetWidth);
+    }
+  }, [isFamiliesOpen]);
+
+  useEffect(() => {
+    if (isModelsOpen && modelRef.current) {
       setModelWidth(modelRef.current.offsetWidth);
     }
   }, [isModelsOpen]);
@@ -312,6 +380,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   >
                     <PopoverTrigger asChild>
                       <Button
+                        type="button"
                         ref={manufacturerRef}
                         variant="outline"
                         role="combobox"
@@ -361,7 +430,10 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                                 key={m}
                                 onClick={() => {
                                   field.onChange(m);
+                                  setValue('category', '');
+                                  setValue('family', '');
                                   setValue('model', '');
+                                  setValue('codecId', '');
                                   setIsManufacturersOpen(false);
                                   setManufacturersSearch('');
                                 }}
@@ -388,6 +460,195 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
             </div>
 
             <div>
+              <Label htmlFor="device-category-select">
+                {t('devices.category', 'Category')}
+              </Label>
+              <Controller
+                name="category"
+                control={control}
+                render={({ field }) => (
+                  <Popover
+                    open={isCategoriesOpen}
+                    onOpenChange={setIsCategoriesOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        ref={categoryRef}
+                        variant="outline"
+                        role="combobox"
+                        disabled={!watchManufacturer}
+                        className={cn(
+                          'w-full justify-between font-normal rounded-md border-2 h-10 px-3 hover:bg-transparent',
+                          !watchManufacturer && 'opacity-50 cursor-not-allowed'
+                        )}
+                      >
+                        <span className="truncate">
+                          {field.value ||
+                            t('devices.selectCategory', 'Select Category')}
+                        </span>
+                        <div className="flex items-center">
+                          {isLoadingCategories && (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin text-primary" />
+                          )}
+                          <ChevronDown
+                            className={cn(
+                              'ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform duration-200',
+                              isCategoriesOpen && 'rotate-180'
+                            )}
+                          />
+                        </div>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="p-0 border-primary/10"
+                      style={{ width: categoryWidth }}
+                      align="start"
+                    >
+                      <Command>
+                        <CommandInput
+                          placeholder={t('common.search')}
+                          value={categoriesSearch}
+                          onInput={(e: any) =>
+                            setCategoriesSearch(e.target.value)
+                          }
+                          autoFocus
+                        />
+                        <CommandList className="max-h-[250px]">
+                          {filteredCategories.length === 0 && (
+                            <CommandEmpty className="py-6 text-sm text-center text-muted-foreground">
+                              {t('common.noResults')}
+                            </CommandEmpty>
+                          )}
+                          <CommandGroup>
+                            {filteredCategories.map((c) => (
+                              <CommandItem
+                                key={c}
+                                onClick={() => {
+                                  field.onChange(c);
+                                  setValue('family', '');
+                                  setValue('model', '');
+                                  setValue('codecId', '');
+                                  setIsCategoriesOpen(false);
+                                  setCategoriesSearch('');
+                                }}
+                                className="cursor-pointer hover:bg-primary/5 transition-colors"
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4 text-primary',
+                                    field.value === c
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                                {c}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="device-family-select">
+                {t('devices.family', 'Family')}
+              </Label>
+              <Controller
+                name="family"
+                control={control}
+                render={({ field }) => (
+                  <Popover
+                    open={isFamiliesOpen}
+                    onOpenChange={setIsFamiliesOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        ref={familyRef}
+                        variant="outline"
+                        role="combobox"
+                        disabled={!watchCategory}
+                        className={cn(
+                          'w-full justify-between font-normal rounded-md border-2 h-10 px-3 hover:bg-transparent',
+                          !watchCategory && 'opacity-50 cursor-not-allowed'
+                        )}
+                      >
+                        <span className="truncate">
+                          {field.value ||
+                            t('devices.selectFamily', 'Select Family')}
+                        </span>
+                        <div className="flex items-center">
+                          {isLoadingFamilies && (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin text-primary" />
+                          )}
+                          <ChevronDown
+                            className={cn(
+                              'ml-2 h-4 w-4 shrink-0 opacity-50 transition-transform duration-200',
+                              isFamiliesOpen && 'rotate-180'
+                            )}
+                          />
+                        </div>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="p-0 border-primary/10"
+                      style={{ width: familyWidth }}
+                      align="start"
+                    >
+                      <Command>
+                        <CommandInput
+                          placeholder={t('common.search')}
+                          value={familiesSearch}
+                          onInput={(e: any) =>
+                            setFamiliesSearch(e.target.value)
+                          }
+                          autoFocus
+                        />
+                        <CommandList className="max-h-[250px]">
+                          {filteredFamilies.length === 0 && (
+                            <CommandEmpty className="py-6 text-sm text-center text-muted-foreground">
+                              {t('common.noResults')}
+                            </CommandEmpty>
+                          )}
+                          <CommandGroup>
+                            {filteredFamilies.map((f) => (
+                              <CommandItem
+                                key={f.family}
+                                onClick={() => {
+                                  field.onChange(f.family);
+                                  setValue('model', '');
+                                  setValue('codecId', '');
+                                  setIsFamiliesOpen(false);
+                                  setFamiliesSearch('');
+                                }}
+                                className="cursor-pointer hover:bg-primary/5 transition-colors"
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4 text-primary',
+                                    field.value === f.family
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                                {f.family}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              />
+            </div>
+
+            <div>
               <Label htmlFor="device-model-select">
                 {t('devices.modelNumber')}
               </Label>
@@ -398,13 +659,14 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                   <Popover open={isModelsOpen} onOpenChange={setIsModelsOpen}>
                     <PopoverTrigger asChild>
                       <Button
+                        type="button"
                         ref={modelRef}
                         variant="outline"
                         role="combobox"
-                        disabled={!watchManufacturer}
+                        disabled={!watchFamily}
                         className={cn(
                           'w-full justify-between rounded-md font-normal border-2 h-10 px-3 hover:bg-transparent',
-                          !watchManufacturer &&
+                          !watchFamily &&
                             'bg-gray-100 text-gray-400 cursor-not-allowed'
                         )}
                       >
@@ -412,7 +674,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                           {field.value || t('devices.selectModelNumber')}
                         </span>
                         <div className="flex items-center">
-                          {isLoadingModels && (
+                          {isLoadingFamilies && (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                           )}
                           <ChevronDown
@@ -443,13 +705,14 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                             </CommandEmpty>
                           )}
                           <CommandGroup>
-                            {filteredModels.map((m: any) => {
-                              const uniqueKey = `${m.model}`;
+                            {filteredModels.map((m: DeviceVariant) => {
                               return (
                                 <CommandItem
-                                  key={uniqueKey + m.codecId}
+                                  key={m.model + m.codecId}
                                   onClick={() => {
-                                    field.onChange(uniqueKey);
+                                    field.onChange(m.model);
+                                    setValue('codecId', m.codecId);
+                                    setValue('protocol', m.protocol);
                                     setIsModelsOpen(false);
                                     setModelsSearch('');
                                   }}
@@ -458,7 +721,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
                                   <Check
                                     className={cn(
                                       'mr-2 h-4 w-4 text-primary',
-                                      field.value === uniqueKey
+                                      field.value === m.model
                                         ? 'opacity-100'
                                         : 'opacity-0'
                                     )}
@@ -476,25 +739,50 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
               />
             </div>
 
-            {watchModel && (
-              <div className="bg-gray-100 flex gap-2 p-4 rounded-md space-y-2">
-                <div className=" w-96 h-32 object-cover">
+            {selectedFamilyData && (
+              <div className="bg-slate-50 flex gap-4 p-4 rounded-lg border border-slate-200">
+                <div className="w-32 h-32 flex-shrink-0 bg-white rounded-md border border-slate-200 overflow-hidden flex items-center justify-center p-2">
                   <img
-                    src="https://connectedthings.store/726-large_default/milesight-scene-lorawan-smart-button-eu868.jpg"
-                    className="w-full h-full"
-                    alt="device"
+                    src={selectedFamilyData.imageUrl}
+                    alt={selectedFamilyData.family}
+                    className="max-w-full max-h-full object-contain"
                   />
                 </div>
-                <div className=" space-y-2 pt-2">
-                  <h3 className="text-sm font-medium">
-                    {watchModel} Model : WS 101
+                <div className="flex-1 space-y-2">
+                  <h3 className="font-bold text-slate-800">
+                    {watchModel || selectedFamilyData.family}
                   </h3>
-                  <p className="text-xs">
-                    <span className="font-medium">Description : </span>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Vero esse earum autem maxime dicta nemo enim sapiente sit
-                    cupiditate omnis incidunt...
-                  </p>
+                  <div className="text-xs text-slate-600 space-y-1">
+                    <p>
+                      <span className="font-semibold">
+                        {t('common.family')}:
+                      </span>{' '}
+                      {selectedFamilyData.family}
+                    </p>
+                    {watchModel && (
+                      <>
+                        <p>
+                          <span className="font-semibold">
+                            {t('devices.codecId', 'Codec ID')}:
+                          </span>{' '}
+                          {models.find((m) => m.model === watchModel)?.codecId}
+                        </p>
+                        <p>
+                          <span className="font-semibold">
+                            {t('common.protocol')}:
+                          </span>{' '}
+                          {models.find((m) => m.model === watchModel)?.protocol}
+                        </p>
+                      </>
+                    )}
+                    <p className="mt-2 line-clamp-3">
+                      <span className="font-semibold">
+                        {t('common.description')}:
+                      </span>{' '}
+                      {selectedFamilyData.description ||
+                        t('devices.noDescription', 'No description available')}
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

@@ -201,7 +201,28 @@ export const devicesApi = {
       }>
     >(`/codecs/manufacturers/${manufacturer}/models`),
 
+  // Get categories by manufacturer
+  getCategories: (manufacturer: string) =>
+    apiClient.get<ApiResponse<{ data: string[] }>>(
+      `/codecs/manufacturers/${manufacturer}/categories`
+    ),
+
+  // Get families by manufacturer and category
+  getFamilies: (manufacturer: string, category: string) =>
+    apiClient.get<ApiResponse<{ data: string[] }>>(
+      `/codecs/manufacturers/${manufacturer}/families`,
+      { params: { category } }
+    ),
+
   // Get device credentials
   getCredentials: (deviceId: string) =>
     apiClient.get<ApiResponse<any>>(`/devices/${deviceId}/credentials`),
+
+  // Activate device
+  activate: (id: string) =>
+    apiClient.post<ApiResponse<any>>(`/devices/${id}/activate`),
+
+  // Deactivate device
+  deactivate: (id: string) =>
+    apiClient.post<ApiResponse<any>>(`/devices/${id}/deactivate`),
 };

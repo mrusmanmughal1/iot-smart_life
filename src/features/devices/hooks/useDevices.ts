@@ -104,26 +104,25 @@ export const useDeleteDevice = () => {
 };
 
 export const useActivateDevice = () => {
-  // const queryClient = useQueryClient();
-  // return useMutation({
-  //   mutationFn: (deviceId: string) => deviceService.activateDevice(deviceId),
-  //   onSuccess: (_, deviceId) => {
-  //     queryClient.invalidateQueries({ queryKey: ['devices'] });
-  //     queryClient.invalidateQueries({ queryKey: ['devices', deviceId] });
-  //   },
-  // });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (deviceId: string) => devicesApi.activate(deviceId),
+    onSuccess: (_, deviceId) => {
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
+      queryClient.invalidateQueries({ queryKey: ['devices', deviceId] });
+    },
+  });
 };
 
 export const useDeactivateDevice = () => {
-  // const queryClient = useQueryClient();
-  // return useMutation({
-  //   mutationFn: ({ deviceId, reason }: { deviceId: string; reason?: string }) =>
-  //     deviceService.deactivateDevice(deviceId, reason),
-  //   onSuccess: (_, variables) => {
-  //     queryClient.invalidateQueries({ queryKey: ['devices'] });
-  //     queryClient.invalidateQueries({ queryKey: ['devices', variables.deviceId] });
-  //   },
-  // });
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (deviceId: string) => devicesApi.deactivate(deviceId),
+    onSuccess: (_, deviceId) => {
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
+      queryClient.invalidateQueries({ queryKey: ['devices', deviceId] });
+    },
+  });
 };
 
 export const useCloneDevice = () => {
@@ -167,6 +166,22 @@ export const useModels = (manufacturer: string) => {
     queryKey: ['devices', 'models', manufacturer],
     queryFn: () => devicesApi.getModels(manufacturer),
     enabled: !!manufacturer,
+  });
+};
+
+export const useCategories = (manufacturer: string) => {
+  return useQuery({
+    queryKey: ['devices', 'categories', manufacturer],
+    queryFn: () => devicesApi.getCategories(manufacturer),
+    enabled: !!manufacturer,
+  });
+};
+
+export const useFamilies = (manufacturer: string, category: string) => {
+  return useQuery({
+    queryKey: ['devices', 'families', manufacturer, category],
+    queryFn: () => devicesApi.getFamilies(manufacturer, category),
+    enabled: !!manufacturer && !!category,
   });
 };
 

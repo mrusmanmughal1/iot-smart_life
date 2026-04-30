@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Download, Upload, Plus, ChevronLeft, Key } from 'lucide-react';
+import { ChevronLeft, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDevice, useDeviceCredentials } from '@/features/devices/hooks';
-import { DeviceStatus } from '@/services/api/devices.api';
 import { DeviceTelemetryTab } from '@/features/devices/components/DeviceTelemetryTab';
 import { DeviceAlarmsTab } from '@/features/devices/components/DeviceAlarmsTab';
 import { DeviceGeneralTab } from '@/features/devices/components/DeviceGeneralTab';
@@ -16,19 +15,14 @@ type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms' | 'relations';
 
 export default function DeviceDetailsPage() {
   const { id } = useParams<{ id: string }>();
-
   const navigate = useNavigate();
-
   const { t } = useTranslation();
-
   const [activeTab, setActiveTab] = useState<TabType>('details');
   const [isCredentialsOpen, setIsCredentialsOpen] = useState(false);
   const [fetchCredentials, setFetchCredentials] = useState(false);
-
   const { data: deviceData } = useDevice(id || '');
   const { data: credentialsResponse, isLoading: isLoadingCredentials } =
     useDeviceCredentials(id || '', fetchCredentials);
-
   const credentials = credentialsResponse?.data?.data;
   const device = deviceData?.data?.data;
   const handleCredentialsClick = () => {
