@@ -253,6 +253,7 @@ export default function DevicesPage() {
                   devices.map((device: any) => (
                     <TableRow
                       key={device.id}
+                      onClick={() => navigate(`/devices/${device.id}`)}
                       className="cursor-pointer hover:bg-slate-50 transition-colors"
                     >
                       <TableCell className="font-medium">

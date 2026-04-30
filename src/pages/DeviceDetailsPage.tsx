@@ -31,7 +31,6 @@ export default function DeviceDetailsPage() {
 
   const credentials = credentialsResponse?.data?.data;
   const device = deviceData?.data?.data;
-  console.log(device);
   const handleCredentialsClick = () => {
     setFetchCredentials(true);
     setIsCredentialsOpen(true);
