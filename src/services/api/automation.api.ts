@@ -55,10 +55,12 @@ export interface ApiResponse<T> {
 }
 
 export interface AutomationStatistics {
-  total: number;
-  active: number;
-  totalExecutions: number;
-  errors: number;
+  data: {
+    total: number;
+    active: number;
+    totalExecutions: number;
+    error: number;
+  };
 }
 
 export const automationApi = {
