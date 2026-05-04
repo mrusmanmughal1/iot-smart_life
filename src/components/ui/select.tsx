@@ -25,6 +25,7 @@ interface SelectProps {
   defaultValue?: string;
   children: React.ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
 export function Select({
@@ -33,6 +34,7 @@ export function Select({
   defaultValue = '',
   children,
   className = '',
+  disabled = false,
 }: SelectProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const [open, setOpen] = useState(false);

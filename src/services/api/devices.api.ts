@@ -1,5 +1,8 @@
 import apiClient from '@/lib/axios';
-import { DeviceFamily, DeviceCapabilities } from '@/features/devices/types/device.types';
+import {
+  DeviceFamily,
+  DeviceCapabilities,
+} from '@/features/devices/types/device.types';
 
 export enum DeviceType {
   SENSOR = 'sensor',
@@ -121,7 +124,9 @@ export const devicesApi = {
 
   // get device capabilities
   getCapabilities: (id: string) =>
-    apiClient.get<ApiResponse<DeviceCapabilities>>(`/devices/${id}/capabilities`),
+    apiClient.get<ApiResponse<ApiResponse<DeviceCapabilities>>>(
+      `/devices/${id}/capabilities`
+    ),
   // Get device attributes
   getAttributes: (id: string, scope?: string) =>
     apiClient.get<ApiResponse<any>>(`/devices/${id}/attributes`, {

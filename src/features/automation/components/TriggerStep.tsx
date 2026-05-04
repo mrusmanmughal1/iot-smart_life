@@ -516,7 +516,7 @@ export const TriggerStep: React.FC = () => {
                           control={control}
                           render={({ field }) => (
                             <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl gap-2 shadow-inner h-12">
-                              {selectedKey.enum.map((opt: string) => (
+                              {selectedKey?.enum?.map((opt: string) => (
                                 <button
                                   key={opt}
                                   type="button"

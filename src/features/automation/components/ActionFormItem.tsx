@@ -43,7 +43,7 @@ export const ActionFormItem: React.FC<ActionFormItemProps> = ({
 
   const availableCommands = capabilities?.commands || [];
   const selectedCommand = availableCommands.find(
-    (c) => c.type === selectedCommandType
+    (c: any) => c.type === selectedCommandType
   );
 
   // Reset params when command changes
@@ -76,7 +76,11 @@ export const ActionFormItem: React.FC<ActionFormItemProps> = ({
                   </SelectTrigger>
                   <SelectContent>
                     {param.options?.map((opt: any) => (
-                      <SelectItem key={opt.value} value={opt.value} textValue={opt.label}>
+                      <SelectItem
+                        key={opt.value}
+                        value={opt.value}
+                        textValue={opt.label}
+                      >
                         {opt.label}
                       </SelectItem>
                     ))}
