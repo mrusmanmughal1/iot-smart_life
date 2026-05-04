@@ -93,7 +93,7 @@ export const TriggerStep: React.FC = () => {
 
   return (
     <div className="py-2 border border-slate-200 rounded-lg p-4">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">
+      <h2 className="text-xl font-semibold text-gray-800 mb-6">
         Configure Trigger
       </h2>
       <div className="flex items-center gap-2 mb-6">
@@ -326,7 +326,7 @@ export const TriggerStep: React.FC = () => {
                               setValue('trigger.activeDays', newDays);
                             }}
                             className={cn(
-                              'w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold border transition-colors cursor-pointer',
+                              'w-6 h-6 rounded flex items-center justify-center text-[10px] font-semibold border transition-colors cursor-pointer',
                               isActive
                                 ? 'bg-primary/20 text-primary border-primary/30'
                                 : 'bg-gray-100 text-gray-400 border-gray-200'
@@ -352,7 +352,7 @@ export const TriggerStep: React.FC = () => {
                 <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform duration-500">
                   <Target className="w-8 h-8 text-slate-300 group-hover:text-primary transition-colors" />
                 </div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                   Awaiting Selection
                 </p>
                 <p className="text-[10px] text-slate-400 mt-2 max-w-[200px] text-center leading-relaxed">
@@ -401,10 +401,10 @@ export const TriggerStep: React.FC = () => {
                         )}
                       </div>
                       <div>
-                        <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">
+                        <h3 className="text-sm font-semibold text-slate-800 dark:text-white uppercase tracking-tight">
                           {selectedKey?.label || 'Condition'}
                         </h3>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                        <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
                           Configure Automation Logic
                         </p>
                       </div>
@@ -422,10 +422,10 @@ export const TriggerStep: React.FC = () => {
                   <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
                     {/* Part 1: Current State */}
                     <div className="flex flex-col items-center lg:items-start gap-2 min-w-[140px]">
-                      <span className="font-black text-xs  uppercase tracking-[0.2em] text-slate-400">
+                      <span className="font-semibold text-xs  uppercase tracking-[0.2em] text-slate-400">
                         Current State
                       </span>
-                      <div className="flex items-baseline gap-1 bg-slate-50/50 dark:bg-slate-800/50 p-2 rounded-2xl border border-slate-100 dark:border-slate-700 w-full group hover:border-primary/30 transition-colors">
+                      <div className="flex items-baseline text-center justify-center gap-1 bg-slate-50/50 dark:bg-slate-800/50 p-2 rounded-2xl border border-slate-100 dark:border-slate-700 w-full group hover:border-primary/30 transition-colors">
                         <span
                           className={cn(
                             'text-3xl font-black tracking-tighter transition-all duration-500',
@@ -439,7 +439,7 @@ export const TriggerStep: React.FC = () => {
                           {currentValue ?? '---'}
                         </span>
                         {isNumeric && selectedKey?.unit && (
-                          <span className="text-xs font-bold text-slate-400">
+                          <span className="text-xs font-semibold text-slate-400">
                             {selectedKey.unit}
                           </span>
                         )}
@@ -449,7 +449,7 @@ export const TriggerStep: React.FC = () => {
                     {/* Part 2: Operator (Conditional) */}
                     {isNumeric ? (
                       <div className="flex flex-col items-center gap-2">
-                        <span className="font-black text-xs  uppercase tracking-[0.2em] text-slate-400">
+                        <span className="font-semibold text-xs  uppercase tracking-[0.2em] text-slate-400">
                           Logic
                         </span>
                         <div className="flex items-center gap-4">
@@ -464,7 +464,7 @@ export const TriggerStep: React.FC = () => {
                               >
                                 <SelectTrigger className="w-[160px] h-12 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl shadow-sm focus:ring-primary transition-all">
                                   <SelectValue
-                                    className="text-xs font-bold uppercase"
+                                    className="text-xs font-semibold uppercase"
                                     placeholder="Operator"
                                   />
                                 </SelectTrigger>
@@ -507,7 +507,7 @@ export const TriggerStep: React.FC = () => {
 
                     {/* Part 3: Target Threshold */}
                     <div className="flex-1 w-full flex flex-col gap-2">
-                      <span className="font-black text-xs  uppercase tracking-[0.2em] text-slate-400 lg:text-left">
+                      <span className="font-semibold text-xs  uppercase tracking-[0.2em] text-slate-400 lg:text-center ">
                         Target Threshold
                       </span>
                       {selectedKey?.enum && selectedKey.enum.length > 0 ? (
@@ -550,7 +550,7 @@ export const TriggerStep: React.FC = () => {
                         </div>
                       )}
                       {triggerErrors?.value && (
-                        <p className="text-[10px] text-destructive font-bold uppercase tracking-tight text-center lg:text-left mt-1">
+                        <p className="text-[10px] text-destructive font-semibold uppercase tracking-tight text-center lg:text-left mt-1">
                           {triggerErrors.value.message}
                         </p>
                       )}

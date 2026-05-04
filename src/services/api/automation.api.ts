@@ -99,7 +99,7 @@ export const automationApi = {
 
   // Get statistics
   getStatistics: () =>
-    apiClient.get<ApiResponse<AutomationStatistics>>('/automations/statistics'),
+    apiClient.get<AutomationStatistics>('/automations/statistics'),
 
   // Bulk enable/disable
   bulkToggle: (ids: string[], enabled: boolean) =>

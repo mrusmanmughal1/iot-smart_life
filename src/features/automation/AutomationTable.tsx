@@ -73,7 +73,7 @@ export const AutomationTable: React.FC<AutomationTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody className=" min-h-[500px] ">
-          {data ? (
+          {meta.total ? (
             autodata.map((automation) => (
               <TableRow key={automation.id} className="dark:text-white">
                 <TableCell>
