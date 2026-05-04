@@ -12,6 +12,8 @@
     "export": "تصدير",
     "import": "استيراد",
     "refresh": "تحديث",
+    "view": "عرض",
+    "copy": "نسخ",
     "actions": "الإجراءات",
     "status": "الحالة",
     "active": "نشط",
@@ -60,6 +62,14 @@
       "description": "هل أنت متأكد أنك تريد حذف \"{{itemName}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
       "descriptionGeneric": "هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
       "deleting": "جاري الحذف..."
+    },
+    "never": "لا ينتهي أبداً",
+    "time": {
+      "oneHour": "ساعة واحدة",
+      "oneDay": "يوم واحد",
+      "sevenDays": "7 أيام",
+      "thirtyDays": "30 يوماً",
+      "customDate": "تاريخ مخصص"
     }
   },
   "pagination": {
@@ -2472,5 +2482,77 @@
     "critical": "حرج",
     "minutes": "دقائق",
     "alertsCount": "{{count}} تنبيه"
+  },
+  "sharing": {
+    "title": "مركز المشاركة",
+    "description": "إدارة لوحات المعلومات والأجهزة والتقارير المشتركة",
+    "actions": {
+      "shareResource": "مشاركة مورد"
+    },
+    "stats": {
+      "totalShares": "إجمالي المشاركات",
+      "activeItems": "العناصر المشتركة النشطة",
+      "publicLinks": "الروابط العامة",
+      "publiclyAccessible": "يمكن الوصول إليها علنًا",
+      "totalViews": "إجمالي المشاهدات",
+      "allTimeViews": "مشاهدات جميع الأوقات",
+      "activeUsers": "المستخدمون النشطون",
+      "withAccess": "لديهم وصول"
+    },
+    "searchPlaceholder": "البحث في العناصر المشتركة...",
+    "tabs": {
+      "sharedByMe": "شاركتها أنا",
+      "sharedWithMe": "شاركت معي",
+      "publicLinks": "روابط عامة"
+    },
+    "content": {
+      "sharedByYou": {
+        "title": "العناصر التي شاركتها",
+        "description": "لوحات المعلومات والأجهزة والتقارير التي شاركتها"
+      },
+      "sharedWithYou": {
+        "title": "العناصر التي شوركت معك",
+        "description": "الموارد التي شاركها الآخرون معك"
+      },
+      "publicLinks": {
+        "title": "روابط عامة",
+        "description": "موارد مشتركة يمكن الوصول إليها علنًا"
+      }
+    },
+    "table": {
+      "sharedWith": "شورك مع",
+      "access": "الوصول",
+      "views": "المشاهدات",
+      "sharedDate": "تاريخ المشاركة",
+      "expires": "ينتهي في",
+      "actions": {
+        "copyLink": "نسخ الرابط",
+        "revokeAccess": "إلغاء الوصول"
+      }
+    },
+    "dialog": {
+      "title": "مشاركة مورد",
+      "description": "مشاركة لوحات المعلومات أو الأجهزة أو التقارير مع أعضاء الفريق أو إنشاء روابط عامة",
+      "shareViaEmail": "مشاركة عبر البريد الإلكتروني",
+      "createPublicLink": "إنشاء رابط عام",
+      "selectResource": "اختر المورد",
+      "chooseResourcePlaceholder": "اختر ما تريد مشاركته",
+      "emailAddresses": "عناوين البريد الإلكتروني",
+      "emailPlaceholder": "user@example.com (افصل بفاصلة للمتعدد)",
+      "accessLevel": "مستوى الوصول",
+      "accessLevels": {
+        "viewOnly": "عرض فقط",
+        "canEdit": "يمكنه التعديل",
+        "admin": "مسؤول"
+      },
+      "publicLink": "الرابط العام",
+      "anyoneWithLink": "يمكن لأي شخص لديه الرابط العرض",
+      "expiration": "انتهاء الرابط (اختياري)",
+      "neverExpires": "لا تنتهي أبداً",
+      "message": "الرسالة (اختياري)",
+      "messagePlaceholder": "أضف رسالة للمستلم...",
+      "sendInvitation": "إرسال دعوة",
+      "createLink": "إنشاء رابط"
+    }
   }
 }

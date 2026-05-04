@@ -170,45 +170,6 @@ export const BasicInfoStep: React.FC = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>
-                {t('automation.dialog.fields.category', 'Category')}
-              </Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="security">Security</SelectItem>
-                  <SelectItem value="energy">Energy</SelectItem>
-                  <SelectItem value="comfort">Comfort</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>
-                {t('automation.dialog.fields.priority', 'Priority')}
-              </Label>
-              <Controller
-                name="status" // Reusing status or mapping to a priority field if added
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="inactive">Inactive</SelectItem>
-                      <SelectItem value="error">Error</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-          </div>
-
           <div className="space-y-2">
             <Label>{t('automation.dialog.fields.tags', 'Tags')}</Label>
             <Controller

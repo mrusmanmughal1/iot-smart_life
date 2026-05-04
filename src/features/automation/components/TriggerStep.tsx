@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useFormContext, Controller } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
@@ -13,9 +13,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDevices } from '@/features/devices/hooks/useDevices';
-import { useDeviceLatestTelemetry } from '@/features/devices/hooks/useDeviceTelemetry';
+import {
+  useDeviceCapabilities,
+  useDeviceLatestTelemetry,
+} from '@/features/devices/hooks/useDeviceTelemetry';
+import { GaugeChart } from '@/components/charts/GaugeChart';
 import { cn } from '@/lib/util';
-import { Search, Loader2 } from 'lucide-react';
+import {
+  Search,
+  Loader2,
+  Info,
+  Activity,
+  ToggleLeft,
+  ArrowRight,
+  Zap,
+  Target,
+} from 'lucide-react';
 
 export const TriggerStep: React.FC = () => {
   const { t } = useTranslation();
@@ -33,38 +46,18 @@ export const TriggerStep: React.FC = () => {
 
   const triggerData = watch('trigger');
 
-  const { data: telemetryData, isLoading: isLoadingTelemetry } =
-    useDeviceLatestTelemetry(triggerData?.deviceId);
-  const flattenObject = (obj: any, prefix = ''): Record<string, any> => {
-    if (!obj || typeof obj !== 'object') return {};
-    return Object.keys(obj).reduce((acc: any, k) => {
-      const pre = prefix.length ? prefix + '.' : '';
-      if (
-        typeof obj[k] === 'object' &&
-        obj[k] !== null &&
-        !Array.isArray(obj[k]) &&
-        Object.keys(obj[k]).length > 0
-      ) {
-        Object.assign(acc, flattenObject(obj[k], pre + k));
-      } else {
-        acc[pre + k] = obj[k];
-      }
-      return acc;
-    }, {});
-  };
+  const { data: capabilitiesData, isLoading: isLoadingCapabilities } =
+    useDeviceCapabilities(triggerData?.deviceId);
+  const capabilities = capabilitiesData?.data?.data?.data;
+
+  const { data: telemetryData } = useDeviceLatestTelemetry(
+    triggerData?.deviceId
+  );
+  const telemetry = telemetryData?.data?.data?.data || {};
 
   const availableTelemetryKeys = useMemo(() => {
-    // Try to find the telemetry object at different possible depths
-    const rawData =
-      telemetryData?.data?.data?.data ||
-      telemetryData?.data?.data ||
-      telemetryData?.data;
-
-    if (!rawData || typeof rawData !== 'object') return [];
-
-    const flattened = flattenObject(rawData);
-    return Object.keys(flattened);
-  }, [telemetryData]);
+    return capabilities?.telemetryKeys || [];
+  }, [capabilities]);
 
   const triggerTypes = [
     { id: 'threshold', label: 'Device Data' },
@@ -78,6 +71,25 @@ export const TriggerStep: React.FC = () => {
   const filteredDevices = devices.filter((d) =>
     d.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Sync operator based on attribute type
+  useEffect(() => {
+    const selectedKey = availableTelemetryKeys.find(
+      (k) => k.key === triggerData?.telemetryKey
+    );
+    if (
+      selectedKey &&
+      selectedKey.type !== 'number' &&
+      triggerData?.operator !== 'eq'
+    ) {
+      setValue('trigger.operator', 'eq');
+    }
+  }, [
+    triggerData?.telemetryKey,
+    availableTelemetryKeys,
+    triggerData?.operator,
+    setValue,
+  ]);
 
   return (
     <div className="py-2 border border-slate-200 rounded-lg p-4">
@@ -131,11 +143,15 @@ export const TriggerStep: React.FC = () => {
                         ? 'bg-primary/10 text-primary'
                         : 'hover:bg-accent'
                     )}
-                    onClick={() =>
-                      setValue('trigger.deviceId', device.id, {
-                        shouldValidate: true,
-                      })
-                    }
+                    onClick={() => {
+                      if (triggerData?.deviceId !== device.id) {
+                        setValue('trigger.deviceId', device.id, {
+                          shouldValidate: true,
+                        });
+                        setValue('trigger.telemetryKey', '');
+                        setValue('trigger.value', '');
+                      }
+                    }}
                   >
                     <div
                       className={cn(
@@ -169,12 +185,12 @@ export const TriggerStep: React.FC = () => {
                       'w-full bg-white',
                       triggerErrors?.telemetryKey && 'border-destructive'
                     )}
-                    disabled={isLoadingTelemetry || !triggerData?.deviceId}
+                    disabled={isLoadingCapabilities || !triggerData?.deviceId}
                   >
                     <SelectValue
                       placeholder={
-                        isLoadingTelemetry
-                          ? 'Loading telemetry...'
+                        isLoadingCapabilities
+                          ? 'Loading capabilities...'
                           : !triggerData?.deviceId
                             ? 'Select device first'
                             : 'Select attribute'
@@ -182,15 +198,19 @@ export const TriggerStep: React.FC = () => {
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    {isLoadingTelemetry ? (
+                    {isLoadingCapabilities ? (
                       <div className="flex items-center justify-center p-4 text-xs text-muted-foreground">
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Fetching telemetry...
+                        Fetching capabilities...
                       </div>
                     ) : availableTelemetryKeys.length > 0 ? (
-                      availableTelemetryKeys.map((key) => (
-                        <SelectItem key={key} value={key}>
-                          {key.split('.').pop()}
+                      availableTelemetryKeys.map((item) => (
+                        <SelectItem
+                          key={item.key}
+                          value={item.key}
+                          textValue={`${item.label}${item.unit ? ` (${item.unit})` : ''}`}
+                        >
+                          {item.label} {item.unit ? `(${item.unit})` : ''}
                         </SelectItem>
                       ))
                     ) : (
@@ -324,81 +344,229 @@ export const TriggerStep: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="">
-        <div className="space-y-2">
-          <Label className="text-sm font-medium">Condition *</Label>
-          <div className="grid grid-cols-5 gap-2">
-            <Controller
-              name="trigger.operator"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-[140px] bg-white">
-                    <SelectValue
-                      className="text-sm"
-                      placeholder="Greater Than"
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem className="text-sm" value="gt">
-                      Greater Than
-                    </SelectItem>
-                    <SelectItem className="text-sm" value="lt">
-                      Less Than
-                    </SelectItem>
-                    <SelectItem className="text-sm" value="eq">
-                      Equals
-                    </SelectItem>
-                    <SelectItem className="text-sm" value="gte">
-                      Greater Equals
-                    </SelectItem>
-                    <SelectItem className="text-sm" value="lte">
-                      Less Equals
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <div className="space-y-1">
-              <Input
-                className="text-center"
-                placeholder="25 or idle"
-                type="text"
-                {...register('trigger.value')}
-                error={triggerErrors?.value?.message as string}
-              />
-            </div>
-            <div className="flex items-center gap-2 col-span-3">
-              <div className="px-3 py-2 bg-gray-100 rounded-md text-sm border">
-                °C
+      <div className="my-6 relative">
+        {(() => {
+          if (!triggerData?.deviceId || !triggerData?.telemetryKey) {
+            return (
+              <div className="flex flex-col items-center justify-center py-12 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 transition-all hover:border-primary/30 group">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm mb-4 group-hover:scale-110 transition-transform duration-500">
+                  <Target className="w-8 h-8 text-slate-300 group-hover:text-primary transition-colors" />
+                </div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
+                  Awaiting Selection
+                </p>
+                <p className="text-[10px] text-slate-400 mt-2 max-w-[200px] text-center leading-relaxed">
+                  Choose a device and attribute above to start configuring your
+                  smart trigger
+                </p>
               </div>
-              <Button
-                type="button"
-                variant="primary"
-                size="sm"
-                className="bg-primary text-white"
-              >
-                + Add And
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="bg-slate-900 text-white hover:bg-slate-800"
-              >
-                + Add OR
-              </Button>
+            );
+          }
+
+          if (isLoadingCapabilities) {
+            return (
+              <div className="flex flex-col items-center justify-center py-12 gap-4 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-slate-100 dark:border-slate-800">
+                <div className="relative">
+                  <Loader2 className="w-10 h-10 animate-spin text-primary opacity-20" />
+                  <Zap className="w-5 h-5 text-primary absolute inset-0 m-auto animate-pulse" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 animate-pulse">
+                  Syncing Hardware Data...
+                </span>
+              </div>
+            );
+          }
+          const selectedKey = availableTelemetryKeys.find(
+            (k) => k.key === triggerData?.telemetryKey
+          );
+          const isNumeric = selectedKey?.type === 'number';
+          const currentValue = telemetry[triggerData?.telemetryKey];
+
+          return (
+            <div className="p-1   border border-slate-200 dark:border-slate-800 rounded-3xl shadow ">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 md:p-8  relative">
+                {/* Decorative Elements */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-secondary/5 rounded-full -ml-16 -mb-16 blur-3xl" />
+
+                <div className="flex flex-col gap-8 relative z-10">
+                  {/* Header: Label & Live Badge */}
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                        {isNumeric ? (
+                          <Activity className="w-5 h-5 text-primary" />
+                        ) : (
+                          <ToggleLeft className="w-5 h-5 text-success" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight">
+                          {selectedKey?.label || 'Condition'}
+                        </h3>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                          Configure Automation Logic
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-full border border-slate-100 dark:border-slate-700">
+                      <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">
+                        Live Telemetry
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Main Interaction Flow */}
+                  <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
+                    {/* Part 1: Current State */}
+                    <div className="flex flex-col items-center lg:items-start gap-2 min-w-[140px]">
+                      <span className="font-black text-xs  uppercase tracking-[0.2em] text-slate-400">
+                        Current State
+                      </span>
+                      <div className="flex items-baseline gap-1 bg-slate-50/50 dark:bg-slate-800/50 p-2 rounded-2xl border border-slate-100 dark:border-slate-700 w-full group hover:border-primary/30 transition-colors">
+                        <span
+                          className={cn(
+                            'text-3xl font-black tracking-tighter transition-all duration-500',
+                            currentValue === 'on'
+                              ? 'text-success'
+                              : isNumeric
+                                ? 'text-primary'
+                                : 'text-slate-600'
+                          )}
+                        >
+                          {currentValue ?? '---'}
+                        </span>
+                        {isNumeric && selectedKey?.unit && (
+                          <span className="text-xs font-bold text-slate-400">
+                            {selectedKey.unit}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Part 2: Operator (Conditional) */}
+                    {isNumeric ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="font-black text-xs  uppercase tracking-[0.2em] text-slate-400">
+                          Logic
+                        </span>
+                        <div className="flex items-center gap-4">
+                          <div className="hidden lg:block w-12 h-px bg-gradient-to-r from-transparent to-slate-200 dark:to-slate-700" />
+                          <Controller
+                            name="trigger.operator"
+                            control={control}
+                            render={({ field }) => (
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                              >
+                                <SelectTrigger className="w-[160px] h-12 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl shadow-sm focus:ring-primary transition-all">
+                                  <SelectValue
+                                    className="text-xs font-bold uppercase"
+                                    placeholder="Operator"
+                                  />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700 shadow-xl">
+                                  <SelectItem className="text-xs " value="gt">
+                                    Greater Than
+                                  </SelectItem>
+                                  <SelectItem className="text-xs " value="lt">
+                                    Less Than
+                                  </SelectItem>
+                                  <SelectItem className="text-xs   " value="eq">
+                                    Exactly Equals
+                                  </SelectItem>
+                                  <SelectItem
+                                    className="text-xs   "
+                                    value="gte"
+                                  >
+                                    Greater or Equal
+                                  </SelectItem>
+                                  <SelectItem
+                                    className="text-xs   "
+                                    value="lte"
+                                  >
+                                    Less or Equal
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
+                          />
+                          <div className="hidden lg:block w-12 h-px bg-gradient-to-l from-transparent to-slate-200 dark:to-slate-700" />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <div className="bg-slate-100 dark:bg-slate-800 p-2 rounded-full">
+                          <ArrowRight className="w-5 h-5 text-slate-400" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Part 3: Target Threshold */}
+                    <div className="flex-1 w-full flex flex-col gap-2">
+                      <span className="font-black text-xs  uppercase tracking-[0.2em] text-slate-400 lg:text-left">
+                        Target Threshold
+                      </span>
+                      {selectedKey?.enum && selectedKey.enum.length > 0 ? (
+                        <Controller
+                          name="trigger.value"
+                          control={control}
+                          render={({ field }) => (
+                            <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl gap-2 shadow-inner h-12">
+                              {selectedKey.enum.map((opt: string) => (
+                                <button
+                                  key={opt}
+                                  type="button"
+                                  onClick={() => field.onChange(opt)}
+                                  className={cn(
+                                    'flex-1 text-[10px] font-black uppercase rounded-xl transition-all duration-300',
+                                    field.value === opt
+                                      ? 'bg-primary text-white shadow-lg scale-[1.02] active:scale-95'
+                                      : 'text-slate-500 hover:bg-white/50 dark:hover:bg-slate-700/50 hover:text-slate-700'
+                                  )}
+                                >
+                                  {opt}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        />
+                      ) : (
+                        <div className="relative group/input">
+                          <Input
+                            className="h-12 bg-slate-50/50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-700 rounded-2xl text-lg font-black text-center focus:border-primary transition-all pr-12"
+                            placeholder={isNumeric ? '0.00' : 'Target Value'}
+                            type={isNumeric ? 'number' : 'text'}
+                            {...register('trigger.value')}
+                          />
+                          {isNumeric && selectedKey?.unit && (
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-black text-slate-300 uppercase tracking-widest">
+                              {selectedKey.unit}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {triggerErrors?.value && (
+                        <p className="text-[10px] text-destructive font-bold uppercase tracking-tight text-center lg:text-left mt-1">
+                          {triggerErrors.value.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          );
+        })()}
       </div>
+
       <div className="flex items-center gap-4 mt-2 pt-4">
-        <Button
-          type="button"
-          className="bg-primary text-white text-xs px-3 py-1"
-        >
-          Test Trigger
-        </Button>
+        <div className=" ">
+          <Info className="h-6 w-6 text-secondary" />
+        </div>
         <div className="bg-blue-50 text-blue-600 px-4 py-2 rounded-md text-sm border border-blue-100">
           Preview: When{' '}
           {devices.find((d) => d.id === triggerData?.deviceId)?.name ||
@@ -413,8 +581,10 @@ export const TriggerStep: React.FC = () => {
                 : triggerData?.operator === 'gte'
                   ? '>='
                   : '<='}{' '}
-          {triggerData?.value ?? '0'}
-          °C
+          {triggerData?.value ?? '0'}{' '}
+          {availableTelemetryKeys.find(
+            (k) => k.key === triggerData?.telemetryKey
+          )?.unit || ''}
         </div>
       </div>
     </div>

@@ -26,3 +26,11 @@ export const useDeviceLatestTelemetry = (deviceId: string) => {
     refetchInterval: 3000, // Refresh every 3 seconds
   });
 };
+// get devices capabilities
+export const useDeviceCapabilities = (deviceId: string) => {
+  return useQuery({
+    queryKey: ['devices', deviceId, 'capabilities'],
+    queryFn: () => devicesApi.getCapabilities(deviceId),
+    enabled: !!deviceId,
+  });
+};

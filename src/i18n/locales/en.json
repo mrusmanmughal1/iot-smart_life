@@ -12,6 +12,8 @@
     "export": "Export",
     "import": "Import",
     "refresh": "Refresh",
+    "view": "View",
+    "copy": "Copy",
     "actions": "Actions",
     "status": "Status",
     "active": "Active",
@@ -60,6 +62,14 @@
       "description": "Are you sure you want to delete \"{{itemName}}\"? This action cannot be undone.",
       "descriptionGeneric": "Are you sure you want to delete this item? This action cannot be undone.",
       "deleting": "Deleting..."
+    },
+    "never": "Never",
+    "time": {
+      "oneHour": "1 Hour",
+      "oneDay": "1 Day",
+      "sevenDays": "7 Days",
+      "thirtyDays": "30 Days",
+      "customDate": "Custom Date"
     }
   },
   "pagination": {
@@ -2518,5 +2528,77 @@
     "critical": "Critical",
     "minutes": "minutes",
     "alertsCount": "{{count}} alerts"
+  },
+  "sharing": {
+    "title": "Sharing Center",
+    "description": "Manage shared dashboards, devices, and reports",
+    "actions": {
+      "shareResource": "Share Resource"
+    },
+    "stats": {
+      "totalShares": "Total Shares",
+      "activeItems": "Active shared items",
+      "publicLinks": "Public Links",
+      "publiclyAccessible": "Publicly accessible",
+      "totalViews": "Total Views",
+      "allTimeViews": "All time views",
+      "activeUsers": "Active Users",
+      "withAccess": "With access"
+    },
+    "searchPlaceholder": "Search shared items...",
+    "tabs": {
+      "sharedByMe": "Shared by Me",
+      "sharedWithMe": "Shared with Me",
+      "publicLinks": "Public Links"
+    },
+    "content": {
+      "sharedByYou": {
+        "title": "Items Shared by You",
+        "description": "Dashboards, devices, and reports you've shared"
+      },
+      "sharedWithYou": {
+        "title": "Items Shared with You",
+        "description": "Resources others have shared with you"
+      },
+      "publicLinks": {
+        "title": "Public Links",
+        "description": "Publicly accessible shared resources"
+      }
+    },
+    "table": {
+      "sharedWith": "Shared With",
+      "access": "Access",
+      "views": "Views",
+      "sharedDate": "Shared Date",
+      "expires": "Expires",
+      "actions": {
+        "copyLink": "Copy Link",
+        "revokeAccess": "Revoke Access"
+      }
+    },
+    "dialog": {
+      "title": "Share Resource",
+      "description": "Share dashboards, devices, or reports with team members or create public links",
+      "shareViaEmail": "Share via Email",
+      "createPublicLink": "Create Public Link",
+      "selectResource": "Select Resource",
+      "chooseResourcePlaceholder": "Choose what to share",
+      "emailAddresses": "Email Addresses",
+      "emailPlaceholder": "user@example.com (comma separated for multiple)",
+      "accessLevel": "Access Level",
+      "accessLevels": {
+        "viewOnly": "View Only",
+        "canEdit": "Can Edit",
+        "admin": "Admin"
+      },
+      "publicLink": "Public Link",
+      "anyoneWithLink": "Anyone with link can view",
+      "expiration": "Link Expiration (Optional)",
+      "neverExpires": "Never expires",
+      "message": "Message (Optional)",
+      "messagePlaceholder": "Add a message for the recipient...",
+      "sendInvitation": "Send Invitation",
+      "createLink": "Create Link"
+    }
   }
 }

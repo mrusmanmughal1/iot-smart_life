@@ -148,15 +148,14 @@ export const AutomationDialog: React.FC<AutomationDialogProps> = ({
                 deviceId: data.trigger?.deviceId,
                 telemetryKey: data.trigger?.telemetryKey,
                 operator: data.trigger?.operator || 'eq',
-                value: 'short press',
+                value: data.trigger?.value,
                 debounce: data.trigger?.debounce || 0,
               },
               action: {
                 type: firstAction.type || 'control',
                 deviceId: firstAction.deviceId,
-                command: 'control_switch',
-                // Default value for switch if not provided
-                value: firstAction.value || { switches: { switch_3: 'off' } },
+                command: firstAction.command || 'control_switch',
+                value: firstAction.params || {},
               },
               settings: {
                 cooldown: data.settings?.cooldown || 60,

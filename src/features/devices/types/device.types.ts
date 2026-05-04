@@ -99,3 +99,47 @@ export interface DeviceProfileApiResponse {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface DeviceCapabilityParam {
+  key: string;
+  label: string;
+  type: 'select' | 'number' | 'text' | 'boolean' | 'switch';
+  required?: boolean;
+  default?: any;
+  min?: number;
+  max?: number;
+  options?: Array<{ label: string; value: any }>;
+}
+
+export interface DeviceCommand {
+  type: string;
+  label: string;
+  description?: string;
+  params: DeviceCapabilityParam[];
+}
+
+export interface DeviceTelemetryKey {
+  key: string;
+  label: string;
+  type: 'string' | 'number' | 'boolean';
+  unit?: string;
+  enum?: string[];
+}
+
+export interface DeviceUIComponent {
+  type: 'toggle' | 'value' | 'gauge' | 'slider' | 'chart';
+  label: string;
+  keys: string[];
+  command?: string;
+  unit?: string;
+}
+
+export interface DeviceCapabilities {
+  codecId: string;
+  manufacturer: string;
+  model: string;
+  description: string;
+  telemetryKeys: DeviceTelemetryKey[];
+  commands: DeviceCommand[];
+  uiComponents: DeviceUIComponent[];
+}

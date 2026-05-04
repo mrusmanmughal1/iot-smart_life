@@ -10,7 +10,7 @@ export const actionSchema = z.object({
   delay: z.number().optional(),
   priority: z.enum(['low', 'medium', 'high']).optional(),
   channel: z.string().optional(),
-  params: z.string().optional(),
+  params: z.any().optional(),
 });
 
 export const automationSchema = z.object({

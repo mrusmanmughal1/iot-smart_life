@@ -1,29 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useFormContext, useFieldArray, Controller } from 'react-hook-form';
-import {
-  Plus,
-  Trash2,
-  Shield,
-  Zap,
-  Mail,
-  Globe,
-  CheckCircle2,
-  MailCheck,
-  Pencil,
-} from 'lucide-react';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+import { useFormContext, useFieldArray } from 'react-hook-form';
+import { Plus, Shield, Zap, CheckCircle2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { useDevices } from '@/features/devices/hooks/useDevices';
 import { cn } from '@/lib/util';
+import { ActionFormItem } from './ActionFormItem';
 
 interface ActionStepProps {
   onNext: () => void;
@@ -31,12 +15,10 @@ interface ActionStepProps {
 }
 
 export const ActionStep: React.FC<ActionStepProps> = ({ onNext, onBack }) => {
-  const { t } = useTranslation();
   const { data: devicesData } = useDevices({ limit: 100 });
   const devices = devicesData?.data?.data?.data || [];
 
   const {
-    register,
     control,
     watch,
     setValue,
@@ -80,257 +62,13 @@ export const ActionStep: React.FC<ActionStepProps> = ({ onNext, onBack }) => {
         {/* Main Content */}
         <div className="col-span-12 lg:col-span-8 space-y-6">
           {fields.map((field, index) => (
-            <div
+            <ActionFormItem
               key={field.id}
-              className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm relative group transition-all hover:shadow-md"
-            >
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-md font-medium text-gray-800 flex items-center gap-2">
-                  Action {index + 1}:{' '}
-                  {watch(`actions.${index}.type`) === 'control'
-                    ? 'Device Control'
-                    : watch(`actions.${index}.type`) === 'notification'
-                      ? 'Send Notification'
-                      : 'HTTP Request'}
-                </h3>
-                {fields.length > 1 && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => remove(index)}
-                    className="text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                )}
-              </div>
-
-              <div className="space-y-6">
-                {/* Action Type Selector */}
-                <div className="flex  flex-col  gap-1">
-                  <span className="text-sm font-medium text-gray-500 w-24">
-                    Action Type:
-                  </span>
-                  <div className="flex bg-slate-100 p-2 rounded-md gap-1">
-                    {[
-                      { value: 'control', label: 'Device Control', icon: Zap },
-                      {
-                        value: 'notification',
-                        label: 'Notification',
-                        icon: Mail,
-                      },
-                      {
-                        value: 'setValue',
-                        label: 'Set Value',
-                        icon: Pencil,
-                      },
-                      { value: 'webhook', label: 'Webhook', icon: Globe },
-                    ].map((type) => (
-                      <button
-                        key={type.value}
-                        type="button"
-                        onClick={() =>
-                          setValue(`actions.${index}.type`, type.value)
-                        }
-                        className={cn(
-                          'flex items-center gap-2 px-4 py-2 rounded-md text-xs font-medium transition-all',
-                          watch(`actions.${index}.type`) === type.value
-                            ? 'bg-slate-800 text-white shadow-sm'
-                            : 'text-slate-600 hover:bg-slate-200'
-                        )}
-                      >
-                        <type.icon className="w-4 h-4" />
-                        {type.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {watch(`actions.${index}.type`) === 'control' && (
-                  <div className="space-y-4 pt-2">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="">
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-medium text-gray-500 w-24">
-                            Target Device:
-                          </span>
-                          <Controller
-                            name={`actions.${index}.deviceId`}
-                            control={control}
-                            render={({ field }) => (
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                                className="w-full"
-                              >
-                                <SelectTrigger
-                                  className={cn(
-                                    'w-full bg-slate-50 border-slate-200',
-                                    actionErrors?.[index]?.deviceId &&
-                                      'border-red-500'
-                                  )}
-                                >
-                                  <SelectValue placeholder="Select Device" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {devices.map((d) => (
-                                    <SelectItem key={d.id} value={d.id}>
-                                      {d.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          />
-                        </div>
-                        {actionErrors?.[index]?.deviceId && (
-                          <p className="text-[10px] text-red-500 ml-28">
-                            Device is required
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-500">
-                          Command:
-                        </span>
-                        <Controller
-                          name={`actions.${index}.command`}
-                          control={control}
-                          render={({ field }) => (
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                              className="w-full"
-                            >
-                              <SelectTrigger className="w-full bg-slate-50 border-slate-200">
-                                <SelectValue placeholder="Turn On" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="Turn On">Turn On</SelectItem>
-                                <SelectItem value="Turn Off">
-                                  Turn Off
-                                </SelectItem>
-                                <SelectItem value="Set Value">
-                                  Set Value
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                          )}
-                        />
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-500">
-                          Parameters:
-                        </span>
-                        <Input
-                          className="w-[140px] bg-slate-50 border-slate-200"
-                          placeholder="Temp=22"
-                          {...register(`actions.${index}.params`)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6 w-full">
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-500 w-24">
-                          Delay:
-                        </span>
-                        <div className="flex items-center">
-                          <Input
-                            type="number"
-                            className="w-16 rounded-r-none bg-slate-50 border-slate-200"
-                            {...register(`actions.${index}.delay`, {
-                              valueAsNumber: true,
-                            })}
-                          />
-                          <div className="px-3 py-2 bg-slate-100 text-slate-500 text-xs border border-l-0 border-slate-200 rounded-r-md">
-                            Seconds
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-gray-500">
-                          Priority:
-                        </span>
-                        <Controller
-                          name={`actions.${index}.priority`}
-                          control={control}
-                          render={({ field }) => (
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                              className="w-full"
-                            >
-                              <SelectTrigger className="w-[100px] bg-slate-50 border-slate-200">
-                                <SelectValue placeholder="High" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="low">Low</SelectItem>
-                                <SelectItem value="medium">Medium</SelectItem>
-                                <SelectItem value="high">High</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          )}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {watch(`actions.${index}.type`) === 'notification' && (
-                  <div className="space-y-4 pt-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium text-gray-500 w-24">
-                        Message:
-                      </span>
-                      <Input
-                        className="flex-1 bg-slate-50 border-slate-200"
-                        placeholder="Temperature too high! AC turned on"
-                        {...register(`actions.${index}.message`)}
-                      />
-                      <span className="text-sm font-medium text-gray-500 ml-4">
-                        Recipients:
-                      </span>
-                      <Input
-                        className="w-[200px] bg-slate-50 border-slate-200"
-                        placeholder="admin@company.com"
-                        {...register(`actions.${index}.recipients.0`)}
-                      />
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-medium text-gray-500 w-24">
-                        Channel:
-                      </span>
-                      <Controller
-                        name={`actions.${index}.channel`}
-                        control={control}
-                        render={({ field }) => (
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger className="w-[160px] bg-slate-50 border-slate-200">
-                              <SelectValue placeholder="Email + SMS" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Email">Email</SelectItem>
-                              <SelectItem value="SMS">SMS</SelectItem>
-                              <SelectItem value="Email + SMS">
-                                Email + SMS
-                              </SelectItem>
-                              <SelectItem value="Push Notification">
-                                Push
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+              index={index}
+              devices={devices}
+              onRemove={() => remove(index)}
+              errors={actionErrors?.[index]}
+            />
           ))}
 
           {/* Quick Templates */}

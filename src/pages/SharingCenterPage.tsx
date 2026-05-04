@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -15,9 +23,18 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { DataTable } from '@/components/common/DataTable/DataTable';
-import { createSortableColumn, createActionsColumn } from '@/components/common/DataTable/columns';
+import {
+  createSortableColumn,
+  createActionsColumn,
+} from '@/components/common/DataTable/columns';
 import {
   Share2,
   Plus,
@@ -99,16 +116,17 @@ const sharedItems: SharedItem[] = [
 ];
 
 export default function SharingCenter() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [shareType, setShareType] = useState<'email' | 'link'>('email');
   const [activeTab, setActiveTab] = useState('shared-by-me');
 
   const columns = [
-    createSortableColumn('name', 'Name'),
+    createSortableColumn('name', t('common.name')),
     {
       accessorKey: 'type',
-      header: 'Type',
+      header: t('common.type'),
       cell: ({ row }: any) => {
         const type = row.getValue('type') as string;
         const colors: Record<string, string> = {
@@ -117,16 +135,12 @@ export default function SharingCenter() {
           Asset: 'bg-purple-500',
           Report: 'bg-orange-500',
         };
-        return (
-          <Badge className={`${colors[type]} text-white`}>
-            {type}
-          </Badge>
-        );
+        return <Badge className={`${colors[type]} text-white`}>{type}</Badge>;
       },
     },
     {
       accessorKey: 'sharedWith',
-      header: 'Shared With',
+      header: t('sharing.table.sharedWith'),
       cell: ({ row }: any) => {
         const isPublic = row.original.isPublic;
         return (
@@ -134,7 +148,7 @@ export default function SharingCenter() {
             {isPublic ? (
               <>
                 <LinkIcon className="h-4 w-4 text-muted-foreground" />
-                <span>Public Link</span>
+                <span>{t('sharing.stats.publicLinks')}</span>
               </>
             ) : (
               <>
@@ -148,16 +162,21 @@ export default function SharingCenter() {
     },
     {
       accessorKey: 'accessLevel',
-      header: 'Access',
+      header: t('sharing.table.access'),
       cell: ({ row }: any) => {
         const level = row.getValue('accessLevel') as string;
-        const variant = level === 'Admin' ? 'default' : level === 'Edit' ? 'secondary' : 'outline';
+        const variant =
+          level === 'Admin'
+            ? 'default'
+            : level === 'Edit'
+              ? 'secondary'
+              : 'outline';
         return <Badge variant={variant}>{level}</Badge>;
       },
     },
     {
       accessorKey: 'views',
-      header: 'Views',
+      header: t('sharing.table.views'),
       cell: ({ row }: any) => (
         <div className="flex items-center gap-2">
           <Eye className="h-4 w-4 text-muted-foreground" />
@@ -165,29 +184,32 @@ export default function SharingCenter() {
         </div>
       ),
     },
-    createSortableColumn('sharedDate', 'Shared Date'),
+    createSortableColumn('sharedDate', t('sharing.table.sharedDate')),
     {
       accessorKey: 'expiresAt',
-      header: 'Expires',
+      header: t('sharing.table.expires'),
       cell: ({ row }: any) => {
         const expires = row.getValue('expiresAt') as Date | undefined;
-        if (!expires) return <span className="text-muted-foreground">Never</span>;
+        if (!expires)
+          return (
+            <span className="text-muted-foreground">{t('common.never')}</span>
+          );
         return <span>{expires.toLocaleDateString()}</span>;
       },
     },
     createActionsColumn((row: any) => [
       {
-        label: 'Copy Link',
+        label: t('sharing.table.actions.copyLink'),
         onClick: () => console.log('Copy link', row.id),
         icon: <Copy className="h-4 w-4" />,
       },
       {
-        label: 'View',
+        label: t('common.view'),
         onClick: () => console.log('View', row.id),
         icon: <ExternalLink className="h-4 w-4" />,
       },
       {
-        label: 'Revoke Access',
+        label: t('sharing.table.actions.revokeAccess'),
         onClick: () => console.log('Revoke', row.id),
         icon: <Trash2 className="h-4 w-4" />,
         variant: 'destructive' as const,
@@ -195,19 +217,20 @@ export default function SharingCenter() {
     ]),
   ];
 
-  const filteredItems = sharedItems.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.type.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredItems = sharedItems.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Sharing Center"
-        description="Manage shared dashboards, devices, and reports"
+        title={t('sharing.title')}
+        description={t('sharing.description')}
         actions={[
           {
-            label: 'Share Resource',
+            label: t('sharing.actions.shareResource'),
             onClick: () => setIsShareOpen(true),
             icon: <Plus className="h-4 w-4 mr-2" />,
           },
@@ -218,49 +241,65 @@ export default function SharingCenter() {
       <div className="grid gap-6 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Shares</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('sharing.stats.totalShares')}
+            </CardTitle>
             <Share2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{sharedItems.length}</div>
-            <p className="text-xs text-muted-foreground">Active shared items</p>
+            <p className="text-xs text-muted-foreground">
+              {t('sharing.stats.activeItems')}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Public Links</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('sharing.stats.publicLinks')}
+            </CardTitle>
             <LinkIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {sharedItems.filter(i => i.isPublic).length}
+              {sharedItems.filter((i) => i.isPublic).length}
             </div>
-            <p className="text-xs text-muted-foreground">Publicly accessible</p>
+            <p className="text-xs text-muted-foreground">
+              {t('sharing.stats.publiclyAccessible')}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('sharing.stats.totalViews')}
+            </CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {sharedItems.reduce((sum, i) => sum + i.views, 0)}
             </div>
-            <p className="text-xs text-muted-foreground">All time views</p>
+            <p className="text-xs text-muted-foreground">
+              {t('sharing.stats.allTimeViews')}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('sharing.stats.activeUsers')}
+            </CardTitle>
             <UserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">With access</p>
+            <p className="text-xs text-muted-foreground">
+              {t('sharing.stats.withAccess')}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -271,7 +310,7 @@ export default function SharingCenter() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search shared items..."
+              placeholder={t('sharing.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -281,18 +320,26 @@ export default function SharingCenter() {
       </Card>
 
       {/* Tabs */}
-      <Tabs defaultValue='' value={activeTab} onValueChange={setActiveTab}>
+      <Tabs defaultValue="" value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="shared-by-me">Shared by Me</TabsTrigger>
-          <TabsTrigger value="shared-with-me">Shared with Me</TabsTrigger>
-          <TabsTrigger value="public">Public Links</TabsTrigger>
+          <TabsTrigger value="shared-by-me">
+            {t('sharing.tabs.sharedByMe')}
+          </TabsTrigger>
+          <TabsTrigger value="shared-with-me">
+            {t('sharing.tabs.sharedWithMe')}
+          </TabsTrigger>
+          <TabsTrigger value="public">
+            {t('sharing.tabs.publicLinks')}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="shared-by-me" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Items Shared by You</CardTitle>
-              <CardDescription>Dashboards, devices, and reports you've shared</CardDescription>
+              <CardTitle>{t('sharing.content.sharedByYou.title')}</CardTitle>
+              <CardDescription>
+                {t('sharing.content.sharedByYou.description')}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DataTable
@@ -307,13 +354,15 @@ export default function SharingCenter() {
         <TabsContent value="shared-with-me" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Items Shared with You</CardTitle>
-              <CardDescription>Resources others have shared with you</CardDescription>
+              <CardTitle>{t('sharing.content.sharedWithYou.title')}</CardTitle>
+              <CardDescription>
+                {t('sharing.content.sharedWithYou.description')}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DataTable
                 columns={columns}
-                data={filteredItems.filter(i => !i.isPublic)}
+                data={filteredItems.filter((i) => !i.isPublic)}
                 searchKey="name"
               />
             </CardContent>
@@ -323,13 +372,15 @@ export default function SharingCenter() {
         <TabsContent value="public" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Public Links</CardTitle>
-              <CardDescription>Publicly accessible shared resources</CardDescription>
+              <CardTitle>{t('sharing.content.publicLinks.title')}</CardTitle>
+              <CardDescription>
+                {t('sharing.content.publicLinks.description')}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <DataTable
                 columns={columns}
-                data={filteredItems.filter(i => i.isPublic)}
+                data={filteredItems.filter((i) => i.isPublic)}
                 searchKey="name"
               />
             </CardContent>
@@ -341,9 +392,9 @@ export default function SharingCenter() {
       <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Share Resource</DialogTitle>
+            <DialogTitle>{t('sharing.dialog.title')}</DialogTitle>
             <DialogDescription>
-              Share dashboards, devices, or reports with team members or create public links
+              {t('sharing.dialog.description')}
             </DialogDescription>
           </DialogHeader>
 
@@ -356,7 +407,7 @@ export default function SharingCenter() {
                 onClick={() => setShareType('email')}
               >
                 <Mail className="h-4 w-4 mr-2" />
-                Share via Email
+                {t('sharing.dialog.shareViaEmail')}
               </Button>
               <Button
                 variant={shareType === 'link' ? 'default' : 'outline'}
@@ -364,22 +415,30 @@ export default function SharingCenter() {
                 onClick={() => setShareType('link')}
               >
                 <LinkIcon className="h-4 w-4 mr-2" />
-                Create Public Link
+                {t('sharing.dialog.createPublicLink')}
               </Button>
             </div>
 
             {/* Resource Selection */}
             <div className="space-y-2">
-              <Label htmlFor="resource">Select Resource *</Label>
+              <Label htmlFor="resource">
+                {t('sharing.dialog.selectResource')} *
+              </Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose what to share" />
+                  <SelectValue
+                    placeholder={t('sharing.dialog.chooseResourcePlaceholder')}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="dashboard-1">Factory Dashboard</SelectItem>
-                  <SelectItem value="device-1">Temperature Sensor #123</SelectItem>
+                  <SelectItem value="device-1">
+                    Temperature Sensor #123
+                  </SelectItem>
                   <SelectItem value="asset-1">Building A - Floor 3</SelectItem>
-                  <SelectItem value="report-1">Monthly Energy Report</SelectItem>
+                  <SelectItem value="report-1">
+                    Monthly Energy Report
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -387,23 +446,33 @@ export default function SharingCenter() {
             {shareType === 'email' ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Addresses *</Label>
+                  <Label htmlFor="email">
+                    {t('sharing.dialog.emailAddresses')} *
+                  </Label>
                   <Input
                     id="email"
-                    placeholder="user@example.com (comma separated for multiple)"
+                    placeholder={t('sharing.dialog.emailPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="access">Access Level *</Label>
+                  <Label htmlFor="access">
+                    {t('sharing.dialog.accessLevel')} *
+                  </Label>
                   <Select defaultValue="view">
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="view">View Only</SelectItem>
-                      <SelectItem value="edit">Can Edit</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="view">
+                        {t('sharing.dialog.accessLevels.viewOnly')}
+                      </SelectItem>
+                      <SelectItem value="edit">
+                        {t('sharing.dialog.accessLevels.canEdit')}
+                      </SelectItem>
+                      <SelectItem value="admin">
+                        {t('sharing.dialog.accessLevels.admin')}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -412,10 +481,10 @@ export default function SharingCenter() {
               <div className="space-y-4">
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
-                    <Label>Public Link</Label>
-                    <Button variant="outline" size="sm">
+                    <Label>{t('sharing.dialog.publicLink')}</Label>
+                    <Button variant="outline" size="sm" type="button">
                       <Copy className="h-4 w-4 mr-2" />
-                      Copy
+                      {t('common.copy')}
                     </Button>
                   </div>
                   <Input
@@ -428,15 +497,17 @@ export default function SharingCenter() {
                 <div className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">Anyone with link can view</span>
+                    <span className="text-sm">
+                      {t('sharing.dialog.anyoneWithLink')}
+                    </span>
                   </div>
                   <Select defaultValue="view">
                     <SelectTrigger className="w-[120px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="view">View</SelectItem>
-                      <SelectItem value="edit">Edit</SelectItem>
+                      <SelectItem value="view">{t('common.view')}</SelectItem>
+                      <SelectItem value="edit">{t('common.edit')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -445,28 +516,34 @@ export default function SharingCenter() {
 
             {/* Expiration */}
             <div className="space-y-2">
-              <Label htmlFor="expiry">Link Expiration (Optional)</Label>
+              <Label htmlFor="expiry">{t('sharing.dialog.expiration')}</Label>
               <Select>
                 <SelectTrigger>
-                  <SelectValue placeholder="Never expires" />
+                  <SelectValue placeholder={t('sharing.dialog.neverExpires')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="never">Never</SelectItem>
-                  <SelectItem value="1h">1 Hour</SelectItem>
-                  <SelectItem value="1d">1 Day</SelectItem>
-                  <SelectItem value="7d">7 Days</SelectItem>
-                  <SelectItem value="30d">30 Days</SelectItem>
-                  <SelectItem value="custom">Custom Date</SelectItem>
+                  <SelectItem value="never">{t('common.never')}</SelectItem>
+                  <SelectItem value="1h">{t('common.time.oneHour')}</SelectItem>
+                  <SelectItem value="1d">{t('common.time.oneDay')}</SelectItem>
+                  <SelectItem value="7d">
+                    {t('common.time.sevenDays')}
+                  </SelectItem>
+                  <SelectItem value="30d">
+                    {t('common.time.thirtyDays')}
+                  </SelectItem>
+                  <SelectItem value="custom">
+                    {t('common.time.customDate')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {/* Message */}
             <div className="space-y-2">
-              <Label htmlFor="message">Message (Optional)</Label>
+              <Label htmlFor="message">{t('sharing.dialog.message')}</Label>
               <Textarea
                 id="message"
-                placeholder="Add a message for the recipient..."
+                placeholder={t('sharing.dialog.messagePlaceholder')}
                 rows={3}
               />
             </div>
@@ -474,11 +551,13 @@ export default function SharingCenter() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsShareOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button>
               <Share2 className="h-4 w-4 mr-2" />
-              {shareType === 'email' ? 'Send Invitation' : 'Create Link'}
+              {shareType === 'email'
+                ? t('sharing.dialog.sendInvitation')
+                : t('sharing.dialog.createLink')}
             </Button>
           </DialogFooter>
         </DialogContent>

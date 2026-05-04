@@ -10,8 +10,9 @@ import { DeviceAlarmsTab } from '@/features/devices/components/DeviceAlarmsTab';
 import { DeviceGeneralTab } from '@/features/devices/components/DeviceGeneralTab';
 import { DeviceCredentialsDialog } from '@/features/devices/components/DeviceCredentialsDialog';
 import { DeviceAttributesTab } from '@/features/devices/components/DeviceAttributesTab';
+import { DeviceControlTab } from '@/features/devices/components/DeviceControlTab';
 
-type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms' | 'relations';
+type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms' | 'relations' | 'control';
 
 export default function DeviceDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -39,6 +40,7 @@ export default function DeviceDetailsPage() {
     { id: 'details', label: t('devices.details.tabs.details') },
     { id: 'attributes', label: t('devices.details.tabs.attributes') },
     { id: 'telemetry', label: t('devices.details.tabs.telemetry') },
+    { id: 'control', label: t('devices.details.tabs.control', 'Control') },
     { id: 'alarms', label: t('devices.details.tabs.alarms') },
     { id: 'relations', label: t('devices.details.tabs.relations') },
   ];
@@ -117,6 +119,9 @@ export default function DeviceDetailsPage() {
 
       {/* Alarms Tab */}
       {activeTab === 'alarms' && id && <DeviceAlarmsTab deviceId={id} />}
+
+      {/* Control Tab */}
+      {activeTab === 'control' && id && <DeviceControlTab deviceId={id} />}
 
       {/* Details/General Tab */}
       {activeTab === 'details' && id && <DeviceGeneralTab deviceId={id} />}
