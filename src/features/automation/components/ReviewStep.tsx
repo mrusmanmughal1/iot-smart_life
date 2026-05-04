@@ -127,13 +127,13 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
                     <p className="text-sm font-medium text-gray-500">
                       Action {idx + 1}:
                     </p>
-                    <p className="text-sm text-gray-800">
+                    {/* <p className="text-sm text-gray-800">
                       {action.type === 'control'
-                        ? `Turn ON AC Controller - Office (temp=${action.params?.split('=')[1] || '22'})`
+                        ? `Turn ON AC Controller - Office (temp=${action?.params?.split('=')[1] || '22'})`
                         : action.type === 'notification'
                           ? `Send Notification - "${action.message || 'Temperature too high! AC turned on.'}"`
                           : `${action.type} configuration`}
-                    </p>
+                    </p> */}
                   </div>
                 )) || (
                   <>

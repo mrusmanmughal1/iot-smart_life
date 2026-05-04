@@ -419,7 +419,7 @@ export const TriggerStep: React.FC = () => {
                   </div>
 
                   {/* Main Interaction Flow */}
-                  <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
+                  <div className="flex flex-col lg:flex-row items-center  gap-6 lg:gap-12">
                     {/* Part 1: Current State */}
                     <div className="flex flex-col items-center lg:items-start gap-2 min-w-[140px]">
                       <span className="font-semibold text-xs  uppercase tracking-[0.2em] text-slate-400">
