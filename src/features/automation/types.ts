@@ -69,7 +69,6 @@ export interface Automation {
     maxExecutionsPerDay: number;
   };
   tags?: string[];
-  additionalInfo?: any;
   createdAt?: string;
   updatedAt?: string;
 }

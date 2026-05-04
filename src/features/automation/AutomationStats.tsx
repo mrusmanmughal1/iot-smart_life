@@ -63,7 +63,7 @@ export const AutomationStats: React.FC = () => {
           <AlertTriangle className="h-8 w-8 text-white" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats?.errors || 0}</div>
+          <div className="text-2xl font-bold">{stats?.error || 0}</div>
           <p className="text-xs text-white ">
             {t('automation.stats.errorsDesc')}
           </p>
