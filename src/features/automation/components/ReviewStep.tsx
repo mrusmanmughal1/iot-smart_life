@@ -1,11 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Check, AlertTriangle, ArrowRight } from 'lucide-react';
 import { Automation } from '../types';
 import { cn } from '@/lib/util';
+import { useDevices } from '@/features/devices/hooks/useDevices';
 
 interface ReviewStepProps {
   formData: Partial<Automation>;
@@ -13,6 +13,13 @@ interface ReviewStepProps {
 
 export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
   const { t } = useTranslation();
+  const { data: devicesData } = useDevices({ limit: 100 });
+  const devices = devicesData?.data?.data?.data || [];
+
+  const getDeviceName = (id?: string) => {
+    if (!id) return 'Unknown Device';
+    return devices.find((d: any) => d.id === id)?.name || id;
+  };
 
   const getOperatorSymbol = (op?: string) => {
     switch (op) {
@@ -29,6 +36,19 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
       default:
         return op || '>';
     }
+  };
+
+  const getActionDescription = (action: any) => {
+    if (action.type === 'control') {
+      return `Control ${getDeviceName(action.deviceId)}: ${action.command || 'Command'} = ${action.params || action.value || 'N/A'}`;
+    }
+    if (action.type === 'notification') {
+      return `Send Notification - "${action.message || 'No message'}" to ${action.recipients?.join(', ') || 'Users'}`;
+    }
+    if (action.type === 'webhook') {
+      return `Webhook -> ${action.webhookUrl || 'URL'}`;
+    }
+    return `${action.type || 'Unknown'} Action`;
   };
 
   return (
@@ -52,25 +72,33 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
                       Rule Name:
                     </p>
                     <p className="text-sm text-gray-800">
-                      {formData.name || 'Office Temperature Control'}
+                      {formData.name || 'Untitled Rule'}
                     </p>
                   </div>
+                  {formData.description && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Description:
+                      </p>
+                      <p className="text-sm text-gray-800">
+                        {formData.description}
+                      </p>
+                    </div>
+                  )}
 
                   <div>
                     <p className="text-sm font-medium text-gray-500 mb-1">
-                      Category:
+                      Status:
                     </p>
-                    <p className="text-sm text-gray-800">Climate Control</p>
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      Priority:
-                    </p>
-                    <p className="text-sm text-gray-800">Medium Status:</p>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-gray-800">Active</span>
-                      <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.8)]" />
+                      <span className="text-sm text-gray-800 capitalize">
+                        {formData.enabled !== false ? 'Active' : 'Disabled'}
+                      </span>
+                      {formData.enabled !== false ? (
+                        <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.8)]" />
+                      ) : (
+                        <span className="w-2 h-2 rounded-full bg-gray-400" />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -87,26 +115,30 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
                     <p className="text-sm font-medium text-gray-500 mb-1">
                       Trigger Type:
                     </p>
-                    <p className="text-sm text-gray-800">Device Data</p>
+                    <p className="text-sm text-gray-800 capitalize">
+                      {formData.trigger?.type || 'Device Data'}
+                    </p>
                   </div>
 
-                  <div>
-                    <p className="text-sm font-medium text-gray-500 mb-1">
-                      Device:
-                    </p>
-                    <p className="text-sm text-gray-800">
-                      Temperature Sensor 01 - Office
-                    </p>
-                  </div>
+                  {formData.trigger?.deviceId && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Device:
+                      </p>
+                      <p className="text-sm text-gray-800">
+                        {getDeviceName(formData.trigger.deviceId)}
+                      </p>
+                    </div>
+                  )}
 
                   <div>
                     <p className="text-sm font-medium text-gray-500 mb-1">
                       Condition:
                     </p>
                     <p className="text-sm text-gray-800">
-                      {formData.trigger?.telemetryKey || 'Temperature'}{' '}
+                      {formData.trigger?.telemetryKey || 'Attribute'}{' '}
                       {getOperatorSymbol(formData.trigger?.operator)}{' '}
-                      {formData.trigger?.value ?? '25'}°C
+                      {formData.trigger?.value ?? 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -122,52 +154,22 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
               </h3>
 
               <div className="space-y-4">
-                {formData.actions?.map((action, idx) => (
-                  <div key={action.id || idx} className="space-y-1">
-                    <p className="text-sm font-medium text-gray-500">
-                      Action {idx + 1}:
-                    </p>
-                    {/* <p className="text-sm text-gray-800">
-                      {action.type === 'control'
-                        ? `Turn ON AC Controller - Office (temp=${action?.params?.split('=')[1] || '22'})`
-                        : action.type === 'notification'
-                          ? `Send Notification - "${action.message || 'Temperature too high! AC turned on.'}"`
-                          : `${action.type} configuration`}
-                    </p> */}
-                  </div>
-                )) || (
-                  <>
-                    <div className="space-y-1">
+                {formData.actions && formData.actions.length > 0 ? (
+                  formData.actions.map((action, idx) => (
+                    <div key={action.id || idx} className="space-y-1">
                       <p className="text-sm font-medium text-gray-500">
-                        Action 1:
+                        Action {idx + 1}:
                       </p>
                       <p className="text-sm text-gray-800">
-                        Turn ON AC Controller - Office (temp=22)
+                        {getActionDescription(action)}
                       </p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium text-gray-500">
-                        Action 2:
-                      </p>
-                      <p className="text-sm text-gray-800">
-                        Send Notification - "Temperature too high! AC turned
-                        on."
-                      </p>
-                    </div>
-                  </>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    No actions configured.
+                  </p>
                 )}
-              </div>
-
-              <div className="flex items-center gap-3 pt-2">
-                <Button
-                  variant="outline"
-                  className="bg-[#5C4D9D] hover:bg-[#4C3D8D] text-white border-none px-6 rounded-md text-xs h-9"
-                >
-                  Back
-                </Button>
-                <Button className="bg-[#2D1616] hover:bg-[#1D0606] text-white px-6 rounded-md text-xs h-9">
-                  Cancel
-                </Button>
               </div>
             </CardContent>
           </Card>
@@ -184,34 +186,34 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
                 </h3>
 
                 <div className="flex items-center gap-2 overflow-x-auto pb-2">
-                  <div className="    bg-sky-50 border border-sky-200 rounded-lg  p-4 text-center">
+                  <div className="min-w-[120px] bg-sky-50 border border-sky-200 rounded-lg p-4 text-center shrink-0">
                     <p className="text-[10px] font-medium text-gray-400 tracking-wider mb-1 uppercase">
                       Trigger
                     </p>
                     <p className="text-[11px] font-medium text-sky-800 truncate">
-                      {formData.trigger?.telemetryKey || 'Temp'}{' '}
+                      {formData.trigger?.telemetryKey || 'Attribute'}{' '}
                       {getOperatorSymbol(formData.trigger?.operator)}{' '}
-                      {formData.trigger?.value ?? '25'}°C
+                      {formData.trigger?.value ?? 'N/A'}
                     </p>
                   </div>
 
-                  <div className="    bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-                    <p className="text-[10px] font-medium text-gray-400 tracking-wider mb-1 uppercase">
-                      Action 1
-                    </p>
-                    <p className="text-[11px] font-medium text-green-800 truncate">
-                      Temp {getOperatorSymbol(formData.trigger?.operator)} 25°C
-                    </p>
-                  </div>
-
-                  <div className="    bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
-                    <p className="text-[10px] font-medium text-gray-400 tracking-wider mb-1 uppercase">
-                      Action 1
-                    </p>
-                    <p className="text-[11px] font-medium text-amber-800 truncate">
-                      Temp {getOperatorSymbol(formData.trigger?.operator)} 25°C
-                    </p>
-                  </div>
+                  {formData.actions?.map((action, idx) => (
+                    <React.Fragment key={action.id || idx}>
+                      <ArrowRight className="w-4 h-4 text-gray-300 shrink-0" />
+                      <div className="min-w-[120px] bg-green-50 border border-green-200 rounded-lg p-4 text-center shrink-0">
+                        <p className="text-[10px] font-medium text-gray-400 tracking-wider mb-1 uppercase">
+                          Action {idx + 1}
+                        </p>
+                        <p className="text-[11px] font-medium text-green-800 truncate">
+                          {action.type === 'control'
+                            ? 'Device Control'
+                            : action.type === 'notification'
+                              ? 'Notify User'
+                              : action.type}
+                        </p>
+                      </div>
+                    </React.Fragment>
+                  ))}
                 </div>
               </section>
 
@@ -223,21 +225,43 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
 
                 <div className="space-y-3">
                   <div className="flex items-start gap-2 text-[11px] text-gray-700 font-medium">
-                    <Check className="w-3.5 h-3.5 text-gray-400 mt-0.5" />
-                    <span>Execute Actions In Sequence</span>
+                    <Check className="w-3.5 h-3.5 text-green-500 mt-0.5" />
+                    <span>
+                      {formData.execution?.sequence !== false
+                        ? 'Execute Actions In Sequence'
+                        : 'Execute Actions In Parallel'}
+                    </span>
                   </div>
-                  <div className="flex items-start gap-2 text-[11px] text-gray-700 font-medium">
-                    <Check className="w-3.5 h-3.5 text-gray-400 mt-0.5" />
-                    <span>Retry Failed Actions (Max 3 Times)</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-[11px] text-gray-700 font-medium">
-                    <Check className="w-3.5 h-3.5 text-gray-400 mt-0.5" />
-                    <span>Debounce Enabled (30 Seconds)</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-[11px] text-gray-700 font-medium">
-                    <Check className="w-3.5 h-3.5 text-gray-400 mt-0.5" />
-                    <span>Time Window: 08:00 - 18:00 (M-F</span>
-                  </div>
+                  {formData.execution?.retryCount &&
+                  formData.execution.retryCount > 0 ? (
+                    <div className="flex items-start gap-2 text-[11px] text-gray-700 font-medium">
+                      <Check className="w-3.5 h-3.5 text-green-500 mt-0.5" />
+                      <span>
+                        Retry Failed Actions (Max{' '}
+                        {formData.execution.retryCount} Times)
+                      </span>
+                    </div>
+                  ) : null}
+                  {(formData.trigger as any)?.enableDebounce ? (
+                    <div className="flex items-start gap-2 text-[11px] text-gray-700 font-medium">
+                      <Check className="w-3.5 h-3.5 text-green-500 mt-0.5" />
+                      <span>
+                        Debounce Enabled ({formData.trigger?.debounce || 0}{' '}
+                        Seconds)
+                      </span>
+                    </div>
+                  ) : null}
+                  {(formData.trigger as any)?.activeHoursEnabled &&
+                  (formData.trigger as any)?.activeHours ? (
+                    <div className="flex items-start gap-2 text-[11px] text-gray-700 font-medium">
+                      <Check className="w-3.5 h-3.5 text-green-500 mt-0.5" />
+                      <span>
+                        Time Window:{' '}
+                        {(formData.trigger as any).activeHours.start || '00:00'}{' '}
+                        - {(formData.trigger as any).activeHours.end || '23:59'}
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
               </section>
 
@@ -247,12 +271,12 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
                   <div className="flex items-center gap-2 mb-1">
                     <Check className="w-4 h-4 text-green-600" />
                     <p className="text-sm font-medium text-gray-800 tracking-tight">
-                      Rule Test Passed
+                      Configuration Valid
                     </p>
                   </div>
                   <p className="text-[10px] text-gray-600 leading-relaxed pl-6">
-                    Trigger Condition Validated Successfully All Actions Can Be
-                    Executed No Configuration Conflicts Detected
+                    Trigger Condition Validated Successfully. All Actions Can Be
+                    Executed. No Configuration Conflicts Detected.
                   </p>
                 </div>
 
@@ -264,18 +288,12 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
                     </p>
                   </div>
                   <p className="text-[10px] text-gray-600 leading-relaxed pl-6">
-                    Rule Will Be Active Immediately After Creation Ensure Target
-                    Devices Are Online Before Activating
+                    Rule Will Be Active Immediately After Creation. Ensure
+                    Target Devices Are Online Before Activating.
                   </p>
                 </div>
               </div>
             </CardContent>
-
-            <div className="p-6 flex justify-end items-end">
-              <Button className="bg-[#2D1616] hover:bg-[#1D0606] text-white px-8 rounded-md text-xs font-bold py-5 h-auto">
-                Create Rule
-              </Button>
-            </div>
           </Card>
         </div>
       </div>
