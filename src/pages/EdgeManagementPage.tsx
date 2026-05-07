@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Plus, Search } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Plus } from 'lucide-react';
 
-import { edgeInstances } from '@/features/Edge-managment/data';
+import { edgeInstances, edgeActivities } from '@/features/Edge-managment/data';
 import { EdgeStats } from '@/features/Edge-managment/components/EdgeStats';
-import { EdgeResourceUsage } from '@/features/Edge-managment/components/EdgeResourceUsage';
 import { EdgeTable } from '@/features/Edge-managment/components/EdgeTable';
 import { EdgeCreateDialog } from '@/features/Edge-managment/components/EdgeCreateDialog';
+import { EdgeRecentActivities } from '@/features/Edge-managment/components/EdgeRecentActivities';
+import { useNavigate } from 'react-router-dom';
 
 export default function EdgeManagement() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-6">
@@ -24,14 +24,19 @@ export default function EdgeManagement() {
             onClick: () => setIsCreateOpen(true),
             icon: <Plus className="h-4 w-4 mr-2" />,
           },
+          {
+            label: 'create rule chain template',
+            onClick: () => navigate('/edge-management/create-rule-chain'),
+            icon: <Plus className="h-4 w-4 mr-2" />,
+          },
         ]}
       />
 
       <EdgeStats edgeInstances={edgeInstances} />
 
-      <EdgeResourceUsage edgeInstances={edgeInstances} />
-
       <EdgeTable edgeInstances={edgeInstances} />
+
+      <EdgeRecentActivities activities={edgeActivities} />
 
       <EdgeCreateDialog open={isCreateOpen} onOpenChange={setIsCreateOpen} />
     </div>

@@ -1,4 +1,45 @@
-import { EdgeInstance } from './types';
+import { EdgeInstance, EdgeActivity } from './types';
+
+// ... (existing edgeInstances code)
+
+export const edgeActivities: EdgeActivity[] = [
+  {
+    id: 'act-1',
+    instanceId: '1',
+    instanceName: 'Factory Floor - Building A',
+    type: 'success',
+    action: 'Data Sync Completed',
+    timestamp: new Date(Date.now() - 1000 * 60 * 5),
+    details: 'Synchronized 156 telemetry records successfully.',
+  },
+  {
+    id: 'act-2',
+    instanceId: '3',
+    instanceName: 'Remote Site - Mining',
+    type: 'warning',
+    action: 'High CPU Usage',
+    timestamp: new Date(Date.now() - 1000 * 60 * 15),
+    details: 'CPU usage exceeded 85% for more than 10 minutes.',
+  },
+  {
+    id: 'act-3',
+    instanceId: '4',
+    instanceName: 'Branch Office - Seattle',
+    type: 'error',
+    action: 'Instance Offline',
+    timestamp: new Date(Date.now() - 1000 * 60 * 60),
+    details: 'Connection lost. Heartbeat failed.',
+  },
+  {
+    id: 'act-4',
+    instanceId: '2',
+    instanceName: 'Warehouse - Distribution Center',
+    type: 'info',
+    action: 'Version Update',
+    timestamp: new Date(Date.now() - 1000 * 60 * 120),
+    details: 'System updated to version 3.5.2.',
+  },
+];
 
 export const edgeInstances: EdgeInstance[] = [
   {

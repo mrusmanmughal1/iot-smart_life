@@ -155,12 +155,6 @@ export const EdgeTable: React.FC<EdgeTableProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Edge Instances</CardTitle>
-        <CardDescription>
-          Monitor and manage your edge computing nodes
-        </CardDescription>
-      </CardHeader>
       <CardContent>
         <DataTable
           columns={columns}

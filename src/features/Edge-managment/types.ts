@@ -16,3 +16,13 @@ export interface EdgeInstance {
     lastSync: Date;
   };
 }
+
+export interface EdgeActivity {
+  id: string;
+  instanceId: string;
+  instanceName: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  action: string;
+  timestamp: Date;
+  details?: string;
+}

@@ -22,6 +22,12 @@ const ScheduleManagement = Loadable(
 const SharingCenter = Loadable(
   lazy(() => import('@/pages/SharingCenterPage.tsx'))
 );
+const CreateRuleChainTemplate = Loadable(
+  lazy(() => import('@/pages/CreateRuleChainTemplatePage.tsx'))
+);
+const MQTTTemplatePage = Loadable(
+  lazy(() => import('@/pages/MQTTTemplatePage.tsx'))
+);
 
 export const connectivityRoutes = [
   // ------------------ automation ------------------------
@@ -35,6 +41,7 @@ export const connectivityRoutes = [
       },
     ],
   },
+
   {
     path: '/integrations',
     element: <FeatureRoute feature="integration" />,
@@ -60,6 +67,14 @@ export const connectivityRoutes = [
       {
         index: true,
         element: <EdgeManagement />,
+      },
+      {
+        path: 'create-rule-chain',
+        element: <CreateRuleChainTemplate />,
+      },
+      {
+        path: 'mqtt-template/:id',
+        element: <MQTTTemplatePage />,
       },
     ],
   },
