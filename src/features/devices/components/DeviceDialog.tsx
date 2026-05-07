@@ -234,7 +234,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl rounded-lg border-none gap-0  overflow-hidden shadow-none dark:bg-gray-950 dark:border-gray-700 ">
+      <DialogContent className="max-w-3xl rounded-lg border-none gap-  overflow-hidden shadow-none dark:bg-gray-950 dark:border-gray-700 ">
         <DialogHeader className="dark:text-white dark:bg-gray-950 dark:border-gray-700 dark:border-b">
           <DialogTitle>
             {isCreateMode ? t('devices.addDevice') : t('devices.editDevice')}
@@ -458,6 +458,7 @@ export const DeviceDialog: React.FC<DeviceDialogProps> = ({
             </div>
 
             <Tabs
+              defaultValue="hierarchy"
               value={selectionMethod}
               onValueChange={(val: any) => {
                 setSelectionMethod(val);

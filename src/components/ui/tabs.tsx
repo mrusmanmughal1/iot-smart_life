@@ -72,9 +72,7 @@ export function TabsTrigger({
   if (!context) {
     throw new Error('TabsTrigger must be used within Tabs');
   }
-
   const isActive = context.value === value;
-
   return (
     <button
       type="button"
@@ -95,7 +93,7 @@ export function TabsTrigger({
 
 interface TabsContentProps {
   value: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 
@@ -109,7 +107,6 @@ export function TabsContent({
   if (!context) {
     throw new Error('TabsContent must be used within Tabs');
   }
-
   if (context.value !== value) {
     return null;
   }

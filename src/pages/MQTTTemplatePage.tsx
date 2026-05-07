@@ -102,7 +102,6 @@ export default function MQTTTemplatePage() {
                   </div>
                 </div>
               </section>
-
               <section className="space-y-2">
                 <h3 className="text-xl font-semibold text-slate-800">
                   Connection Configuration
@@ -138,7 +137,6 @@ export default function MQTTTemplatePage() {
                   </div>
                 </div>
               </section>
-
               <section className="space-y-2">
                 <h3 className="text-xl font-semibold text-slate-800">
                   Topic Configuration
@@ -174,7 +172,6 @@ export default function MQTTTemplatePage() {
                 </div>
               </section>
             </div>
-
             {/* Right Column */}
             <div className="space-y-8 p-8 bg-white rounded-xl border border-slate-100 shadow-sm">
               <section className="space-y-6">

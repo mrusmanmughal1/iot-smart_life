@@ -137,8 +137,8 @@ export default function CreateRuleChainTemplatePage() {
                     id="isRoot"
                     className="h-5 w-5 border-slate-300"
                     checked={formData.isRoot}
-                    onCheckedChange={(val) =>
-                      setFormData({ ...formData, isRoot: !!val })
+                    onChange={(e) =>
+                      setFormData({ ...formData, isRoot: e.target.checked })
                     }
                   />
                   <Label
@@ -153,8 +153,8 @@ export default function CreateRuleChainTemplatePage() {
                     id="debugMode"
                     className="h-5 w-5 border-slate-300"
                     checked={formData.debugMode}
-                    onCheckedChange={(val) =>
-                      setFormData({ ...formData, debugMode: !!val })
+                    onChange={(e) =>
+                      setFormData({ ...formData, debugMode: e.target.checked })
                     }
                   />
                   <Label
