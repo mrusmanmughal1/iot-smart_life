@@ -28,6 +28,18 @@ const CreateRuleChainTemplate = Loadable(
 const MQTTTemplatePage = Loadable(
   lazy(() => import('@/pages/MQTTTemplatePage.tsx'))
 );
+const RuleChainTemplates = Loadable(
+  lazy(() => import('@/pages/RuleChainTemplatesPage.tsx'))
+);
+const CreateConverterTemplate = Loadable(
+  lazy(() => import('@/pages/CreateConverterTemplatePage.tsx'))
+);
+const JsonUplinkConverterConfig = Loadable(
+  lazy(() => import('@/pages/JsonUplinkConverterConfigPage.tsx'))
+);
+const ConverterTemplates = Loadable(
+  lazy(() => import('@/pages/ConverterTemplatesPage.tsx'))
+);
 
 export const connectivityRoutes = [
   // ------------------ automation ------------------------
@@ -73,8 +85,24 @@ export const connectivityRoutes = [
         element: <CreateRuleChainTemplate />,
       },
       {
+        path: 'rule-chain-templates',
+        element: <RuleChainTemplates />,
+      },
+      {
         path: 'mqtt-template/:id',
         element: <MQTTTemplatePage />,
+      },
+      {
+        path: 'create-converter-template',
+        element: <CreateConverterTemplate />,
+      },
+      {
+        path: 'converter-config/:id',
+        element: <JsonUplinkConverterConfig />,
+      },
+      {
+        path: 'converter-templates',
+        element: <ConverterTemplates />,
       },
     ],
   },

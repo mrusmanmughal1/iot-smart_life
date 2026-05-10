@@ -72,15 +72,13 @@ export default function MQTTTemplatePage() {
                       MQTT Integration Template
                     </p>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 flex items-center gap-2 justify-end">
                     <p className="text-slate-500 font-medium text-right">
                       Status:
                     </p>
-                    <div className="flex justify-end">
-                      <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white border-none px-4 py-1 rounded-full text-[10px] font-medium">
-                        Active
-                      </Badge>
-                    </div>
+                    <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white border-none px-4 py-1 rounded-full text-[10px] font-medium">
+                      Active
+                    </Badge>
                   </div>
                   <div className="space-y-1">
                     <p className="text-slate-500 font-medium">Type:</p>
@@ -173,13 +171,12 @@ export default function MQTTTemplatePage() {
               </section>
             </div>
             {/* Right Column */}
-            <div className="space-y-8 p-8 bg-white rounded-xl border border-slate-100 shadow-sm">
-              <section className="space-y-6">
+            <div className="space-y-8 p-6 bg-white rounded-xl border border-slate-100 shadow-sm">
+              <section className="space-y-2">
                 <h3 className="text-xl font-semibold text-slate-800">
                   Advanced Configuration
                 </h3>
-
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <div className="space-y-4">
                     <h4 className="text-base font-medium text-slate-700">
                       Security
@@ -209,7 +206,6 @@ export default function MQTTTemplatePage() {
                         <Input
                           value="Mqtt_user"
                           className="bg-slate-50 border-none h-10 text-slate-500"
-                          readOnly
                         />
                       </div>
                       <div className="space-y-2">
@@ -219,8 +215,7 @@ export default function MQTTTemplatePage() {
                         <Input
                           value="********"
                           type="password"
-                          className="bg-slate-50 border-none h-10 text-slate-500"
-                          readOnly
+                          className="bg-slate-50 border-none h-10 text-slate-500 "
                         />
                       </div>
                     </div>
@@ -282,9 +277,7 @@ export default function MQTTTemplatePage() {
                     </div>
                   </div>
 
-                  <Button className="w-full bg-indigo-700 hover:bg-indigo-800 text-white py-6 h-auto text-lg font-medium rounded-lg mt-4">
-                    Test Connection
-                  </Button>
+                  <Button variant="primary">Test Connection</Button>
                 </div>
               </section>
             </div>

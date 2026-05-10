@@ -194,9 +194,25 @@ const getNavItems = (): NavItem[] => [
   },
   {
     titleKey: 'nav.edgeManagementCenter',
-    href: '/edge-management',
     icon: <TvIcon className="h-5 w-5" />,
     feature: 'edge',
+    children: [
+      {
+        titleKey: 'nav.edgeInstances',
+        href: '/edge-management',
+        icon: <TvIcon className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.ruleChainTemplates',
+        href: '/edge-management/rule-chain-templates',
+        icon: <PiSquare className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.converterTemplates',
+        href: '/edge-management/converter-templates',
+        icon: <Layers className="h-4 w-4" />,
+      },
+    ],
   },
   {
     titleKey: 'nav.scheduleManagement',

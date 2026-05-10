@@ -61,6 +61,10 @@ export const schedulesApi = {
   getAll: (params?: ScheduleQuery) =>
     apiClient.get<PaginatedResponse<Schedule>>('/schedules', { params }),
 
+  // Get all schedules statistics
+  getAllStatistics: () =>
+    apiClient.get<PaginatedResponse<Schedule>>('/schedules/statistics'),
+
   // Get schedule by ID
   getById: (id: string) =>
     apiClient.get<ApiResponse<Schedule>>(`/schedules/${id}`),
@@ -91,8 +95,7 @@ export const schedulesApi = {
     }),
 
   // Get statistics
-  getStatistics: () =>
-    apiClient.get<ApiResponse<any>>('/schedules/statistics'),
+  getStatistics: () => apiClient.get<ApiResponse<any>>('/schedules/statistics'),
 
   // Validate cron expression
   validateCron: (expression: string) =>

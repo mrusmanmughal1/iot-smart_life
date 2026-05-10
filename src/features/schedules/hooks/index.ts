@@ -22,6 +22,13 @@ export const useSchedules = (params?: ScheduleQuery) => {
   });
 };
 
+export const useAllScheduleStatistics = () => {
+  return useQuery({
+    queryKey: scheduleKeys.statistics(),
+    queryFn: () => schedulesService.getAllStatistics(),
+  });
+};
+
 export const useScheduleById = (id?: string) => {
   return useQuery({
     queryKey: scheduleKeys.detail(id as string),

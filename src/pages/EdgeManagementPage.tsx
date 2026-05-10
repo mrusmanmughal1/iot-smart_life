@@ -7,11 +7,9 @@ import { EdgeStats } from '@/features/Edge-managment/components/EdgeStats';
 import { EdgeTable } from '@/features/Edge-managment/components/EdgeTable';
 import { EdgeCreateDialog } from '@/features/Edge-managment/components/EdgeCreateDialog';
 import { EdgeRecentActivities } from '@/features/Edge-managment/components/EdgeRecentActivities';
-import { useNavigate } from 'react-router-dom';
 
 export default function EdgeManagement() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <div className="space-y-6">
@@ -22,11 +20,6 @@ export default function EdgeManagement() {
           {
             label: 'Add Edge Instance',
             onClick: () => setIsCreateOpen(true),
-            icon: <Plus className="h-4 w-4 mr-2" />,
-          },
-          {
-            label: 'create rule chain template',
-            onClick: () => navigate('/edge-management/create-rule-chain'),
             icon: <Plus className="h-4 w-4 mr-2" />,
           },
         ]}

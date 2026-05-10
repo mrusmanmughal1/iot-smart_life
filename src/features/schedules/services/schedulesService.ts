@@ -10,7 +10,10 @@ export const schedulesService = {
     const response = await schedulesApi.getAll(params);
     return response.data;
   },
-
+  async getAllStatistics() {
+    const response = await schedulesApi.getAllStatistics();
+    return response.data;
+  },
   async getById(id: string) {
     const response = await schedulesApi.getById(id);
     return response.data.data;
