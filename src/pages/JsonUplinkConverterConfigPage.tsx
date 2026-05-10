@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,9 +21,9 @@ const converterSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   type: z.string().min(1, 'Type is required'),
   protocol: z.string().min(1, 'Protocol is required'),
-  enableValidation: z.boolean().default(true),
-  skipInvalid: z.boolean().default(false),
-  enableDebug: z.boolean().default(false),
+  enableValidation: z.boolean(),
+  skipInvalid: z.boolean(),
+  enableDebug: z.boolean(),
   inputFormat1: z.string().min(1, 'Input format is required'),
   inputFormat2: z.string().min(1, 'Output mapping is required'),
 });
@@ -54,7 +54,7 @@ export default function JsonUplinkConverterConfigPage() {
     },
   });
 
-  const onSave = (data: ConverterFormValues) => {
+  const onSave: SubmitHandler<ConverterFormValues> = (data) => {
     console.log('Converter Config Saved:', data);
     // TODO: API Integration
   };

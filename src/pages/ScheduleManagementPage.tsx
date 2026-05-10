@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -49,8 +49,8 @@ const scheduleSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   type: z.string().min(1, 'Type is required'),
   schedule: z.string().min(1, 'Schedule is required'),
-  enabled: z.boolean().default(true),
-  configuration: z.record(z.any()).default({}),
+  enabled: z.boolean(),
+  configuration: z.any(),
 });
 
 type ScheduleFormValues = z.infer<typeof scheduleSchema>;
@@ -111,7 +111,7 @@ export default function ScheduleManagement() {
     },
   });
 
-  const onSave = (data: ScheduleFormValues) => {
+  const onSave: SubmitHandler<ScheduleFormValues> = (data) => {
     console.log('Dummy Create Schedule:', data);
     toast.success('Schedule created (Dummy)');
     setIsCreateOpen(false);
