@@ -102,6 +102,8 @@
     "alarms": "Alarms",
     "analytics": "Analytics",
     "devicesAnalytics": "Devices Analytics",
+    "systemPerformanceAnalytics": "System Performance Analytics",
+
 
     "alertConfiguration": "Alert Configuration",
     "users": "Users & Roles",
@@ -1748,6 +1750,31 @@
         "status": "Status",
         "lastSeen": "Last Seen",
         "activity": "Activity"
+      }
+    },
+    "system": {
+      "title": "System Performance Analytics",
+      "subtitle": "Monitor system health, response times, and resource utilization",
+      "stats": {
+        "totalData": "Total Data Consumption",
+        "avgDaily": "Avg Daily Usage",
+        "peakHour": "Peak Usage Hour",
+        "storageEfficiency": "Storage Efficiency"
+      },
+      "charts": {
+        "responseTime": "Response Time Trends",
+        "resourceUtilization": "Resource Utilization",
+        "errorAnalysis": "Error Analysis"
+      },
+      "status": {
+        "title": "System Health Status",
+        "db": "Database Connection",
+        "mq": "Message Queue",
+        "cache": "Cache Service",
+        "storage": "File Storage"
+      },
+      "alerts": {
+        "title": "Recent Alerts"
       }
     },
     "title": "Device Analytics and Monitoring - Building {{building}}",

@@ -25,6 +25,9 @@ const AnalyticsPage = Loadable(lazy(() => import('@/pages/AnalyticsPage.tsx')));
 const DevicesAnalyticsPage = Loadable(
   lazy(() => import('@/pages/DevicesAnalyticsPage.tsx'))
 );
+const SystemPerformanceAnalyticsPage = Loadable(
+  lazy(() => import('@/pages/SystemPerformanceAnalyticsPage.tsx'))
+);
 const IndividualDeviceAnalyticsPage = Loadable(
   lazy(() => import('@/pages/IndividualDeviceAnalyticsPage.tsx'))
 );
@@ -118,6 +121,10 @@ export const mainDashboardRoutes = [
       {
         path: 'devices',
         element: <DevicesAnalyticsPage />,
+      },
+      {
+        path: 'system',
+        element: <SystemPerformanceAnalyticsPage />,
       },
       {
         path: 'device-analytics',

@@ -178,6 +178,11 @@ const getNavItems = (): NavItem[] => [
         href: '/analytics/devices',
         icon: <Smartphone className="h-4 w-4" />,
       },
+      {
+        titleKey: 'nav.systemPerformanceAnalytics',
+        href: '/analytics/system',
+        icon: <Activity className="h-4 w-4" />,
+      },
     ],
   },
   {
