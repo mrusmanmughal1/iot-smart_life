@@ -7,16 +7,18 @@ const CardComponent = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   const { effectiveTheme } = useThemeStore();
-  
+
   return (
     <div
       ref={ref}
       className={cn(
         'rounded-xl border shadow-sm hover:shadow-md transition-all',
         // Light mode
-        effectiveTheme === 'light' && 'border-slate-200 bg-white text-slate-950',
+        effectiveTheme === 'light' &&
+          'border-slate-200 bg-white text-slate-950',
         // Dark mode
-        effectiveTheme === 'dark' && 'border-slate-800 bg-slate-950 text-slate-50',
+        effectiveTheme === 'dark' &&
+          'border-slate-800 bg-slate-950 text-slate-50',
         // Fallback for Tailwind dark: classes
         'dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50',
         className
@@ -46,7 +48,7 @@ const CardTitleComponent = React.forwardRef<
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
   const { effectiveTheme } = useThemeStore();
-  
+
   return (
     <h3
       ref={ref}
@@ -73,7 +75,7 @@ const CardDescriptionComponent = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
   const { effectiveTheme } = useThemeStore();
-  
+
   return (
     <p
       ref={ref}
@@ -115,4 +117,11 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = 'CardFooter';
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+};

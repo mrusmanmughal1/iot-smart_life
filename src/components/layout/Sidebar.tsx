@@ -170,9 +170,15 @@ const getNavItems = (): NavItem[] => [
   },
   {
     titleKey: 'nav.analytics',
-    href: '/analytics',
     icon: <BarChart3 className="h-5 w-5" />,
     feature: 'analytics',
+    children: [
+      {
+        titleKey: 'nav.devicesAnalytics',
+        href: '/analytics/devices',
+        icon: <Smartphone className="h-4 w-4" />,
+      },
+    ],
   },
   {
     titleKey: 'nav.usersAndRoles',

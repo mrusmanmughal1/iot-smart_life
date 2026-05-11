@@ -101,6 +101,8 @@
     "alerts": "Alerts",
     "alarms": "Alarms",
     "analytics": "Analytics",
+    "devicesAnalytics": "Devices Analytics",
+
     "alertConfiguration": "Alert Configuration",
     "users": "Users & Roles",
     "history": "History",
@@ -1725,7 +1727,29 @@
       "pleaseSelectTwoVersions": "Please select exactly 2 versions to compare"
     }
   },
-  "analytics": {
+    "analytics": {
+    "devices": {
+      "title": "Devices Analytics",
+      "subtitle": "Comprehensive overview of device performance and connectivity",
+      "stats": {
+        "activeDevices": "Active Devices",
+        "dataThroughput": "Data Throughput",
+        "activeAlarms": "Active Alarms",
+        "systemUptime": "System Uptime"
+      },
+      "charts": {
+        "connectivityTrend": "Connectivity Trend",
+        "deviceDistribution": "Device Type Distribution",
+        "dataUsage": "Data Usage (MB)"
+      },
+      "table": {
+        "recentActivity": "Recent Activity",
+        "deviceId": "Device ID",
+        "status": "Status",
+        "lastSeen": "Last Seen",
+        "activity": "Activity"
+      }
+    },
     "title": "Device Analytics and Monitoring - Building {{building}}",
     "reportTemplates": "Report Templates",
     "filters": "Filters:",
