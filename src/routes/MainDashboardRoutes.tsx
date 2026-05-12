@@ -28,11 +28,17 @@ const DevicesAnalyticsPage = Loadable(
 const SystemPerformanceAnalyticsPage = Loadable(
   lazy(() => import('@/pages/SystemPerformanceAnalyticsPage.tsx'))
 );
+const DataConsumptionAnalyticsPage = Loadable(
+  lazy(() => import('@/pages/DataConsumptionAnalyticsPage.tsx'))
+);
+const DashboardsAnalyticsPage = Loadable(
+  lazy(() => import('@/pages/DashboardsAnalyticsPage'))
+);
 const IndividualDeviceAnalyticsPage = Loadable(
   lazy(() => import('@/pages/IndividualDeviceAnalyticsPage.tsx'))
 );
 const DashboardAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/DashboardAnalyticsPage.tsx'))
+  lazy(() => import('@/pages/DashboardsAnalyticsPage'))
 );
 const ProductionOverviewPage = Loadable(
   lazy(() => import('@/pages/ProductionOverviewPage.tsx'))
@@ -115,16 +121,32 @@ export const mainDashboardRoutes = [
     element: <FeatureRoute feature="analytics" />,
     children: [
       {
-        index: true,
-        element: <DeviceAnalyticsPage />,
+        path: 'dashboard',
+        element: <DevicesAnalyticsPage />,
       },
       {
         path: 'devices',
-        element: <DevicesAnalyticsPage />,
+        element: <DeviceAnalyticsPage />,
+      },
+      {
+        path: 'dashboard-analytics',
+        element: <DashboardAnalyticsPage />,
+      },
+      {
+        path: 'data-consumption',
+        element: <DataConsumptionAnalyticsPage />,
       },
       {
         path: 'system',
         element: <SystemPerformanceAnalyticsPage />,
+      },
+      {
+        path: 'geo-analytics',
+        element: <AnalyticsPage />,
+      },
+      {
+        path: 'reports',
+        element: <AnalyticsPage />,
       },
       {
         path: 'device-analytics',
@@ -136,7 +158,7 @@ export const mainDashboardRoutes = [
       },
       {
         path: 'dashboard-analytics',
-        element: <DashboardAnalyticsPage />,
+        element: <DashboardsAnalyticsPage />,
       },
       {
         path: 'product-overview',

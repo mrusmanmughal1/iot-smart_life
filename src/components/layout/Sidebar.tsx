@@ -35,6 +35,8 @@ import {
   History,
   SquareChartGantt,
   Rss,
+  MapPin,
+  Zap,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useAppStore } from '@/stores/useAppStore';
@@ -174,14 +176,39 @@ const getNavItems = (): NavItem[] => [
     feature: 'analytics',
     children: [
       {
+        titleKey: 'nav.analyticsDashboard',
+        href: '/analytics/dashboard',
+        icon: <LayoutDashboard className="h-4 w-4" />,
+      },
+      {
         titleKey: 'nav.devicesAnalytics',
         href: '/analytics/devices',
         icon: <Smartphone className="h-4 w-4" />,
       },
       {
+        titleKey: 'nav.dashboardAnalytics',
+        href: '/analytics/dashboard-analytics',
+        icon: <BarChart3 className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.dataConsumption',
+        href: '/analytics/data-consumption',
+        icon: <Zap className="h-4 w-4" />,
+      },
+      {
         titleKey: 'nav.systemPerformanceAnalytics',
         href: '/analytics/system',
         icon: <Activity className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.geoAnalytics',
+        href: '/analytics/geo-analytics',
+        icon: <MapPin className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.reports',
+        href: '/analytics/reports',
+        icon: <FileText className="h-4 w-4" />,
       },
     ],
   },

@@ -101,9 +101,13 @@
     "alerts": "Alerts",
     "alarms": "Alarms",
     "analytics": "Analytics",
-    "devicesAnalytics": "Devices Analytics",
-    "systemPerformanceAnalytics": "System Performance Analytics",
-
+    "devicesAnalytics": "Device Analytics",
+    "systemPerformanceAnalytics": "System Performance",
+    "analyticsDashboard": "Dashboard",
+    "dashboardAnalytics": "Dashboard Analytics",
+    "dataConsumption": "Data Consumption",
+    "geoAnalytics": "Geo Analytics",
+    "reports": "Reports",
 
     "alertConfiguration": "Alert Configuration",
     "users": "Users & Roles",
@@ -1729,7 +1733,7 @@
       "pleaseSelectTwoVersions": "Please select exactly 2 versions to compare"
     }
   },
-    "analytics": {
+  "analytics": {
     "devices": {
       "title": "Devices Analytics",
       "subtitle": "Comprehensive overview of device performance and connectivity",
@@ -1775,6 +1779,54 @@
       },
       "alerts": {
         "title": "Recent Alerts"
+      }
+    },
+    "dashboard": {
+      "title": "Dashboard Analytics",
+      "filters": {
+        "sortBy": "Sort by: {{value}}"
+      },
+      "table": {
+        "dashboardName": "DASHBOARD NAME",
+        "co2Emissions": "CO2 EMISSIONS",
+        "temperature": "TEMPERATURE",
+        "humidity": "HUMIDITY",
+        "energyUsage": "ENERGY USAGE",
+        "lastUpdated": "LAST UPDATED",
+        "status": "STATUS",
+        "actions": "ACTIONS"
+      },
+      "charts": {
+        "metricsTrends": "Environmental Metrics Trends",
+        "impactSummary": "Environmental Impact Summary",
+        "totalCo2": "Total CO2 Emissions (7 days)",
+        "carbonFootprint": "Carbon Footprint",
+        "energyConsumption": "Energy Consumption",
+        "efficiencyScore": "Efficiency Score",
+        "sustainabilityTarget": "Sustainability Target: {{value}}%",
+        "optimizationGoal": "Optimization Goal: {{value}}%"
+      }
+    },
+    "dataConsumption": {
+      "title": "Data Consumption Analytics",
+      "subtitle": "Detailed analytics for Production Overview dashboard",
+      "stats": {
+        "totalData": "Total Data Consumption",
+        "avgDaily": "Avg Daily Usage",
+        "peakHour": "Peak Usage Hour",
+        "storageEfficiency": "Storage Efficiency"
+      },
+      "charts": {
+        "consumptionTrend": "Data Consumption Trend (30 days)",
+        "statusDistribution": "Device Status Distribution"
+      },
+      "table": {
+        "type": "TYPE",
+        "name": "NAME",
+        "dataConsumed": "DATA CONSUMED",
+        "percentOfTotal": "% OF TOTAL",
+        "trend": "TREND",
+        "actions": "ACTIONS"
       }
     },
     "title": "Device Analytics and Monitoring - Building {{building}}",
