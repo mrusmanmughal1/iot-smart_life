@@ -28,7 +28,6 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { MoreHorizontal } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 const metricsTrendsData = [
@@ -89,12 +88,19 @@ export default function DashboardsAnalyticsPage() {
 
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in duration-500">
+      <PageHeader
+        title={t('analytics.dashboard.title')}
+        description="Real-time analytics for your IoT devices."
+        actions={[
+          {
+            label: 'Export Data',
+            onClick: () => {},
+          },
+        ]}
+      />
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col space-y-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t('analytics.dashboard.title')}
-          </h1>
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
@@ -102,59 +108,66 @@ export default function DashboardsAnalyticsPage() {
             >
               Data Consumption
             </Button>
-            <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-[160px] h-10 bg-gray-100 border-none rounded-md">
-                <SelectValue placeholder="Time Range: 7 days" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="24h">Last 24 hours</SelectItem>
-                <SelectItem value="7d">Time Range: 7 days</SelectItem>
-                <SelectItem value="30d">Last 30 days</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[160px] h-10 bg-gray-100 border-none rounded-md">
-                <SelectValue placeholder="Sort by: CO2" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="CO2">Sort by: CO2</SelectItem>
-                <SelectItem value="Temp">Sort by: Temp</SelectItem>
-                <SelectItem value="Humidity">Sort by: Humidity</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex gap-1  items-center">
+              {' '}
+              <span>Time:</span>{' '}
+              <Select value={timeRange} onValueChange={setTimeRange}>
+                <SelectTrigger className="w-[160px] h-10 bg-gray-100 border-none rounded-md">
+                  <SelectValue placeholder="Time Range: 7 days" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="24h">Last 24 hours</SelectItem>
+                  <SelectItem value="7d">Time Range: 7 days</SelectItem>
+                  <SelectItem value="30d">Last 30 days</SelectItem>
+                </SelectContent>
+              </Select>{' '}
+            </div>
+            <div className="flex items-center gap-2 ">
+              {' '}
+              <span>Sort By:</span>{' '}
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[160px] h-10 bg-gray-100 border-none rounded-md">
+                  <SelectValue placeholder="CO2" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="CO2">CO2</SelectItem>
+                  <SelectItem value="Temp">Temp</SelectItem>
+                  <SelectItem value="Humidity">Humidity</SelectItem>
+                </SelectContent>
+              </Select>{' '}
+            </div>
           </div>
         </div>
-        <Button variant="primary">Export Data</Button>
       </div>
 
       {/* Main Table Card */}
-      <Card className="border border-gray-100 shadow-sm rounded-xl overflow-hidden">
+      <Card className=" shadow-sm rounded-xl overflow-hidden">
         <CardContent className="p-6">
           <Table>
             <TableHeader className="">
               <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="text-white font-medium h-14">
+                <TableHead className="text-white font-medium h-12">
                   {t('analytics.dashboard.table.dashboardName')}
                 </TableHead>
-                <TableHead className="text-white font-medium h-14">
+                <TableHead className="text-white font-medium h-12">
                   {t('analytics.dashboard.table.co2Emissions')}
                 </TableHead>
-                <TableHead className="text-white font-medium h-14">
+                <TableHead className="text-white font-medium h-12">
                   {t('analytics.dashboard.table.temperature')}
                 </TableHead>
-                <TableHead className="text-white font-medium h-14">
+                <TableHead className="text-white font-medium h-12">
                   {t('analytics.dashboard.table.humidity')}
                 </TableHead>
-                <TableHead className="text-white font-medium h-14">
+                <TableHead className="text-white font-medium h-12 ">
                   {t('analytics.dashboard.table.energyUsage')}
                 </TableHead>
-                <TableHead className="text-white font-medium h-14">
+                <TableHead className="text-white font-medium h-12">
                   {t('analytics.dashboard.table.lastUpdated')}
                 </TableHead>
-                <TableHead className="text-white font-medium h-14">
+                <TableHead className="text-white font-medium h-12">
                   {t('analytics.dashboard.table.status')}
                 </TableHead>
-                <TableHead className="text-white font-medium h-14 text-right">
+                <TableHead className="text-white font-medium h-12 text-right">
                   {t('analytics.dashboard.table.actions')}
                 </TableHead>
               </TableRow>
@@ -196,8 +209,12 @@ export default function DashboardsAnalyticsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="h-8 text-[10px]"
+                    >
+                      View Details
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -210,9 +227,9 @@ export default function DashboardsAnalyticsPage() {
       {/* Charts and Summary Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Trends Chart */}
-        <Card className="border border-gray-100 shadow-sm rounded-xl overflow-hidden">
+        <Card className="shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="p-6 pb-2">
-            <CardTitle className="text-xl font-bold text-gray-800">
+            <CardTitle className="text-xl font-semibold text-gray-800">
               {t('analytics.dashboard.charts.metricsTrends')}
             </CardTitle>
           </CardHeader>
@@ -277,7 +294,7 @@ export default function DashboardsAnalyticsPage() {
         {/* Impact Summary */}
         <Card className="border border-gray-100 shadow-sm rounded-xl overflow-hidden">
           <CardHeader className="p-6 pb-2">
-            <CardTitle className="text-xl font-bold text-gray-800">
+            <CardTitle className="text-xl font-semibold text-gray-800">
               {t('analytics.dashboard.charts.impactSummary')}
             </CardTitle>
           </CardHeader>
@@ -304,11 +321,7 @@ export default function DashboardsAnalyticsPage() {
                 <p className="text-3xl font-bold text-red-500">854 kWh</p>
                 <p className="text-xs text-gray-500">↑ 5% from last week</p>
                 <div className="pt-2">
-                  <Progress
-                    value={80}
-                    className="h-2 bg-gray-100"
-                    indicatorClassName="bg-green-500"
-                  />
+                  <Progress value={80} className="h-2 bg-gray-100" />
                   <p className="text-[10px] text-gray-400 mt-1">
                     {t('analytics.dashboard.charts.sustainabilityTarget', {
                       value: 80,
@@ -323,11 +336,7 @@ export default function DashboardsAnalyticsPage() {
                 <p className="text-3xl font-bold text-[#4338ca]">87%</p>
                 <p className="text-xs text-gray-500">↑ 3% from last week</p>
                 <div className="pt-2">
-                  <Progress
-                    value={87}
-                    className="h-2 bg-gray-100"
-                    indicatorClassName="bg-[#4338ca]"
-                  />
+                  <Progress value={87} className="h-2 bg-gray-100" />
                   <p className="text-[10px] text-gray-400 mt-1">
                     {t('analytics.dashboard.charts.optimizationGoal', {
                       value: 87,
