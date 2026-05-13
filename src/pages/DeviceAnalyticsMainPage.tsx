@@ -31,46 +31,44 @@ import {
   Cell,
   Label,
 } from 'recharts';
-import { ChevronRight, Edit2, Trash2 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/util';
 
 const tableData = [
   {
-    name: 'Building A - Main Office',
-    type: 'Commercial',
-    status: 'ACTIVE',
-    dataGenerated: '2 hours ago',
+    name: 'Sensor-001',
+    type: 'Temperature',
+    status: 'Online',
+    dataGenerated: '2.3 MB/day',
     lastActive: '2 min ago',
-    uptimePercent: '99.8%',
-    uptimeCount: '3',
+    uptime: '99.8%',
+    alerts: 3,
     statusColor: 'text-green-500',
     dotColor: 'bg-green-500',
-    typeColor: 'bg-green-50 text-green-700 hover:bg-green-50',
+    alertColor: 'text-red-500',
   },
   {
-    name: 'Warehouse B',
-    type: 'Retail',
-    status: 'Processing',
-    dataGenerated: '1 day ago',
+    name: 'Gateway-002',
+    type: 'Gateway',
+    status: 'Online',
+    dataGenerated: '12.7 MB/day',
     lastActive: '5 min ago',
-    uptimePercent: '99.2%',
-    uptimeCount: '5',
-    statusColor: 'text-blue-400',
-    dotColor: 'bg-blue-400',
-    typeColor: 'bg-purple-50 text-purple-700 hover:bg-purple-50',
+    uptime: '99.2%',
+    alerts: 0,
+    statusColor: 'text-green-500',
+    dotColor: 'bg-green-500',
+    alertColor: 'text-green-500',
   },
   {
-    name: 'Retail Store C',
-    type: 'Industrial',
-    status: 'ERROR',
-    dataGenerated: '3 days ago',
+    name: 'Motor-003',
+    type: 'Actuator',
+    status: 'Offline',
+    dataGenerated: '0 MB/day',
     lastActive: '2 hours ago',
-    uptimePercent: '87.3%',
-    uptimeCount: '7',
-    statusColor: 'text-purple-500',
-    dotColor: 'bg-purple-500',
-    typeColor: 'bg-blue-50 text-blue-700 hover:bg-blue-50',
+    uptime: '87.3%',
+    alerts: 1,
+    statusColor: 'text-gray-500',
+    dotColor: 'bg-red-500',
+    alertColor: 'text-red-500',
   },
 ];
 
@@ -105,12 +103,8 @@ export default function DeviceAnalyticsMainPage() {
 
       {/* Filters Section */}
       <div className="flex flex-wrap items-center gap-3">
-        <Select
-          value={deviceType}
-          onValueChange={setDeviceType}
-          className="w-44"
-        >
-          <SelectTrigger className="  bg-gray-100 border-none rounded-md">
+        <Select value={deviceType} onValueChange={setDeviceType}>
+          <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
             <SelectValue
               placeholder={t('analytics.deviceMain.filters.deviceType')}
             />
@@ -119,13 +113,13 @@ export default function DeviceAnalyticsMainPage() {
             <SelectItem value="all">
               {t('analytics.deviceMain.filters.deviceType')}
             </SelectItem>
-            <SelectItem value="commercial">Commercial</SelectItem>
-            <SelectItem value="retail">Retail</SelectItem>
-            <SelectItem value="industrial">Industrial</SelectItem>
+            <SelectItem value="temperature">Temperature</SelectItem>
+            <SelectItem value="gateway">Gateway</SelectItem>
+            <SelectItem value="actuator">Actuator</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={status} onValueChange={setStatus} className="w-44">
+        <Select value={status} onValueChange={setStatus}>
           <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
             <SelectValue
               placeholder={t('analytics.deviceMain.filters.status')}
@@ -135,13 +129,12 @@ export default function DeviceAnalyticsMainPage() {
             <SelectItem value="all">
               {t('analytics.deviceMain.filters.status')}
             </SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
-            <SelectItem value="error">Error</SelectItem>
+            <SelectItem value="online">Online</SelectItem>
+            <SelectItem value="offline">Offline</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={timeRange} onValueChange={setTimeRange} className="w-44">
+        <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
             <SelectValue
               placeholder={t('analytics.deviceMain.filters.timeRange')}
@@ -158,35 +151,33 @@ export default function DeviceAnalyticsMainPage() {
       </div>
 
       {/* Main Table Card */}
-      <Card className="  rounded-xl overflow-hidden">
-        <CardContent className="p-6">
-          <Table className=" ">
-            <TableHeader className=" ">
-              <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="text-white font-medium   w-[300px]">
-                  <div className="flex items-center ">
-                    {t('analytics.deviceMain.table.deviceName')}
-                  </div>
+      <Card className=" rounded-xl overflow-hidden">
+        <CardContent className="p-5">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold  ">
+                  {t('analytics.deviceMain.table.deviceName')}
                 </TableHead>
-                <TableHead className="text-white font-medium  ">
+                <TableHead className="font-semibold  ">
                   {t('analytics.deviceMain.table.type')}
                 </TableHead>
-                <TableHead className="text-white font-medium  ">
+                <TableHead className="font-semibold  ">
                   {t('analytics.deviceMain.table.status')}
                 </TableHead>
-                <TableHead className="text-white font-medium  ">
+                <TableHead className="font-semibold  ">
                   {t('analytics.deviceMain.table.dataGenerated')}
                 </TableHead>
-                <TableHead className="text-white font-medium  ">
+                <TableHead className="font-semibold  ">
                   {t('analytics.deviceMain.table.lastActive')}
                 </TableHead>
-                <TableHead className="text-white font-medium  ">
-                  {t('analytics.deviceMain.table.uptimePercent')}
+                <TableHead className="font-semibold  ">
+                  {t('analytics.deviceMain.table.uptime')}
                 </TableHead>
-                <TableHead className="text-white font-medium  ">
-                  {t('analytics.deviceMain.table.uptimeCount')}
+                <TableHead className="font-semibold  ">
+                  {t('analytics.deviceMain.table.alerts')}
                 </TableHead>
-                <TableHead className="text-white font-medium   text-center">
+                <TableHead className="font-semibold  ">
                   {t('analytics.deviceMain.table.actions')}
                 </TableHead>
               </TableRow>
@@ -197,31 +188,18 @@ export default function DeviceAnalyticsMainPage() {
                   key={index}
                   className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16"
                 >
-                  <TableCell className="text-sm font-medium text-gray-700">
-                    <div className="flex items-center gap-2">{row.name}</div>
+                  <TableCell className="text-sm text-gray-700">
+                    {row.name}
                   </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="secondary"
-                      className={cn(
-                        'rounded-md px-3 py-1 font-normal',
-                        row.typeColor
-                      )}
-                    >
-                      {row.type}
-                    </Badge>
+                  <TableCell className="text-sm text-gray-600">
+                    {row.type}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <div
-                        className={cn('w-1.5 h-1.5 rounded-full', row.dotColor)}
+                        className={cn('w-2 h-2 rounded-full', row.dotColor)}
                       />
-                      <span
-                        className={cn(
-                          'font-bold text-[10px] uppercase',
-                          row.statusColor
-                        )}
-                      >
+                      <span className="text-sm text-gray-600">
                         {row.status}
                       </span>
                     </div>
@@ -233,28 +211,21 @@ export default function DeviceAnalyticsMainPage() {
                     {row.lastActive}
                   </TableCell>
                   <TableCell className="text-sm text-gray-600">
-                    {row.uptimePercent}
+                    {row.uptime}
                   </TableCell>
-                  <TableCell className="text-sm text-gray-600 text-center">
-                    {row.uptimeCount}
+                  <TableCell
+                    className={cn('text-sm font-bold', row.alertColor)}
+                  >
+                    {row.alerts}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="hover:bg-secondary hover:text-white"
-                      >
-                        <Edit2 className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="hover:bg-secondary hover:text-white"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
+                  <TableCell>
+                    <Button 
+                      variant="primary" 
+                      size="sm"
+                      onClick={() => window.location.href = `/analytics/devices/${row.name}`}
+                    >
+                      {t('analytics.deviceMain.table.viewDetails')}
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -266,7 +237,7 @@ export default function DeviceAnalyticsMainPage() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Data Generators */}
-        <Card className="  rounded-xl overflow-hidden">
+        <Card className=" rounded-xl overflow-hidden">
           <CardHeader className="p-6">
             <CardTitle className="text-lg font-semibold text-gray-800">
               {t('analytics.deviceMain.charts.topGenerators')}
@@ -298,7 +269,7 @@ export default function DeviceAnalyticsMainPage() {
                       if (active && payload && payload.length) {
                         return (
                           <div className="bg-white p-2 border border-gray-100 rounded-md shadow-lg">
-                            <p className="text-sm font-bold text-gray-800">{`${payload[0].value}MB`}</p>
+                            <p className="text-sm font-semibold text-gray-800">{`${payload[0].value} MB`}</p>
                           </div>
                         );
                       }
@@ -328,7 +299,7 @@ export default function DeviceAnalyticsMainPage() {
         </Card>
 
         {/* Device Status Distribution */}
-        <Card className="  rounded-xl overflow-hidden">
+        <Card className=" rounded-xl overflow-hidden">
           <CardHeader className="p-6">
             <CardTitle className="text-lg font-semibold text-gray-800">
               {t('analytics.deviceMain.charts.statusDistribution')}
@@ -343,7 +314,7 @@ export default function DeviceAnalyticsMainPage() {
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
-                    outerRadius={110}
+                    outerRadius={100}
                     paddingAngle={0}
                     dataKey="value"
                   >
@@ -363,7 +334,7 @@ export default function DeviceAnalyticsMainPage() {
                             <tspan
                               x={cx}
                               y={cy - 10}
-                              className="text-4xl font-bold fill-gray-800"
+                              className="text-xl font-semibold  "
                             >
                               247
                             </tspan>

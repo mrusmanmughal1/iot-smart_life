@@ -12,7 +12,13 @@ import { DeviceCredentialsDialog } from '@/features/devices/components/DeviceCre
 import { DeviceAttributesTab } from '@/features/devices/components/DeviceAttributesTab';
 import { DeviceControlTab } from '@/features/devices/components/DeviceControlTab';
 
-type TabType = 'details' | 'attributes' | 'telemetry' | 'alarms' | 'relations' | 'control';
+type TabType =
+  | 'details'
+  | 'attributes'
+  | 'telemetry'
+  | 'alarms'
+  | 'relations'
+  | 'control';
 
 export default function DeviceDetailsPage() {
   const { id } = useParams<{ id: string }>();

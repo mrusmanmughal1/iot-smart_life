@@ -1743,19 +1743,55 @@
         "timeRange": "Time Range: 7 days"
       },
       "table": {
-        "deviceName": "DEVICE NAME",
-        "type": "TYPE",
-        "status": "STATUS",
-        "dataGenerated": "DATA GENERATED",
-        "lastActive": "LAST ACTIVE",
-        "uptimePercent": "UPTIME (%)",
-        "uptimeCount": "UPTIME",
-        "actions": "ACTIONS"
+        "deviceName": "Device Name",
+        "type": "Type",
+        "status": "Status",
+        "dataGenerated": "Data Generated",
+        "lastActive": "Last Active",
+        "uptime": "Uptime",
+        "alerts": "Alerts",
+        "actions": "Actions",
+        "viewDetails": "View Details"
       },
       "charts": {
         "topGenerators": "Top Data Generators",
         "statusDistribution": "Device Status Distribution",
         "totalDevices": "Total Devices"
+      }
+    },
+    "deviceDetails": {
+      "title": "Device Analytics - {{name}}",
+      "subtitle": "Detailed analytics for {{type}}",
+      "stats": {
+        "currentStatus": "Current Status",
+        "dataRate": "Data Rate",
+        "uptime": "Uptime",
+        "activeAlerts": "Active Alerts",
+        "lastSeen": "Last seen: {{time}}",
+        "last30Days": "Last 30 days"
+      },
+      "charts": {
+        "generationTrend": "Data Generation Trend (7 days)",
+        "readings": "{{type}} Readings",
+        "normalRange": "Current Normal Range",
+        "max": "Max: {{value}}",
+        "min": "Min: {{value}}",
+        "avg": "Avg: {{value}}"
+      },
+      "alertHistory": {
+        "title": "Alert History"
+      },
+      "info": {
+        "title": "Device Information",
+        "deviceId": "Device ID",
+        "location": "Location",
+        "firmware": "Firmware",
+        "battery": "Battery",
+        "signalStrength": "Signal Strength"
+      },
+      "actions": {
+        "configure": "Configure",
+        "reset": "Reset Device"
       }
     },
     "geo": {
