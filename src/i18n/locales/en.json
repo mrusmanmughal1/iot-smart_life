@@ -1734,6 +1734,27 @@
     }
   },
   "analytics": {
+    "geo": {
+      "title": "Geo Analytics",
+      "subtitle": "Geographic distribution and location-based device analytics",
+      "mapTitle": "Device Distribution Map",
+      "stats": {
+        "title": "Regional Statistics",
+        "totalDevices": "Total: {{count}} devices",
+        "viewMode": "View Mode:",
+        "heatmap": "Heatmap",
+        "clusters": "Clusters"
+      },
+      "table": {
+        "title": "Location-Based Performance",
+        "region": "REGION",
+        "avgResponseTime": "AVG RESPONSE TIME",
+        "uptime": "UPTIME",
+        "dataQuality": "DATA QUALITY",
+        "alertRate": "ALERT RATE",
+        "status": "STATUS"
+      }
+    },
     "devices": {
       "title": "Devices Analytics",
       "subtitle": "Comprehensive overview of device performance and connectivity",
@@ -1807,6 +1828,7 @@
         "optimizationGoal": "Optimization Goal: {{value}}%"
       }
     },
+
     "dataConsumption": {
       "title": "Data Consumption Analytics",
       "subtitle": "Detailed analytics for Production Overview dashboard",

@@ -108,7 +108,10 @@ export default function AssetsPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <PageHeader title={t('assets.title')} description={t('assets.subtitle')} />
+          <PageHeader
+            title={t('assets.title')}
+            description={t('assets.subtitle')}
+          />
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

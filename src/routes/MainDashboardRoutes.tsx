@@ -34,6 +34,9 @@ const DataConsumptionAnalyticsPage = Loadable(
 const DashboardsAnalyticsPage = Loadable(
   lazy(() => import('@/pages/DashboardsAnalyticsPage'))
 );
+const GeoAnalyticsPage = Loadable(
+  lazy(() => import('@/pages/GeoAnalyticsPage.tsx'))
+);
 const IndividualDeviceAnalyticsPage = Loadable(
   lazy(() => import('@/pages/IndividualDeviceAnalyticsPage.tsx'))
 );
@@ -44,9 +47,6 @@ const ProductionOverviewPage = Loadable(
   lazy(() => import('@/pages/ProductionOverviewPage.tsx'))
 );
 const Overview2Page = Loadable(lazy(() => import('@/pages/Overview2Page.tsx')));
-const GeoAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/GeoAnalyticsPage.tsx'))
-);
 const SettingsPage = Loadable(lazy(() => import('@/pages/SettingsPage.tsx')));
 const GeneralSettingsTab = Loadable(
   lazy(() =>
@@ -142,7 +142,7 @@ export const mainDashboardRoutes = [
       },
       {
         path: 'geo-analytics',
-        element: <AnalyticsPage />,
+        element: <GeoAnalyticsPage />,
       },
       {
         path: 'reports',
