@@ -131,17 +131,14 @@ export const mainDashboardRoutes = [
         element: <DeviceAnalyticsMainPage />,
       },
       {
-        path: 'device-analytics/:id',
-        element: <IndividualDeviceAnalyticsPage />,
-      },
-      {
-        path: 'devices-main',
-        element: <DeviceAnalyticsMainPage />,
-      },
-      {
         path: 'devices/:id',
         element: <DeviceanalyticsDetailsPage />,
       },
+      {
+        path: 'device-analytics/:id',
+        element: <IndividualDeviceAnalyticsPage />,
+      },
+
       {
         path: 'dashboard-analytics',
         element: <DashboardAnalyticsPage />,
