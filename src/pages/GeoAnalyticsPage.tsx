@@ -125,7 +125,6 @@ export default function GeoAnalyticsPage() {
     queryFn: () => assetsApi.getAll(),
     retry: 2,
   });
-  console.log('assetss', assetsResponse?.data.data?.data);
   // Fetch assets on mount
   useEffect(() => {
     if (assetsResponse?.data.data?.data) {
