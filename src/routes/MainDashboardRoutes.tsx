@@ -129,7 +129,7 @@ export const mainDashboardRoutes = [
       },
       {
         path: 'devices',
-        element: <DeviceAnalyticsPage />,
+        element: <DeviceAnalyticsMainPage />,
       },
       {
         path: 'devices-main',
