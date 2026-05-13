@@ -313,7 +313,7 @@ export default function DeviceAnalyticsMainPage() {
                       position: 'top',
                       fill: '#64748b',
                       fontSize: 12,
-                      formatter: (val: number) => `${val}MB`,
+                      // formatter: (val: number) => `${val}MB`,
                       offset: 10,
                     }}
                   >
