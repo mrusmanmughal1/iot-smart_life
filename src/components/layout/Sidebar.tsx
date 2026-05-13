@@ -176,11 +176,6 @@ const getNavItems = (): NavItem[] => [
     feature: 'analytics',
     children: [
       {
-        titleKey: 'nav.analyticsDashboard',
-        href: '/analytics/dashboard',
-        icon: <LayoutDashboard className="h-4 w-4" />,
-      },
-      {
         titleKey: 'nav.devicesAnalytics',
         href: '/analytics/devices',
         icon: <Smartphone className="h-4 w-4" />,

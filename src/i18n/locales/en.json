@@ -1734,6 +1734,30 @@
     }
   },
   "analytics": {
+    "deviceMain": {
+      "title": "Device Analytics",
+      "subtitle": "Monitor individual device performance and data generation",
+      "filters": {
+        "deviceType": "Device Type All",
+        "status": "Status All",
+        "timeRange": "Time Range: 7 days"
+      },
+      "table": {
+        "deviceName": "DEVICE NAME",
+        "type": "TYPE",
+        "status": "STATUS",
+        "dataGenerated": "DATA GENERATED",
+        "lastActive": "LAST ACTIVE",
+        "uptimePercent": "UPTIME (%)",
+        "uptimeCount": "UPTIME",
+        "actions": "ACTIONS"
+      },
+      "charts": {
+        "topGenerators": "Top Data Generators",
+        "statusDistribution": "Device Status Distribution",
+        "totalDevices": "Total Devices"
+      }
+    },
     "geo": {
       "title": "Geo Analytics",
       "subtitle": "Geographic distribution and location-based device analytics",

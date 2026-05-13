@@ -40,6 +40,9 @@ const GeoAnalyticsPage = Loadable(
 const IndividualDeviceAnalyticsPage = Loadable(
   lazy(() => import('@/pages/IndividualDeviceAnalyticsPage.tsx'))
 );
+const DeviceAnalyticsMainPage = Loadable(
+  lazy(() => import('@/pages/DeviceAnalyticsMainPage.tsx'))
+);
 const DashboardAnalyticsPage = Loadable(
   lazy(() => import('@/pages/DashboardsAnalyticsPage'))
 );
@@ -127,6 +130,10 @@ export const mainDashboardRoutes = [
       {
         path: 'devices',
         element: <DeviceAnalyticsPage />,
+      },
+      {
+        path: 'devices-main',
+        element: <DeviceAnalyticsMainPage />,
       },
       {
         path: 'dashboard-analytics',
