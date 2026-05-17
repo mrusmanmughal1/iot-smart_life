@@ -45,7 +45,7 @@ export default function DeviceAnalyticsMainPage() {
   );
   const { data: devicesAnalytics } = useDevicesAnalytics({
     // period: timeRange,
-    // deviceType,
+    deviceType,
     status,
   });
 
@@ -93,7 +93,6 @@ export default function DeviceAnalyticsMainPage() {
     { name: 'Offline', value: dist.offline || 0, color: '#c026d3' },
     { name: 'Maintenance', value: dist.maintenance || 0, color: '#fca5a1' },
   ];
-  console.log(tableData);
   const totalDevices = rawData.total || 0;
   const navigate = useNavigate();
   return (
@@ -144,7 +143,12 @@ export default function DeviceAnalyticsMainPage() {
 
         <div className="flex items-center gap-2">
           <span>Time Range :</span>{' '}
-          <Select value={timeRange} onValueChange={setTimeRange}>
+          <Select
+            value={timeRange}
+            onValueChange={(value) =>
+              setTimeRange(value as 'daily' | 'weekly' | 'monthly')
+            }
+          >
             <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
               <SelectValue
                 placeholder={t('analytics.deviceMain.filters.timeRange')}
@@ -203,7 +207,7 @@ export default function DeviceAnalyticsMainPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                tableData.map((row, index) => (
+                tableData.map((row: any, index: number) => (
                   <TableRow
                     key={index}
                     className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16"
@@ -316,7 +320,7 @@ export default function DeviceAnalyticsMainPage() {
                       offset: 10,
                     }}
                   >
-                    {topGeneratorsData.map((entry, index) => (
+                    {topGeneratorsData.map((entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Bar>

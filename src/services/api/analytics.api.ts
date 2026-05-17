@@ -88,7 +88,7 @@ export interface TelemetryStats {
   today: number;
 }
 export interface DeviesAnaltyisParams {
-  period?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  period?: 'daily' | 'weekly' | 'monthly';
   deviceType?: string;
   status?: string;
 }

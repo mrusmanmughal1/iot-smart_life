@@ -213,11 +213,7 @@ export const analyticsService = {
     const endTime = Date.now();
     const startTime = endTime - days * 24 * 60 * 60 * 1000;
 
-    const analytics = await analyticsApi.getDeviceAnalytics(
-      deviceId,
-      startTime,
-      endTime
-    );
+    const analytics = await analyticsApi.getDeviceAnalytics(deviceId);
 
     const data = analytics.data.data;
     const totalTime = endTime - startTime;
