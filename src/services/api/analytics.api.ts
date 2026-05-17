@@ -87,6 +87,11 @@ export interface AnalyticsAlarmStats {
 export interface TelemetryStats {
   today: number;
 }
+export interface DeviesAnaltyisParams {
+  period?: 'daily' | 'weekly' | 'monthly' | 'yearly';
+  deviceType?: string;
+  status?: string;
+}
 
 export const analyticsApi = {
   //get analytics overview
@@ -99,13 +104,15 @@ export const analyticsApi = {
       query
     ),
 
+  getDevicesAnalytics: (params: DeviesAnaltyisParams) =>
+    apiClient.get<ApiResponse<DeviceAnalytics[]>>('/analytics/devices', {
+      params,
+    }),
+
   // Get device analytics
-  getDeviceAnalytics: (deviceId: string, startTime: number, endTime: number) =>
+  getDeviceAnalytics: (deviceId: string) =>
     apiClient.get<ApiResponse<DeviceAnalytics>>(
-      `/analytics/device/${deviceId}`,
-      {
-        params: { startTime, endTime },
-      }
+      `/analytics/devices/${deviceId}`
     ),
 
   // Get system analytics

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,10 +16,11 @@ import {
   Cell,
 } from 'recharts';
 import { cn } from '@/lib/util';
+import { useDeviceDetails } from '@/features/analytics/hooks';
 
 // Mock data for the charts
 const generationTrendData = [
-  { month: 'JAN', value1: 0, value2: 0, value3: 0 },
+  { month: 'JAN', value1: 10, value2: 0, value3: 30 },
   { month: 'FEB', value1: 15, value2: 5, value3: 10 },
   { month: 'MAR', value1: 12, value2: 15, value3: 12 },
   { month: 'APR', value1: 22, value2: 18, value3: 20 },
@@ -69,6 +69,7 @@ export default function DeviceanalyticsDetailsPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const deviceName = id || 'Sensor-001';
+  const { data: deviceAnalytics } = useDeviceDetails(id!);
 
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in duration-500 pb-10">

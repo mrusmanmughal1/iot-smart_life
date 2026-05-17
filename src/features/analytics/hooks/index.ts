@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { analyticsApi } from '@/services/api';
+import { analyticsApi, DeviesAnaltyisParams } from '@/services/api';
 
 export const useSystemAnalytics = () => {
   return useQuery({
@@ -15,7 +15,23 @@ export const useTimeSeries = (query: any) => {
     enabled: !!query.entityId,
   });
 };
-
+export const useDevicesAnalytics = (params: DeviesAnaltyisParams) => {
+  return useQuery({
+    queryKey: ['analytics', 'devices', params],
+    queryFn: async () => {
+      const ApiResponse = await analyticsApi.getDevicesAnalytics(params);
+      return ApiResponse.data.data;
+    },
+  });
+};
+// get device details by id
+export const useDeviceDetails = (deviceId: string) => {
+  return useQuery({
+    queryKey: ['analytics', 'device', deviceId],
+    queryFn: () => analyticsApi.getDeviceAnalytics(deviceId),
+    enabled: !!deviceId,
+  });
+};
 export const useDeviceAnalytics = (
   deviceId: string,
   startTime: number,
@@ -23,8 +39,7 @@ export const useDeviceAnalytics = (
 ) => {
   return useQuery({
     queryKey: ['analytics', 'device', deviceId, startTime, endTime],
-    queryFn: () =>
-      analyticsApi.getDeviceAnalytics(deviceId, startTime, endTime),
+    queryFn: () => analyticsApi.getDeviceAnalytics(deviceId),
     enabled: !!deviceId,
   });
 };

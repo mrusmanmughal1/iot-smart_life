@@ -1751,7 +1751,8 @@
         "uptime": "Uptime",
         "alerts": "Alerts",
         "actions": "Actions",
-        "viewDetails": "View Details"
+        "viewDetails": "View Details",
+        "noData": "No data available"
       },
       "charts": {
         "topGenerators": "Top Data Generators",
@@ -1792,6 +1793,47 @@
       "actions": {
         "configure": "Configure",
         "reset": "Reset Device"
+      }
+    },
+    "dashboardDetails": {
+      "title": "Energy Management Dashboard",
+      "subtitle": "Building A - Production Floor | Last Updated: {{time}}",
+      "buttons": {
+        "download": "Download Report",
+        "configure": "Configure",
+        "optimize": "Optimize"
+      },
+      "stats": {
+        "co2": "Current CO2 Emissions",
+        "energy": "Energy Consumption",
+        "temp": "Temperature",
+        "efficiency": "System Efficiency",
+        "threshold": "Threshold: {{val}}",
+        "budget": "Budget: {{val}}",
+        "optimal": "Optimal: {{val}}",
+        "target": "Target: {{val}}",
+        "peak": "Peak: {{val}}",
+        "projected": "Projected: {{val}}",
+        "variance": "Variance: {{val}}",
+        "optNeeded": "Optimization needed"
+      },
+      "charts": {
+        "trend": "24-Hour Trend Analysis",
+        "devicesStatus": "Connected Devices Status",
+        "co2Label": "CO2 Emissions (kg)",
+        "energyLabel": "Energy (kWh)",
+        "tempLabel": "Temperature (°C)",
+        "co2Threshold": "CO2 Threshold"
+      },
+      "alerts": {
+        "title": "Recent Alerts Notifications",
+        "viewAll": "View All Alerts History"
+      },
+      "actions": {
+        "title": "Recommended Actions",
+        "apply": "Apply",
+        "schedule": "Schedule",
+        "viewReport": "View Optimization Report"
       }
     },
     "geo": {

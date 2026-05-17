@@ -32,64 +32,70 @@ import {
   Label,
 } from 'recharts';
 import { cn } from '@/lib/util';
-
-const tableData = [
-  {
-    name: 'Sensor-001',
-    type: 'Temperature',
-    status: 'Online',
-    dataGenerated: '2.3 MB/day',
-    lastActive: '2 min ago',
-    uptime: '99.8%',
-    alerts: 3,
-    statusColor: 'text-green-500',
-    dotColor: 'bg-green-500',
-    alertColor: 'text-red-500',
-  },
-  {
-    name: 'Gateway-002',
-    type: 'Gateway',
-    status: 'Online',
-    dataGenerated: '12.7 MB/day',
-    lastActive: '5 min ago',
-    uptime: '99.2%',
-    alerts: 0,
-    statusColor: 'text-green-500',
-    dotColor: 'bg-green-500',
-    alertColor: 'text-green-500',
-  },
-  {
-    name: 'Motor-003',
-    type: 'Actuator',
-    status: 'Offline',
-    dataGenerated: '0 MB/day',
-    lastActive: '2 hours ago',
-    uptime: '87.3%',
-    alerts: 1,
-    statusColor: 'text-gray-500',
-    dotColor: 'bg-red-500',
-    alertColor: 'text-red-500',
-  },
-];
-
-const topGeneratorsData = [
-  { name: 'Gateway-002', value: 12.7, color: '#312e81' },
-  { name: 'Sensor-004', value: 5.2, color: '#c026d3' },
-  { name: 'Sensor-001', value: 2.3, color: '#4a4a4a' },
-];
-
-const statusDistributionData = [
-  { name: 'Online', value: 180, color: '#4338ca' },
-  { name: 'Offline', value: 12, color: '#c026d3' },
-  { name: 'Maintenance', value: 55, color: '#fca5a1' },
-];
+import { useDevicesAnalytics } from '@/features/analytics/hooks';
+import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 
 export default function DeviceAnalyticsMainPage() {
   const { t } = useTranslation();
   const [deviceType, setDeviceType] = useState('all');
-  const [status, setStatus] = useState('all');
-  const [timeRange, setTimeRange] = useState('7d');
+  const [status, setStatus] = useState('');
+  const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>(
+    'daily'
+  );
+  const { data: devicesAnalytics } = useDevicesAnalytics({
+    // period: timeRange,
+    // deviceType,
+    status,
+  });
 
+  const rawData: any = (devicesAnalytics as any)?.data || {};
+  console.log(rawData);
+  const tableData = (rawData.devices || []).map((device: any) => ({
+    id: device.deviceId,
+    name: device.deviceName || 'Unknown',
+    type: device.deviceType || 'Unknown',
+    status:
+      device.status === 'active' || device.status === 'online'
+        ? 'Online'
+        : 'Offline',
+    dataGenerated: `${device.dataGeneratedMB || 0} MB`,
+    lastActive: device.lastActive || 'N/A',
+    uptime: `${device.uptimePercent || 0}%`,
+    alerts: device.alarmCount || 0,
+    statusColor:
+      device.status === 'active' || device.status === 'online'
+        ? 'text-green-500'
+        : 'text-gray-500',
+    dotColor:
+      device.status === 'active' || device.status === 'online'
+        ? 'bg-green-500'
+        : 'bg-gray-500',
+    alertColor:
+      (device.alarmCount || 0) > 0 ? 'text-red-500' : 'text-green-500',
+  }));
+
+  const topGeneratorsData = (rawData.topGenerators || []).map(
+    (gen: any, index: number) => ({
+      name: gen.deviceName || 'Unknown',
+      value: gen.dataGeneratedMB || 0,
+      color: ['#312e81', '#c026d3', '#4a4a4a'][index % 3] || '#4a4a4a',
+    })
+  );
+
+  const dist = rawData.statusDistribution || {
+    online: 0,
+    offline: 0,
+    maintenance: 0,
+  };
+  const statusDistributionData = [
+    { name: 'Online', value: dist.online || 0, color: '#4338ca' },
+    { name: 'Offline', value: dist.offline || 0, color: '#c026d3' },
+    { name: 'Maintenance', value: dist.maintenance || 0, color: '#fca5a1' },
+  ];
+  console.log(tableData);
+  const totalDevices = rawData.total || 0;
+  const navigate = useNavigate();
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in duration-500">
       {/* Header Section */}
@@ -103,51 +109,55 @@ export default function DeviceAnalyticsMainPage() {
 
       {/* Filters Section */}
       <div className="flex flex-wrap items-center gap-3">
-        <Select value={deviceType} onValueChange={setDeviceType}>
-          <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
-            <SelectValue
-              placeholder={t('analytics.deviceMain.filters.deviceType')}
-            />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">
-              {t('analytics.deviceMain.filters.deviceType')}
-            </SelectItem>
-            <SelectItem value="temperature">Temperature</SelectItem>
-            <SelectItem value="gateway">Gateway</SelectItem>
-            <SelectItem value="actuator">Actuator</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <span>Device Type :</span>{' '}
+          <Select
+            value={deviceType}
+            onValueChange={setDeviceType}
+            className="w-[180px]"
+          >
+            <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="temperature">Temperature</SelectItem>
+              <SelectItem value="gateway">Gateway</SelectItem>
+              <SelectItem value="actuator">Actuator</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
-            <SelectValue
-              placeholder={t('analytics.deviceMain.filters.status')}
-            />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">
-              {t('analytics.deviceMain.filters.status')}
-            </SelectItem>
-            <SelectItem value="online">Online</SelectItem>
-            <SelectItem value="offline">Offline</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <span>Status :</span>{' '}
+          <Select value={status} onValueChange={setStatus} className="w-32">
+            <SelectTrigger className="w-[280px] h-10 bg-gray-100 border-none rounded-md">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
-            <SelectValue
-              placeholder={t('analytics.deviceMain.filters.timeRange')}
-            />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="24h">Last 24 hours</SelectItem>
-            <SelectItem value="7d">
-              {t('analytics.deviceMain.filters.timeRange')}
-            </SelectItem>
-            <SelectItem value="30d">Last 30 days</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <span>Time Range :</span>{' '}
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
+              <SelectValue
+                placeholder={t('analytics.deviceMain.filters.timeRange')}
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="daily">Last 24 hours</SelectItem>
+              <SelectItem value="weekly">Last week</SelectItem>
+              <SelectItem value="monthly">Last 30 days</SelectItem>
+              <SelectItem value="yearly">Last year</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Main Table Card */}
@@ -183,52 +193,70 @@ export default function DeviceAnalyticsMainPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tableData.map((row, index) => (
-                <TableRow
-                  key={index}
-                  className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16"
-                >
-                  <TableCell className="text-sm text-gray-700">
-                    {row.name}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-600">
-                    {row.type}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={cn('w-2 h-2 rounded-full', row.dotColor)}
-                      />
-                      <span className="text-sm text-gray-600">
-                        {row.status}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-600">
-                    {row.dataGenerated}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-600">
-                    {row.lastActive}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-600">
-                    {row.uptime}
-                  </TableCell>
+              {rawData.total == 0 ? (
+                <TableRow className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16">
                   <TableCell
-                    className={cn('text-sm font-bold', row.alertColor)}
+                    colSpan={8}
+                    className="text-center text-gray-500 text-sm"
                   >
-                    {row.alerts}
-                  </TableCell>
-                  <TableCell>
-                    <Button 
-                      variant="primary" 
-                      size="sm"
-                      onClick={() => window.location.href = `/analytics/devices/${row.name}`}
-                    >
-                      {t('analytics.deviceMain.table.viewDetails')}
-                    </Button>
+                    {t('analytics.deviceMain.table.noData')}
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                tableData.map((row, index) => (
+                  <TableRow
+                    key={index}
+                    className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16"
+                  >
+                    <TableCell className="text-sm font-semibold capitalize text-gray-700">
+                      {row.name}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-600">
+                      {row.type}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div />
+                        <span className="text-sm text-gray-600">
+                          <Badge
+                            className={cn(
+                              'capitalize',
+                              row.dotColor === 'bg-green-500'
+                                ? 'bg-green-500 text-white'
+                                : 'bg-red-500 text-white'
+                            )}
+                          >
+                            {row.status}
+                          </Badge>
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-600">
+                      {row.dataGenerated}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-600">
+                      {row.lastActive}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-600">
+                      {row.uptime}
+                    </TableCell>
+                    <TableCell
+                      className={cn('text-sm font-bold', row.alertColor)}
+                    >
+                      {row.alerts}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => navigate(`/analytics/devices/${row.id}`)}
+                      >
+                        {t('analytics.deviceMain.table.viewDetails')}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -336,7 +364,7 @@ export default function DeviceAnalyticsMainPage() {
                               y={cy - 10}
                               className="text-xl font-semibold  "
                             >
-                              247
+                              {totalDevices}
                             </tspan>
                             <tspan
                               x={cx}
