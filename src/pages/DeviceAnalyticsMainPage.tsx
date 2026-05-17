@@ -38,7 +38,7 @@ import { Badge } from '@/components/ui/badge';
 
 export default function DeviceAnalyticsMainPage() {
   const { t } = useTranslation();
-  const [deviceType, setDeviceType] = useState('all');
+  const [deviceType, setDeviceType] = useState('');
   const [status, setStatus] = useState('');
   const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>(
     'daily'

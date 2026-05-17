@@ -104,7 +104,7 @@ export const analyticsApi = {
       query
     ),
 
-  getDevicesAnalytics: (params: DeviesAnaltyisParams) =>
+  getDevicesAnalytics: (params: DeviesAnaltyisParams = {}) =>
     apiClient.get<ApiResponse<DeviceAnalytics[]>>('/analytics/devices', {
       params,
     }),

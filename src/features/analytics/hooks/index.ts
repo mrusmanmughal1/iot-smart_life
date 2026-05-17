@@ -15,7 +15,7 @@ export const useTimeSeries = (query: any) => {
     enabled: !!query.entityId,
   });
 };
-export const useDevicesAnalytics = (params: DeviesAnaltyisParams) => {
+export const useDevicesAnalytics = (params?: DeviesAnaltyisParams) => {
   return useQuery({
     queryKey: ['analytics', 'devices', params],
     queryFn: async () => {
