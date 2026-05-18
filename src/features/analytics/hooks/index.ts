@@ -53,3 +53,13 @@ export const useAnalyticsOverview = () => {
     },
   });
 };
+
+export const useGeoAnalytics = (region?: string) => {
+  return useQuery({
+    queryKey: ['analytics', 'geo', region],
+    queryFn: async () => {
+      const response = await analyticsApi.getgeoDetails(region);
+      return response.data.data;
+    },
+  });
+};

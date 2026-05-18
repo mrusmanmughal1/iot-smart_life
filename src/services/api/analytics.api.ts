@@ -137,7 +137,9 @@ export const analyticsApi = {
     apiClient.get<ApiResponse<any>>('/analytics/telemetry/stats', {
       params: { entityId, key, startTime, endTime },
     }),
-
+  // get details based on the geo
+  getgeoDetails: (region?: string) =>
+    apiClient.get<ApiResponse<any>>('/analytics/geo', { params: { region } }),
   // Get device activity report
   getDeviceActivityReport: (startTime: number, endTime: number) =>
     apiClient.get<ApiResponse<any[]>>('/analytics/reports/device-activity', {

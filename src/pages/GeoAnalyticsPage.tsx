@@ -24,117 +24,55 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PageHeader } from '@/components/common/PageHeader';
-import { api, Asset, assetsApi } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/util';
-import { useAssets } from '@/features/assets/hooks';
-import { useQuery } from '@tanstack/react-query';
-
-// Regional statistics mock data (would normally come from an API)
-const regionalStats = [
-  {
-    name: 'North America',
-    devices: 60,
-    data: '1.2TB',
-    growth: '↑ 15% growth',
-    color: 'text-green-500',
-  },
-  {
-    name: 'Asia',
-    devices: 57,
-    data: '980GB',
-    growth: '↑ 22% growth',
-    color: 'text-green-500',
-  },
-  {
-    name: 'Europe',
-    devices: 23,
-    data: '450GB',
-    growth: '↓ 5% decline',
-    color: 'text-red-500',
-  },
-  {
-    name: 'Australia',
-    devices: 18,
-    data: '380GB',
-    growth: '↑ 8% growth',
-    color: 'text-green-500',
-  },
-  {
-    name: 'Others',
-    devices: 42,
-    data: '720GB',
-    growth: '↓ 12% growth',
-    color: 'text-orange-500',
-  },
-  {
-    name: 'Others',
-    devices: 42,
-    data: '720GB',
-    growth: '↓ 12% growth',
-    color: 'text-orange-500',
-  },
-  {
-    name: 'Others',
-    devices: 42,
-    data: '720GB',
-    growth: '↓ 12% growth',
-    color: 'text-orange-500',
-  },
-];
-
-const performanceData = [
-  {
-    region: 'North America',
-    responseTime: '120ms',
-    uptime: '99.8%',
-    quality: '97.5%',
-    rate: '97.5%',
-    status: 'Online',
-    statusColor: 'bg-green-500',
-  },
-  {
-    region: 'Asia',
-    responseTime: '180ms',
-    uptime: '92.8%',
-    quality: '92.8%',
-    rate: '92.8%',
-    status: 'Offline',
-    statusColor: 'bg-gray-400',
-  },
-  {
-    region: 'Europe',
-    responseTime: '95ms',
-    uptime: '93.8%',
-    quality: '93.8%',
-    rate: '93.8%',
-    status: 'Online',
-    statusColor: 'bg-green-500',
-  },
-];
+import { useGeoAnalytics } from '@/features/analytics/hooks';
 
 export default function GeoAnalyticsPage() {
   const { t } = useTranslation();
-  const [assets, setAssets] = useState<Asset[]>([]);
+  const [region, setRegion] = useState('all');
   const [viewMode, setViewMode] = useState<'Heatmap' | 'Clusters'>('Clusters');
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
-  const { data: assetsResponse } = useQuery({
-    queryKey: ['assets'],
-    queryFn: () => assetsApi.getAll(),
-    retry: 2,
-  });
-  // Fetch assets on mount
-  useEffect(() => {
-    if (assetsResponse?.data.data?.data) {
-      setAssets(assetsResponse?.data.data?.data);
-    }
-  }, [assetsResponse]);
+
+  const { data: geoDataDetails } = useGeoAnalytics(
+    region === 'all' ? undefined : region
+  );
+
+  const geoData = (geoDataDetails?.data || {}) as any;
+  const regionalStats = (geoData?.regionalStats || []).map((r: any) => ({
+    name: r.region || 'Unknown',
+    devices: r.deviceCount || 0,
+    data: `${r.dataGB || 0}GB`,
+    growth: `${(r.growthPercent || 0) >= 0 ? '↑' : '↓'} ${Math.abs(r.growthPercent || 0)}%`,
+    color: (r.growthPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500',
+  }));
+
+  const performanceData = (geoData?.locationPerformance || []).map(
+    (p: any) => ({
+      region: p.region || 'Unknown',
+      responseTime: `${p.avgResponseMs || 0}ms`,
+      uptime: `${p.uptimePercent || 0}%`,
+      quality: `${p.dataQualityPercent || 0}%`,
+      rate: `${p.alertRate || 0}%`,
+      status: p.status || 'Offline',
+      statusColor:
+        p.status === 'Online' || p.status === 'active'
+          ? 'bg-green-500'
+          : 'bg-gray-400',
+    })
+  );
+
+  const deviceDistribution = geoData?.deviceDistribution || [];
+  const totalDevices = regionalStats.reduce(
+    (acc: number, curr: any) => acc + (curr.devices || 0),
+    0
+  );
 
   // Initialize Map and Markers
   useEffect(() => {
-    if (!mapRef.current || assets.length === 0) return;
+    if (!mapRef.current || deviceDistribution.length === 0) return;
 
     const loadGoogleMaps = () => {
       return new Promise<void>((resolve, reject) => {
@@ -189,16 +127,16 @@ export default function GeoAnalyticsPage() {
       markersRef.current.forEach((m) => m.setMap(null));
       markersRef.current = [];
 
-      // Add new markers for assets with location
-      assets.forEach((asset) => {
-        if (asset.location?.latitude && asset.location?.longitude) {
+      // Add new markers for locations
+      deviceDistribution.forEach((loc: any) => {
+        if (loc.lat && loc.lng) {
           const marker = new window.google.maps.Marker({
             position: {
-              lat: asset.location.latitude,
-              lng: asset.location.longitude,
+              lat: loc.lat,
+              lng: loc.lng,
             },
             map,
-            title: asset.name,
+            title: `${loc.region} (${loc.deviceCount} devices)`,
             icon: {
               path: window.google.maps.SymbolPath.BACKWARD_OPEN_TRIANGLE,
               scale: 8,
@@ -212,7 +150,7 @@ export default function GeoAnalyticsPage() {
         }
       });
     });
-  }, [assets]);
+  }, [deviceDistribution]);
 
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in duration-500">
@@ -228,7 +166,7 @@ export default function GeoAnalyticsPage() {
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <Select defaultValue="all">
+        <Select value={region} onValueChange={setRegion} className="text-sm">
           <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
             <SelectValue placeholder="Filter: All Regions" />
           </SelectTrigger>
@@ -278,7 +216,7 @@ export default function GeoAnalyticsPage() {
               variant="secondary"
               className="bg-[#c026d3] text-white hover:bg-[#a21caf] rounded-md px-3"
             >
-              {t('analytics.geo.stats.totalDevices', { count: 200 })}
+              {t('analytics.geo.stats.totalDevices', { count: totalDevices })}
             </Badge>
           </CardHeader>
           <CardContent className="px-4 space-y-2 h-[400px] overflow-y-auto">

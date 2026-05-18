@@ -43,7 +43,7 @@ export default function DeviceAnalyticsMainPage() {
   const [status, setStatus] = useState('');
   const [timeRange, setTimeRange] = useState<TimeRangeType>('daily');
   const { data: devicesAnalytics } = useDevicesAnalytics({
-    // period: timeRange,
+    period: timeRange,
     deviceType,
     status,
   });
