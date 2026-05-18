@@ -76,7 +76,7 @@ export default function GeoAnalyticsPage() {
     0
   );
 
-  // Initialize Map and Markers
+  // Initialize Map and Markersasdsa
   useEffect(() => {
     if (!mapRef.current) return;
 
