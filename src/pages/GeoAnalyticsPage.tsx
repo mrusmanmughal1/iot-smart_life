@@ -27,6 +27,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/util';
 import { useGeoAnalytics } from '@/features/analytics/hooks';
+import { GeoAnalyticsData, GeoStat, PerformanceMetric } from '@/services/api';
 
 export default function GeoAnalyticsPage() {
   const { t } = useTranslation();
@@ -39,9 +40,9 @@ export default function GeoAnalyticsPage() {
   const { data: geoDataDetails } = useGeoAnalytics(
     region === 'all' ? undefined : region
   );
-
-  const geoData = (geoDataDetails?.data || {}) as any;
-  const regionalStats = (geoData?.regionalStats || []).map((r: any) => ({
+  console.log(geoDataDetails, 'geodata');
+  const geoData = (geoDataDetails || {}) as GeoAnalyticsData;
+  const regionalStats = (geoData?.regionalStats || []).map((r: GeoStat) => ({
     name: r.region || 'Unknown',
     devices: r.deviceCount || 0,
     data: `${r.dataGB || 0}GB`,
@@ -49,8 +50,8 @@ export default function GeoAnalyticsPage() {
     color: (r.growthPercent || 0) >= 0 ? 'text-green-500' : 'text-red-500',
   }));
 
-  const performanceData = (geoData?.locationPerformance || []).map(
-    (p: any) => ({
+  const performanceData = geoData?.locationPerformance?.map(
+    (p: PerformanceMetric) => ({
       region: p.region || 'Unknown',
       responseTime: `${p.avgResponseMs || 0}ms`,
       uptime: `${p.uptimePercent || 0}%`,
@@ -299,15 +300,15 @@ export default function GeoAnalyticsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {performanceData.map((row, index) => (
+              {performanceData.map((row: any, index: number) => (
                 <TableRow
                   key={index}
                   className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16"
                 >
-                  <TableCell className="text-sm text-gray-600">
+                  <TableCell className="text-sm font-semibold text-gray-600">
                     {row.region}
                   </TableCell>
-                  <TableCell className="text-sm font-medium text-gray-800">
+                  <TableCell className="text-sm  text-gray-800">
                     {row.responseTime}
                   </TableCell>
                   <TableCell className="text-sm text-gray-600">

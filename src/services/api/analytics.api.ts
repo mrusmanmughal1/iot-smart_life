@@ -101,6 +101,40 @@ export interface DeviesAnaltyisParams {
   status?: string;
 }
 
+export interface GeoAnalyticsResponse {
+  message: string;
+  data: GeoAnalyticsData;
+}
+
+export interface GeoAnalyticsData {
+  regionalStats: GeoStat[];
+  locationPerformance: PerformanceMetric;
+  deviceDistribution: DeviceDistribution;
+}
+
+export interface DeviceDistribution {
+  lat: number;
+  lng: number;
+  deviceCount: number;
+  dataGB: number;
+}
+
+export interface GeoStat {
+  region: string;
+  dataGB: number;
+  deviceCount: number;
+  growthPercent: number;
+}
+
+export interface PerformanceMetric {
+  region: string;
+  alertRate: number;
+  avgResponseMs: number;
+  dataQualityPercent: number;
+  uptimePercent: number;
+  status: string;
+}
+
 export const analyticsApi = {
   //get analytics overview
   getAnalyticsOverview: () =>
@@ -139,7 +173,9 @@ export const analyticsApi = {
     }),
   // get details based on the geo
   getgeoDetails: (region?: string) =>
-    apiClient.get<ApiResponse<any>>('/analytics/geo', { params: { region } }),
+    apiClient.get<ApiResponse<GeoAnalyticsResponse>>('/analytics/geo', {
+      params: { region },
+    }),
   // Get device activity report
   getDeviceActivityReport: (startTime: number, endTime: number) =>
     apiClient.get<ApiResponse<any[]>>('/analytics/reports/device-activity', {

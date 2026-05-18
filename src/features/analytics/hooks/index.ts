@@ -59,7 +59,7 @@ export const useGeoAnalytics = (region?: string) => {
     queryKey: ['analytics', 'geo', region],
     queryFn: async () => {
       const response = await analyticsApi.getgeoDetails(region);
-      return response.data.data;
+      return response.data.data.data;
     },
   });
 };
