@@ -108,8 +108,8 @@ export interface GeoAnalyticsResponse {
 
 export interface GeoAnalyticsData {
   regionalStats: GeoStat[];
-  locationPerformance: PerformanceMetric;
-  deviceDistribution: DeviceDistribution;
+  locationPerformance: PerformanceMetric[];
+  deviceDistribution: DeviceDistribution[];
 }
 
 export interface DeviceDistribution {
@@ -117,6 +117,7 @@ export interface DeviceDistribution {
   lng: number;
   deviceCount: number;
   dataGB: number;
+  region?: string;
 }
 
 export interface GeoStat {

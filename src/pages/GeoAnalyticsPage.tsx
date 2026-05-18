@@ -27,7 +27,12 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/util';
 import { useGeoAnalytics } from '@/features/analytics/hooks';
-import { GeoAnalyticsData, GeoStat, PerformanceMetric } from '@/services/api';
+import {
+  DeviceDistribution,
+  GeoAnalyticsData,
+  GeoStat,
+  PerformanceMetric,
+} from '@/services/api';
 
 export default function GeoAnalyticsPage() {
   const { t } = useTranslation();
@@ -73,7 +78,7 @@ export default function GeoAnalyticsPage() {
 
   // Initialize Map and Markers
   useEffect(() => {
-    if (!mapRef.current || deviceDistribution.length === 0) return;
+    if (!mapRef.current) return;
 
     const loadGoogleMaps = () => {
       return new Promise<void>((resolve, reject) => {
@@ -129,7 +134,7 @@ export default function GeoAnalyticsPage() {
       markersRef.current = [];
 
       // Add new markers for locations
-      deviceDistribution.forEach((loc: any) => {
+      deviceDistribution?.forEach((loc: DeviceDistribution) => {
         if (loc.lat && loc.lng) {
           const marker = new window.google.maps.Marker({
             position: {
