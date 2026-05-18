@@ -35,14 +35,13 @@ import { cn } from '@/lib/util';
 import { useDevicesAnalytics } from '@/features/analytics/hooks';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { TimeRangeType } from '@/services/api/analytics.api';
 
 export default function DeviceAnalyticsMainPage() {
   const { t } = useTranslation();
   const [deviceType, setDeviceType] = useState('');
   const [status, setStatus] = useState('');
-  const [timeRange, setTimeRange] = useState<'daily' | 'weekly' | 'monthly'>(
-    'daily'
-  );
+  const [timeRange, setTimeRange] = useState<TimeRangeType>('daily');
   const { data: devicesAnalytics } = useDevicesAnalytics({
     // period: timeRange,
     deviceType,

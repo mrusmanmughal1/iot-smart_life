@@ -87,8 +87,16 @@ export interface AnalyticsAlarmStats {
 export interface TelemetryStats {
   today: number;
 }
+export const TimeRangeType = {
+  daily: 'daily',
+  weekly: 'weekly',
+  monthly: 'monthly',
+  yearly: 'yearly',
+};
+export type TimeRangeType = (typeof TimeRangeType)[keyof typeof TimeRangeType];
+
 export interface DeviesAnaltyisParams {
-  period?: 'daily' | 'weekly' | 'monthly';
+  period?: TimeRangeType;
   deviceType?: string;
   status?: string;
 }
