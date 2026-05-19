@@ -21,7 +21,7 @@ export const useAlarm = (alarmId: string) => {
 export const useAlarmSummary = () => {
   return useQuery({
     queryKey: ['alarms', 'summary'],
-    queryFn: () => alarmService.getAlarmSummary(),
+    // queryFn: () => alarmService.getAlarmSummary(),
   });
 };
 
@@ -66,7 +66,7 @@ export const useGetStatsAlaram = () => {
     queryKey: ['alaram'],
     queryFn: async () => {
       const apiresponse = await alarmsApi.getStatistics();
-      return apiresponse.data;
+      return apiresponse.data.data;
     },
   });
 };

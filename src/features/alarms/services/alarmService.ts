@@ -74,21 +74,19 @@ export const alarmService = {
   /**
    * Get alarm summary statistics
    */
-  async getAlarmSummary() {
-    const [stats, activeCount] = await Promise.all([
-      alarmsApi.getStatistics(),
-      alarmsApi.getActiveCount(),
-    ]);
+  // async getAlarmSummary() {
+  //   const [stats, activeCount] = await Promise.all([
+  //     alarmsApi.getStatistics(),
+  //     alarmsApi.getActiveCount(),
+  //   ]);
 
-    return {
-      total: stats.data.data.total,
-      active: activeCount.data.data.count,
-      acknowledged: stats.data.data.acknowledged,
-      cleared: stats.data.data.cleared,
-      bySeverity: stats.data.data.bySeverity,
-      byType: stats.data.data.byType,
-    };
-  },
+  //   return {
+  //     total: stats.data.data.total,
+  //     active: activeCount.data.data.count,
+  //     bySeverity: stats.data.data.bySeverity,
+  //     byType: stats.data.data.byType,
+  //   };
+  // },
 
   /**
    * Get alarms by priority (severity-based)

@@ -37,7 +37,7 @@ export default function AlarmsPage() {
     return colors[severity] || 'default';
   };
   const { data: stats } = useGetStatsAlaram();
-  const statsDataByStatus = stats?.data?.byStatus;
+  const statsDataByStatus = stats?.byStatus;
 
   const statusCards = [
     {

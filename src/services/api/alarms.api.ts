@@ -22,23 +22,20 @@ export type AlarmStats = {
   resolved: number;
 };
 export interface AlertsSummaryResponse {
-  byType: any;
-  bySeverity: any;
-  cleared: any;
-  acknowledged: any;
-  total: any;
-  success: boolean;
   data: {
-    byType: any;
-    cleared: any;
-    acknowledged: any;
     total: number;
     byStatus: AlarmStats;
-    bySeverity: Record<AlertSeverity, number>;
+    bySeverity: severityStats;
     mostTriggered: AlertItem[];
     recent: AlertItem[];
   };
-  timestamp: string;
+}
+
+interface severityStats {
+  critical: number;
+  error: number;
+  info: number;
+  warning: number;
 }
 
 export interface AlertItem {
