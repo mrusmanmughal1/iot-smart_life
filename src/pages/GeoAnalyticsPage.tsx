@@ -47,7 +47,7 @@ export default function GeoAnalyticsPage() {
   );
   console.log(geoDataDetails, 'geodata');
   const geoData = (geoDataDetails || {}) as GeoAnalyticsData;
-  const regionalStats = (geoData?.regionalStats || []).map((r: GeoStat) => ({
+  const regionalStats = (geoData?.regionalStats || [])?.map((r: GeoStat) => ({
     name: r.region || 'Unknown',
     devices: r.deviceCount || 0,
     data: `${r.dataGB || 0}GB`,
@@ -76,7 +76,7 @@ export default function GeoAnalyticsPage() {
     0
   );
 
-  // Initialize Map and Markersasdsa
+  // Initialize Map and Markers
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -218,10 +218,7 @@ export default function GeoAnalyticsPage() {
             <CardTitle className="text-lg font-semibold text-gray-800">
               {t('analytics.geo.stats.title')}
             </CardTitle>
-            <Badge
-              variant="secondary"
-              className="bg-[#c026d3] text-white hover:bg-[#a21caf] rounded-md px-3"
-            >
+            <Badge variant="default">
               {t('analytics.geo.stats.totalDevices', { count: totalDevices })}
             </Badge>
           </CardHeader>
@@ -305,7 +302,7 @@ export default function GeoAnalyticsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {performanceData.map((row: any, index: number) => (
+              {performanceData?.map((row, index) => (
                 <TableRow
                   key={index}
                   className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16"
@@ -327,10 +324,13 @@ export default function GeoAnalyticsPage() {
                   </TableCell>
                   <TableCell className="text-sm">
                     <div className="flex items-center gap-2">
-                      <div
-                        className={cn('w-2 h-2 rounded-full', row.statusColor)}
-                      />
-                      <span className="text-gray-700">{row.status}</span>
+                      <Badge
+                        variant={
+                          row.status === 'Online' ? 'success' : 'secondary'
+                        }
+                      >
+                        <span className=" ">{row.status}</span>
+                      </Badge>
                     </div>
                   </TableCell>
                 </TableRow>

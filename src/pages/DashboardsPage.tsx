@@ -22,13 +22,14 @@ import { dashboardsApi } from '@/services/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useNavigate } from 'react-router-dom';
 
 export default function DashboardsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-
+  const navigate = useNavigate();
   const {
     selectedTab,
     dashboards,
@@ -49,7 +50,6 @@ export default function DashboardsPage() {
   const handleOpenImportModal = () => {
     setIsImportModalOpen(true);
   };
-  console.log(dashboards, 'dashboards');
   // Handle importing dashboard from modal
   const handleImportFromModal = async (file: File) => {
     setIsImporting(true);
@@ -77,11 +77,15 @@ export default function DashboardsPage() {
       setIsImporting(false);
     }
   };
+
+  const getNavigationPath = (id: any) => {
+    return `/solution-dashboards/${id}`;
+  };
   return (
     <>
       <div className="space-y-6">
         {/* Header Section */}
-          <PageHeader title={t('solutionDashboards.title')} />
+        <PageHeader title={t('solutionDashboards.title')} />
 
         {/* Tabs */}
         <div className="flex justify-between items-center gap-2">
@@ -186,6 +190,7 @@ export default function DashboardsPage() {
                 handlePreviousPage={handlePreviousPage}
                 handleFirstPage={handleFirstPage}
                 handleLastPage={handleLastPage}
+                getNavigationPath={getNavigationPath}
               />
             )}
           </CardContent>

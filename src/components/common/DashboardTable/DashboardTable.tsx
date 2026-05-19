@@ -153,9 +153,7 @@ export function DashboardTable({
   };
 
   const handleTitleClick = (id: string) => {
-    if (onTitleClick) {
-      onTitleClick(id);
-    } else if (getNavigationPath) {
+    if (getNavigationPath) {
       const path = getNavigationPath(id);
       navigate(path);
     }

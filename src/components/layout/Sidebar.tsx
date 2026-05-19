@@ -200,11 +200,6 @@ const getNavItems = (): NavItem[] => [
         href: '/analytics/geo-analytics',
         icon: <MapPin className="h-4 w-4" />,
       },
-      {
-        titleKey: 'nav.reports',
-        href: '/analytics/reports',
-        icon: <FileText className="h-4 w-4" />,
-      },
     ],
   },
   {
