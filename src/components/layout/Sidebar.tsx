@@ -10,6 +10,7 @@ import {
   Smartphone,
   Box,
   Bell,
+  BellRing,
   BarChart3,
   Users,
   Settings,
@@ -21,7 +22,6 @@ import {
   Activity,
   Layers,
   Calendar,
-  CreditCard,
   PiIcon,
   BotIcon,
   TvIcon,
@@ -49,6 +49,7 @@ interface NavItem {
   children?: NavItem[];
   feature?: keyof SubscriptionFeatures;
 }
+
 const getNavItems = (): NavItem[] => [
   {
     titleKey: 'nav.overview',
@@ -167,6 +168,11 @@ const getNavItems = (): NavItem[] => [
         titleKey: 'nav.alertRules',
         href: '/alarms/rules',
         icon: <Settings className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.alertNotifications',
+        href: '/alarms/notifications',
+        icon: <BellRing className="h-4 w-4" />,
       },
       {
         titleKey: 'nav.analytics',

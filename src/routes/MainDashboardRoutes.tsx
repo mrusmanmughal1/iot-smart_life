@@ -18,6 +18,9 @@ const AlertAnalyticsPage = Loadable(
 const AlertRulesPage = Loadable(
   lazy(() => import('@/pages/AlertRulesPage.tsx'))
 );
+const AlertsNotificationPage = Loadable(
+  lazy(() => import('@/pages/AlertsNotificationPage.tsx'))
+);
 const NotificationsPage = Loadable(
   lazy(() => import('@/pages/NotificationsPage.tsx'))
 );
@@ -115,6 +118,10 @@ export const mainDashboardRoutes = [
       {
         path: 'rules',
         element: <AlertRulesPage />,
+      },
+      {
+        path: 'notifications',
+        element: <AlertsNotificationPage />,
       },
       {
         path: 'analytics',
