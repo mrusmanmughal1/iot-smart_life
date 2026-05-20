@@ -102,6 +102,7 @@
     "alarms": "Alarms",
     "alertRules": "Alert Rules",
     "alertNotifications": "Notification Settings",
+    "alertDetails": "Alert Details",
     "analytics": "Analytics",
     "devicesAnalytics": "Device Analytics",
     "systemPerformanceAnalytics": "System Performance",

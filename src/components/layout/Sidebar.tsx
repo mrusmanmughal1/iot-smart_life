@@ -37,6 +37,7 @@ import {
   Rss,
   MapPin,
   Zap,
+  AlertTriangle,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useAppStore } from '@/stores/useAppStore';
@@ -169,15 +170,23 @@ const getNavItems = (): NavItem[] => [
         href: '/alarms/rules',
         icon: <Settings className="h-4 w-4" />,
       },
-      {
-        titleKey: 'nav.alertNotifications',
-        href: '/alarms/notifications',
-        icon: <BellRing className="h-4 w-4" />,
-      },
+
       {
         titleKey: 'nav.analytics',
         href: '/alarms/analytics',
         icon: <BarChart3 className="h-4 w-4" />,
+      },
+
+      {
+        titleKey: 'nav.alertDetails',
+        href: '/alarms/details',
+        icon: <AlertTriangle className="h-4 w-4" />,
+      },
+
+      {
+        titleKey: 'nav.alertNotifications',
+        href: '/alarms/notifications',
+        icon: <BellRing className="h-4 w-4" />,
       },
     ],
   },

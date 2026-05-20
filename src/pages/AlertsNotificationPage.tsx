@@ -179,7 +179,7 @@ export const AlertsNotificationPage = () => {
         >
           Cancel
         </Button>
-        <Button className="bg-[#484285] hover:bg-[#383366] text-white font-medium px-8 h-10">
+        <Button variant="primary" className="px-8  ">
           Save Setting
         </Button>
       </div>
