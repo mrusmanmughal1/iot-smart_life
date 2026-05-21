@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/util';
 import { Progress } from '@/components/ui/progress';
+import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 const trendData = [
   { time: '00:00', co2: 1.5, energy: 2.2, temp: 2.7 },
@@ -435,6 +436,10 @@ export default function AnalyticsDashboardDetailsPage() {
             </Button>
           </CardContent>
         </Card>
+      </div>
+      <div className="flex justify-center gap-3 pt-4">
+        <DashboardNavigation previousRoute="/analytics/dashboard-analytics/:id"
+          nextRoute="/analytics/dashboard-analytics-/:id" />
       </div>
     </div>
   );

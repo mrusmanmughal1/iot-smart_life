@@ -24,6 +24,7 @@ import {
 import { TrendingUp } from 'lucide-react';
 import { useAnalyticsOverview } from '@/features/analytics/hooks';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
+import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 // Mock data for device activity trends
 const activityData = [
@@ -330,6 +331,10 @@ export default function DeviceAnalyticsPage() {
           </div>
         </CardContent>
       </Card>
+        <div className="flex justify-center gap-3 pt-4">
+        <DashboardNavigation  previousRoute="/analytics/devices"
+          nextRoute="/analytics/devices-2"/>
+      </div>
     </div>
   );
 }

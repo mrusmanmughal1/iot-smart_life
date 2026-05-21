@@ -2,6 +2,8 @@ import React, { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
+import DeviceAnalyticsPage from '@/pages/DeviceAnalyticsPage';
+import DashboardsPage from '@/pages/DashboardsPage';
 
 // Import dashboard page components lazily
 const DashboardPage = Loadable(
@@ -27,39 +29,35 @@ const AlertDetailsPage = Loadable(
 const NotificationsPage = Loadable(
   lazy(() => import('@/pages/NotificationsPage.tsx'))
 );
-const DeviceAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/DeviceAnalyticsPage.tsx'))
-);
-const AnalyticsPage = Loadable(lazy(() => import('@/pages/AnalyticsPage.tsx')));
-const DevicesAnalyticsPage = Loadable(
+
+const AnalyticsPage = Loadable(lazy(() => import('@/features/analytics/pages/AnalyticsPage')));
+const DashboardAnalyticsDetailsPage = Loadable(
   lazy(() => import('@/pages/DevicesAnalyticsPage.tsx'))
 );
 const SystemPerformanceAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/SystemPerformanceAnalyticsPage.tsx'))
+  lazy(() => import('@/features/analytics/pages/SystemPerformanceAnalyticsPage'))
 );
 const DataConsumptionAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/DataConsumptionAnalyticsPage.tsx'))
+  lazy(() => import('@/features/analytics/pages/DataConsumptionAnalyticsPage'))
 );
 const DashboardsAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/DashboardsAnalyticsPage'))
+  lazy(() => import('@/features/analytics/pages/DashboardsAnalyticsPage'))
 );
 const GeoAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/GeoAnalyticsPage.tsx'))
+  lazy(() => import('@/features/analytics/pages/GeoAnalyticsPage'))
 );
-const IndividualDeviceAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/IndividualDeviceAnalyticsPage.tsx'))
-);
+ 
 const DeviceAnalyticsMainPage = Loadable(
   lazy(() => import('@/pages/DeviceAnalyticsMainPage.tsx'))
 );
 const DeviceanalyticsDetailsPage = Loadable(
-  lazy(() => import('@/pages/DeviceanalyticsDetailsPage.tsx'))
+  lazy(() => import('@/features/analytics/pages/DeviceanalyticsDetailsPage'))
 );
 const AnalyticsDashboardDetailsPage = Loadable(
   lazy(() => import('@/pages/AnalyticsDashboardDetailsPage.tsx'))
 );
 const DashboardAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/DashboardsAnalyticsPage'))
+  lazy(() => import('@/features/analytics/pages/DashboardsAnalyticsPage'))
 );
 const ProductionOverviewPage = Loadable(
   lazy(() => import('@/pages/ProductionOverviewPage.tsx'))
@@ -155,25 +153,33 @@ export const mainDashboardRoutes = [
         element: <DeviceAnalyticsMainPage />,
       },
       {
+        path: 'devices-2',
+        element: <DeviceAnalyticsPage />,
+      },
+      {
         path: 'devices/:id',
         element: <DeviceanalyticsDetailsPage />,
       },
-      {
-        path: 'device-analytics/:id',
-        element: <IndividualDeviceAnalyticsPage />,
-      },
-
+      
       {
         path: 'dashboard-analytics',
         element: <DashboardAnalyticsPage />,
       },
       {
-        path: 'dashboard-analyticss',
+        path: 'dashboard-analytics-/:id',
         element: <AnalyticsDashboardDetailsPage />,
       },
       {
-        path: 'dashboard/:id',
-        element: <DevicesAnalyticsPage />,
+        path: 'dashboard-analytics/:id',
+        element: <DashboardAnalyticsDetailsPage />,
+      },
+      {
+        path: 'device-analytics',
+        element: <AnalyticsPage />,
+      },
+      {
+        path: 'product-overview',
+        element: <ProductionOverviewPage />,
       },
       {
         path: 'data-consumption',
@@ -188,26 +194,9 @@ export const mainDashboardRoutes = [
         element: <GeoAnalyticsPage />,
       },
       {
-        path: 'reports',
-        element: <AnalyticsPage />,
-      },
-      {
-        path: 'device-analytics',
-        element: <AnalyticsPage />,
-      },
-
-      // {
-      //   path: 'dashboard-analytics',
-      //   element: <DashboardsAnalyticsPage />,
-      // },
-      {
-        path: 'product-overview',
-        element: <ProductionOverviewPage />,
-      },
-      {
-        path: 'geo-analytics',
-        element: <GeoAnalyticsPage />,
-      },
+        path: 'test',
+        element: <AnalyticsDashboardDetailsPage />,
+      }
     ],
   },
   {

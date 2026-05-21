@@ -101,8 +101,6 @@ export const AlertDetailsPage = () => {
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
                         </div>
                     </CardContent>

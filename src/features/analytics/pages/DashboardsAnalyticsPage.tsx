@@ -29,6 +29,7 @@ import {
   Legend,
 } from 'recharts';
 import { Progress } from '@/components/ui/progress';
+import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 const metricsTrendsData = [
   { month: 'JAN', co2: 0, temp: 0, humidity: 0 },
@@ -81,6 +82,43 @@ const dashboardTableData = [
   },
 ];
 
+const dataConsumptionTrends = [
+  { date: '20/8', value: 1200 },
+  { date: '21/8', value: 1380 },
+  { date: '22/8', value: 1440 },
+  { date: '23/8', value: 1580 },
+  { date: '24/8', value: 1710 },
+  { date: '25/8', value: 1960 },
+  { date: '26/8', value: 2100 },
+];
+
+const performanceMetrics = [
+  {
+    label: 'Average Load Time',
+    value: 78,
+    text: '2.1s',
+    color: 'bg-primary',
+  },
+  {
+    label: 'Average Views/Day',
+    value: 85,
+    text: '2.1s',
+    color: 'bg-secondary',
+  },
+  {
+    label: 'Data Efficiency',
+    value: 85,
+    text: '85%',
+    color: 'bg-black',
+  },
+  {
+    label: 'Error Rate',
+    value: 12,
+    text: '1.2%',
+    color: 'bg-[#f97316]',
+  },
+];
+
 export default function DashboardsAnalyticsPage() {
   const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState('7d');
@@ -94,7 +132,7 @@ export default function DashboardsAnalyticsPage() {
         actions={[
           {
             label: 'Export Data',
-            onClick: () => {},
+            onClick: () => { },
           },
         ]}
       />
@@ -347,7 +385,74 @@ export default function DashboardsAnalyticsPage() {
             </div>
           </CardContent>
         </Card>
+
       </div>
+
+      {/* Bottom Insights Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="shadow-sm rounded-xl overflow-hidden">
+          <CardHeader className="p-6 pb-2">
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Data Consumption Trends
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 pt-0">
+            <div className="h-[280px] w-full mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={dataConsumptionTrends}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis
+                    dataKey="date"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#94a3b8', fontSize: 10 }}
+                    dy={10}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#94a3b8', fontSize: 10 }}
+                  />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#d946ef"
+                    strokeWidth={3}
+                    dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm rounded-xl overflow-hidden">
+          <CardHeader className="p-6 pb-2">
+            <CardTitle className="text-xl font-semibold text-gray-800">
+              Dashboard Performance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 pt-4 space-y-5">
+            {performanceMetrics.map((metric) => (
+              <div key={metric.label} className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium text-gray-700">{metric.label}</span>
+                  <span className="text-sm font-semibold text-gray-900">{metric.text}</span>
+                </div>
+                <div className="h-4 rounded-full bg-gray-100 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${metric.color}`}
+                    style={{ width: `${metric.value}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
     </div>
   );
 }

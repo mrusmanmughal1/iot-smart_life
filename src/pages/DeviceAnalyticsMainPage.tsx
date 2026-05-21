@@ -35,7 +35,9 @@ import { cn } from '@/lib/util';
 import { useDevicesAnalytics } from '@/features/analytics/hooks';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TimeRangeType } from '@/services/api/analytics.api';
+import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 export default function DeviceAnalyticsMainPage() {
   const { t } = useTranslation();
@@ -401,6 +403,12 @@ export default function DeviceAnalyticsMainPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Bottom navigation */}
+      <div className="flex justify-center gap-3 pt-4">
+        <DashboardNavigation  previousRoute="/analytics/devices"
+          nextRoute="/analytics/devices-2"/>
       </div>
     </div>
   );

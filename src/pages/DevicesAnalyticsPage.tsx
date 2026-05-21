@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PageHeader } from '@/components/common/PageHeader';
+import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
 export default function DevicesAnalyticsPage() {
   const { t } = useTranslation();
@@ -347,6 +348,10 @@ export default function DevicesAnalyticsPage() {
         <Button onClick={handleRefresh} variant="primary">
           Refresh
         </Button>
+      </div>
+        <div className="flex justify-center gap-3 pt-4">
+        <DashboardNavigation  previousRoute="/analytics/dashboard-analytics/:id"
+          nextRoute="/analytics/dashboard-analytics-/:id"/>
       </div>
     </div>
   );

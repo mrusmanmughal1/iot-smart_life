@@ -43,7 +43,7 @@ const MultiFloorBuildingViewPage = Loadable(
 const FloorMapSettingsPage = Loadable(
   lazy(() => import('@/pages/FloorMapSettingsPage.tsx'))
 );
-const AnalyticsPage = Loadable(lazy(() => import('@/pages/AnalyticsPage.tsx')));
+const AnalyticsPage = Loadable(lazy(() => import('@/features/analytics/pages/AnalyticsPage')));
 const BuildingHierarchyChartPage = Loadable(
   lazy(() => import('@/pages/BuildingHierarchyChartPage.tsx'))
 );
