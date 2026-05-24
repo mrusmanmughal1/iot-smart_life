@@ -11,7 +11,7 @@ const PaymentSuccess = Loadable(
   )
 );
 const WidgetEditorPage = Loadable(
-  lazy(() => import('@/pages/WidgetEditorPage.tsx'))
+  lazy(() => import('@/features/widgets/page/WidgetEditorPage'))
 );
 const PrivateNotFoundPage = Loadable(
   lazy(() => import('@/pages/PrivateNotFoundPage.tsx'))

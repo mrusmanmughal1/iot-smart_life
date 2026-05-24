@@ -111,7 +111,6 @@ export default function AnalyticsPage() {
 
   const handleSetAlerts = () => {
     // TODO: Navigate to alerts settings
-    console.log('Setting alerts...');
   };
 
   return (

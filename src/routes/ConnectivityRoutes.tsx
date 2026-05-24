@@ -14,7 +14,7 @@ const AddIntegrationPage = Loadable(
   lazy(() => import('@/pages/AddIntegrationPage.tsx'))
 );
 const EdgeManagement = Loadable(
-  lazy(() => import('@/pages/EdgeManagementPage.tsx'))
+  lazy(() => import('@/features/Edge-managment/page/EdgeManagementPage'))
 );
 const ScheduleManagement = Loadable(
   lazy(() => import('@/pages/ScheduleManagementPage.tsx'))

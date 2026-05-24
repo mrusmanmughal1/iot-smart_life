@@ -3,8 +3,8 @@ import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
 
 // Import resource page components lazily
-const WidgetsBundle = Loadable(lazy(() => import('@/pages/WidgetsBundle.tsx')));
-const Widgets = Loadable(lazy(() => import('@/pages/WidgetsPage.tsx')));
+const WidgetsBundle = Loadable(lazy(() => import('@/features/widgets/page/WidgetsBundle')));
+const Widgets = Loadable(lazy(() => import('@/features/widgets/page/WidgetsPage')));
 const ImageLibrary = Loadable(
   lazy(() => import('@/pages/ImageLibraryPage.tsx'))
 );

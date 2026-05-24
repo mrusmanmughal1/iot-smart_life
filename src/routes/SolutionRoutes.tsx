@@ -13,10 +13,10 @@ const CreateGroupPage = Loadable(
   lazy(() => import('@/pages/CreateGroupPage.tsx'))
 );
 const WidgetConfigurationPage = Loadable(
-  lazy(() => import('@/pages/WidgetConfigurationPage.tsx'))
+  lazy(() => import('@/features/widgets/page/WidgetConfigurationPage'))
 );
 const WidgetEditorPage = Loadable(
-  lazy(() => import('@/pages/WidgetEditorPage.tsx'))
+  lazy(() => import('@/features/widgets/page/WidgetEditorPage'))
 );
 const MainDashboardPage = Loadable(
   lazy(() => import('@/pages/MainDashboardPage.tsx'))
@@ -33,15 +33,15 @@ const TemplatePreviewPage = Loadable(
 const CreateTemplatePage = Loadable(
   lazy(() => import('@/pages/CreateTemplatePage.tsx'))
 );
-const FloorPlans = Loadable(lazy(() => import('@/pages/FloorPlanPage.tsx')));
+const FloorPlans = Loadable(lazy(() => import('@/features/floorPlan/page/FloorPlanPage')));
 const FloorMapCreatePage = Loadable(
-  lazy(() => import('@/pages/FloorMapCreatePage.tsx'))
+  lazy(() => import('@/features/floorPlan/page/FloorMapCreatePage'))
 );
 const MultiFloorBuildingViewPage = Loadable(
   lazy(() => import('@/pages/MultiFloorBuildingViewPage.tsx'))
 );
 const FloorMapSettingsPage = Loadable(
-  lazy(() => import('@/pages/FloorMapSettingsPage.tsx'))
+  lazy(() => import('@/features/floorPlan/page/FloorMapSettingsPage'))
 );
 const AnalyticsPage = Loadable(lazy(() => import('@/features/analytics/pages/AnalyticsPage')));
 const BuildingHierarchyChartPage = Loadable(
@@ -51,7 +51,7 @@ const AlertConfigurationPage = Loadable(
   lazy(() => import('@/pages/AlertConfigurationPage.tsx'))
 );
 const FloorMapHistoryPage = Loadable(
-  lazy(() => import('@/pages/FloorMapHistoryPage.tsx'))
+  lazy(() => import('@/features/floorPlan/page/FloorMapHistoryPage'))
 );
 const ReportTemplatesPage = Loadable(
   lazy(() => import('@/pages/ReportTemplatesPage.tsx'))

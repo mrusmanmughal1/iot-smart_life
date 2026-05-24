@@ -4,13 +4,13 @@ import { Loadable } from '@/components/common/Loadable';
 import CustomerDetailsPage from '@/pages/CustomerDetailsPage';
 // Import management page components lazily
 const SubscriptionPlans = Loadable(
-  lazy(() => import('@/pages/SubscriptionPlans'))
+  lazy(() => import('@/features/Subscription/page/SubscriptionPlans'))
 );
 const Subscriptioninvoices = Loadable(
-  lazy(() => import('@/pages/Subscriptioninvoices'))
+  lazy(() => import('@/features/Subscription/page/Subscriptioninvoices'))
 );
 const UsersAndRolesManagementPage = Loadable(
-  lazy(() => import('@/pages/UsersAndRolesManagementPage.tsx'))
+  lazy(() => import('@/features/users/page/UsersAndRolesManagementPage'))
 );
 const CustomerUserAssociationPage = Loadable(
   lazy(() => import('@/pages/CustomerUserAssociationPage.tsx'))
@@ -23,7 +23,7 @@ const CustomerAdministratorPage = Loadable(
   lazy(() => import('@/pages/CustomerDetailsPage'))
 );
 const RolePermissionManagementPage = Loadable(
-  lazy(() => import('@/pages/RolePermissionManagementPage.tsx'))
+  lazy(() => import('@/features/users/page/RolePermissionManagementPage'))
 );
 const AssignPermissionsPage = Loadable(
   lazy(() => import('@/pages/AssignPermissionsPage.tsx'))
@@ -61,6 +61,9 @@ const CustomerPage = Loadable(
 const AuditPage = Loadable(lazy(() => import('@/pages/AuditPage.tsx')));
 const APIMonitoring = Loadable(
   lazy(() => import('@/pages/APIMonitoringPage.tsx'))
+);
+const RequestAnalytics = Loadable(
+  lazy(() => import('@/pages/RequestAnalyticsPage.tsx'))
 );
 
 export const managementRoutes = [
@@ -164,16 +167,24 @@ export const managementRoutes = [
       },
     ],
   },
+  // -------- api-monitoring --------
+
   {
-    path: '/api-monitoring',
+    path: '/reports-apis',
     element: <FeatureRoute feature="apiAccess" />,
     children: [
       {
         index: true,
         element: <APIMonitoring />,
       },
+      ,
+      {
+        path: 'request-analytics',
+        element: <RequestAnalytics />,
+      },
     ],
   },
+  //  
 
   // -------- subscription routes --------
   {
@@ -187,7 +198,7 @@ export const managementRoutes = [
       {
         path: 'invoices',
         element: <Subscriptioninvoices />,
-      },
+      }
     ],
   },
 ];

@@ -35,7 +35,6 @@ import { cn } from '@/lib/util';
 import { useDevicesAnalytics } from '@/features/analytics/hooks';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { TimeRangeType } from '@/services/api/analytics.api';
 import DashboardNavigation from '@/components/ui/DashboardNavigation';
 
@@ -51,7 +50,6 @@ export default function DeviceAnalyticsMainPage() {
   });
 
   const rawData: any = (devicesAnalytics as any)?.data || {};
-  console.log(rawData);
   const tableData = (rawData.devices || []).map((device: any) => ({
     id: device.deviceId,
     name: device.deviceName || 'Unknown',
@@ -127,7 +125,6 @@ export default function DeviceAnalyticsMainPage() {
             </SelectContent>
           </Select>
         </div>
-
         <div className="flex items-center gap-2">
           <span>Status :</span>{' '}
           <Select value={status} onValueChange={setStatus} className="w-32">
@@ -141,7 +138,6 @@ export default function DeviceAnalyticsMainPage() {
             </SelectContent>
           </Select>
         </div>
-
         <div className="flex items-center gap-2">
           <span>Time Range :</span>{' '}
           <Select
@@ -149,8 +145,9 @@ export default function DeviceAnalyticsMainPage() {
             onValueChange={(value) =>
               setTimeRange(value as 'daily' | 'weekly' | 'monthly')
             }
+            className="w-[180px]"
           >
-            <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
+            <SelectTrigger className="  h-10 bg-gray-100 border-none rounded-md">
               <SelectValue
                 placeholder={t('analytics.deviceMain.filters.timeRange')}
               />
@@ -407,8 +404,8 @@ export default function DeviceAnalyticsMainPage() {
 
       {/* Bottom navigation */}
       <div className="flex justify-center gap-3 pt-4">
-        <DashboardNavigation  previousRoute="/analytics/devices"
-          nextRoute="/analytics/devices-2"/>
+        <DashboardNavigation previousRoute="/analytics/devices"
+          nextRoute="/analytics/devices-2" />
       </div>
     </div>
   );

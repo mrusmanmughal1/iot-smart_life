@@ -68,13 +68,13 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="space-y-4 py-5 px-3">
+    <div className="space-y-4 py-5  ">
       <DataTableToolbar
         table={table}
         searchKey={searchKey}
         searchPlaceholder={searchPlaceholder}
       />
-      <div className="rounded-md overflow-visible">
+      <div className="rounded-md overflow-hidden">
         <Table>
           <TableHeader className="bg-primary">
             {table.getHeaderGroups().map((headerGroup) => (

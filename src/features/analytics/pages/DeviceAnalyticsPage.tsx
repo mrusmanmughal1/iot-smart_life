@@ -9,6 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { parseISO, startOfDay, endOfDay, isAfter, format } from 'date-fns';
 
 import {
   LineChart,
@@ -25,6 +28,7 @@ import { TrendingUp } from 'lucide-react';
 import { useAnalyticsOverview } from '@/features/analytics/hooks';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import DashboardNavigation from '@/components/ui/DashboardNavigation';
+import { PageHeader } from '@/components/common/PageHeader';
 
 // Mock data for device activity trends
 const activityData = [
@@ -74,54 +78,119 @@ const getRecentActivity = (t: TFunction) => [
 export default function DeviceAnalyticsPage() {
   const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState('7d');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const { data: analyticsOverview, isLoading } = useAnalyticsOverview();
   const { alarms, devices, telemetry, users } = analyticsOverview?.data || {};
   if (isLoading) return <LoadingOverlay />;
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-            {t('deviceAnalytics.title')}
-          </h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            {t('deviceAnalytics.subtitle')}
-          </p>
+      {/* Header and Filters */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <PageHeader title={t('deviceAnalytics.title')} description={t('deviceAnalytics.description')} />
+          </div>
+          <Select value={timeRange} onValueChange={setTimeRange} className="w-40">
+            <SelectTrigger className="w-[180px] dark:bg-gray-800 dark:border-gray-700">
+              <SelectValue placeholder={t('deviceAnalytics.selectTimeRange')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="24h">
+                {t('deviceAnalytics.last24Hours')}
+              </SelectItem>
+              <SelectItem value="7d">{t('deviceAnalytics.last7Days')}</SelectItem>
+              <SelectItem value="30d">
+                {t('deviceAnalytics.last30Days')}
+              </SelectItem>
+              <SelectItem value="90d">
+                {t('deviceAnalytics.last90Days')}
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={timeRange} onValueChange={setTimeRange} className="w-40">
-          <SelectTrigger className="w-[180px] dark:bg-gray-800 dark:border-gray-700">
-            <SelectValue placeholder={t('deviceAnalytics.selectTimeRange')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="24h">
-              {t('deviceAnalytics.last24Hours')}
-            </SelectItem>
-            <SelectItem value="7d">{t('deviceAnalytics.last7Days')}</SelectItem>
-            <SelectItem value="30d">
-              {t('deviceAnalytics.last30Days')}
-            </SelectItem>
-            <SelectItem value="90d">
-              {t('deviceAnalytics.last90Days')}
-            </SelectItem>
-          </SelectContent>
-        </Select>
+
+        {/* Date Range Filters */}
+        <div className="flex flex-col sm:flex-row gap-4 items-end bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="flex">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('deviceAnalytics.startDate')}
+            </label>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full dark:bg-gray-800 dark:border-gray-700"
+            />
+          </div>
+          <div className="flex">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('deviceAnalytics.endDate')}
+            </label>
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full dark:bg-gray-800 dark:border-gray-700"
+            />
+          </div>
+          <Button
+            variant="default"
+            onClick={() => {
+              // Validate and normalize dates using date-fns
+              if (!startDate || !endDate) {
+                console.warn('Start and end dates are required');
+                return;
+              }
+              try {
+                const start = startOfDay(parseISO(startDate));
+                const end = endOfDay(parseISO(endDate));
+                if (isAfter(start, end)) {
+                  console.warn('Start date must be before or equal to end date');
+                  return;
+                }
+                // Format to ISO date strings (UTC) or any backend-expected format
+                const payload = {
+                  start: format(start, "yyyy-MM-dd'T'00:00:00'Z'"),
+                  end: format(end, "yyyy-MM-dd'T'23:59:59'Z'"),
+                };
+                console.log('Applying filters:', payload);
+                // TODO: call analytics query with payload
+              } catch (err) {
+                console.error('Invalid date format', err);
+              }
+            }}
+            className="w-full sm:w-auto"
+          >
+            {t('deviceAnalytics.apply')}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setStartDate('');
+              setEndDate('');
+            }}
+            className="w-full sm:w-auto"
+          >
+            {t('deviceAnalytics.clear')}
+          </Button>
+        </div>
       </div>
 
       {/* Key Metrics Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Total Devices */}
-        <Card className="bg-green-50 border-green-200 dark:bg-gray-800 dark:border-gray-700">
+        <Card className="bg-primary text-white border-green-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+            <CardTitle className="text-sm font-medium   text-white dark:text-gray-300">
               {t('deviceAnalytics.totalDevices')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold   dark:text-white">
               {devices?.total}
             </div>
-            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
+            <div className="flex items-center gap-1 text-sm   dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
               <span>
                 {t('deviceAnalytics.trendUpPercent', { percent: 12 })}
@@ -131,17 +200,17 @@ export default function DeviceAnalyticsPage() {
         </Card>
 
         {/* Data Generated */}
-        <Card className="bg-purple-50 border-purple-200 dark:bg-gray-800 dark:border-gray-700">
+        <Card className="bg-secondary text-white border-purple-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+            <CardTitle className="text-sm font-medium text-white   dark:text-gray-300">
               {t('deviceAnalytics.dataGenerated')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold   dark:text-white">
               {telemetry?.today}
             </div>
-            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
+            <div className="flex items-center gap-1 text-sm   dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
               <span>{t('deviceAnalytics.trendUpPercent', { percent: 8 })}</span>
             </div>
@@ -149,17 +218,17 @@ export default function DeviceAnalyticsPage() {
         </Card>
 
         {/* Active Alerts */}
-        <Card className="bg-orange-50 border-orange-200 dark:bg-gray-800 dark:border-gray-700">
+        <Card className="bg-success text-white border-orange-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+            <CardTitle className="text-sm font-medium  text-white  dark:text-gray-300">
               {t('deviceAnalytics.activeAlerts')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold   dark:text-white">
               {alarms?.active}
             </div>
-            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
+            <div className="flex items-center gap-1 text-sm   dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
               <span>{t('deviceAnalytics.trendUpPercent', { percent: 5 })}</span>
             </div>
@@ -167,17 +236,17 @@ export default function DeviceAnalyticsPage() {
         </Card>
 
         {/* Uptime */}
-        <Card className="bg-violet-50 border-violet-200 dark:bg-gray-800 dark:border-gray-700">
+        <Card className="  border-violet-200 dark:bg-gray-800 dark:border-gray-700">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
               {t('deviceAnalytics.uptime')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="text-3xl font-bold   dark:text-white">
               99.8%
             </div>
-            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400 mt-1">
+            <div className="flex items-center gap-1 text-sm   dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
               <span>
                 {t('deviceAnalytics.trendUpPercent', { percent: 0.2 })}
@@ -331,9 +400,9 @@ export default function DeviceAnalyticsPage() {
           </div>
         </CardContent>
       </Card>
-        <div className="flex justify-center gap-3 pt-4">
-        <DashboardNavigation  previousRoute="/analytics/devices"
-          nextRoute="/analytics/devices-2"/>
+      <div className="flex justify-center gap-3 pt-4">
+        <DashboardNavigation previousRoute="/analytics/devices"
+          nextRoute="/analytics/devices-2" />
       </div>
     </div>
   );

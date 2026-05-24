@@ -2,13 +2,12 @@ import React, { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
-import DeviceAnalyticsPage from '@/pages/DeviceAnalyticsPage';
-import DashboardsPage from '@/pages/DashboardsPage';
+import DeviceAnalyticsPage from '@/features/analytics/pages/DeviceAnalyticsPage';
 
 // Import dashboard page components lazily
 const DashboardPage = Loadable(
   lazy(() =>
-    import('@/pages/DashboardPage.tsx').then((module) => ({
+    import('@/features/dashboard/page/DashboardPage').then((module) => ({
       default: module.DashboardPage,
     }))
   )
@@ -27,12 +26,12 @@ const AlertDetailsPage = Loadable(
   lazy(() => import('@/pages/AlertDetailsPage.tsx'))
 );
 const NotificationsPage = Loadable(
-  lazy(() => import('@/pages/NotificationsPage.tsx'))
+  lazy(() => import('@/features/notifications/page/NotificationsPage'))
 );
 
 const AnalyticsPage = Loadable(lazy(() => import('@/features/analytics/pages/AnalyticsPage')));
 const DashboardAnalyticsDetailsPage = Loadable(
-  lazy(() => import('@/pages/DevicesAnalyticsPage.tsx'))
+  lazy(() => import('@/features/analytics/pages/DevicesAnalyticsPage'))
 );
 const SystemPerformanceAnalyticsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/SystemPerformanceAnalyticsPage'))
@@ -46,9 +45,9 @@ const DashboardsAnalyticsPage = Loadable(
 const GeoAnalyticsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/GeoAnalyticsPage'))
 );
- 
+
 const DeviceAnalyticsMainPage = Loadable(
-  lazy(() => import('@/pages/DeviceAnalyticsMainPage.tsx'))
+  lazy(() => import('@/features/analytics/pages/DeviceAnalyticsMainPage'))
 );
 const DeviceanalyticsDetailsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/DeviceanalyticsDetailsPage'))
@@ -60,10 +59,10 @@ const DashboardAnalyticsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/DashboardsAnalyticsPage'))
 );
 const ProductionOverviewPage = Loadable(
-  lazy(() => import('@/pages/ProductionOverviewPage.tsx'))
+  lazy(() => import('@/features/analytics/pages/ProductionOverviewPage'))
 );
 const Overview2Page = Loadable(lazy(() => import('@/pages/Overview2Page.tsx')));
-const SettingsPage = Loadable(lazy(() => import('@/pages/SettingsPage.tsx')));
+const SettingsPage = Loadable(lazy(() => import('@/features/settings/pages/SettingsPage')));
 const GeneralSettingsTab = Loadable(
   lazy(() =>
     import('@/features/settings/components/GeneralSettingsTab').then(
@@ -160,7 +159,7 @@ export const mainDashboardRoutes = [
         path: 'devices/:id',
         element: <DeviceanalyticsDetailsPage />,
       },
-      
+
       {
         path: 'dashboard-analytics',
         element: <DashboardAnalyticsPage />,
@@ -193,10 +192,7 @@ export const mainDashboardRoutes = [
         path: 'geo-analytics',
         element: <GeoAnalyticsPage />,
       },
-      {
-        path: 'test',
-        element: <AnalyticsDashboardDetailsPage />,
-      }
+
     ],
   },
   {

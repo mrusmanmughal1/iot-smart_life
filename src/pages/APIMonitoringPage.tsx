@@ -1,25 +1,16 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LineChart } from '@/components/charts/LineChart';
-import { BarChart } from '@/components/charts/BarChart';
-import { PieChart } from '@/components/charts/PieChart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DataTable } from '@/components/common/DataTable/DataTable';
 import { createSortableColumn } from '@/components/common/DataTable/columns';
 import {
   Activity,
-  TrendingUp,
-  TrendingDown,
   Clock,
-  AlertCircle,
-  CheckCircle2,
   XCircle,
-  Globe,
   Server,
-  Database,
-  Zap,
 } from 'lucide-react';
 
 interface APILog {
@@ -29,95 +20,123 @@ interface APILog {
   method: string;
   statusCode: number;
   responseTime: number;
-  userId: string;
-  ip: string;
+  apiKey: string;
 }
 
 const apiLogs: APILog[] = [
   {
     id: '1',
-    timestamp: new Date('2025-01-30T14:23:45'),
+    timestamp: new Date('2025-05-29T14:23:15'),
     endpoint: '/api/v1/devices',
     method: 'GET',
     statusCode: 200,
-    responseTime: 145,
-    userId: 'user123',
-    ip: '192.168.1.100',
+    responseTime: 89,
+    apiKey: 'key_***abc123',
   },
   {
     id: '2',
-    timestamp: new Date('2025-01-30T14:24:12'),
+    timestamp: new Date('2025-05-29T14:32:08'),
     endpoint: '/api/v1/telemetry',
     method: 'POST',
-    statusCode: 201,
-    responseTime: 234,
-    userId: 'user456',
-    ip: '192.168.1.105',
+    statusCode: 429,
+    responseTime: 156,
+    apiKey: 'key_***def456',
   },
   {
     id: '3',
-    timestamp: new Date('2025-01-30T14:25:33'),
-    endpoint: '/api/v1/devices/123',
+    timestamp: new Date('2025-05-29T14:31:55'),
+    endpoint: '/api/v1/attributes',
     method: 'PUT',
-    statusCode: 500,
-    responseTime: 567,
-    userId: 'user789',
-    ip: '192.168.1.110',
+    statusCode: 201,
+    responseTime: 203,
+    apiKey: 'key_***ghi789',
   },
-  // Add more logs...
 ];
 
-const requestData = Array.from({ length: 24 }, (_, i) => ({
-  hour: `${i}:00`,
-  requests: Math.floor(Math.random() * 1000) + 500,
-}));
+const requestData = [
+  { period: 'Apr', requests: 5 },
+  { period: 'May', requests: 82 },
+  { period: 'Jun', requests: 95 },
+  { period: 'Jul', requests: 2 },
+  { period: 'Aug', requests: 123 },
+  { period: 'Sep', requests: 130 },
+  { period: 'Nov', requests: 130 },
+  { period: 'Oct', requests: 130 },
+  { period: 'Dec', requests: 150 },
+
+];
 
 const endpointData = [
-  { name: '/api/v1/devices', count: 4521, percentage: 35 },
-  { name: '/api/v1/telemetry', count: 3842, percentage: 30 },
-  { name: '/api/v1/assets', count: 2156, percentage: 17 },
-  { name: '/api/v1/users', count: 1534, percentage: 12 },
-  { name: 'Others', count: 768, percentage: 6 },
+  { name: '/api/v1/devices', count: 847592, percentage: 29.8, color: '#4338ca' },
+  { name: '/api/v1/telemetry', count: 623441, percentage: 21.9, color: '#22c55e' },
+  { name: '/api/v1/attributes', count: 392156, percentage: 13.8, color: '#f97316' },
 ];
 
-const responseTimeData = Array.from({ length: 24 }, (_, i) => ({
-  hour: `${i}:00`,
-  avgTime: Math.floor(Math.random() * 200) + 100,
-  p95Time: Math.floor(Math.random() * 400) + 300,
-}));
+const statsCards = [
+  {
+    title: 'Total API Calls',
+    value: '2,847,592',
+    change: '+12.5% vs last period',
+    icon: <Activity className="h-5 w-5  " />,
+    className: 'bg-primary',
+    changeClass: 'text-white',
+  },
+  {
+    title: 'Avg Response Time',
+    value: '127ms',
+    change: '-8.2% vs last period',
+    icon: <Clock className="h-5 w-5  " />,
+    className: 'bg-secondary',
+    changeClass: 'text-white',
+  },
+  {
+    title: 'Error Rate',
+    value: '2.3%',
+    change: '+0.5% vs last period',
+    icon: <XCircle className="h-5 w-5  " />,
+    className: 'bg-success',
+    changeClass: 'text-white',
+  },
+  {
+    title: 'Active API Keys',
+    value: '47',
+    change: 'No change',
+    icon: <Server className="h-5 w-5  " />,
+    className: 'bg-white',
+    changeClass: 'text-black',
+  },
+];
 
 export default function APIMonitoring() {
-  const [timeRange, setTimeRange] = useState('24h');
+  const [timeRange, setTimeRange] = useState('30d');
 
   const columns = [
     {
       accessorKey: 'timestamp',
       header: 'Timestamp',
       cell: ({ row }: any) => (
-        <span className="text-sm">
+        <span className="text-sm text-slate-700">
           {row.getValue('timestamp').toLocaleString()}
         </span>
       ),
     },
+    createSortableColumn('endpoint', 'Endpoint'),
     {
       accessorKey: 'method',
       header: 'Method',
       cell: ({ row }: any) => {
         const method = row.getValue('method') as string;
         const colors: Record<string, string> = {
-          GET: 'bg-blue-500',
-          POST: 'bg-green-500',
-          PUT: 'bg-yellow-500',
-          DELETE: 'bg-red-500',
+          GET: 'bg-sky-500',
+          POST: 'bg-emerald-500',
+          PUT: 'bg-amber-500',
+          DELETE: 'bg-rose-500',
         };
         return (
-          <Badge className={`${colors[method]} text-white`}>
-            {method}
-          </Badge>
+          <Badge className={`${colors[method]} text-white`}>{method}</Badge>
         );
       },
     },
-    createSortableColumn('endpoint', 'Endpoint'),
     {
       accessorKey: 'statusCode',
       header: 'Status',
@@ -131,11 +150,10 @@ export default function APIMonitoring() {
       accessorKey: 'responseTime',
       header: 'Response Time',
       cell: ({ row }: any) => (
-        <span className="text-sm">{row.getValue('responseTime')}ms</span>
+        <span className="text-sm text-slate-700">{row.getValue('responseTime')}ms</span>
       ),
     },
-    createSortableColumn('userId', 'User ID'),
-    createSortableColumn('ip', 'IP Address'),
+    createSortableColumn('apiKey', 'API Key'),
   ];
 
   return (
@@ -145,64 +163,23 @@ export default function APIMonitoring() {
         description="Monitor API performance, usage, and health metrics"
       />
 
-      {/* Stats */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Requests</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12,821</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <TrendingUp className="h-3 w-3 text-green-500" />
-              <span className="text-green-500">+12.5%</span> from last hour
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Success Rate</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">98.7%</div>
-            <p className="text-xs text-muted-foreground">
-              12,652 successful requests
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">187ms</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <TrendingDown className="h-3 w-3 text-green-500" />
-              <span className="text-green-500">-8ms</span> from last hour
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Error Rate</CardTitle>
-            <XCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1.3%</div>
-            <p className="text-xs text-muted-foreground">
-              169 failed requests
-            </p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 lg:grid-cols-4">
+        {statsCards.map((card) => (
+          <Card key={card.title} className={`  pt-6  0 shadow-sm ${card.className} ${card.changeClass}`}>
+            <CardContent className="space-y-3 ">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium  ">{card.title}</p>
+                  <p className="mt-3 text-3xl font-semibold  ">{card.value}</p>
+                </div>
+                <div className="rounded-2xl  text-white p-2 shadow-sm">{card.icon}</div>
+              </div>
+              <p className={`text-sm ${card.changeClass}`}>{card.change}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Time Range Selector */}
       <div className="flex justify-end">
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-[180px]">
@@ -217,125 +194,65 @@ export default function APIMonitoring() {
         </Select>
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Request Volume</CardTitle>
-            <CardDescription>API requests over time</CardDescription>
+      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+        <Card className="border border-gray-100 shadow-sm">
+          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <CardTitle>API Calls Over Time</CardTitle>
+              <CardDescription>Monitor request volume across your platform.</CardDescription>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700">
+              Last 30 days
+            </div>
           </CardHeader>
           <CardContent>
             <LineChart
               data={requestData}
-              lines={[{ dataKey: 'requests', name: 'Requests', color: '#8b5cf6' }]}
-              xAxisKey="hour"
+              lines={[{ dataKey: 'requests', name: 'API Calls', color: '#db2777' }]}
+              xAxisKey="period"
               title=""
+              showLegend={false}
+              height={350}
             />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-gray-100 shadow-sm">
           <CardHeader>
-            <CardTitle>Response Times</CardTitle>
-            <CardDescription>Average and P95 response times</CardDescription>
+            <CardTitle>Top API Endpoints</CardTitle>
+            <CardDescription>Most frequently called endpoints.</CardDescription>
           </CardHeader>
-          <CardContent>
-            <LineChart
-              data={responseTimeData}
-              lines={[
-                { dataKey: 'avgTime', name: 'Average', color: '#10b981' },
-                { dataKey: 'p95Time', name: 'P95', color: '#f59e0b' },
-              ]}
-              xAxisKey="hour"
-              title=""
-            />
+          <CardContent className="space-y-5">
+            {endpointData.map((endpoint) => (
+              <div key={endpoint.name} className="space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium text-slate-700">{endpoint.name}</span>
+                  <span className="text-sm font-semibold text-slate-900">{endpoint.count.toLocaleString()} calls</span>
+                </div>
+                <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${endpoint.percentage}%`, backgroundColor: endpoint.color }}
+                  />
+                </div>
+                <div className="text-xs text-slate-500">{endpoint.percentage}% of traffic</div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Endpoints</CardTitle>
-            <CardDescription>Most frequently called endpoints</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <PieChart
-              data={endpointData}
-              nameKey="name"
-              dataKey="count"
-              title=""
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Endpoint Usage</CardTitle>
-            <CardDescription>Request count by endpoint</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <BarChart
-              data={endpointData}
-              bars={[{ dataKey: 'count', name: 'Requests', color: '#8b5cf6' }]}
-              xAxisKey="name"
-              title=""
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* API Health */}
-      <Card>
-        <CardHeader>
-          <CardTitle>API Health Status</CardTitle>
-          <CardDescription>Real-time health of API services</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="flex items-center gap-3 p-4 border rounded-lg">
-              <Server className="h-8 w-8 text-green-500" />
-              <div>
-                <p className="font-semibold">API Gateway</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-sm text-muted-foreground">Operational</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-4 border rounded-lg">
-              <Database className="h-8 w-8 text-green-500" />
-              <div>
-                <p className="font-semibold">Database</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-sm text-muted-foreground">Operational</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 p-4 border rounded-lg">
-              <Zap className="h-8 w-8 text-yellow-500" />
-              <div>
-                <p className="font-semibold">Cache Service</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                  <span className="text-sm text-muted-foreground">Degraded</span>
-                </div>
-              </div>
-            </div>
+      <Card className="border border-gray-100 shadow-sm">
+        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle>Recent API Activity</CardTitle>
+            <CardDescription>Latest API requests and responses</CardDescription>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Logs */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent API Logs</CardTitle>
-          <CardDescription>Latest API requests and responses</CardDescription>
+          <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700">
+            Showing latest 30 logs
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-hidden">
           <DataTable
             columns={columns}
             data={apiLogs}

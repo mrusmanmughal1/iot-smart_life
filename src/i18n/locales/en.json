@@ -2012,6 +2012,11 @@
     "celsius": "Celsius",
     "tooltipDate": "Date: {{value}}",
     "tooltipTotal": "Total",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "apply": "Apply",
+    "clear": "Clear",
+    "description": "Analytics overview",
     "activityMessages": {
       "deviceGeneratedData": "Device \"{{deviceName}}\" generated {{size}} of data",
       "dashboardConsumed": "Dashboard \"{{dashboardName}}\" consumed {{size}}",

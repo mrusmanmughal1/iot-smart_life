@@ -142,9 +142,8 @@ export default function DataConsumptionAnalyticsPage() {
         ].map((kpi, idx) => (
           <Card key={idx} className={`  rounded-lg `}>
             <CardContent
-              className={`p-6  rounded-lg ${kpi.color} ${
-                idx === 3 ? 'text-black' : 'text-white'
-              }`}
+              className={`p-6  rounded-lg ${kpi.color} ${idx === 3 ? 'text-black' : 'text-white'
+                }`}
             >
               <h3
                 className={`text-sm font-semibold ${kpi.color.split(' ')[1]}`}
@@ -328,10 +327,10 @@ export default function DataConsumptionAnalyticsPage() {
                     {row.trend}
                   </TableCell>
                   <TableCell className="text-right flex items-center justify-end gap-2 h-16">
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" className='rounded-full' size="sm">
                       <Edit2 className="h-3 w-3" />
                     </Button>
-                    <Button variant="destructive" size="sm">
+                    <Button variant="destructive" className='rounded-full' size="sm">
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </TableCell>

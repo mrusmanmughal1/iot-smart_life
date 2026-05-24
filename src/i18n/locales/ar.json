@@ -1756,6 +1756,11 @@
     "celsius": "درجة مئوية",
     "tooltipDate": "التاريخ: {{value}}",
     "tooltipTotal": "الإجمالي",
+    "startDate": "تاريخ البداية",
+    "endDate": "تاريخ النهاية",
+    "apply": "تطبيق",
+    "clear": "مسح",
+    "description": "نظرة عامة على التحليلات",
     "activityMessages": {
       "deviceGeneratedData": "الجهاز \"{{deviceName}}\" أنتج {{size}} من البيانات",
       "dashboardConsumed": "لوحة المعلومات \"{{dashboardName}}\" استهلكت {{size}}",

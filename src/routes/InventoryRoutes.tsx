@@ -3,11 +3,11 @@ import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
 import DeviceDetailsPage from '@/pages/DeviceDetailsPage';
 
-const DevicesPage = Loadable(lazy(() => import('@/pages/DevicesPage.tsx')));
-const AssetsPage = Loadable(lazy(() => import('@/pages/AssetsPage.tsx')));
+const DevicesPage = Loadable(lazy(() => import('@/features/devices/page/DevicesPage')));
+const AssetsPage = Loadable(lazy(() => import('@/features/assets/page/AssetsPage')));
 
 const AssetDetailsPage = Loadable(
-  lazy(() => import('@/pages/AssetDetailsPage.tsx'))
+  lazy(() => import('@/features/assets/page/AssetDetailsPage'))
 );
 const AssetProfiles = Loadable(
   lazy(() => import('@/pages/AssetProfilesPage.tsx'))

@@ -309,7 +309,7 @@ const getNavItems = (): NavItem[] => [
   },
   {
     titleKey: 'nav.apiMonitoring',
-    href: '/api-monitoring',
+    href: '/api-monitor',
     icon: <Activity className="h-5 w-5" />,
     feature: 'apiAccess',
   },
