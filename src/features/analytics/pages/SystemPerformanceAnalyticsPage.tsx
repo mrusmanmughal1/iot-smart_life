@@ -24,6 +24,7 @@ import {
 } from 'recharts';
 
 import { PageHeader } from '@/components/common/PageHeader';
+import { useSystemAnalytics } from '../hooks';
 
 const responseTimeData = [
   { time: '20/8', value: 30 },
@@ -112,7 +113,8 @@ const recentAlerts = [
 export default function SystemPerformanceAnalyticsPage() {
   const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState('30d');
-
+const {data }= useSystemAnalytics( );
+console.log(data, 'system analytics data');
   return (
     <div className="flex flex-col space-y-6">
       <div className="flex justify-between">

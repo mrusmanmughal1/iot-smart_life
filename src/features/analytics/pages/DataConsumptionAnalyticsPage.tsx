@@ -83,7 +83,7 @@ const tableData = [
 export default function DataConsumptionAnalyticsPage() {
   const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState('30d');
-
+console.log()
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in duration-500">
       {/* Header */}

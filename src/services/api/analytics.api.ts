@@ -160,7 +160,7 @@ export const analyticsApi = {
 
   // Get system analytics
   getSystemAnalytics: () =>
-    apiClient.get<ApiResponse<SystemAnalytics>>('/analytics/system'),
+    apiClient.get<ApiResponse<SystemAnalytics>>('/analytics/system-performance'),
 
   // Get telemetry statistics
   getTelemetryStats: (

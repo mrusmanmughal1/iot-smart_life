@@ -45,7 +45,6 @@ export default function GeoAnalyticsPage() {
   const { data: geoDataDetails } = useGeoAnalytics(
     region === 'all' ? undefined : region
   );
-  console.log(geoDataDetails, 'geodata');
   const geoData = (geoDataDetails || {}) as GeoAnalyticsData;
   const regionalStats = (geoData?.regionalStats || [])?.map((r: GeoStat) => ({
     name: r.region || 'Unknown',
