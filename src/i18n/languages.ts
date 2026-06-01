@@ -23,8 +23,6 @@ export const languages: Language[] = [
     flag: '🇸🇦',
     direction: 'rtl',
   },
- 
- 
 ];
 
 export function getLanguage(code: string): Language | undefined {

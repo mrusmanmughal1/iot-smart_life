@@ -167,6 +167,7 @@ export default function GeoAnalyticsPage() {
         <div className="flex items-center gap-3">
           <Button>Export Map</Button>
           <Button variant="primary">Refresh</Button>
+
         </div>
       </div>
 

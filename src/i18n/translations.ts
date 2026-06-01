@@ -27,11 +27,15 @@ export const translations = {
       notifications: 'Notifications',
       sharingCenter: 'Sharing Center',
       apiMonitoring: 'API Monitoring',
+      apiMonitoringOverview: 'API Monitoring Overview',
+      requestAnalytics: 'Request Analytics',
+      performanceMetrics: 'Performance Metrics',
+      errorAnalysis: 'Error Analysis',
       auditLogs: 'Audit Logs',
       subscriptionPlans: 'Subscription Plans',
       settings: 'Settings',
     },
-    
+
     // Overview Page
     overview: {
       title: 'Overview',
@@ -62,7 +66,7 @@ export const translations = {
       automations: 'Automations',
       recentlyAccessed: 'Recently Accessed Dashboards',
     },
-    
+
     // Common
     common: {
       save: 'Save',
@@ -99,7 +103,7 @@ export const translations = {
       somethingWentWrong: 'Something went wrong',
       invalidEmail: 'Invalid email',
     },
-    
+
     // Auth
     auth: {
       login: 'Login',
@@ -116,7 +120,7 @@ export const translations = {
       welcomeBack: 'Welcome Back',
       createAccount: 'Create Account',
     },
-    
+
     // Devices
     devices: {
       title: 'Devices',
@@ -132,7 +136,7 @@ export const translations = {
       relations: 'Relations',
       alarms: 'Alarms',
     },
-    
+
     // Users
     users: {
       title: 'User Management',
@@ -145,7 +149,7 @@ export const translations = {
       createdAt: 'Created At',
       permissions: 'Permissions',
     },
-    
+
     // Roles
     roles: {
       admin: 'Administrator',
@@ -157,7 +161,8 @@ export const translations = {
     settings: {
       profile: {
         photo: 'Profile Photo',
-        photoDescription: 'Upload a new photo to change your profile picture. Recommended size: 400x400px.',
+        photoDescription:
+          'Upload a new photo to change your profile picture. Recommended size: 400x400px.',
         changePhoto: 'Change Photo',
         removePhoto: 'Remove',
         invalidFileType: 'Please select an image file',
@@ -192,193 +197,7 @@ export const translations = {
       invalidPhone: 'Invalid phone number',
     },
   },
-  
-  es: {
-    // Navigation
-    nav: {
-      overview: 'Resumen',
-      solutionTemplates: 'Plantillas de Solución',
-      solutionDashboards: 'Paneles de Solución',
-      profiles: 'Perfiles',
-      devices: 'Dispositivos',
-      assets: 'Activos',
-      objects: 'Objetos',
-      floorPlans: 'Planos de Piso',
-      alerts: 'Alertas',
-      analytics: 'Análisis',
-      usersRoles: 'Usuarios y Roles',
-      automation: 'Automatización',
-      integrations: 'Integraciones',
-      edgeManagement: 'Centro de Gestión Edge',
-      scheduleManagement: 'Gestión de Horarios',
-      resources: 'Recursos',
-      widgetsBundle: 'Paquete de Widgets',
-      widgets: 'Widgets',
-      imageLibrary: 'Biblioteca de Imágenes',
-      jsLibrary: 'Biblioteca JavaScript',
-      notifications: 'Notificaciones',
-      sharingCenter: 'Centro de Compartir',
-      apiMonitoring: 'Monitoreo de API',
-      auditLogs: 'Registros de Auditoría',
-      subscriptionPlans: 'Planes de Suscripción',
-      settings: 'Configuración',
-    },
-    
-    overview: {
-      title: 'Resumen',
-      description: 'Monitoreo en tiempo real de su plataforma IoT',
-      liveUpdates: 'Actualizaciones en Vivo',
-      lastUpdate: 'Última actualización',
-      waiting: 'Esperando...',
-      activeSolutions: 'Soluciones Activas',
-      viewAll: 'Ver Todo',
-      connectedDevices: 'Dispositivos Conectados',
-      total: 'Total',
-      online: 'En Línea',
-      offline: 'Fuera de Línea',
-      addNewDevice: 'Agregar Nuevo Dispositivo',
-      usage: 'Uso',
-      totalUsers: 'Total de Usuarios',
-      users: 'Usuarios',
-      manageUsers: 'Gestionar Usuarios',
-      realtimeActivity: 'Actividad en Tiempo Real',
-      pendingTasks: 'Tareas Pendientes',
-      billingStatus: 'Estado de Facturación',
-      nextBilling: 'Próxima facturación',
-      currentPlan: 'Plan actual',
-      usageSummary: 'Resumen de Uso',
-      apiCalls: 'Llamadas API',
-      dashboards: 'Paneles',
-      floorMaps: 'Mapas de Piso',
-      automations: 'Automatizaciones',
-      recentlyAccessed: 'Paneles Accedidos Recientemente',
-    },
-    
-    common: {
-      save: 'Guardar',
-      cancel: 'Cancelar',
-      delete: 'Eliminar',
-      edit: 'Editar',
-      add: 'Agregar',
-      search: 'Buscar',
-      filter: 'Filtrar',
-      export: 'Exportar',
-      import: 'Importar',
-      loading: 'Cargando...',
-      noData: 'No hay datos disponibles',
-      confirm: 'Confirmar',
-      close: 'Cerrar',
-      back: 'Atrás',
-      next: 'Siguiente',
-      previous: 'Anterior',
-      status: 'Estado',
-      active: 'Activo',
-      inactive: 'Inactivo',
-      name: 'Nombre',
-      description: 'Descripción',
-      createdAt: 'Creado el',
-      updatedAt: 'Actualizado el',
-      actions: 'Acciones',
-      profile: 'Perfil',
-      updateYourProfile: 'Actualice la información de su cuenta',
-      email: 'Correo electrónico',
-      companyName: 'Nombre de la empresa',
-      phoneNumber: 'Número de teléfono',
-      saving: 'Guardando...',
-      saved: 'Guardado',
-      somethingWentWrong: 'Algo salió mal',
-      invalidEmail: 'Correo electrónico no válido',
-    },
-    
-    auth: {
-      login: 'Iniciar Sesión',
-      logout: 'Cerrar Sesión',
-      register: 'Registrarse',
-      forgotPassword: 'Olvidé mi Contraseña',
-      resetPassword: 'Restablecer Contraseña',
-      email: 'Correo Electrónico',
-      password: 'Contraseña',
-      confirmPassword: 'Confirmar Contraseña',
-      rememberMe: 'Recordarme',
-      signIn: 'Iniciar Sesión',
-      signUp: 'Registrarse',
-      welcomeBack: 'Bienvenido de Nuevo',
-      createAccount: 'Crear Cuenta',
-    },
-    
-    devices: {
-      title: 'Dispositivos',
-      addDevice: 'Agregar Dispositivo',
-      deviceName: 'Nombre del Dispositivo',
-      deviceType: 'Tipo de Dispositivo',
-      status: 'Estado',
-      lastSeen: 'Visto por Última Vez',
-      firmware: 'Firmware',
-      location: 'Ubicación',
-      telemetry: 'Telemetría',
-      attributes: 'Atributos',
-      relations: 'Relaciones',
-      alarms: 'Alarmas',
-    },
-    
-    users: {
-      title: 'Gestión de Usuarios',
-      addUser: 'Agregar Usuario',
-      firstName: 'Nombre',
-      lastName: 'Apellido',
-      email: 'Correo Electrónico',
-      role: 'Rol',
-      status: 'Estado',
-      createdAt: 'Creado el',
-      permissions: 'Permisos',
-    },
-    
-    roles: {
-      admin: 'Administrador',
-      manager: 'Gerente',
-      operator: 'Operador',
-      user: 'Usuario',
-      viewer: 'Observador',
-    },
-    settings: {
-      profile: {
-        photo: 'Foto de perfil',
-        photoDescription: 'Sube una nueva foto para cambiar tu imagen de perfil. Tamaño recomendado: 400x400px.',
-        changePhoto: 'Cambiar foto',
-        removePhoto: 'Eliminar',
-        invalidFileType: 'Por favor seleccione un archivo de imagen',
-        fileTooLarge: 'El tamaño del archivo debe ser inferior a 5 MB',
-        avatarUpdated: 'Foto de perfil actualizada',
-        uploadFailed: 'Error al subir la imagen',
-        avatarRemoved: 'Foto de perfil eliminada',
-        removeFailed: 'Error al eliminar la imagen',
-      },
-      changePassword: {
-        title: 'Cambiar contraseña',
-        currentPassword: 'Contraseña actual',
-        currentPasswordPlaceholder: 'Introduce la contraseña actual',
-        newPassword: 'Nueva contraseña',
-        newPasswordPlaceholder: 'Introduce la nueva contraseña',
-        confirmPassword: 'Confirmar contraseña',
-        confirmPasswordPlaceholder: 'Confirma la nueva contraseña',
-        updatePassword: 'Actualizar contraseña',
-        updating: 'Actualizando...',
-        passwordUpdatedSuccessfully: 'Contraseña actualizada con éxito',
-        oldPasswordIncorrect: 'La contraseña antigua es incorrecta',
-        newPasswordSameAsOld: 'La nueva contraseña no puede ser igual a la antigua',
-        failedToUpdatePassword: 'Error al actualizar la contraseña',
-        passwordRequired: 'La contraseña actual es obligatoria',
-        passwordMinLength: 'La contraseña debe tener al menos 8 caracteres',
-        confirmPasswordRequired: 'Confirma tu nueva contraseña',
-        passwordsDoNotMatch: 'Las contraseñas no coinciden',
-      },
-    },
-    CommonPrifleSchema: {
-      name: 'El nombre es obligatorio',
-      invalidPhone: 'Número de teléfono no válido',
-    },
-  },
-  
+
   ar: {
     // Navigation (Arabic - RTL)
     nav: {
@@ -405,11 +224,15 @@ export const translations = {
       notifications: 'الإشعارات',
       sharingCenter: 'مركز المشاركة',
       apiMonitoring: 'مراقبة API',
+      apiMonitoringOverview: 'نظرة عامة على المراقبة',
+      requestAnalytics: 'تحليلات الطلبات',
+      performanceMetrics: 'مقاييس الأداء',
+      errorAnalysis: 'تحليل الأخطاء',
       auditLogs: 'سجلات التدقيق',
       subscriptionPlans: 'خطط الاشتراك',
       settings: 'الإعدادات',
     },
-    
+
     overview: {
       title: 'نظرة عامة',
       description: 'المراقبة في الوقت الفعلي لمنصة إنترنت الأشياء',
@@ -439,7 +262,7 @@ export const translations = {
       automations: 'الأتمتة',
       recentlyAccessed: 'لوحات المعلومات التي تم الوصول إليها مؤخراً',
     },
-    
+
     common: {
       save: 'حفظ',
       cancel: 'إلغاء',
@@ -475,7 +298,7 @@ export const translations = {
       somethingWentWrong: 'حدث خطأ ما',
       invalidEmail: 'البريد الإلكتروني غير صالح',
     },
-    
+
     auth: {
       login: 'تسجيل الدخول',
       logout: 'تسجيل الخروج',
@@ -491,7 +314,7 @@ export const translations = {
       welcomeBack: 'مرحباً بعودتك',
       createAccount: 'إنشاء حساب',
     },
-    
+
     devices: {
       title: 'الأجهزة',
       addDevice: 'إضافة جهاز',
@@ -506,7 +329,7 @@ export const translations = {
       relations: 'العلاقات',
       alarms: 'التنبيهات',
     },
-    
+
     users: {
       title: 'إدارة المستخدمين',
       addUser: 'إضافة مستخدم',
@@ -518,7 +341,7 @@ export const translations = {
       createdAt: 'تاريخ الإنشاء',
       permissions: 'الصلاحيات',
     },
-    
+
     roles: {
       admin: 'مدير',
       manager: 'مدير',
@@ -529,7 +352,8 @@ export const translations = {
     settings: {
       profile: {
         photo: 'صورة الملف الشخصي',
-        photoDescription: 'قم بتحميل صورة جديدة لتغيير صورتك الشخصية. الحجم الموصى به: 400x400 بكسل.',
+        photoDescription:
+          'قم بتحميل صورة جديدة لتغيير صورتك الشخصية. الحجم الموصى به: 400x400 بكسل.',
         changePhoto: 'تغيير الصورة',
         removePhoto: 'إزالة',
         invalidFileType: 'يرجى اختيار ملف صورة',
@@ -551,7 +375,8 @@ export const translations = {
         updating: 'جاري التحديث...',
         passwordUpdatedSuccessfully: 'تم تحديث كلمة المرور بنجاح',
         oldPasswordIncorrect: 'كلمة المرور القديمة غير صحيحة',
-        newPasswordSameAsOld: 'لا يمكن أن تكون كلمة المرور الجديدة هي نفسها القديمة',
+        newPasswordSameAsOld:
+          'لا يمكن أن تكون كلمة المرور الجديدة هي نفسها القديمة',
         failedToUpdatePassword: 'فشل تحديث كلمة المرور',
         passwordRequired: 'كلمة المرور الحالية مطلوبة',
         passwordMinLength: 'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل',
@@ -565,6 +390,3 @@ export const translations = {
     },
   },
 };
-
-export type Language = 'en' | 'es' | 'ar';
-export type TranslationKey = keyof typeof translations.en;

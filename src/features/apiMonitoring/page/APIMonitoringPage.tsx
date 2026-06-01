@@ -1,17 +1,24 @@
 import { useState } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LineChart } from '@/components/charts/LineChart';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { DataTable } from '@/components/common/DataTable/DataTable';
 import { createSortableColumn } from '@/components/common/DataTable/columns';
-import {
-  Activity,
-  Clock,
-  XCircle,
-  Server,
-} from 'lucide-react';
+import { Activity, Clock, XCircle, Server } from 'lucide-react';
 
 interface APILog {
   id: string;
@@ -63,13 +70,27 @@ const requestData = [
   { period: 'Nov', requests: 130 },
   { period: 'Oct', requests: 130 },
   { period: 'Dec', requests: 150 },
-
 ];
 
 const endpointData = [
-  { name: '/api/v1/devices', count: 847592, percentage: 29.8, color: '#4338ca' },
-  { name: '/api/v1/telemetry', count: 623441, percentage: 21.9, color: '#22c55e' },
-  { name: '/api/v1/attributes', count: 392156, percentage: 13.8, color: '#f97316' },
+  {
+    name: '/api/v1/devices',
+    count: 847592,
+    percentage: 29.8,
+    color: '#4338ca',
+  },
+  {
+    name: '/api/v1/telemetry',
+    count: 623441,
+    percentage: 21.9,
+    color: '#22c55e',
+  },
+  {
+    name: '/api/v1/attributes',
+    count: 392156,
+    percentage: 13.8,
+    color: '#f97316',
+  },
 ];
 
 const statsCards = [
@@ -142,7 +163,8 @@ export default function APIMonitoring() {
       header: 'Status',
       cell: ({ row }: any) => {
         const status = row.getValue('statusCode') as number;
-        const variant = status >= 200 && status < 300 ? 'default' : 'destructive';
+        const variant =
+          status >= 200 && status < 300 ? 'default' : 'destructive';
         return <Badge variant={variant}>{status}</Badge>;
       },
     },
@@ -150,7 +172,9 @@ export default function APIMonitoring() {
       accessorKey: 'responseTime',
       header: 'Response Time',
       cell: ({ row }: any) => (
-        <span className="text-sm text-slate-700">{row.getValue('responseTime')}ms</span>
+        <span className="text-sm text-slate-700">
+          {row.getValue('responseTime')}ms
+        </span>
       ),
     },
     createSortableColumn('apiKey', 'API Key'),
@@ -165,14 +189,19 @@ export default function APIMonitoring() {
 
       <div className="grid gap-6 lg:grid-cols-4">
         {statsCards.map((card) => (
-          <Card key={card.title} className={`  pt-6  0 shadow-sm ${card.className} ${card.changeClass}`}>
+          <Card
+            key={card.title}
+            className={`  pt-6  0 shadow-sm ${card.className} ${card.changeClass}`}
+          >
             <CardContent className="space-y-3 ">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm font-medium  ">{card.title}</p>
                   <p className="mt-3 text-3xl font-semibold  ">{card.value}</p>
                 </div>
-                <div className="rounded-2xl  text-white p-2 shadow-sm">{card.icon}</div>
+                <div className="rounded-2xl  text-white p-2 shadow-sm">
+                  {card.icon}
+                </div>
               </div>
               <p className={`text-sm ${card.changeClass}`}>{card.change}</p>
             </CardContent>
@@ -199,7 +228,9 @@ export default function APIMonitoring() {
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <CardTitle>API Calls Over Time</CardTitle>
-              <CardDescription>Monitor request volume across your platform.</CardDescription>
+              <CardDescription>
+                Monitor request volume across your platform.
+              </CardDescription>
             </div>
             <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700">
               Last 30 days
@@ -208,7 +239,9 @@ export default function APIMonitoring() {
           <CardContent>
             <LineChart
               data={requestData}
-              lines={[{ dataKey: 'requests', name: 'API Calls', color: '#db2777' }]}
+              lines={[
+                { dataKey: 'requests', name: 'API Calls', color: '#db2777' },
+              ]}
               xAxisKey="period"
               title=""
               showLegend={false}
@@ -226,16 +259,25 @@ export default function APIMonitoring() {
             {endpointData.map((endpoint) => (
               <div key={endpoint.name} className="space-y-2">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-slate-700">{endpoint.name}</span>
-                  <span className="text-sm font-semibold text-slate-900">{endpoint.count.toLocaleString()} calls</span>
+                  <span className="text-sm font-medium text-slate-700">
+                    {endpoint.name}
+                  </span>
+                  <span className="text-sm font-semibold text-slate-900">
+                    {endpoint.count.toLocaleString()} calls
+                  </span>
                 </div>
                 <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
                   <div
                     className="h-full rounded-full"
-                    style={{ width: `${endpoint.percentage}%`, backgroundColor: endpoint.color }}
+                    style={{
+                      width: `${endpoint.percentage}%`,
+                      backgroundColor: endpoint.color,
+                    }}
                   />
                 </div>
-                <div className="text-xs text-slate-500">{endpoint.percentage}% of traffic</div>
+                <div className="text-xs text-slate-500">
+                  {endpoint.percentage}% of traffic
+                </div>
               </div>
             ))}
           </CardContent>
@@ -253,11 +295,7 @@ export default function APIMonitoring() {
           </div>
         </CardHeader>
         <CardContent className="overflow-hidden">
-          <DataTable
-            columns={columns}
-            data={apiLogs}
-            searchKey="endpoint"
-          />
+          <DataTable columns={columns} data={apiLogs} searchKey="endpoint" />
         </CardContent>
       </Card>
     </div>

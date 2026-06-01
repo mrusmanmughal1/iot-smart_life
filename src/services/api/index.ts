@@ -9,7 +9,7 @@ export * from './notifications.api';
 export * from './audit.api';
 export * from './users.api';
 export * from './alarms.api';
-export * from './api-monitoring.api';
+export * from '../../features/apiMonitoring/services/api-monitoring.api.ts';
 export * from './attributes.api';
 export * from './automation.api';
 export * from './floor-plans.api';
@@ -30,7 +30,7 @@ export * from './telemetry.api';
 
 import { alarmsApi } from './alarms.api';
 import { analyticsApi } from './analytics.api';
-import { apiMonitoringApi } from './api-monitoring.api';
+import { apiMonitoringApi } from '../../features/apiMonitoring/services/api-monitoring.api.ts';
 import { assetsApi } from './assets.api';
 import { attributesApi } from './attributes.api';
 import { auditApi } from './audit.api';

@@ -75,7 +75,9 @@ export const apiMonitoringApi = {
     apiClient.get<PaginatedResponse<ApiLog>>('/api-monitoring/logs', {
       params,
     }),
-
+  // get API performance
+  getAPiperfomance: () =>
+    apiClient.get<ApiResponse<ApiMetrics>>('/api-monitoring/performance'),
   // Get log by ID
   getLogById: (id: string) =>
     apiClient.get<ApiResponse<ApiLog>>(`/api-monitoring/logs/${id}`),

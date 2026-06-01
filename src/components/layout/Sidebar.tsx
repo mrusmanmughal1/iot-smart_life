@@ -309,9 +309,30 @@ const getNavItems = (): NavItem[] => [
   },
   {
     titleKey: 'nav.apiMonitoring',
-    href: '/api-monitor',
     icon: <Activity className="h-5 w-5" />,
     feature: 'apiAccess',
+    children: [
+      {
+        titleKey: 'nav.apiMonitoringOverview',
+        href: '/reports-apis',
+        icon: <Activity className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.requestAnalytics',
+        href: '/reports-apis/request-analytics',
+        icon: <BarChart3 className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.performanceMetrics',
+        href: '/reports-apis/performance-metrics',
+        icon: <Activity className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.errorAnalysis',
+        href: '/reports-apis/error-analysis',
+        icon: <AlertTriangle className="h-4 w-4" />,
+      },
+    ],
   },
   {
     titleKey: 'nav.auditLogs',

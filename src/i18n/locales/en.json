@@ -111,6 +111,7 @@
     "dataConsumption": "Data Consumption",
     "geoAnalytics": "Geo Analytics",
     "reports": "Reports",
+    "errorAnalysis": "Error Analysis",
 
     "alertConfiguration": "Alert Configuration",
     "users": "Users & Roles",
@@ -139,6 +140,9 @@
     "notifications": "Notifications",
     "sharingCenter": "Sharing Center",
     "apiMonitoring": "API Monitoring",
+    "apiMonitoringOverview": "API Monitoring Overview",
+    "requestAnalytics": "Request Analytics",
+    "performanceMetrics": "Performance Metrics",
     "auditLogs": "Audit Logs",
     "audit": "Audit",
     "activity": "Activity",

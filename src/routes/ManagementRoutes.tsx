@@ -60,10 +60,16 @@ const CustomerPage = Loadable(
 );
 const AuditPage = Loadable(lazy(() => import('@/pages/AuditPage.tsx')));
 const APIMonitoring = Loadable(
-  lazy(() => import('@/pages/APIMonitoringPage.tsx'))
+  lazy(() => import('@/features/apiMonitoring/page/APIMonitoringPage'))
 );
 const RequestAnalytics = Loadable(
-  lazy(() => import('@/pages/RequestAnalyticsPage.tsx'))
+  lazy(() => import('@/features/apiMonitoring/page/RequestAnalyticsPage'))
+);
+const PerformanceMetrics = Loadable(
+  lazy(() => import('@/features/apiMonitoring/page/PerformanceMetricsPage'))
+);
+const ErrorAnalysis = Loadable(
+  lazy(() => import('@/features/apiMonitoring/page/ErrorAnalysisPage'))
 );
 
 export const managementRoutes = [
@@ -177,14 +183,21 @@ export const managementRoutes = [
         index: true,
         element: <APIMonitoring />,
       },
-      ,
+
       {
         path: 'request-analytics',
         element: <RequestAnalytics />,
       },
+      {
+        path: 'performance-metrics',
+        element: <PerformanceMetrics />,
+      },
+      {
+        path: 'error-analysis',
+        element: <ErrorAnalysis />,
+      },
     ],
   },
-  //  
 
   // -------- subscription routes --------
   {
@@ -198,7 +211,7 @@ export const managementRoutes = [
       {
         path: 'invoices',
         element: <Subscriptioninvoices />,
-      }
+      },
     ],
   },
 ];

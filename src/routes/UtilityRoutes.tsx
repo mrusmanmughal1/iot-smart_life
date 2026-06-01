@@ -2,14 +2,6 @@ import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
 
-// Import utility page components lazily
-const PaymentSuccess = Loadable(
-  lazy(() =>
-    import('@/components/common/PaymentSuccess/PaymentSuccess.tsx').then(
-      (module) => ({ default: module.PaymentSuccess })
-    )
-  )
-);
 const WidgetEditorPage = Loadable(
   lazy(() => import('@/features/widgets/page/WidgetEditorPage'))
 );
