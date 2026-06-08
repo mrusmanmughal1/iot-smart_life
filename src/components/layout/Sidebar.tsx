@@ -236,9 +236,15 @@ const getNavItems = (): NavItem[] => [
   },
   {
     titleKey: 'nav.integrations',
-    href: '/integrations',
     icon: <BotIcon className="h-5 w-5" />,
-    feature: 'integrations',
+    feature: 'integration',
+    children: [
+      {
+        titleKey: 'nav.integrationDashboard',
+        href: '/integrations/dashboard',
+        icon: <Activity className="h-4 w-4" />,
+      },
+    ],
   },
   {
     titleKey: 'nav.edgeManagementCenter',
@@ -331,6 +337,16 @@ const getNavItems = (): NavItem[] => [
         titleKey: 'nav.errorAnalysis',
         href: '/reports-apis/error-analysis',
         icon: <AlertTriangle className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.apiResponseOverview',
+        href: '/reports-apis/api-response',
+        icon: <Activity className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.rateLimitingDashboard',
+        href: '/reports-apis/rate-limiting',
+        icon: <Activity className="h-4 w-4" />,
       },
     ],
   },

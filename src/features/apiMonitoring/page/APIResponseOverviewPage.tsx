@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import {
   Card,
@@ -42,7 +42,8 @@ import {
   ArrowDownRight,
   CheckCircle2,
 } from 'lucide-react';
-import { useGetAPiperfomance } from '../hooks';
+
+// ─── Types ──────────────────────────────────────────────────
 
 interface EndpointMetric {
   id: string;
@@ -55,6 +56,8 @@ interface EndpointMetric {
   status: 'Good' | 'Fair' | 'Poor';
   sla: string;
 }
+
+// ─── Mock Data ──────────────────────────────────────────────
 
 const endpointMetrics: EndpointMetric[] = [
   {
@@ -131,7 +134,9 @@ const throughputData = [
   { time: 'M_3', value: 430 },
 ];
 
-export default function PerformanceMetricsPage() {
+// ─── Component ──────────────────────────────────────────────
+
+export default function APIResponseOverviewPage() {
   const [timeRange, setTimeRange] = useState('7d');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -146,16 +151,14 @@ export default function PerformanceMetricsPage() {
     console.log(`Exporting data as ${format}`);
   };
 
-  const { data: apiPerfomance } = useGetAPiperfomance();
-  console.log(apiPerfomance);
   return (
     <div className="space-y-6 pb-12">
       {/* Top Header & Actions Section */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <PageHeader
-            title="Performance Metrics"
-            description="Monitor API response times, throughput, and system performance"
+            title="API Response  Overview"
+            description="Monitor and analyze API consumption across your platform"
           />
         </div>
 
@@ -188,7 +191,8 @@ export default function PerformanceMetricsPage() {
           <Button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="h-10 bg-[#e53935] hover:bg-[#c62828] text-white font-semibold rounded-lg px-4 flex items-center gap-2 border-none shadow-sm cursor-pointer transition-colors duration-200"
+            variant="success"
+            id="api-overview-refresh-btn"
           >
             <RefreshCw
               className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`}
@@ -198,50 +202,52 @@ export default function PerformanceMetricsPage() {
         </div>
       </div>
 
-      {/* Pastel Metrics Cards Grid */}
+      {/* KPI Metrics Cards */}
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-        {/* Sky Blue Card - Avg Response Time */}
-        <Card className=" bg-primary text-white">
+        {/* Avg Response Time */}
+        <Card className="bg-primary text-white border-none shadow-sm">
           <CardContent className="p-6">
-            <p className="text-sm font-medium tracking-wide ">
+            <p className="text-sm font-medium tracking-wide">
               Avg Response Time
             </p>
-            <p className="mt-3 text-3xl font-semibold ">127ms</p>
-            <div className="mt-3 flex items-center gap-1.5  ">
+            <p className="mt-3 text-3xl font-semibold">127ms</p>
+            <div className="mt-3 flex items-center gap-1.5">
               <ArrowUpRight className="h-4 w-4" />
-              <span className="text-xs font-medium">12.5% vs last period</span>
+              <span className="text-xs font-medium">
+                ↑ 12.5% vs last period
+              </span>
             </div>
           </CardContent>
         </Card>
 
-        {/* Soft Green Card - Throughput */}
-        <Card className=" bg-secondary text-white">
+        {/* Throughput */}
+        <Card className="bg-secondary text-white border-none shadow-sm">
           <CardContent className="p-6">
-            <p className="text-sm font-semibold tracking-wide ">Throughput</p>
-            <p className="mt-3 text-3xl font-medium ">342</p>
-            <div className="mt-3 flex items-center gap-1.5 ">
+            <p className="text-sm font-semibold tracking-wide">Throughput</p>
+            <p className="mt-3 text-3xl font-medium">342</p>
+            <div className="mt-3 flex items-center gap-1.5">
               <ArrowDownRight className="h-4 w-4" />
-              <span className="text-xs font-medium">8.2% vs last period</span>
+              <span className="text-xs font-medium">↓ 8.2% vs last period</span>
             </div>
           </CardContent>
         </Card>
 
-        {/* Soft Yellow Card - P95 R esponse Time */}
-        <Card className=" bg-success text-white ">
+        {/* P95 Response Time */}
+        <Card className="bg-success text-white border-none shadow-sm">
           <CardContent className="p-6">
-            <p className="text-sm font-medium tracking-wide ">
+            <p className="text-sm font-medium tracking-wide">
               P95 Response Time
             </p>
-            <p className="mt-3 text-3xl font-medium ">289ms</p>
-            <div className="mt-3 flex items-center gap-1.5 ">
+            <p className="mt-3 text-3xl font-medium">289ms</p>
+            <div className="mt-3 flex items-center gap-1.5">
               <ArrowDownRight className="h-4 w-4" />
-              <span className="text-xs font-medium">0.5% vs last period</span>
+              <span className="text-xs font-medium">↓ 0.5% vs last period</span>
             </div>
           </CardContent>
         </Card>
 
-        {/* Soft Rose Card - Apdex Score */}
-        <Card className="bg-[#fce4ec] border-none shadow-sm">
+        {/* Apdex Score */}
+        <Card className=" bg-white border-none shadow-sm">
           <CardContent className="p-6">
             <p className="text-sm font-semibold tracking-wide text-slate-700">
               Apdex Score
@@ -255,9 +261,9 @@ export default function PerformanceMetricsPage() {
         </Card>
       </div>
 
-      {/* Response Time Trends & Throughput Side-by-Side Charts */}
+      {/* Charts Row: Response Time Trends + Throughput Analysis */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Response Time Trends Card */}
+        {/* Response Time Trends */}
         <Card className="border border-slate-100 shadow-sm rounded-xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold text-slate-800 dark:text-slate-100">
@@ -329,7 +335,7 @@ export default function PerformanceMetricsPage() {
           </CardContent>
         </Card>
 
-        {/* Throughput Analysis Card */}
+        {/* Throughput Analysis */}
         <Card className="border border-slate-100 shadow-sm rounded-xl">
           <CardHeader className="pb-1">
             <CardTitle className="text-lg font-semibold text-slate-800 dark:text-slate-100">
@@ -348,14 +354,18 @@ export default function PerformanceMetricsPage() {
                 >
                   <defs>
                     <linearGradient
-                      id="colorThroughput"
+                      id="colorThroughputOverview"
                       x1="0"
                       y1="0"
                       x2="0"
                       y2="1"
                     >
-                      <stop offset="5%" stopColor="#44489d" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#44489d" stopOpacity={0} />
+                      <stop
+                        offset="5%"
+                        stopColor="#10b981"
+                        stopOpacity={0.15}
+                      />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid
@@ -395,10 +405,10 @@ export default function PerformanceMetricsPage() {
                     type="monotone"
                     dataKey="value"
                     name="Requests/sec"
-                    stroke="#44489d"
+                    stroke="#10b981"
                     strokeWidth={2.5}
                     fillOpacity={1}
-                    fill="url(#colorThroughput)"
+                    fill="url(#colorThroughputOverview)"
                     dot={{ r: 3, strokeWidth: 1 }}
                     activeDot={{ r: 5 }}
                   />
@@ -418,9 +428,9 @@ export default function PerformanceMetricsPage() {
         </CardHeader>
         <CardContent className="overflow-hidden">
           <div className="rounded-lg overflow-hidden border border-slate-100 dark:border-slate-800">
-            <Table className="  ">
-              <TableHeader className="p-4">
-                <TableRow className=" ">
+            <Table>
+              <TableHeader>
+                <TableRow>
                   <TableHead className="text-white font-semibold py-3">
                     Endpoint
                   </TableHead>
@@ -458,7 +468,10 @@ export default function PerformanceMetricsPage() {
                     Poor: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900',
                   };
                   return (
-                    <TableRow key={row.id}>
+                    <TableRow
+                      key={row.id}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                    >
                       <TableCell className="font-mono text-xs font-semibold text-slate-800 dark:text-slate-200">
                         {row.endpoint}
                       </TableCell>

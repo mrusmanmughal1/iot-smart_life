@@ -149,7 +149,7 @@ const recentErrors: ErrorEvent[] = [
   },
 ];
 
-// ─── Component ──────────────────────────────────────────────
+// ── Component ──────────────────────────────────────────────
 
 export default function ErrorAnalysisPage() {
   const [events, setEvents] = useState<ErrorEvent[]>(recentErrors);

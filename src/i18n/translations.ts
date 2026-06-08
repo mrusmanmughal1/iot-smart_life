@@ -1,5 +1,3 @@
-// src/i18n/translations.ts - Complete Translation System
-
 export const translations = {
   en: {
     // Navigation
@@ -31,6 +29,7 @@ export const translations = {
       requestAnalytics: 'Request Analytics',
       performanceMetrics: 'Performance Metrics',
       errorAnalysis: 'Error Analysis',
+      apiResponseOverview: 'API Response Overview',
       auditLogs: 'Audit Logs',
       subscriptionPlans: 'Subscription Plans',
       settings: 'Settings',
@@ -197,7 +196,6 @@ export const translations = {
       invalidPhone: 'Invalid phone number',
     },
   },
-
   ar: {
     // Navigation (Arabic - RTL)
     nav: {
@@ -228,6 +226,7 @@ export const translations = {
       requestAnalytics: 'تحليلات الطلبات',
       performanceMetrics: 'مقاييس الأداء',
       errorAnalysis: 'تحليل الأخطاء',
+      apiResponseOverview: 'نظرة عامة على استجابة API',
       auditLogs: 'سجلات التدقيق',
       subscriptionPlans: 'خطط الاشتراك',
       settings: 'الإعدادات',

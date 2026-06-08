@@ -1,10 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { integrationsApi } from '@/services/api/integrations.api';
+import { integrationsApi } from '@/features/integrations/sevices/integrations.api';
 import type {
   IntegrationQuery,
   Integration,
   IntegrationType,
-} from '@/services/api/integrations.api';
+} from '@/features/integrations/sevices/integrations.api';
 
 const INTEGRATIONS_QUERY_KEY = 'integrations';
 

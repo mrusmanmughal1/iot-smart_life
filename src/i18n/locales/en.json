@@ -112,7 +112,8 @@
     "geoAnalytics": "Geo Analytics",
     "reports": "Reports",
     "errorAnalysis": "Error Analysis",
-
+    "apiResponseOverview": "API Response  ",
+    "rateLimitingDashboard": "Rate Limiting Dashboard",
     "alertConfiguration": "Alert Configuration",
     "users": "Users & Roles",
     "history": "History",
@@ -125,6 +126,7 @@
     "usersAndRoles": "Users & Roles",
     "automation": "Automation",
     "integrations": "Integrations",
+    "integrationDashboard": "Dashboard",
     "edgeManagementCenter": "Edge Management  ",
     "edgeInstances": "Edge Instances",
     "ruleChainTemplates": "Rule Chain Templates",

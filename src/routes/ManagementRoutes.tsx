@@ -71,6 +71,15 @@ const PerformanceMetrics = Loadable(
 const ErrorAnalysis = Loadable(
   lazy(() => import('@/features/apiMonitoring/page/ErrorAnalysisPage'))
 );
+const APIResponseOverview = Loadable(
+  lazy(() => import('@/features/apiMonitoring/page/APIResponseOverviewPage'))
+);
+const RateLimitingDashboard = Loadable(
+  lazy(() => import('@/features/apiMonitoring/page/RateLimitingDashboardPage'))
+);
+const IntegrationCentreDashboard = Loadable(
+  lazy(() => import('@/features/integrations/page/IntegrationCentreDashboardPage'))
+);
 
 export const managementRoutes = [
   //  -------------------Users Management Routes-------------------
@@ -195,6 +204,26 @@ export const managementRoutes = [
       {
         path: 'error-analysis',
         element: <ErrorAnalysis />,
+      },
+      {
+        path: 'api-response',
+        element: <APIResponseOverview />,
+      },
+      {
+        path: 'rate-limiting',
+        element: <RateLimitingDashboard />,
+      },
+    ],
+  },
+  
+  // -------- integrations --------
+  {
+    path: '/integrations',
+    element: <FeatureRoute feature="integration" />,
+    children: [
+      {
+        path: 'dashboard',
+        element: <IntegrationCentreDashboard />,
       },
     ],
   },
