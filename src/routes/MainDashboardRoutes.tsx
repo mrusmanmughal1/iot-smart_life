@@ -17,10 +17,10 @@ const AlertAnalyticsPage = Loadable(
   lazy(() => import('@/pages/AlertAnalyticsPage.tsx'))
 );
 const AlertRulesPage = Loadable(
-  lazy(() => import('@/pages/AlertRulesPage.tsx'))
+  lazy(() => import('@/features/alarms/page/AlertRulesPage'))
 );
 const AlertsNotificationPage = Loadable(
-  lazy(() => import('@/pages/AlertsNotificationPage.tsx'))
+  lazy(() => import('@/features/alarms/page/AlertsNotificationPage'))
 );
 const AlertDetailsPage = Loadable(
   lazy(() => import('@/pages/AlertDetailsPage.tsx'))
@@ -29,12 +29,16 @@ const NotificationsPage = Loadable(
   lazy(() => import('@/features/notifications/page/NotificationsPage'))
 );
 
-const AnalyticsPage = Loadable(lazy(() => import('@/features/analytics/pages/AnalyticsPage')));
+const AnalyticsPage = Loadable(
+  lazy(() => import('@/features/analytics/pages/AnalyticsPage'))
+);
 const DashboardAnalyticsDetailsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/DevicesAnalyticsPage'))
 );
 const SystemPerformanceAnalyticsPage = Loadable(
-  lazy(() => import('@/features/analytics/pages/SystemPerformanceAnalyticsPage'))
+  lazy(
+    () => import('@/features/analytics/pages/SystemPerformanceAnalyticsPage')
+  )
 );
 const DataConsumptionAnalyticsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/DataConsumptionAnalyticsPage'))
@@ -62,7 +66,9 @@ const ProductionOverviewPage = Loadable(
   lazy(() => import('@/features/analytics/pages/ProductionOverviewPage'))
 );
 const Overview2Page = Loadable(lazy(() => import('@/pages/Overview2Page.tsx')));
-const SettingsPage = Loadable(lazy(() => import('@/features/settings/pages/SettingsPage')));
+const SettingsPage = Loadable(
+  lazy(() => import('@/features/settings/pages/SettingsPage'))
+);
 const GeneralSettingsTab = Loadable(
   lazy(() =>
     import('@/features/settings/components/GeneralSettingsTab').then(
@@ -192,7 +198,6 @@ export const mainDashboardRoutes = [
         path: 'geo-analytics',
         element: <GeoAnalyticsPage />,
       },
-
     ],
   },
   {

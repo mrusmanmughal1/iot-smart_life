@@ -108,9 +108,7 @@ export const LocationMap: React.FC<LocationMapProps> = ({
           console.error('Google Maps API failed to load');
           return;
         }
-
         const { maps } = window.google;
-
         // Initialize map if not already initialized
         if (!mapInstanceRef.current) {
           mapInstanceRef.current = new maps.Map(mapRef.current, {
@@ -121,9 +119,7 @@ export const LocationMap: React.FC<LocationMapProps> = ({
             fullscreenControl: true,
           });
         }
-
         const map = mapInstanceRef.current;
-
         // Update marker position if coordinates are provided
         if (
           latitude !== null &&

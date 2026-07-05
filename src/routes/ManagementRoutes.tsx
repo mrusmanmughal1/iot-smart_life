@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
 import CustomerDetailsPage from '@/pages/CustomerDetailsPage';
+import MQTTIntegrationPage from '@/features/integrations/page/MQTTIntegrationPage';
 // Import management page components lazily
 const SubscriptionPlans = Loadable(
   lazy(() => import('@/features/Subscription/page/SubscriptionPlans'))
@@ -78,7 +79,21 @@ const RateLimitingDashboard = Loadable(
   lazy(() => import('@/features/apiMonitoring/page/RateLimitingDashboardPage'))
 );
 const IntegrationCentreDashboard = Loadable(
-  lazy(() => import('@/features/integrations/page/IntegrationCentreDashboardPage'))
+  lazy(
+    () => import('@/features/integrations/page/IntegrationCentreDashboardPage')
+  )
+);
+const DataConvertersPage = Loadable(
+  lazy(() => import('@/features/integrations/page/DataConvertersPage'))
+);
+const CreateDataConverterPage = Loadable(
+  lazy(() => import('@/features/integrations/page/CreateDataConverterPage'))
+);
+const APIIntegrationLogsPage = Loadable(
+  lazy(() => import('@/features/integrations/page/APIIntegrationLogsPage'))
+);
+const APIIntegrationStatisticsPage = Loadable(
+  lazy(() => import('@/features/integrations/page/APIIntegrationStatisticsPage'))
 );
 
 export const managementRoutes = [
@@ -215,7 +230,7 @@ export const managementRoutes = [
       },
     ],
   },
-  
+
   // -------- integrations --------
   {
     path: '/integrations',
@@ -224,6 +239,26 @@ export const managementRoutes = [
       {
         path: 'dashboard',
         element: <IntegrationCentreDashboard />,
+      },
+      {
+        path: 'data-converters',
+        element: <DataConvertersPage />,
+      },
+      {
+        path: 'data-converters/create',
+        element: <CreateDataConverterPage />,
+      },
+      {
+        path: 'mqtt-integration',
+        element: <MQTTIntegrationPage />,
+      },
+      {
+        path: 'api-logs',
+        element: <APIIntegrationLogsPage />,
+      },
+      {
+        path: 'api-statistics',
+        element: <APIIntegrationStatisticsPage />,
       },
     ],
   },

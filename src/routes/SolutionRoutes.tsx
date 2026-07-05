@@ -33,7 +33,9 @@ const TemplatePreviewPage = Loadable(
 const CreateTemplatePage = Loadable(
   lazy(() => import('@/pages/CreateTemplatePage.tsx'))
 );
-const FloorPlans = Loadable(lazy(() => import('@/features/floorPlan/page/FloorPlanPage')));
+const FloorPlans = Loadable(
+  lazy(() => import('@/features/floorPlan/page/FloorPlanPage'))
+);
 const FloorMapCreatePage = Loadable(
   lazy(() => import('@/features/floorPlan/page/FloorMapCreatePage'))
 );
@@ -43,7 +45,9 @@ const MultiFloorBuildingViewPage = Loadable(
 const FloorMapSettingsPage = Loadable(
   lazy(() => import('@/features/floorPlan/page/FloorMapSettingsPage'))
 );
-const AnalyticsPage = Loadable(lazy(() => import('@/features/analytics/pages/AnalyticsPage')));
+const AnalyticsPage = Loadable(
+  lazy(() => import('@/features/analytics/pages/AnalyticsPage'))
+);
 const BuildingHierarchyChartPage = Loadable(
   lazy(() => import('@/pages/BuildingHierarchyChartPage.tsx'))
 );

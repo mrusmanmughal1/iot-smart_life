@@ -1,6 +1,15 @@
-import { format, formatDistance, formatRelative, isValid, parseISO } from 'date-fns';
+import {
+  format,
+  formatDistance,
+  formatRelative,
+  isValid,
+  parseISO,
+} from 'date-fns';
 
-export const formatDate = (date: string | Date | number, pattern = 'PPP'): string => {
+export const formatDate = (
+  date: string | Date | number,
+  pattern = 'PPP'
+): string => {
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : new Date(date);
     return isValid(dateObj) ? format(dateObj, pattern) : 'Invalid date';
@@ -20,7 +29,9 @@ export const formatTime = (date: string | Date | number): string => {
 export const formatRelativeTime = (date: string | Date | number): string => {
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : new Date(date);
-    return isValid(dateObj) ? formatDistance(dateObj, new Date(), { addSuffix: true }) : 'Invalid date';
+    return isValid(dateObj)
+      ? formatDistance(dateObj, new Date(), { addSuffix: true })
+      : 'Invalid date';
   } catch {
     return 'Invalid date';
   }
@@ -29,7 +40,9 @@ export const formatRelativeTime = (date: string | Date | number): string => {
 export const formatRelativeDate = (date: string | Date | number): string => {
   try {
     const dateObj = typeof date === 'string' ? parseISO(date) : new Date(date);
-    return isValid(dateObj) ? formatRelative(dateObj, new Date()) : 'Invalid date';
+    return isValid(dateObj)
+      ? formatRelative(dateObj, new Date())
+      : 'Invalid date';
   } catch {
     return 'Invalid date';
   }

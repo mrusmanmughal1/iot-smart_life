@@ -38,6 +38,7 @@ import {
   MapPin,
   Zap,
   AlertTriangle,
+  Plus,
 } from 'lucide-react';
 import { useThemeStore } from '@/stores/useThemeStore';
 import { useAppStore } from '@/stores/useAppStore';
@@ -243,6 +244,31 @@ const getNavItems = (): NavItem[] => [
         titleKey: 'nav.integrationDashboard',
         href: '/integrations/dashboard',
         icon: <Activity className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.dataConverters',
+        href: '/integrations/data-converters',
+        icon: <Zap className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.createDataConverter',
+        href: '/integrations/data-converters/create',
+        icon: <Plus className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'MQTT Integration',
+        href: '/integrations/mqtt-integration',
+        icon: <Rss className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'API Logs',
+        href: '/integrations/api-logs',
+        icon: <FileText className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'API Statistics',
+        href: '/integrations/api-statistics',
+        icon: <BarChart3 className="h-4 w-4" />,
       },
     ],
   },

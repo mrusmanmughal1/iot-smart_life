@@ -127,6 +127,8 @@
     "automation": "Automation",
     "integrations": "Integrations",
     "integrationDashboard": "Dashboard",
+    "dataConverters": "Data Converters",
+    "createDataConverter": "Add Converter",
     "edgeManagementCenter": "Edge Management  ",
     "edgeInstances": "Edge Instances",
     "ruleChainTemplates": "Rule Chain Templates",

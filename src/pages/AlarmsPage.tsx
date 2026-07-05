@@ -89,7 +89,6 @@ export default function AlarmsPage() {
           </Card>
         ))}
       </div>
-
       <Card className="py-4">
         <CardContent>
           {isLoading ? (

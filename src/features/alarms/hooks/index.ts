@@ -12,26 +12,11 @@ export const useAlarms = (params?: AlarmQuery) => {
 
 export const useAlarm = (alarmId: string) => {
   return useQuery({
-    queryKey: ['alarms', alarmId],
+    queryKey: ['alarm', alarmId],
     queryFn: () => alarmsApi.getById(alarmId),
     enabled: !!alarmId,
   });
 };
-
-export const useAlarmSummary = () => {
-  return useQuery({
-    queryKey: ['alarms', 'summary'],
-    // queryFn: () => alarmService.getAlarmSummary(),
-  });
-};
-
-// export const useAlarmMetrics = () => {
-//   return useQuery({
-//     queryKey: ['alarms', 'metrics'],
-
-//     queryFn: () => alarmService.getAlarmMetrics(),
-//   });
-// };
 
 export const useAcknowledgeAlarm = () => {
   const queryClient = useQueryClient();
@@ -63,7 +48,7 @@ export const useClearAlarm = () => {
 // get alarms statistics
 export const useGetStatsAlaram = () => {
   return useQuery({
-    queryKey: ['alaram'],
+    queryKey: ['alaramStats'],
     queryFn: async () => {
       const apiresponse = await alarmsApi.getStatistics();
       return apiresponse.data.data;
