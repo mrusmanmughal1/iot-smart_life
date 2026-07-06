@@ -270,6 +270,16 @@ const getNavItems = (): NavItem[] => [
         href: '/integrations/api-statistics',
         icon: <BarChart3 className="h-4 w-4" />,
       },
+      {
+        titleKey: 'Test Data Converter',
+        href: '/integrations/test-data-converter',
+        icon: <Zap className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'Decoder Config',
+        href: '/integrations/decoder-config',
+        icon: <Settings className="h-4 w-4" />,
+      },
     ],
   },
   {

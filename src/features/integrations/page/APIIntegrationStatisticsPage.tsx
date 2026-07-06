@@ -56,7 +56,6 @@ export const APIIntegrationStatisticsPage = () => {
           <Button variant="outline">Clone</Button>
         </div>
       </div>
-
       {/* Time Range Bar */}
       <div className="flex items-center gap-4 mb-6 p-4  rounded-md  bg-white shadow-sm">
         <span className="text-sm font-semibold text-slate-700">
@@ -307,5 +306,4 @@ export const APIIntegrationStatisticsPage = () => {
     </div>
   );
 };
-
 export default APIIntegrationStatisticsPage;

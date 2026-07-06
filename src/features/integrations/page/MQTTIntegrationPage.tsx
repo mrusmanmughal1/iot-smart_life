@@ -9,6 +9,7 @@ import {
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PageHeader } from '@/components/common/PageHeader';
 
 const data = [
   { name: 'Apr', value: 20 },
@@ -24,15 +25,13 @@ const data = [
 
 export const MQTTIntegrationPage = () => {
   return (
-    <div className="p-2">
+    <div>
       {/* Header section */}
-      <div className="flex flex-col  md:flex-row justify-between items-start mb-6">
-        <div>
-          <h1 className="text-2xl font-semibold mb-1">MQTT Integration</h1>
-          <p className="text-sm text-slate-500">
-            Production Sensor Data Collection Via MQTT
-          </p>
-        </div>
+      <div className="flex flex-col  md:flex-row justify-between items-center mb-6">
+        <PageHeader
+          title="MQTT Integration"
+          description="Production Sensor Data Collection Via MQTT"
+        />
         <div className="flex gap-3">
           <Button variant="primary" className="px-6 py-2 text-sm font-medium">
             Stop

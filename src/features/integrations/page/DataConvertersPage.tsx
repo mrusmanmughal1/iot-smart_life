@@ -22,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { PageHeader } from '@/components/common/PageHeader';
 
 interface Converter {
   id: string;
@@ -83,14 +84,10 @@ export default function DataConvertersPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-800">
-          Data Converters
-        </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Transform And Process Incoming Data
-        </p>
-      </div>
+      <PageHeader
+        title="Data Converters"
+        description="Transform And Process Incoming Data"
+      />
 
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-4">

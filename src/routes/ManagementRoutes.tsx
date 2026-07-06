@@ -93,7 +93,15 @@ const APIIntegrationLogsPage = Loadable(
   lazy(() => import('@/features/integrations/page/APIIntegrationLogsPage'))
 );
 const APIIntegrationStatisticsPage = Loadable(
-  lazy(() => import('@/features/integrations/page/APIIntegrationStatisticsPage'))
+  lazy(
+    () => import('@/features/integrations/page/APIIntegrationStatisticsPage')
+  )
+);
+const TestDataConverterPage = Loadable(
+  lazy(() => import('@/features/integrations/page/TestDataConverterPage'))
+);
+const DecoderConfigPage = Loadable(
+  lazy(() => import('@/features/integrations/page/DecoderConfigPage'))
 );
 
 export const managementRoutes = [
@@ -259,6 +267,14 @@ export const managementRoutes = [
       {
         path: 'api-statistics',
         element: <APIIntegrationStatisticsPage />,
+      },
+      {
+        path: 'test-data-converter',
+        element: <TestDataConverterPage />,
+      },
+      {
+        path: 'decoder-config',
+        element: <DecoderConfigPage />,
       },
     ],
   },
