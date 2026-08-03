@@ -136,7 +136,7 @@ export const solutionTemplatesApi = {
       rating,
     }),
 
-  // Get by category
+  // Get by categoryfs
   getByCategory: (category: TemplateCategory) =>
     apiClient.get<ApiResponse<SolutionTemplate[]>>(
       `/solution-templates/category/${category}`
