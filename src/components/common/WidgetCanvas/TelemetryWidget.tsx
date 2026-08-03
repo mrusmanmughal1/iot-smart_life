@@ -1,7 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Activity, Wifi, WifiOff, Battery, Thermometer, Droplets, Zap, ChevronDown } from 'lucide-react';
+import {
+  Activity,
+  Wifi,
+  WifiOff,
+  Battery,
+  Thermometer,
+  Droplets,
+  Zap,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { BarChart } from '@/components/charts/BarChart';
 
 export interface DeviceTelemetry {
@@ -36,12 +50,15 @@ const generateMockDeviceTelemetry = (deviceId?: string): DeviceTelemetry => {
     status: Math.random() > 0.2 ? 'online' : 'offline',
     lastUpdate: new Date(),
     metrics: {
-      temperature: device.name.includes('Temperature') || device.name.includes('Thermostat')
-        ? Math.round((Math.random() * 30 + 15) * 10) / 10
-        : Math.round((Math.random() * 30 + 15) * 10) / 10,
-      humidity: device.name.includes('Humidity') || device.name.includes('Air')
-        ? Math.round((Math.random() * 40 + 30) * 10) / 10
-        : Math.round((Math.random() * 40 + 30) * 10) / 10,
+      temperature:
+        device.name.includes('Temperature') ||
+        device.name.includes('Thermostat')
+          ? Math.round((Math.random() * 30 + 15) * 10) / 10
+          : Math.round((Math.random() * 30 + 15) * 10) / 10,
+      humidity:
+        device.name.includes('Humidity') || device.name.includes('Air')
+          ? Math.round((Math.random() * 40 + 30) * 10) / 10
+          : Math.round((Math.random() * 40 + 30) * 10) / 10,
       battery: Math.round((Math.random() * 30 + 70) * 10) / 10,
       power: device.name.includes('Power')
         ? Math.round((Math.random() * 500 + 100) * 10) / 10
@@ -60,7 +77,12 @@ export const availableDevices = [
   { id: 'dev-005', name: 'Air Quality Sensor 05' },
 ];
 
-export type MetricType = 'temperature' | 'humidity' | 'battery' | 'power' | 'signal';
+export type MetricType =
+  | 'temperature'
+  | 'humidity'
+  | 'battery'
+  | 'power'
+  | 'signal';
 
 export interface TelemetryWidgetConfig {
   enabledMetrics?: MetricType[];
@@ -76,8 +98,8 @@ interface TelemetryWidgetProps {
   onDeviceChange?: (deviceId: string) => void;
 }
 
-export function TelemetryWidget({ 
-  data, 
+export function TelemetryWidget({
+  data,
   refreshInterval = 5000,
   enabledMetrics = ['temperature', 'humidity', 'battery', 'power', 'signal'],
   deviceId: propDeviceId,
@@ -215,12 +237,16 @@ export function TelemetryWidget({
       {/* Device Selection & Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 flex-1">
-          <div className={`w-3 h-3 rounded-full ${getStatusColor(deviceTelemetry.status)} animate-pulse`} />
+          <div
+            className={`w-3 h-3 rounded-full ${getStatusColor(deviceTelemetry.status)} animate-pulse`}
+          />
           <span className="text-base font-semibold text-gray-900 dark:text-white">
             {deviceTelemetry.deviceName}
           </span>
           <Badge
-            variant={deviceTelemetry.status === 'online' ? 'default' : 'destructive'}
+            variant={
+              deviceTelemetry.status === 'online' ? 'default' : 'destructive'
+            }
             className="text-xs"
           >
             {deviceTelemetry.status === 'online' ? (
@@ -301,7 +327,8 @@ export function TelemetryWidget({
                 />
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {percentage.toFixed(0)}% of {max}{getMetricUnit(metric)}
+                {percentage.toFixed(0)}% of {max}
+                {getMetricUnit(metric)}
               </div>
             </div>
           );

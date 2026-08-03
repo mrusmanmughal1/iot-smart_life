@@ -4,34 +4,36 @@ import { Loadable } from '@/components/common/Loadable';
 
 // Import solution page components lazily
 const DashboardsPage = Loadable(
-  lazy(() => import('@/pages/DashboardsPage.tsx'))
+  lazy(() => import('@/features/solution-Dashboards/pages/DashboardsPage'))
 );
 const CreateDashboardPage = Loadable(
-  lazy(() => import('@/pages/CreateDashboardPage.tsx'))
+  lazy(() => import('@/features/solution-Dashboards/pages/CreateDashboardPage'))
 );
 const CreateGroupPage = Loadable(
-  lazy(() => import('@/pages/CreateGroupPage.tsx'))
+  lazy(() => import('@/features/solution-Dashboards/pages/CreateGroupPage'))
 );
 const WidgetConfigurationPage = Loadable(
   lazy(() => import('@/features/widgets/page/WidgetConfigurationPage'))
 );
 const WidgetEditorPage = Loadable(
-  lazy(() => import('@/features/widgets/page/WidgetEditorPage'))
+  lazy(() => import('@/features/solution-Dashboards/pages/WidgetEditorPage'))
 );
 const MainDashboardPage = Loadable(
-  lazy(() => import('@/pages/MainDashboardPage.tsx'))
+  lazy(() => import('@/features/solution-Dashboards/pages/MainDashboardPage'))
 );
 const MainControlPanelPage = Loadable(
   lazy(() => import('@/pages/MainControlPanelPage.tsx'))
 );
 const SolutionTemplates = Loadable(
-  lazy(() => import('@/pages/SolutionTemplatesPage.tsx'))
+  lazy(
+    () => import('@/features/solution-templates/pages/SolutionTemplatesPage')
+  )
 );
 const TemplatePreviewPage = Loadable(
-  lazy(() => import('@/pages/TemplatePreviewPage.tsx'))
+  lazy(() => import('@/features/solution-templates/pages/TemplatePreviewPage'))
 );
 const CreateTemplatePage = Loadable(
-  lazy(() => import('@/pages/CreateTemplatePage.tsx'))
+  lazy(() => import('@/features/solution-templates/pages/CreateTemplatePage'))
 );
 const FloorPlans = Loadable(
   lazy(() => import('@/features/floorPlan/page/FloorPlanPage'))

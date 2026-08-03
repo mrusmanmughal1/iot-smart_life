@@ -8,6 +8,7 @@ import type {
   Room,
   UploadedFile,
 } from '@/features/floorPlan/types';
+import type { ParsedGeometry } from '@/services/api/floor-plans.api';
 
 export type StepId = 1 | 2 | 3 | 4 | 5;
 
@@ -37,6 +38,10 @@ interface FloorMapStore {
   selectedFloor: string;
   setSelectedFloor: (floor: string) => void;
 
+  // Parsed geometry received from backend after DWG upload
+  parsedGeometry: ParsedGeometry | null;
+  setParsedGeometry: (geometry: ParsedGeometry | null) => void;
+
   // Zone Setup step
   zones: Zone[];
   setZones: (zones: Zone[]) => void;
@@ -57,8 +62,14 @@ interface FloorMapStore {
   assignedDevices: Record<string, Device[]>; // roomId -> devices
   assignDeviceToRoom: (device: Device, roomId: string) => void;
   unassignDeviceFromRoom: (deviceId: string, roomId: string) => void;
-  devicePositions: Record<string, { x: number; y: number; zoneId: string | null; floor: string }>;
-  setDevicePosition: (deviceId: string, position: { x: number; y: number; zoneId: string | null; floor: string }) => void;
+  devicePositions: Record<
+    string,
+    { x: number; y: number; zoneId: string | null; floor: string }
+  >;
+  setDevicePosition: (
+    deviceId: string,
+    position: { x: number; y: number; zoneId: string | null; floor: string }
+  ) => void;
   removeDevicePosition: (deviceId: string) => void;
   clearDevicePositions: () => void;
 
@@ -67,7 +78,6 @@ interface FloorMapStore {
 
   // Uploaded files
   uploadedFiles: UploadedFile[];
- 
 }
 
 const defaultFormValues: FilterFormValues = {
@@ -90,12 +100,16 @@ const defaultState = {
   uploadedFiles: [] as UploadedFile[],
   formValues: defaultFormValues,
   selectedFloor: 'Ground',
+  parsedGeometry: null as ParsedGeometry | null,
   zones: [] as Zone[],
   selectedZoneId: null as string | null,
   zoomLevel: 100,
   rooms: [] as Room[],
   assignedDevices: {} as Record<string, Device[]>,
-  devicePositions: {} as Record<string, { x: number; y: number; zoneId: string | null; floor: string }>,
+  devicePositions: {} as Record<
+    string,
+    { x: number; y: number; zoneId: string | null; floor: string }
+  >,
 };
 
 export const useFloorMapStore = create<FloorMapStore>()(
@@ -149,6 +163,11 @@ export const useFloorMapStore = create<FloorMapStore>()(
       // DWG Import step
       setSelectedFloor: (floor: string) => {
         set({ selectedFloor: floor });
+      },
+
+      // Parsed geometry
+      setParsedGeometry: (geometry: ParsedGeometry | null) => {
+        set({ parsedGeometry: geometry });
       },
 
       // Zone Setup step
@@ -234,10 +253,7 @@ export const useFloorMapStore = create<FloorMapStore>()(
             });
 
             // Add the full device object to the room
-            newAssignedDevices[roomId] = [
-              ...roomDevices,
-              device,
-            ];
+            newAssignedDevices[roomId] = [...roomDevices, device];
           }
 
           return { assignedDevices: newAssignedDevices };
@@ -256,7 +272,10 @@ export const useFloorMapStore = create<FloorMapStore>()(
       },
 
       // Device Positions management
-      setDevicePosition: (deviceId: string, position: { x: number; y: number; zoneId: string | null; floor: string }) => {
+      setDevicePosition: (
+        deviceId: string,
+        position: { x: number; y: number; zoneId: string | null; floor: string }
+      ) => {
         set((state) => ({
           devicePositions: {
             ...state.devicePositions,
@@ -291,6 +310,7 @@ export const useFloorMapStore = create<FloorMapStore>()(
         floorPlanId: state.floorPlanId,
         formValues: state.formValues,
         selectedFloor: state.selectedFloor,
+        parsedGeometry: state.parsedGeometry,
         zones: state.zones,
         selectedZoneId: state.selectedZoneId,
         zoomLevel: state.zoomLevel,

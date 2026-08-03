@@ -1,10 +1,15 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload, Search } from 'lucide-react';
+import { Upload, Search, PenBox } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAssetsPage, useCreateAsset } from '@/features/assets/hooks';
+import {
+  useAssetsPage,
+  useCreateAsset,
+  useUpdateAsset,
+  type Asset,
+} from '@/features/assets/hooks';
 import { debounce } from '@/lib/util';
 import {
   Table,
@@ -14,26 +19,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import { Badge } from '@/components/ui/badge';
-import { MoreVertical, Trash2, Eye, Download } from 'lucide-react';
+import { Trash2, Eye, Download } from 'lucide-react';
 import { AddAssetModal } from '@/features/assets/components/AddAssetModal';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { Pagination } from '@/components/common/Pagination/Pagination';
 import { format } from 'date-fns';
 import { PageHeader } from '@/components/common/PageHeader';
+import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog/DeleteConfirmationDialog';
 
 export default function AssetsPage() {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
   const [isAddAssetModalOpen, setIsAddAssetModalOpen] = useState(false);
   const [isSavingAsset, setIsSavingAsset] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
+  const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const createAssetMutation = useCreateAsset();
+  const updateAssetMutation = useUpdateAsset();
   const {
     searchQuery,
     isLoading,
@@ -49,7 +54,6 @@ export default function AssetsPage() {
     handleExport,
     handleImport,
   } = useAssetsPage();
-
   // Handle opening add asset modal
   const handleOpenAddAssetModal = () => {
     setIsAddAssetModalOpen(true);
@@ -80,7 +84,32 @@ export default function AssetsPage() {
     }
   };
 
-  // Sync input value with search query
+  // Handle saving edited asset from modal
+  const handleSaveEditedAsset = async (assetData: {
+    name: string;
+    type: string;
+    description: string;
+    assetProfileId?: string;
+    parentAssetId?: string;
+    location?: { latitude: number; longitude: number };
+    attributes: Array<{ key: string; value: string }>;
+  }) => {
+    if (!editingAsset) return;
+    setIsSavingAsset(true);
+    try {
+      await updateAssetMutation.mutateAsync({
+        id: editingAsset.id,
+        data: assetData,
+      });
+      setEditingAsset(null);
+      setIsAddAssetModalOpen(false);
+    } catch (error: unknown) {
+      console.error('Failed to update asset:', error);
+    } finally {
+      setIsSavingAsset(false);
+    }
+  };
+
   useEffect(() => {
     setInputValue(searchQuery);
   }, [searchQuery]);
@@ -103,6 +132,7 @@ export default function AssetsPage() {
     },
     [debouncedSearch]
   );
+
   return (
     <>
       <div className="space-y-6">
@@ -234,38 +264,36 @@ export default function AssetsPage() {
                             ? format(new Date(asset.created), 'yyyy-MM-dd')
                             : 'N/A'}
                         </TableCell>
+
                         <TableCell
                           className="text-right"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className="w-[160px]"
+                          <div className="flex items-center justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                              onClick={() => {
+                                setAssetToDelete(asset.id);
+                                setDeleteDialogOpen(true);
+                              }}
                             >
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  (window.location.href = `/assets/${asset.id}`)
-                                }
-                              >
-                                <Eye className="mr-2 h-4 w-4" />
-                                {t('common.edit') || 'Edit'}
-                              </DropdownMenuItem>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
 
-                              <DropdownMenuItem
-                                className="text-red-600 focus:text-red-700"
-                                onClick={() => handleAction('delete', asset.id)}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                {t('common.delete') || 'Delete'}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              className="text-primary hover:bg-primary/10"
+                              onClick={() => {
+                                setEditingAsset(asset);
+                                setIsAddAssetModalOpen(true);
+                              }}
+                            >
+                              <PenBox className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))
@@ -288,12 +316,34 @@ export default function AssetsPage() {
         </Card>
       </div>
 
-      {/* Add Asset Modal */}
+      {/* Add / Edit Asset Modal */}
       <AddAssetModal
         open={isAddAssetModalOpen}
-        onOpenChange={setIsAddAssetModalOpen}
-        onSave={handleSaveAsset}
+        onOpenChange={(open) => {
+          setIsAddAssetModalOpen(open);
+          if (!open) setEditingAsset(null);
+        }}
+        onSave={editingAsset ? handleSaveEditedAsset : handleSaveAsset}
         isLoading={isSavingAsset}
+        mode={editingAsset ? 'edit' : 'add'}
+        initialData={editingAsset ? editingAsset : undefined}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={(open) => {
+          setDeleteDialogOpen(open);
+          if (!open) setAssetToDelete(null);
+        }}
+        onConfirm={() => {
+          if (assetToDelete) handleAction('delete', assetToDelete);
+        }}
+        title={t('common.deleteConfirmation.title')}
+        itemName={
+          assets.find((d: any) => d.id === assetToDelete)?.name ||
+          t('common.name')
+        }
       />
     </>
   );

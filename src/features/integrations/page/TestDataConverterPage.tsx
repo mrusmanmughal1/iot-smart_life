@@ -14,7 +14,6 @@ export const TestDataConverterPage = () => {
           description="Test Your Decoder Function With Sample Payloads And Validate Output"
         />
       </div>
-
       {/* Time Range Bar (from design) */}
       <div className="flex items-center gap-4 mb-6 p-4 rounded-md bg-white border border-slate-200">
         <span className="text-sm font-semibold text-slate-700">
@@ -36,20 +35,18 @@ export const TestDataConverterPage = () => {
           ))}
         </div>
       </div>
-
       {/* Test Controls */}
       <div className="bg-white   items-center border border-slate-200 rounded-lg p-5 mb-6">
         <h3 className="text-sm font-semibold text-slate-700 mb-3 ">
           Test Controls
         </h3>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button variant="primary">Run Test</Button>
           <Button variant="outline">Clear All</Button>
           <Button variant="secondary">Load Sample</Button>
           <Button variant="success">Save Test Case</Button>
         </div>
       </div>
-
       {/* Input / Output Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Input */}
@@ -103,7 +100,6 @@ export const TestDataConverterPage = () => {
           </div>
         </div>
       </div>
-
       {/* Metadata */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div className="bg-white rounded-xl p-4">

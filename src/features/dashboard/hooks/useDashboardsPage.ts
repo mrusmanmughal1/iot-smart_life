@@ -4,10 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useDashboards } from './index';
 import { dashboardsApi } from '@/services/api';
-import type {
-  Dashboard,
-  DashboardQuery,
-} from '@/services/api/dashboards.api';
+import type { Dashboard, DashboardQuery } from '@/services/api/dashboards.api';
 import type { DashboardTableItem } from '@/components/common/DashboardTable';
 
 // API response structure: { json: { data: T[], total: number, page: number, limit: number, totalPages: number } }

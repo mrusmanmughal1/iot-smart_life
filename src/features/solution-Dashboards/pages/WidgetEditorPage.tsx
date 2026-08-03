@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import type { Layout } from 'react-grid-layout';
-import AppLayout from '@/components/layout/AppLayout';
 import {
   WidgetCanvas,
   Widget,
+  buildDashboardPayload,
 } from '@/components/common/WidgetCanvas/WidgetCanvas';
 import { Card, CardContent } from '@/components/ui/card';
 import { dashboardsApi } from '@/services/api';
@@ -16,7 +16,7 @@ export default function WidgetEditorPage() {
   const [savedLayout, setSavedLayout] = useState<Layout[]>([]);
   const [savedWidgets, setSavedWidgets] = useState<Widget[]>([]);
 
-  // Fetch dashboard data
+  // Fetch dashboard data if editing an existing dashboard
   const {
     data: dashboardData,
     isLoading,
@@ -36,33 +36,48 @@ export default function WidgetEditorPage() {
   useEffect(() => {
     const storedLayout = localStorage.getItem('dashboardLayout');
     const storedWidgets = localStorage.getItem('dashboardWidgets');
-
-    if (storedLayout) {
-      setSavedLayout(JSON.parse(storedLayout));
-    }
-    if (storedWidgets) {
-      setSavedWidgets(JSON.parse(storedWidgets));
-    }
+    if (storedLayout) setSavedLayout(JSON.parse(storedLayout));
+    if (storedWidgets) setSavedWidgets(JSON.parse(storedWidgets));
   }, []);
 
-  const handleSaveLayout = (layout: Layout[], widgets: Widget[]) => {
-    // Save to localStorage
+  /**
+   * Called by WidgetCanvas "Save Layout" button.
+   * Saves locally and POSTs to /dashboards with the full expected payload.
+   */
+  const handleSaveLayout = async (
+    layout: Layout[],
+    widgets: Widget[],
+    payload?: any
+  ) => {
+    // 1. Persist in localStorage
     localStorage.setItem('dashboardLayout', JSON.stringify(layout));
     localStorage.setItem('dashboardWidgets', JSON.stringify(widgets));
-
     setSavedLayout(layout);
     setSavedWidgets(widgets);
 
-    toast.success('Layout saved successfully!');
+    // 2. Build full dashboard payload (format expected by /dashboards)
+    const dashboardPayload = payload || buildDashboardPayload(widgets, layout);
 
-    // Here you would typically also save to your backend API
-    // await dashboardsApi.saveLayout({ layout, widgets });
+    console.log('[WidgetEditorPage] Posting to /dashboards:', dashboardPayload);
+
+    // 3. POST to /dashboards
+    try {
+      await dashboardsApi.create(dashboardPayload as any);
+      toast.success('Dashboard saved to /dashboards successfully!');
+    } catch (err: any) {
+      toast.error('Try ');
+      // Surface API error but still confirm local save
+      console.error(
+        '/dashboards API error:',
+        err?.response?.data || err?.message
+      );
+    }
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
   }
@@ -89,13 +104,14 @@ export default function WidgetEditorPage() {
             {dashboard?.name || 'Dashboard Editor'}
           </h1>
           <p className="text-xs text-gray-500">
-            Drag, drop, and resize widgets to create your custom dashboard
+            Add widgets → configure device &amp; telemetry settings → save to
+            &nbsp;<code className="font-mono text-primary">/dashboards</code>
           </p>
         </div>
       </div>
 
       {/* Canvas */}
-      <Card className="">
+      <Card>
         <CardContent
           className="p-0"
           style={{ height: 'calc(100vh - 280px)', minHeight: '600px' }}
@@ -109,16 +125,30 @@ export default function WidgetEditorPage() {
       </Card>
 
       {/* Instructions */}
-      <Card className="bg-blue-50 border-blue-200">
+      <Card className="bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800">
         <CardContent className="p-4">
-          <h3 className="font-semibold text-blue-900 mb-2">How to use:</h3>
-          <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
-            <li>Click "Add Widget" to add new widgets to your dashboard</li>
-            <li>Drag widgets from the header bar to reposition them</li>
-            <li>Resize widgets by dragging the bottom-right corner</li>
-            <li>Click the trash icon to remove a widget</li>
-            <li>Click "Save Layout" to persist your dashboard configuration</li>
-            <li>Your layout is automatically saved to localStorage</li>
+          <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
+            How to use:
+          </h3>
+          <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1 list-disc list-inside">
+            <li>
+              Click <strong>"Widget Library"</strong> to browse Smart Life
+              widget bundles and add widgets
+            </li>
+            <li>
+              Click the <strong>⚙ Settings</strong> icon on any widget header to
+              open the Device &amp; Telemetry Settings modal
+            </li>
+            <li>
+              Select one or more <strong>devices</strong> and
+              <strong> telemetry keys</strong> (e.g.&nbsp;temperature, humidity)
+              to bind the widget to real data
+            </li>
+            <li>Drag and resize widgets to arrange your dashboard layout</li>
+            <li>
+              Click <strong>"Save Layout"</strong> to POST the full dashboard
+              payload to the <code className="font-mono">/dashboards</code> API
+            </li>
           </ul>
         </CardContent>
       </Card>

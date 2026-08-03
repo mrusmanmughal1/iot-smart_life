@@ -16,7 +16,8 @@ class WebSocketClient {
   private isConnecting = false;
 
   constructor(config: WebSocketConfig = {}) {
-    this.url = config.url || `ws://localhost:5000`;
+    this.url =
+      config.url || import.meta.env.VITE_WS_BASE_URL || 'ws://localhost:5000';
     this.reconnectInterval = config.reconnectInterval || 5000;
     this.maxReconnectAttempts = config.maxReconnectAttempts || 5;
   }

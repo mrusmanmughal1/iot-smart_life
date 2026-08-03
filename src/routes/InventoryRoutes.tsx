@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
-import DeviceDetailsPage from '@/pages/DeviceDetailsPage';
+import DeviceDetailsPage from '@/features/devices/page/DeviceDetailsPage';
 
 const DevicesPage = Loadable(
   lazy(() => import('@/features/devices/page/DevicesPage'))

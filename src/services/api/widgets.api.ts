@@ -20,13 +20,14 @@ export enum WidgetTypeCategory {
 export interface WidgetType {
   id: string;
   name: string;
-  description?: string;
-  category: WidgetTypeCategory;
-  bundleFqn?: string;
-  image?: string;
-  iconUrl?: string;
-  descriptor: {
-    type: 'timeseries' | 'latest' | 'rpc' | 'alarm' | 'static';
+  description?: string | null;
+  category: WidgetTypeCategory | string;
+  bundleFqn?: string | null;
+  image?: string | null;
+  iconUrl?: string | null;
+  descriptor?: {
+    type: 'timeseries' | 'latest' | 'rpc' | 'alarm' | 'static' | string;
+    alias?: string;
     sizeX: number;
     sizeY: number;
     minSizeX?: number;
@@ -39,13 +40,15 @@ export interface WidgetType {
     controllerScript?: string;
     settingsSchema?: Record<string, any>;
     dataKeySettingsSchema?: Record<string, any>;
+    dataConfig?: Record<string, any>;
     defaultConfig?: Record<string, any>;
   };
-  settingsTemplate?: Record<string, any>;
+  settingsTemplate?: Record<string, any> | null;
   tags?: string[];
   system?: boolean;
-  tenantId?: string;
-  additionalInfo?: Record<string, any>;
+  deprecated?: boolean;
+  tenantId?: string | null;
+  additionalInfo?: Record<string, any> | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -53,11 +56,11 @@ export interface WidgetType {
 export interface WidgetBundle {
   id: string;
   title: string;
-  description?: string;
-  image?: string;
+  description?: string | null;
+  image?: string | null;
   order?: number;
   system?: boolean;
-  tenantId?: string;
+  tenantId?: string | null;
   createdAt: string;
   updatedAt: string;
 }

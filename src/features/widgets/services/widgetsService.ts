@@ -86,12 +86,13 @@ export const widgetService = {
     
     // Group by category
     const library = allWidgets.data.data.reduce((acc, widget) => {
-      if (!acc[widget.category]) {
-        acc[widget.category] = [];
+      const catKey = String(widget.category);
+      if (!acc[catKey]) {
+        acc[catKey] = [];
       }
-      acc[widget.category].push(widget);
+      acc[catKey].push(widget);
       return acc;
-    }, {} as Record<WidgetTypeCategory, WidgetType[]>);
+    }, {} as Record<string, WidgetType[]>);
 
     return {
       library,
@@ -169,8 +170,8 @@ export const widgetService = {
       widget: widget.data.data,
       sampleData: sampleData || this.generateSampleData(widget.data.data),
       preview: {
-        width: widget.data.data.descriptor.sizeX * 100,
-        height: widget.data.data.descriptor.sizeY * 100,
+        width: (widget.data.data.descriptor?.sizeX || 4) * 100,
+        height: (widget.data.data.descriptor?.sizeY || 4) * 100,
       },
     };
   },
@@ -179,7 +180,7 @@ export const widgetService = {
    * Generate sample data for widget preview
    */
   generateSampleData(widget: WidgetType) {
-    const { type } = widget.descriptor;
+    const type = widget.descriptor?.type || 'latest';
 
     switch (type) {
       case 'timeseries':

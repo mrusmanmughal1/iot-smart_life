@@ -96,7 +96,7 @@
     "assets": "Assets",
     "floorPlans": "Floor Plans",
     "deviceAnalytics": "Device Analytics",
-    "viewFloorPlans": "Create Floor Plans",
+    "viewFloorPlans": "Your Floor Plans",
     "multiFloorBuildingView": "Multi Floor Building  ",
     "alerts": "Alerts",
     "alarms": "Alarms",
@@ -395,13 +395,16 @@
       "smartTransportation": "Smart Transportation",
       "smartHome": "Smart Home",
       "smartFactory": "Smart Factory",
+      "smartFacility": "Smart Facility",
+      "smartwater": "Smart Water",
       "healthcare": "Healthcare",
       "energy": "Energy",
-      "retail": "Retail",
+      "retail": "Smart Retail",
       "logistics": "Logistics",
       "water": "Water",
       "climate": "Climate",
-      "education": "Education"
+      "education": "Education",
+      "smartenergy": "Smart Energy"
     },
     "templatePreview": {
       "title": "Smart City Template Preview",
@@ -1083,7 +1086,9 @@
   },
   "addAsset": {
     "title": "Add New Asset",
+    "editTitle": "Edit Asset",
     "assetName": "Asset Name",
+    "update": "Update Asset",
     "assetNamePlaceholder": "Asset Name *",
     "assetType": "Asset Type",
     "assetTypePlaceholder": "Select asset type...",
@@ -1632,6 +1637,7 @@
   },
   "floorplans": {
     "title": "Floor Plans",
+    "nofloorPlan": "No Floor Plan Available ",
     "subtitle": "Manage and monitor all your floor plans",
     "floorMap": "Floor Maps",
     "totalFloorPlans": "Total Floor Plans",

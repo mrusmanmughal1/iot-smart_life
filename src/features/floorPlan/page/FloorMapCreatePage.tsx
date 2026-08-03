@@ -1,21 +1,20 @@
-import React, { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import type { FilterFormValues, AssetOption } from '@/features/floorPlan/types';
-import type { Asset } from '@/services/api/assets.api';
+import type { FilterFormValues } from '@/features/floorPlan/types';
 import { AssetSelectionStep } from '@/features/floorPlan/components/AssetSelectionStep';
 import { DwgImportStep } from '@/features/floorPlan/components/DwgImportStep';
 import { ZoneSetupStep } from '@/features/floorPlan/components/ZoneSetupStep';
 import { DeviceLinkStep } from '@/features/floorPlan/components/DeviceLinkStep';
 import { ReviewStep } from '@/features/floorPlan/components/ReviewStep';
-import { assetsApi } from '@/services/api';
-import { useQuery } from '@tanstack/react-query';
+
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { useFloorMapStore } from '@/features/floorPlan/store';
 import type { StepId } from '@/features/floorPlan/store';
+import { useAssetsPage } from '@/features/assets/hooks';
 
 export default function FloorMapCreatePage() {
   const { t } = useTranslation();
@@ -37,29 +36,30 @@ export default function FloorMapCreatePage() {
     previousStep,
     selectedAssetId,
     setSelectedAssetId,
-    filteredAssets,
-    setFilteredAssets,
+
     formValues,
     setFormValues,
     reset,
   } = useFloorMapStore();
 
-  // Fetch assets
   const {
-    data: assetsResponse,
+    searchQuery,
     isLoading,
+    assets,
     isError,
     error,
-  } = useQuery({
-    queryKey: ['assets'],
-    queryFn: () => assetsApi.getAll(),
-  });
+    totalAssets,
+    currentPage,
+    totalPages,
+    itemsPerPage,
+    meta,
 
+    handleSearchChange,
+    handlePageChange,
+  } = useAssetsPage();
   // Handle nested API response structure: response.data.data (PaginatedResponse.data)
-  const assetsdataa = (
-    assetsResponse?.data as unknown as { data?: { data?: Asset[] } } | undefined
-  )?.data?.data;
-
+  const totalItems = meta?.totalItems;
+  const assetsdataa = assets;
   // Initialize form with store values
   const form = useForm<FilterFormValues>({
     defaultValues: formValues,
@@ -82,49 +82,6 @@ export default function FloorMapCreatePage() {
     });
     return () => subscription.unsubscribe();
   }, [form, setFormValues]);
-
-  // Filter and transform assets
-  const computedFilteredAssets = useMemo((): AssetOption[] => {
-    if (!assetsdataa || !Array.isArray(assetsdataa)) return [];
-
-    // Transform Asset[] to AssetOption[] and filter
-    const transformedAssets: AssetOption[] = assetsdataa
-      .map((asset: Asset) => ({
-        id: asset.id,
-        name: asset.name || 'Unnamed Asset',
-        type: asset.type || 'Unknown',
-        location: asset.location?.address || 'No location',
-        status: 'active', // Default status since Asset doesn't have status field
-        active: 'active', // Default to active (string as per AssetOption interface)
-      }))
-      .filter((assetOption: AssetOption) => {
-        const assetName = assetOption.name?.toLowerCase() || '';
-        const assetLocation = assetOption.location?.toLowerCase() || '';
-        const searchLower = search?.toLowerCase() || '';
-
-        const matchesSearch =
-          !search ||
-          assetName.includes(searchLower) ||
-          assetLocation.includes(searchLower);
-
-        const assetType = assetOption.type?.toLowerCase() || '';
-        const matchesType =
-          type === 'all' || assetType.includes(type.toLowerCase());
-
-        const matchesStatus =
-          status === 'all' ||
-          assetOption.status.toLowerCase() === status.toLowerCase();
-
-        return matchesSearch && matchesType && matchesStatus;
-      });
-
-    return transformedAssets;
-  }, [assetsdataa, search, type, status]);
-
-  // Update store with filtered assets
-  useEffect(() => {
-    setFilteredAssets(computedFilteredAssets);
-  }, [computedFilteredAssets, setFilteredAssets]);
 
   const handleNext = () => {
     nextStep();
@@ -179,7 +136,10 @@ export default function FloorMapCreatePage() {
       <Card className="">
         <CardHeader className="py-4">
           <CardTitle className="dark:text-white">
-            {t('floorplans.create.stepTitle', { current: currentStep, total: 5 })}
+            {t('floorplans.create.stepTitle', {
+              current: currentStep,
+              total: 5,
+            })}
           </CardTitle>
         </CardHeader>
         <div className="space-y-3 relative m-4 relative">
@@ -221,7 +181,7 @@ export default function FloorMapCreatePage() {
               register={register}
               control={control}
               setValue={setValue}
-              filteredAssets={filteredAssets}
+              filteredAssets={assetsdataa}
               selectedAssetId={selectedAssetId}
               onSelectAsset={setSelectedAssetId}
               onCancel={() => {
@@ -229,6 +189,13 @@ export default function FloorMapCreatePage() {
                 navigate('/floor-plans');
               }}
               onNext={handleNext}
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              handleSearchChange={handleSearchChange}
+              searchQuery={searchQuery}
             />
           )}
 

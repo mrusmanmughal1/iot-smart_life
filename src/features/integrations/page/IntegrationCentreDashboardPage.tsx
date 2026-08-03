@@ -1,12 +1,17 @@
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useIntegrationStats } from '../Hooks';
 
 export default function IntegrationCentreDashboardPage() {
+  const { data: stats, isLoading: statLoading } = useIntegrationStats();
+
   return (
     <div className="space-y-6">
-      <PageHeader title="Integration Centre Dashboard" />
-
+      <PageHeader
+        title="Integration Centre Dashboard"
+        description="Manage and monitor your IoT integrations"
+      />
       {/* KPI Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* Active Integrations */}
@@ -17,7 +22,6 @@ export default function IntegrationCentreDashboardPage() {
             <div className="mt-3 text-xs  ">2 new this week</div>
           </CardContent>
         </Card>
-
         {/* Data Converters */}
         <Card className="bg-secondary text-white ">
           <CardContent className="p-6">
@@ -26,7 +30,6 @@ export default function IntegrationCentreDashboardPage() {
             <div className="mt-3 text-xs  ">1 updated today</div>
           </CardContent>
         </Card>
-
         {/* Messages Today */}
         <Card className=" bg-success text-white ">
           <CardContent className="p-6">
@@ -35,7 +38,6 @@ export default function IntegrationCentreDashboardPage() {
             <div className="mt-3 text-xs  ">↑ 15% from yesterday</div>
           </CardContent>
         </Card>
-
         {/* System Health */}
         <Card className="    ">
           <CardContent className="p-6">
@@ -47,7 +49,7 @@ export default function IntegrationCentreDashboardPage() {
           </CardContent>
         </Card>
       </div>
-
+      {/* __   __ */}
       {/* Recent Activity */}
       <Card className="border border-slate-200 shadow-sm rounded-xl">
         <CardHeader className="pb-2">

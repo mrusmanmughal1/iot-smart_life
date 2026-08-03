@@ -14,38 +14,40 @@ interface ApiResponseWrapper<T> {
 
 // Template interface matching component expectations
 export interface Template {
+  imageUrl: string;
   id: string;
   name: string;
   description: string;
   category: string;
   tags: string[];
-  images: string[];
+  image: string[];
   isActivated?: boolean;
 }
 
 // Category mapping from component keys to API TemplateCategory enum
 const categoryKeyToApiCategory: Record<string, TemplateCategory | undefined> = {
   smartCity: TemplateCategory.SMART_CITY,
-  smartAgriculture: TemplateCategory.AGRICULTURE,
+  smartAgriculture: TemplateCategory.SMART_AGRICULTURE,
   smartTransportation: TemplateCategory.TRANSPORTATION,
   smartHome: TemplateCategory.SMART_HOME,
   smartFactory: TemplateCategory.SMART_FACTORY,
   smartBuilding: TemplateCategory.SMART_BUILDING,
   healthcare: TemplateCategory.HEALTHCARE,
   energy: TemplateCategory.ENERGY,
-  retail: TemplateCategory.RETAIL,
+  smartRetail: TemplateCategory.SMART_RETAIL,
   logistics: TemplateCategory.LOGISTICS,
   water: TemplateCategory.WATER,
   climate: TemplateCategory.CLIMATE,
   education: TemplateCategory.EDUCATION,
+  smartFacility: TemplateCategory.SMART_FACILITY,
   all: undefined,
 };
-
 
 // Category mapping from API TemplateCategory to translation key
 const apiCategoryToTranslationKey: Record<TemplateCategory, string> = {
   [TemplateCategory.SMART_HOME]: 'solutionTemplates.categories.smartHome',
-  [TemplateCategory.AGRICULTURE]: 'solutionTemplates.categories.smartAgriculture',
+  [TemplateCategory.SMART_AGRICULTURE]:
+    'solutionTemplates.categories.smartAgriculture',
   [TemplateCategory.SMART_CITY]: 'solutionTemplates.categories.smartCity',
   [TemplateCategory.HEALTHCARE]: 'solutionTemplates.categories.healthcare',
   [TemplateCategory.ENERGY]: 'solutionTemplates.categories.energy',
@@ -54,26 +56,31 @@ const apiCategoryToTranslationKey: Record<TemplateCategory, string> = {
   [TemplateCategory.WATER]: 'solutionTemplates.categories.water',
   [TemplateCategory.CLIMATE]: 'solutionTemplates.categories.climate',
   [TemplateCategory.EDUCATION]: 'solutionTemplates.categories.education',
-  [TemplateCategory.TRANSPORTATION]: 'solutionTemplates.categories.smartTransportation',
-  [TemplateCategory.RETAIL]: 'solutionTemplates.categories.retail', 
-  [TemplateCategory.SMART_BUILDING]: 'solutionTemplates.categories.smartBuilding',
+  [TemplateCategory.TRANSPORTATION]:
+    'solutionTemplates.categories.smartTransportation',
+  [TemplateCategory.SMART_RETAIL]: 'solutionTemplates.categories.retail',
+  [TemplateCategory.SMART_BUILDING]:
+    'solutionTemplates.categories.smartBuilding',
+  [TemplateCategory.SMART_FACILITY]:
+    'solutionTemplates.categories.smartFacility',
 };
 
 // Reverse mapping: API category to component key
 const apiCategoryToComponentKey: Record<TemplateCategory, string> = {
   [TemplateCategory.SMART_CITY]: 'smartCity',
-  [TemplateCategory.AGRICULTURE]: 'smartAgriculture',
+  [TemplateCategory.SMART_AGRICULTURE]: 'smartAgriculture',
   [TemplateCategory.TRANSPORTATION]: 'smartTransportation',
   [TemplateCategory.SMART_HOME]: 'smartHome',
   [TemplateCategory.HEALTHCARE]: 'healthcare',
   [TemplateCategory.ENERGY]: 'energy',
-  [TemplateCategory.RETAIL]: 'retail',
+  [TemplateCategory.SMART_RETAIL]: 'retail',
   [TemplateCategory.SMART_FACTORY]: 'smartFactory',
   [TemplateCategory.SMART_BUILDING]: 'smartBuilding',
   [TemplateCategory.LOGISTICS]: 'logistics',
   [TemplateCategory.WATER]: 'water',
   [TemplateCategory.CLIMATE]: 'climate',
   [TemplateCategory.EDUCATION]: 'education',
+  [TemplateCategory.SMART_FACILITY]: 'facility',
 };
 
 // Category interface for component
@@ -133,13 +140,14 @@ export const useSolutionTemplates = (
     if (searchQuery.trim()) {
       params.search = searchQuery.trim();
     }
-
+    console.log(categoryKeyToApiCategory);
+    console.log(selectedCategory);
     const apiCategory = categoryKeyToApiCategory[selectedCategory];
+    console.log(apiCategory, selectedCategory);
     if (apiCategory && selectedCategory !== 'all') {
       params.category = apiCategory;
     }
     // If 'all' is selected, don't include category filter (API returns all)
-
     return params;
   }, [searchQuery, selectedCategory, currentPage, itemsPerPage]);
 
@@ -159,34 +167,24 @@ export const useSolutionTemplates = (
   // API response structure: { data: { data: [...], meta: {...} } }
   const templates: Template[] = useMemo(() => {
     // Type assertion for nested response structure
-    const responseData = templatesResponse?.data as ApiResponseWrapper<SolutionTemplate> | undefined;
+    const responseData = templatesResponse?.data as
+      | ApiResponseWrapper<SolutionTemplate>
+      | undefined;
     if (!responseData?.data?.data || !Array.isArray(responseData.data.data)) {
       return [];
     }
 
     return responseData.data.data.map((template: SolutionTemplate) => {
-
-      // Extract images from thumbnail or configuration
-      const images: string[] = [];
-      if (template.thumbnail) {
-        images.push(template.thumbnail);
-      }
-      // If there are multiple images in configuration, add them
-      if (template.configuration?.dashboards) {
-        // You might have dashboard preview images here
-        // For now, using placeholder logic
-      }
-      // Fallback to placeholder if no images
-      if (images.length === 0) {
-        images.push(
-          '/placeholder-template-1.png',
-          '/placeholder-template-2.png'
-        );
-      }
+      // Extract image URL from template
+      const imageUrl = template?.imageUrl || template?.thumbnail || '';
 
       // Get category translation key for display
-      const categoryKey = apiCategoryToComponentKey[template.category] || template.category.toLowerCase();
-      const categoryTranslationKey = apiCategoryToTranslationKey[template.category] || `solutionTemplates.categories.${categoryKey}`;
+      const categoryKey =
+        apiCategoryToComponentKey[template.category] ||
+        template.category.toLowerCase();
+      const categoryTranslationKey =
+        apiCategoryToTranslationKey[template.category] ||
+        `solutionTemplates.categories.${categoryKey}`;
 
       return {
         id: template.id,
@@ -194,7 +192,8 @@ export const useSolutionTemplates = (
         description: template.description || '',
         category: categoryTranslationKey, // Store translation key instead of hardcoded name
         tags: template.tags || [],
-        images,
+        imageUrl,
+        image: imageUrl ? [imageUrl] : [],
         isActivated: template.installCount > 0, // Consider activated if installed
       };
     });
@@ -203,13 +202,17 @@ export const useSolutionTemplates = (
   // Get total count and pages from API response
   // API response structure: { data: { data: [...], meta: {...} } }
   const totalPages = useMemo(() => {
-    const responseData = templatesResponse?.data as ApiResponseWrapper<SolutionTemplate> | undefined;
+    const responseData = templatesResponse?.data as
+      | ApiResponseWrapper<SolutionTemplate>
+      | undefined;
     return responseData?.data?.meta?.totalPages || 1;
   }, [templatesResponse]);
 
   const totalTemplates = useMemo(() => {
-    const responseData = templatesResponse?.data as ApiResponseWrapper<SolutionTemplate> | undefined;
-    return responseData?.data?.meta?.total || 0;
+    const responseData = templatesResponse?.data as
+      | ApiResponseWrapper<SolutionTemplate>
+      | undefined;
+    return responseData?.data?.meta?.totalItems || 0;
   }, [templatesResponse]);
 
   // Filter templates client-side if needed (for additional filtering beyond API)
@@ -259,10 +262,10 @@ export const useSolutionTemplates = (
         },
         {
           key: 'smartAgriculture',
-          category: TemplateCategory.AGRICULTURE,
+          category: TemplateCategory.SMART_AGRICULTURE,
           translationKey: 'solutionTemplates.categories.smartAgriculture',
         },
-        
+
         {
           key: 'smartTransportation',
           category: TemplateCategory.TRANSPORTATION,
@@ -273,7 +276,6 @@ export const useSolutionTemplates = (
           category: TemplateCategory.SMART_HOME,
           translationKey: 'solutionTemplates.categories.smartHome',
         },
-        
       ];
     }
 
@@ -289,19 +291,19 @@ export const useSolutionTemplates = (
             ? apiCategory.category
             : (apiCategory as TemplateCategory);
 
-         // Type-safe access to the mapping
-         const componentKey =
-           apiCategoryToComponentKey[categoryEnum] ||
-           categoryEnum.toLowerCase().replace('_', '');
-         const translationKey =
-           apiCategoryToTranslationKey[categoryEnum] ||
-           `solutionTemplates.categories.${componentKey}`;
+        // Type-safe access to the mapping
+        const componentKey =
+          apiCategoryToComponentKey[categoryEnum] ||
+          categoryEnum.toLowerCase().replace('_', '');
+        const translationKey =
+          apiCategoryToTranslationKey[categoryEnum] ||
+          `solutionTemplates.categories.${componentKey}`;
 
-         return {
-           key: componentKey,
-           category: categoryEnum,
-           translationKey,
-         };
+        return {
+          key: componentKey,
+          category: categoryEnum,
+          translationKey,
+        };
       }
     );
   }, [categoriesResponse]);

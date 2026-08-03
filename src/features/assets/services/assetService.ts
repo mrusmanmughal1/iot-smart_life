@@ -16,8 +16,8 @@ export const assetService = {
     }
 
     // If parent is specified, validate it exists
-    if (data.parentId) {
-      await assetsApi.getById(data.parentId);
+    if (data.parentAssetId) {
+      await assetsApi.getById(data.parentAssetId);
     }
 
     const response = await assetsApi.create(data);
@@ -62,7 +62,7 @@ export const assetService = {
       }
     }
 
-    return assetsApi.update(assetId, { parentId: newParentId ?? undefined });
+    return assetsApi.update(assetId, { parentAssetId: newParentId ?? undefined });
   },
 
   /**
@@ -195,7 +195,7 @@ export const assetService = {
       type: original.type,
       label: original.label,
       assetProfileId: original.assetProfileId,
-      parentId: original.parentId,
+      parentAssetId: original.parentAssetId,
       location: original.location,
       attributes: original.attributes,
       additionalInfo: {
@@ -231,7 +231,7 @@ export const assetService = {
 
     for (const asset of assets) {
       // Check parent exists
-      if (asset.parentId && !ids.has(asset.parentId)) {
+      if (asset.parentAssetId && !ids.has(asset.parentAssetId)) {
         errors.push({
           assetId: asset.id,
           error: 'Parent asset not found',

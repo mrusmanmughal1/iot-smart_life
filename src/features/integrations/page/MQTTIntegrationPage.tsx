@@ -27,7 +27,7 @@ export const MQTTIntegrationPage = () => {
   return (
     <div>
       {/* Header section */}
-      <div className="flex flex-col  md:flex-row justify-between items-center mb-6">
+      <div className="flex flex-col  md:flex-row justify-between   mb-6">
         <PageHeader
           title="MQTT Integration"
           description="Production Sensor Data Collection Via MQTT"

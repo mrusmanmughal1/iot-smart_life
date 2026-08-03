@@ -81,7 +81,7 @@ export const dashboardsApi = {
   // Get all dashboards
   getAll: (params?: DashboardQuery) => {
     const accessToken = localStorage.getItem('accessToken');
-    console.log(accessToken , 'accessToken')
+    console.log(accessToken, 'accessToken');
     return apiClient.get<PaginatedResponse<Dashboard>>('/dashboards', {
       params,
       headers: accessToken
@@ -105,8 +105,7 @@ export const dashboardsApi = {
     apiClient.patch<ApiResponse<Dashboard>>(`/dashboards/${id}`, data),
 
   // Delete dashboard
-  delete: (id: string) =>
-    apiClient.delete(`/dashboards/${id}`),
+  delete: (id: string) => apiClient.delete(`/dashboards/${id}`),
 
   // Get statistics
   getStatistics: () =>
@@ -114,23 +113,33 @@ export const dashboardsApi = {
 
   // Clone dashboard
   clone: (id: string, newTitle: string) =>
-    apiClient.post<ApiResponse<Dashboard>>(`/dashboards/${id}/clone`, { title: newTitle }),
+    apiClient.post<ApiResponse<Dashboard>>(`/dashboards/${id}/clone`, {
+      title: newTitle,
+    }),
 
   // Share dashboard
   share: (id: string, customerIds: string[]) =>
-    apiClient.post<ApiResponse<Dashboard>>(`/dashboards/${id}/share`, { customerIds }),
+    apiClient.post<ApiResponse<Dashboard>>(`/dashboards/${id}/share`, {
+      customerIds,
+    }),
 
   // Unshare dashboard
   unshare: (id: string, customerId: string) =>
-    apiClient.delete<ApiResponse<Dashboard>>(`/dashboards/${id}/share/${customerId}`),
+    apiClient.delete<ApiResponse<Dashboard>>(
+      `/dashboards/${id}/share/${customerId}`
+    ),
 
   // Make dashboard public
   makePublic: (id: string) =>
-    apiClient.patch<ApiResponse<Dashboard>>(`/dashboards/${id}/public`, { public: true }),
+    apiClient.patch<ApiResponse<Dashboard>>(`/dashboards/${id}/public`, {
+      public: true,
+    }),
 
   // Make dashboard private
   makePrivate: (id: string) =>
-    apiClient.patch<ApiResponse<Dashboard>>(`/dashboards/${id}/public`, { public: false }),
+    apiClient.patch<ApiResponse<Dashboard>>(`/dashboards/${id}/public`, {
+      public: false,
+    }),
 
   // Export dashboard
   export: (id: string) =>

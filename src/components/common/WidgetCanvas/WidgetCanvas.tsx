@@ -1,27 +1,112 @@
 import { useState, useCallback } from 'react';
 import GridLayout, { Layout } from 'react-grid-layout';
-import { Plus, Trash2, Settings, Maximize2 } from 'lucide-react';
+import { Plus, Trash2, Settings, Maximize2, Layers, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { TelemetryWidget, availableDevices } from './TelemetryWidget';
-import { TelemetryWidgetSettings } from './TelemetryWidgetSettings';
-import type { TelemetryWidgetConfig, DeviceTelemetry, MetricType } from './TelemetryWidget';
+import { WidgetSettingsModal } from './WidgetSettingsModal';
+import { WidgetRenderer } from './WidgetRenderer';
+import { WidgetLibraryModal } from './WidgetLibraryModal';
+import { dashboardsApi } from '@/services/api/dashboards.api';
+import toast from 'react-hot-toast';
+import type {
+  TelemetryWidgetConfig,
+  DeviceTelemetry,
+  MetricType,
+} from './TelemetryWidget';
+import type { WidgetType } from '@/services/api/widgets.api';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
+export interface WidgetDataSource {
+  deviceIds: string[];
+  telemetryKeys: string[];
+  timeRange: string;
+}
+
+export interface WidgetVisualization {
+  chartType: string;
+  colors: string[];
+  showLegend: boolean;
+}
+
 export interface Widget {
   id: string;
-  type: 'temperature' | 'humidity' | 'battery' | 'power' | 'signal' | 'telemetry';
+  type: string;
   title: string;
+  category?: string;
+  description?: string;
+  descriptor?: any;
+  position?: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
+  dataSource?: WidgetDataSource;
+  visualization?: WidgetVisualization;
+  filters?: Record<string, any>;
   content?: DeviceTelemetry[];
   config?: TelemetryWidgetConfig;
 }
 
+export function buildDashboardPayload(widgets: Widget[], layout: Layout[]) {
+  const formattedWidgets = widgets.map((widget) => {
+    const layoutItem = layout.find((l) => l.i === widget.id);
+    const pos = {
+      x: layoutItem?.x ?? widget.position?.x ?? 0,
+      y: layoutItem?.y ?? widget.position?.y ?? 0,
+      w: layoutItem?.w ?? widget.position?.w ?? 4,
+      h: layoutItem?.h ?? widget.position?.h ?? 4,
+    };
+
+    return {
+      type: widget.type,
+      title: widget.title,
+      position: pos,
+      dataSource: {
+        deviceIds:
+          widget.dataSource?.deviceIds ||
+          (widget.config?.deviceId ? [widget.config.deviceId] : []),
+        telemetryKeys:
+          widget.dataSource?.telemetryKeys ||
+          widget.config?.enabledMetrics ||
+          [],
+        timeRange: widget.dataSource?.timeRange || '24h',
+      },
+      visualization: {
+        chartType: widget.visualization?.chartType || 'line',
+        colors: widget.visualization?.colors || ['#3b82f6'],
+        showLegend: widget.visualization?.showLegend ?? true,
+      },
+      filters: widget.filters || {},
+    };
+  });
+
+  return {
+    widgets: formattedWidgets,
+    layout: {
+      cols: 12,
+      rowHeight: 100,
+    },
+    settings: {
+      autoRefresh: true,
+      refreshInterval: 30,
+    },
+  };
+}
+
 interface WidgetCanvasProps {
-  onSaveLayout?: (layout: Layout[], widgets: Widget[]) => void;
+  onSaveLayout?: (layout: Layout[], widgets: Widget[], payload?: any) => void;
   initialLayout?: Layout[];
   initialWidgets?: Widget[];
   readOnly?: boolean;
+  dashboardMetadata?: {
+    name?: string;
+    description?: string;
+    customerId?: string;
+    visibility?: string;
+    tags?: string[];
+  };
 }
 
 export function WidgetCanvas({
@@ -32,192 +117,183 @@ export function WidgetCanvas({
 }: WidgetCanvasProps) {
   const [layout, setLayout] = useState<Layout[]>(initialLayout);
   const [widgets, setWidgets] = useState<Widget[]>(initialWidgets);
-  const [showWidgetLibrary, setShowWidgetLibrary] = useState(false);
-  const [settingsWidgetId, setSettingsWidgetId] = useState<string | null>(null);
-
-  console.log(layout, 'layout');
-  console.log(widgets, 'widgets');
+  const [showWidgetLibraryModal, setShowWidgetLibraryModal] = useState(false);
+  const [selectedSettingWidget, setSelectedSettingWidget] =
+    useState<Widget | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleLayoutChange = useCallback(
     (newLayout: Layout[]) => {
       setLayout(newLayout);
       if (onSaveLayout && !readOnly) {
-        onSaveLayout(newLayout, widgets);
+        const payload = buildDashboardPayload(widgets, newLayout);
+        onSaveLayout(newLayout, widgets, payload);
       }
     },
     [widgets, onSaveLayout, readOnly]
   );
 
-  const handleAddWidget = useCallback((widgetType: Widget['type']) => {
-    const widgetTitles: Record<Widget['type'], string> = {
-      temperature: 'Temperature Widget',
-      humidity: 'Humidity Widget',
-      battery: 'Battery Widget',
-      power: 'Power Widget',
-      signal: 'Signal Widget',
-      telemetry: 'Live Device Telemetry',
-    };
-
-    const getDefaultConfig = (type: Widget['type']): TelemetryWidgetConfig => {
-      if (type === 'telemetry') {
-        return {
+  // Add Widget from API Widget Library Selection
+  const handleAddWidgetFromType = useCallback(
+    (widgetType: WidgetType) => {
+      console.log(widgetType);
+      const alias =
+        widgetType.descriptor?.alias || widgetType.category || 'telemetry';
+      const newWidget: Widget = {
+        id: `widget-${Date.now()}`,
+        type: alias,
+        title: widgetType.name,
+        category: widgetType.category as string,
+        description: widgetType.description || '',
+        descriptor: widgetType.descriptor,
+        dataSource: {
+          deviceIds: [],
+          telemetryKeys: [],
+          timeRange: '24h',
+        },
+        visualization: {
+          chartType: 'line',
+          colors: ['#3b82f6'],
+          showLegend: true,
+        },
+        config: {
           refreshInterval: 5000,
-          enabledMetrics: ['temperature', 'humidity', 'battery', 'power', 'signal'] as MetricType[],
-        };
-      }
-      // For specific metric widgets, only show that metric
-      return {
-        refreshInterval: 5000,
-        enabledMetrics: [type as MetricType],
-        deviceId: availableDevices[0].id,
+          enabledMetrics: [
+            'temperature',
+            'humidity',
+            'battery',
+            'power',
+            'signal',
+          ] as MetricType[],
+        },
       };
-    };
 
-    const newWidget: Widget = {
-      id: `widget-${Date.now()}`,
-      type: widgetType,
-      title: widgetTitles[widgetType] || `New ${widgetType}`,
-      config: getDefaultConfig(widgetType),
-    };
+      const w = widgetType.descriptor?.sizeX || 4;
+      const h = widgetType.descriptor?.sizeY || 4;
 
-    const newLayoutItem: Layout = {
-      i: newWidget.id,
-      x: (layout.length * 2) % 12,
-      y: Infinity, // puts it at the bottom
-      w: 4,
-      h: 4,
-      minW: 2,
-      minH: 2,
-    };
+      const newLayoutItem: Layout = {
+        i: newWidget.id,
+        x: (layout.length * 4) % 12,
+        y: Infinity, // puts it at the bottom of the grid
+        w,
+        h,
+        minW: widgetType.descriptor?.minSizeX || 2,
+        minH: widgetType.descriptor?.minSizeY || 2,
+      };
 
-    setWidgets([...widgets, newWidget]);
-    setLayout([...layout, newLayoutItem]);
-    setShowWidgetLibrary(false);
-  }, [layout, widgets]);
+      setWidgets((prev) => [...prev, newWidget]);
+      setLayout((prev) => [...prev, newLayoutItem]);
+      setShowWidgetLibraryModal(false);
+      // Automatically open the settings modal so the user can select
+      // the device and telemetry keys right after adding the widget
+      setSelectedSettingWidget(newWidget);
+    },
+    [layout.length]
+  );
 
   const handleRemoveWidget = useCallback((widgetId: string) => {
-    setWidgets(widgets.filter((w) => w.id !== widgetId));
-    setLayout(layout.filter((l) => l.i !== widgetId));
-  }, [widgets, layout]);
+    setWidgets((prev) => prev.filter((w) => w.id !== widgetId));
+    setLayout((prev) => prev.filter((l) => l.i !== widgetId));
+  }, []);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
+    setIsSaving(true);
+    const payload = buildDashboardPayload(widgets, layout);
+
     if (onSaveLayout) {
-      onSaveLayout(layout, widgets);
+      onSaveLayout(layout, widgets, payload);
+    }
+
+    try {
+      await dashboardsApi.create(payload as any);
+      toast.success('Dashboard saved to /dashboards API successfully!');
+    } catch (err: any) {
+      console.warn('Backend /dashboards API response:', err?.message);
+    } finally {
+      setIsSaving(false);
     }
   }, [layout, widgets, onSaveLayout]);
 
-  const renderWidgetContent = (widget: Widget) => {
-    // All widget types are telemetry-based
-    if (['temperature', 'humidity', 'battery', 'power', 'signal', 'telemetry'].includes(widget.type)) {
-      return (
-        <TelemetryWidget
-          data={widget.content}
-          refreshInterval={widget.config?.refreshInterval}
-          enabledMetrics={widget.config?.enabledMetrics}
-          deviceId={widget.config?.deviceId}
-          onDeviceChange={(deviceId) => {
-            setWidgets((prev) =>
-              prev.map((w) =>
-                w.id === widget.id
-                  ? { ...w, config: { ...w.config, deviceId } }
-                  : w
-              )
-            );
-          }}
-        />
+  const handleSaveWidgetSettings = useCallback(
+    (
+      widgetId: string,
+      dataSource: WidgetDataSource,
+      visualization: WidgetVisualization
+    ) => {
+      setWidgets((prev) =>
+        prev.map((w) =>
+          w.id === widgetId
+            ? {
+                ...w,
+                dataSource,
+                visualization,
+                config: {
+                  ...w.config,
+                  deviceId: dataSource.deviceIds[0],
+                  enabledMetrics: dataSource.telemetryKeys as any,
+                },
+              }
+            : w
+        )
       );
-    }
-    return <div className="p-4">Unknown widget type</div>;
-  };
+    },
+    []
+  );
 
   return (
     <div className="relative w-full h-full bg-gray-50 rounded-lg">
       {/* Toolbar */}
       {!readOnly && (
-        <div className="absolute -top-18 right-4 z-50 flex items-center gap-2">
+        <div className="absolute -top-18 right-4 z-40 flex items-center gap-2">
           <Button
-            onClick={() => setShowWidgetLibrary(!showWidgetLibrary)}
-            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-md"
+            onClick={() => setShowWidgetLibraryModal(true)}
+            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-md font-medium"
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Widget
+            <Layers className="h-4 w-4 mr-2 text-primary" />
+            Widget Library
           </Button>
           <Button
             onClick={handleSave}
-            className="bg-primary text-white hover:bg-primary/90 shadow-md"
+            disabled={isSaving}
+            className="bg-primary text-white hover:bg-primary/90 shadow-md font-medium flex items-center gap-1.5"
           >
-            Save Layout
+            <Save className="h-4 w-4" />
+            {isSaving ? 'Saving...' : 'Save Layout'}
           </Button>
         </div>
       )}
+      {/* Widget Library Modal */}
+      <WidgetLibraryModal
+        isOpen={showWidgetLibraryModal}
+        onClose={() => setShowWidgetLibraryModal(false)}
+        onSelectWidgetType={handleAddWidgetFromType}
+      />
 
-      {/* Widget Library */}
-      {showWidgetLibrary && (
-        <div className="absolute right-4 z-50 dark:bg-gray-800 bg-white rounded-lg shadow-xl border border-gray-200 p-4 w-64">
-          <h3 className="text-lg font-semibold mb-4 dark:text-white">Add Widget</h3>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant="outline"
-              onClick={() => handleAddWidget('temperature')}
-              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              <span className="text-2xl mb-1">🌡️</span>
-              <span className="text-xs">Temperature</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleAddWidget('humidity')}
-              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              <span className="text-2xl mb-1">💧</span>
-              <span className="text-xs">Humidity</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleAddWidget('battery')}
-              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              <span className="text-2xl mb-1">🔋</span>
-              <span className="text-xs">Battery</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleAddWidget('power')}
-              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              <span className="text-2xl mb-1">⚡</span>
-              <span className="text-xs">Power</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleAddWidget('signal')}
-              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              <span className="text-2xl mb-1">📶</span>
-              <span className="text-xs">Signal</span>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handleAddWidget('telemetry')}
-              className="h-20 flex flex-col items-center justify-center dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-            >
-              <span className="text-2xl mb-1">📡</span>
-              <span className="text-xs">All Metrics</span>
-            </Button>
-          </div>
-        </div>
-      )}
-
+      {/* Widget Settings Modal for Device & Telemetry Selection */}
+      <WidgetSettingsModal
+        open={!!selectedSettingWidget}
+        onOpenChange={(open) => !open && setSelectedSettingWidget(null)}
+        widget={selectedSettingWidget}
+        onSave={handleSaveWidgetSettings}
+      />
       {/* Canvas */}
-      <div className="  h-full overflow-auto bg-gray-200 dark:bg-gray-800">
+      <div className="h-full overflow-auto bg-gray-100 dark:bg-gray-800  ">
         {widgets.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center h-full min-h-[400px]">
             <button
-              onClick={() => setShowWidgetLibrary(true)}
-              className="flex items-center gap-4 px-8 py-6 border-4 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-100 transition-all"
+              onClick={() => setShowWidgetLibraryModal(true)}
+              className="flex flex-col items-center justify-center gap-3 px-12 py-10 border-3 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl hover:border-primary hover:bg-white dark:hover:bg-gray-900 transition-all group"
             >
-              <Plus className="h-12 w-12" />
-              <span className="text-xl font-semibold">Add new widget</span>
+              <div className="p-4 bg-primary/10 rounded-full text-primary group-hover:scale-110 transition-transform">
+                <Plus className="h-8 w-8" />
+              </div>
+              <span className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                Add New Widget from Library
+              </span>
+              <span className="text-xs text-gray-500 max-w-xs text-center">
+                Browse Smart Life Widget Bundles including Charts, Gauges,
+                Cards, Maps & Alarms
+              </span>
             </button>
           </div>
         ) : (
@@ -231,43 +307,65 @@ export function WidgetCanvas({
             isDraggable={!readOnly}
             isResizable={!readOnly}
             draggableHandle=".drag-handle"
+            draggableCancel=".no-drag"
           >
             {widgets.map((widget) => (
               <div key={widget.id} className="widget-container">
-                <Card className="h-full shadow-lg border-2 border-gray-200 hover:border-primary transition-colors">
+                <Card className="h-full shadow-lg border border-gray-200 dark:border-gray-700 hover:border-primary transition-colors flex flex-col overflow-hidden">
                   {/* Widget Header */}
-                  <div className="drag-handle flex items-center justify-between px-4 py-2 bg-gray-100 border-b border-gray-200 cursor-move">
-                    <div className="flex items-center gap-2">
-                      <Maximize2 className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm font-semibold text-gray-700">
+                  <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
+                    <div className="drag-handle flex items-center gap-2 truncate cursor-move flex-1">
+                      <Maximize2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
+                      <span className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate">
                         {widget.title}
                       </span>
                     </div>
                     {!readOnly && (
-                      <div className="flex items-center gap-1">
-                        {['temperature', 'humidity', 'battery', 'power', 'signal', 'telemetry'].includes(widget.type) && (
-                          <button
-                            onClick={() => setSettingsWidgetId(widget.id)}
-                            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-                            title="Settings"
-                          >
-                            <Settings className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                          </button>
-                        )}
+                      <div
+                        className="no-drag flex items-center gap-1 shrink-0"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                      >
                         <button
-                          onClick={() => handleRemoveWidget(widget.id)}
-                          className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedSettingWidget(widget);
+                          }}
+                          className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors text-gray-600 dark:text-gray-300 relative z-20 cursor-pointer"
+                          title="Configure Device & Telemetry Settings"
+                        >
+                          <Settings className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveWidget(widget.id);
+                          }}
+                          className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors text-red-600 dark:text-red-400 relative z-20 cursor-pointer"
                           title="Delete"
                         >
-                          <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     )}
                   </div>
 
                   {/* Widget Content */}
-                  <CardContent className="p-4 h-[calc(100%-48px)] overflow-auto">
-                    {renderWidgetContent(widget)}
+                  <CardContent className="p-2 flex-1 overflow-auto bg-white dark:bg-gray-900">
+                    <WidgetRenderer
+                      widget={widget}
+                      onDeviceChange={(deviceId) => {
+                        setWidgets((prev) =>
+                          prev.map((w) =>
+                            w.id === widget.id
+                              ? { ...w, config: { ...w.config, deviceId } }
+                              : w
+                          )
+                        );
+                      }}
+                    />
                   </CardContent>
                 </Card>
               </div>
@@ -275,33 +373,6 @@ export function WidgetCanvas({
           </GridLayout>
         )}
       </div>
-
-      {/* Telemetry Widget Settings Dialog */}
-      {settingsWidgetId && (
-        <TelemetryWidgetSettings
-          open={!!settingsWidgetId}
-          onOpenChange={(open) => !open && setSettingsWidgetId(null)}
-          config={widgets.find((w) => w.id === settingsWidgetId)?.config as TelemetryWidgetConfig || {}}
-          onSave={(newConfig) => {
-            setWidgets((prev) =>
-              prev.map((w) =>
-                w.id === settingsWidgetId
-                  ? { ...w, config: { ...w.config, ...newConfig } }
-                  : w
-              )
-            );
-            if (onSaveLayout) {
-              const updatedWidgets = widgets.map((w) =>
-                w.id === settingsWidgetId
-                  ? { ...w, config: { ...w.config, ...newConfig } }
-                  : w
-              );
-              onSaveLayout(layout, updatedWidgets);
-            }
-          }}
-        />
-      )}
     </div>
   );
 }
-

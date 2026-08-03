@@ -11,13 +11,16 @@ export interface FilterFormValues {
 }
 
 export interface AssetOption {
-  active: string;
+  active: boolean;
   id: string;
   name: string;
   type: string;
   location: string;
   status: string;
   notes?: string[];
+  description: string;
+  latitude: string;
+  longitude: string;
   isReady?: boolean;
   devicesAvailable?: number;
   hasExistingFloorMap?: boolean;
@@ -38,6 +41,10 @@ export interface Zone {
   w: number;
   h: number;
   isDefined: boolean;
+  /** Polygon boundary points from parsedGeometry (in canvas-scaled pixels) */
+  boundaries?: Array<{ x: number; y: number }>;
+  /** Original room ID from parsedGeometry, if auto-detected */
+  sourceRoomId?: string;
 }
 
 export interface Device {

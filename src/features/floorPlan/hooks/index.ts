@@ -27,26 +27,13 @@ export const useFloorPlans = (params?: FloorPlanQuery) => {
       const apiResponse = response.data as unknown as {
         data?: { data?: FloorPlan[]; meta?: unknown };
       };
-      
-      const floorPlans = apiResponse?.data?.data || [];
-      
-      // Return both the raw response and extracted data for flexibility
-      return {
-        ...response,
-        data: {
-          ...response.data,
-          // Preserve nested structure for backward compatibility
-          data: {
-            data: floorPlans,
-            meta: apiResponse?.data?.meta,
-          },
-        },
-        // Also provide direct access to floor plans
-        floorPlans,
-      };
+
+      return response.data.data;
     },
   });
 };
+
+// upload the dwg
 
 /**
  * Hook to fetch a single floor plan by ID
@@ -156,7 +143,9 @@ export const useCreateFloorPlan = () => {
     }) => floorPlanService.createFloorPlan(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['floor-plans'] });
-      queryClient.invalidateQueries({ queryKey: ['floor-plans', 'statistics'] });
+      queryClient.invalidateQueries({
+        queryKey: ['floor-plans', 'statistics'],
+      });
       toast.success('Floor plan created successfully');
       return data;
     },
@@ -177,7 +166,9 @@ export const useUpdateFloorPlan = () => {
       floorPlanService.updateFloorPlan(id, data),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['floor-plans'] });
-      queryClient.invalidateQueries({ queryKey: ['floor-plans', variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: ['floor-plans', variables.id],
+      });
       toast.success('Floor plan updated successfully');
       return data;
     },
@@ -197,7 +188,9 @@ export const useDeleteFloorPlan = () => {
     mutationFn: (floorPlanId: string) => floorPlansApi.delete(floorPlanId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['floor-plans'] });
-      queryClient.invalidateQueries({ queryKey: ['floor-plans', 'statistics'] });
+      queryClient.invalidateQueries({
+        queryKey: ['floor-plans', 'statistics'],
+      });
       toast.success('Floor plan deleted successfully');
     },
     onError: (error: Error) => {
@@ -235,7 +228,9 @@ export const useUploadFloorPlanImage = () => {
     mutationFn: ({ id, imageFile }: { id: string; imageFile: File }) =>
       floorPlanService.uploadFloorPlanImage(id, imageFile),
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['floor-plans', variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: ['floor-plans', variables.id],
+      });
       toast.success('Image uploaded successfully');
       return data;
     },
@@ -294,8 +289,7 @@ export const useUpdateDeviceMarker = () => {
       floorPlanId: string;
       deviceId: string;
       updates: Partial<DeviceMarker>;
-    }) =>
-      floorPlanService.updateDeviceMarker(floorPlanId, deviceId, updates),
+    }) => floorPlanService.updateDeviceMarker(floorPlanId, deviceId, updates),
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['floor-plans', variables.floorPlanId],
@@ -340,4 +334,3 @@ export const useRemoveDeviceMarker = () => {
     },
   });
 };
-

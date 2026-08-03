@@ -15,6 +15,8 @@ import {
   YAxis,
   CartesianGrid,
 } from 'recharts';
+import { useTemplatePreview } from '../hooks/useSolutionTemplatePrevies';
+import WarningMessage from '@/components/ui/WarningMessage';
 
 // Sample data for charts
 const trafficFlowData = [
@@ -45,8 +47,11 @@ const COLORS = {
 export default function TemplatePreviewPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
+  const { id: templateId } = useParams<{ id: string }>();
 
+  const { data } = useTemplatePreview(templateId);
+  const canInstall = data?.canInstall;
+  const warning = data?.quotaWarnings;
   const wasteCollectionData = [
     {
       name: t('solutionTemplates.templatePreview.chartLabels.collected'),
@@ -75,7 +80,6 @@ export default function TemplatePreviewPage() {
 
   const handleActivate = () => {
     // TODO: Add activation logic
-    console.log('Activating template:', id);
     navigate('/solution-templates');
   };
 
@@ -367,24 +371,35 @@ export default function TemplatePreviewPage() {
                 </CardContent>
               </Card>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-center gap-4 mt-8 pt-6  ">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={handleCancel}
-                className="px-6 bg-gray-200 hover:bg-gray-300  rounded-md text-gray-700"
-              >
-                {t('solutionTemplates.templatePreview.cancel')}
-              </Button>
-              <Button
-                type="button"
-                onClick={handleActivate}
-                className="bg-gray-900 hover:bg-gray-800 text-white rounded-md px-6"
-              >
-                {t('solutionTemplates.templatePreview.activateTemplate')}
-              </Button>
+            <div className=" pt-4">
+              {!!warning?.length && (
+                <WarningMessage className="my-4">
+                  {[...warning].map((val, i) => (
+                    <p key={i}>
+                      {i + 1}. {val}
+                    </p>
+                  ))}
+                </WarningMessage>
+              )}
+              {/* Action Buttons */}
+              <div className="flex justify-center gap-4   ">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleCancel}
+                  className="px-6 bg-gray-200 hover:bg-gray-300  rounded-md text-gray-700"
+                >
+                  {t('solutionTemplates.templatePreview.cancel')}
+                </Button>
+                <Button
+                  type="button"
+                  disabled={!canInstall}
+                  onClick={handleActivate}
+                  className="bg-gray-900 hover:bg-gray-800 text-white rounded-md px-6"
+                >
+                  {t('solutionTemplates.templatePreview.activateTemplate')}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </div>

@@ -142,6 +142,16 @@ export interface PaginatedResponse<T> {
     };
   };
 }
+export interface PaginatedResponseFP<T> {
+  message: string;
+  data: {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
 
 export interface ApiResponse<T> {
   message: string;
@@ -151,11 +161,14 @@ export interface ApiResponse<T> {
 export const floorPlansApi = {
   // Get all floor plans
   getAll: (params?: FloorPlanQuery) =>
-    apiClient.get<PaginatedResponse<FloorPlan>>('/floor-plans', { params }),
+    apiClient.get<PaginatedResponseFP<FloorPlan>>('/floor-plans', { params }),
 
   // Get floor plan by ID
   getById: (id: string) =>
     apiClient.get<ApiResponse<FloorPlan>>(`/floor-plans/${id}`),
+  // get parsed floor plan data
+  getParsedDataByID: (id: string) =>
+    apiClient.get<ApiResponse<FloorPlan>>(`/floor-plans/${id}/geometry`),
 
   // Create floor plan
   create: (data: any) =>
@@ -169,6 +182,7 @@ export const floorPlansApi = {
 
   // Delete floor plan
   delete: (id: string) => apiClient.delete(`/floor-plans/${id}`),
+  //upload DWg
 
   // Upload image
   uploadImage: (id: string, file: File) => {
@@ -189,7 +203,11 @@ export const floorPlansApi = {
     ),
 
   // Update device marker
-  updateDeviceMarker: (id: string, deviceId: string, marker: Partial<DeviceMarker>) =>
+  updateDeviceMarker: (
+    id: string,
+    deviceId: string,
+    marker: Partial<DeviceMarker>
+  ) =>
     apiClient.patch<ApiResponse<FloorPlan>>(
       `/floor-plans/${id}/markers/${deviceId}`,
       marker
@@ -205,7 +223,9 @@ export const floorPlansApi = {
 
   // Get statistics
   getStatistics: () =>
-    apiClient.get<ApiResponse<Record<string, unknown>>>('/floor-plans/statistics'),
+    apiClient.get<ApiResponse<Record<string, unknown>>>(
+      '/floor-plans/statistics'
+    ),
 
   // Clone floor plan
   clone: (id: string, newName: string) =>
@@ -213,21 +233,24 @@ export const floorPlansApi = {
       name: newName,
     }),
 
-  // Upload DWG file
+  // Upload DWG file — backend parses geometry synchronously and returns it in the response
   uploadDwg: (id: string, file: File, floor?: string) => {
     const formData = new FormData();
     formData.append('file', file);
     if (floor) {
       formData.append('floor', floor);
     }
-    return apiClient.post<ApiResponse<{ fileUrl: string; floor?: string }>>(
+    return apiClient.post<
+      ApiResponse<{
+        fileUrl: string;
+        floor?: string;
+        parsedGeometry?: ParsedGeometry;
+      }>
+    >(
       `/floor-plans/${id}/dwg-upload`,
       formData,
-      { 
+      {
         headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (progressEvent) => {
-          // Progress tracking can be handled in the component
-        },
       }
     );
   },

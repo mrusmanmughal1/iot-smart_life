@@ -13,11 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
   Building2,
-  Sprout,
-  Building,
-  Car,
-  Home,
-  Factory,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -80,31 +75,16 @@ export default function SolutionTemplates() {
     setInputValue(searchQuery);
   }, [searchQuery]);
 
-  // Map API categories to component format with icons
-  const iconMap: Record<string, typeof Building2> = {
-    smartCity: Building2,
-    smartAgriculture: Sprout,
-    smartBuilding: Building,
-    smartTransportation: Car,
-    smartHome: Home,
-    smartFactory: Factory,
-    healthcare: Building2, // Fallback icon
-    energy: Building2, // Fallback icon
-    retail: Building2, // Fallback icon
-  };
   const categories = apiCategories.map((cat) => ({
     key: cat.key,
-    icon: iconMap[cat.key] || Building2,
     translationKey: cat.translationKey,
   }));
-
   return (
     <div className="space-y-4">
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <PageHeader title={t('solutionTemplates.title')} />
       </div>
-
       <div className="border border-secondary dark:border-gray-700 p-4 rounded-2xl">
         {/* Search Bar */}
         <div className="flex w flex-col md:flex-row justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B] dark:bg-gray-950">
@@ -138,16 +118,17 @@ export default function SolutionTemplates() {
                   <button
                     key={category.key}
                     onClick={() => handleCategoryChange(category.key)}
-                    className={`  flex-shrink-0 p-4  rounded-xl transition-all flex flex-col items-center dark:bg-gray-800 dark:text-white gap-3 ${selectedCategory === category.key
+                    className={`  flex-shrink-0 p-4  rounded-xl transition-all flex flex-col items-center dark:bg-gray-800 dark:text-white gap-3 ${
+                      selectedCategory === category.key
                         ? 'bg-primary text-white shadow-md hover:bg-gray-400 border border-gray-200'
                         : 'bg-white text-gray-700 '
-                      }`}
+                    }`}
                   >
                     {/* <category.icon className="h-10 w-10" /> */}
                     <span className="text-sm font-medium dark:text-white">
                       {t(
                         category.translationKey ||
-                        `solutionTemplates.categories.${category.key}`
+                          `solutionTemplates.categories.${category.key}`
                       )}
                     </span>
                   </button>
@@ -181,28 +162,16 @@ export default function SolutionTemplates() {
                   <CardHeader className="pb-3">
                     {/* Thumbnail Images */}
                     <div className="flex gap-2 mb-4">
-                      {template.images.map((image, index) => (
-                        <div
-                          key={index}
-                          className="flex-1 h-20 bg-gray-200 rounded-lg overflow-hidden relative"
-                          style={{
-                            background:
-                              index === 0
-                                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                                : 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                      <div className="flex-1 h-28 w-20  w bg-gray-200 rounded-lg overflow-hidden relative">
+                        <img
+                          src={template?.imageUrl}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
                           }}
-                        >
-                          <img
-                            src={image}
-                            alt={`${template.name} preview ${index + 1}`}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                            }}
-                          />
-                        </div>
-                      ))}
+                        />
+                      </div>
                     </div>
 
                     <CardTitle className="text-lg font-bold text-gray-900 mb-2">
@@ -237,10 +206,11 @@ export default function SolutionTemplates() {
                         {t('solutionTemplates.preview')}
                       </Button>
                       <Button
-                        className={`flex-1 ${template.isActivated
+                        className={`flex-1 ${
+                          template.isActivated
                             ? 'bg-secondary hover:bg-secondary/90 text-white'
                             : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
-                          }`}
+                        }`}
                       >
                         {template.isActivated
                           ? t('solutionTemplates.activated')

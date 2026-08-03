@@ -8,367 +8,374 @@ import {
   Image as KonvaImage,
 } from 'react-konva';
 import type { Zone } from '@/features/floorPlan/types';
+import type { ParsedGeometry } from '@/services/api/floor-plans.api';
 import type { Stage as KonvaStage } from 'konva/lib/Stage';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
-// Color mapping for zone types
-const getZoneColor = (type: string): string => {
-  const colors: Record<string, string> = {
-    Room: '#93C5FD',
-    Office: '#FCD34D',
-    Lobby: '#86EFAC',
-    Corridor: '#C4B5FD',
-    Storage: '#FCA5A5',
-  };
-  return colors[type] || '#E5E7EB';
+// ─── helpers ────────────────────────────────────────────────────────────────
+
+const ZONE_COLORS: Record<string, string> = {
+  Room: '#93C5FD',
+  Office: '#FCD34D',
+  Lobby: '#86EFAC',
+  Corridor: '#C4B5FD',
+  Storage: '#FCA5A5',
+  Default: '#E5E7EB',
 };
 
-// Floor Plan Canvas with Drop Zone
-const FloorPlanCanvas: React.FC<{
+const ROOM_STROKE_COLORS = [
+  '#3B82F6',
+  '#10B981',
+  '#F59E0B',
+  '#8B5CF6',
+  '#EF4444',
+  '#06B6D4',
+  '#EC4899',
+  '#84CC16',
+];
+
+function getZoneColor(type: string): string {
+  return ZONE_COLORS[type] ?? ZONE_COLORS.Default;
+}
+
+/** Compute the bounding box of a set of points */
+function getBBox(points: Array<{ x: number; y: number }>) {
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
+  return {
+    minX: Math.min(...xs),
+    minY: Math.min(...ys),
+    maxX: Math.max(...xs),
+    maxY: Math.max(...ys),
+  };
+}
+
+/**
+ * Scale a set of rooms to fit within the canvas (stageWidth × stageHeight).
+ * Returns a scale factor + offset so the geometry fills ~85% of the canvas.
+ */
+function computeScaleTransform(
+  rooms: NonNullable<ParsedGeometry['rooms']>,
+  stageWidth: number,
+  stageHeight: number
+): { scaleX: number; scaleY: number; offsetX: number; offsetY: number } {
+  if (!rooms.length) {
+    return { scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0 };
+  }
+
+  let globalMinX = Infinity;
+  let globalMinY = Infinity;
+  let globalMaxX = -Infinity;
+  let globalMaxY = -Infinity;
+
+  for (const room of rooms) {
+    if (!room.boundaries?.length) continue;
+    const { minX, minY, maxX, maxY } = getBBox(room.boundaries);
+    globalMinX = Math.min(globalMinX, minX);
+    globalMinY = Math.min(globalMinY, minY);
+    globalMaxX = Math.max(globalMaxX, maxX);
+    globalMaxY = Math.max(globalMaxY, maxY);
+  }
+
+  const geomW = globalMaxX - globalMinX || 1;
+  const geomH = globalMaxY - globalMinY || 1;
+
+  const padding = 0.85; // use 85% of stage
+  const scaleX = (stageWidth * padding) / geomW;
+  const scaleY = (stageHeight * padding) / geomH;
+  const scale = Math.min(scaleX, scaleY);
+
+  // Centre the geometry
+  const scaledW = geomW * scale;
+  const scaledH = geomH * scale;
+  const offsetX = (stageWidth - scaledW) / 2 - globalMinX * scale;
+  const offsetY = (stageHeight - scaledH) / 2 - globalMinY * scale;
+
+  return { scaleX: scale, scaleY: scale, offsetX, offsetY };
+}
+
+// ─── types ───────────────────────────────────────────────────────────────────
+
+interface FloorPlanCanvasProps {
   zones: Zone[];
   selectedZoneId: string | null;
   zoomLevel: number;
   dwgImageUrl?: string;
-  dwgFile?: File;
+  /** Parsed geometry from the backend for the active floor */
+  parsedRooms?: ParsedGeometry['rooms'];
   onZoneClick: (zoneId: string) => void;
   onStageClick: () => void;
   stageRef: React.RefObject<KonvaStage>;
   isDrawing: boolean;
   selectionPoints: Array<{ x: number; y: number }>;
   onDwgError?: (hasError: boolean) => void;
-}> = ({
+}
+
+// ─── component ───────────────────────────────────────────────────────────────
+
+const FloorPlanCanvas: React.FC<FloorPlanCanvasProps> = ({
   zones,
   selectedZoneId,
   zoomLevel,
   dwgImageUrl,
-  dwgFile,
+  parsedRooms,
   onZoneClick,
   onStageClick,
   stageRef,
   isDrawing,
   selectionPoints,
-  onDwgError,
 }) => {
   const [dwgImage, setDwgImage] = useState<HTMLImageElement | null>(null);
-  const [dwgError, setDwgError] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const stageWidth = 800;
   const stageHeight = 500;
   const scaledWidth = (stageWidth * zoomLevel) / 100;
   const scaledHeight = (stageHeight * zoomLevel) / 100;
 
-  // Parse and render DWG/DXF file
+  // Load background image from URL (provided by backend after DWG upload)
   useEffect(() => {
-    const parseAndRenderDWG = async () => {
-      if (!dwgFile && !dwgImageUrl) {
-        setDwgImage(null);
-        setDwgError(false);
-        onDwgError?.(false);
-        return;
-      }
+    if (!dwgImageUrl) {
+      setDwgImage(null);
+      return;
+    }
+    const img = new window.Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => setDwgImage(img);
+    img.onerror = () => setDwgImage(null);
+    img.src = dwgImageUrl;
+  }, [dwgImageUrl]);
 
-      try {
-        setDwgError(false);
+  // Compute scale transform for parsed rooms
+  const validRooms = (parsedRooms ?? []).filter(
+    (r) => r.boundaries && r.boundaries.length >= 3
+  );
+  const { scaleX, scaleY, offsetX, offsetY } = computeScaleTransform(
+    validRooms,
+    stageWidth,
+    stageHeight
+  );
 
-        // If we have a file, parse it
-        if (dwgFile) {
-          console.log('Parsing DWG file:', dwgFile.name);
-          const { EnhancedCADParser } = await import(
-            '@/features/floorPlan/services/EnhancedCADParser'
-          );
+  /** Convert a raw boundary point to canvas pixels */
+  const toCanvas = (pt: { x: number; y: number }) => ({
+    x: pt.x * scaleX + offsetX,
+    y: pt.y * scaleY + offsetY,
+  });
 
-          let dxf: {
-            entities?: unknown[];
-            header?: unknown;
-            layers?: unknown;
-            tables?: unknown;
-            blocks?: unknown;
-          };
-          try {
-            if (dwgFile.name.toLowerCase().endsWith('.dxf')) {
-              console.log('Parsing as DXF...');
-              const result = await EnhancedCADParser.parseDXF(dwgFile);
-              dxf = result.dxf;
-              console.log('DXF parsed successfully:', dxf);
-            } else if (dwgFile.name.toLowerCase().endsWith('.dwg')) {
-              console.log('Parsing as DWG...');
-              const result = await EnhancedCADParser.parseDWG(dwgFile);
-              dxf = result.dxf;
-              console.log('DWG parsed successfully:', dxf);
-            } else {
-              throw new Error('Unsupported file format');
-            }
-
-            // Wait for canvas to be ready
-            if (canvasRef.current) {
-              console.log(
-                'Rendering to canvas, size:',
-                scaledWidth,
-                'x',
-                scaledHeight
-              );
-              const canvas = canvasRef.current;
-
-              // Make canvas temporarily visible for getBoundingClientRect to work
-              const originalDisplay = canvas.style.display;
-              canvas.style.display = 'block';
-              canvas.style.width = scaledWidth + 'px';
-              canvas.style.height = scaledHeight + 'px';
-
-              // Force a reflow to ensure dimensions are set
-              void canvas.offsetHeight;
-
-              // Render the DXF to canvas (this will use getBoundingClientRect)
-              try {
-                EnhancedCADParser.renderDXFToCanvas(dxf, canvas);
-                console.log('DXF rendered to canvas');
-
-                // Hide canvas again
-                canvas.style.display = originalDisplay || 'none';
-
-                // Convert canvas to image
-                const img = new Image();
-                img.onload = () => {
-                  console.log(
-                    'DWG image loaded successfully, dimensions:',
-                    img.width,
-                    'x',
-                    img.height
-                  );
-                  setDwgImage(img);
-                  setDwgError(false);
-                  onDwgError?.(false);
-                };
-                img.onerror = (error) => {
-                  console.error('Error loading image from canvas:', error);
-                  setDwgError(true);
-                  onDwgError?.(true);
-                };
-                const dataUrl = canvas.toDataURL('image/png');
-                console.log(
-                  'Canvas data URL generated, length:',
-                  dataUrl.length
-                );
-                if (dataUrl.length < 100) {
-                  console.warn('Canvas data URL is very short, might be empty');
-                }
-                img.src = dataUrl;
-              } catch (renderError) {
-                console.error('Error rendering DXF to canvas:', renderError);
-                canvas.style.display = originalDisplay || 'none';
-                setDwgError(true);
-                onDwgError?.(true);
-              }
-            } else {
-              console.error('Canvas ref is not available');
-              setDwgError(true);
-              onDwgError?.(true);
-            }
-          } catch (error) {
-            console.error('Error parsing DWG/DXF:', error);
-            setDwgError(true);
-            onDwgError?.(true);
-          }
-        } else if (dwgImageUrl) {
-          // Fallback to image loading for non-DWG files
-          console.log('Loading image from URL:', dwgImageUrl);
-          const img = new window.Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            console.log('Image loaded from URL');
-            setDwgImage(img);
-            setDwgError(false);
-            onDwgError?.(false);
-          };
-          img.onerror = (error) => {
-            console.error('Error loading image from URL:', error);
-            setDwgImage(null);
-            setDwgError(true);
-            onDwgError?.(true);
-          };
-          img.src = dwgImageUrl;
-        }
-      } catch (error) {
-        console.error('Error loading DWG file:', error);
-        setDwgError(true);
-        onDwgError?.(true);
-      }
-    };
-
-    parseAndRenderDWG();
-  }, [dwgFile, dwgImageUrl, onDwgError, scaledWidth, scaledHeight]);
+  const userScale = zoomLevel / 100;
 
   return (
     <div className="relative">
-      {/* Hidden canvas for DWG rendering */}
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: 'absolute',
-          visibility: 'hidden',
-          width: scaledWidth,
-          height: scaledHeight,
-        }}
-      />
       <Stage
         ref={stageRef}
         width={scaledWidth}
         height={scaledHeight}
         onClick={onStageClick}
+        scaleX={userScale}
+        scaleY={userScale}
         style={{ cursor: isDrawing ? 'crosshair' : 'default' }}
       >
         <Layer>
-          {/* DWG Background Image or Placeholder */}
-          {dwgImage ? (
+          {/* ── Background Image (from backend) ─────────────────────────── */}
+          {dwgImage && (
             <KonvaImage
               image={dwgImage}
               x={0}
               y={0}
-              width={scaledWidth}
-              height={scaledHeight}
-              opacity={0.7}
+              width={stageWidth}
+              height={stageHeight}
+              opacity={0.55}
             />
-          ) : dwgError ? (
-            // Placeholder for DWG files that can't be displayed as images
+          )}
+
+          {/* ── No image placeholder ─────────────────────────────────────── */}
+          {!dwgImage && validRooms.length === 0 && (
             <Group>
               <Rect
                 x={0}
                 y={0}
-                width={scaledWidth}
-                height={scaledHeight}
-                fill="#F3F4F6"
-                stroke="#D1D5DB"
+                width={stageWidth}
+                height={stageHeight}
+                fill="#F9FAFB"
+                stroke="#E5E7EB"
                 strokeWidth={2}
-                dash={[5, 5]}
               />
               <Text
-                x={scaledWidth / 2}
-                y={scaledHeight / 2 - 20}
-                text="DWG File Loaded"
-                fontSize={16}
-                fontStyle="bold"
-                fill="#6B7280"
-                align="center"
-                verticalAlign="middle"
-                offsetX={60}
-                offsetY={8}
-              />
-              <Text
-                x={scaledWidth / 2}
-                y={scaledHeight / 2 + 10}
-                text="(DWG files require conversion to image format for preview)"
-                fontSize={12}
+                x={stageWidth / 2}
+                y={stageHeight / 2}
+                text="Upload a DWG file to see the floor plan"
+                fontSize={14}
                 fill="#9CA3AF"
                 align="center"
                 verticalAlign="middle"
-                offsetX={150}
-                offsetY={6}
+                offsetX={160}
+                offsetY={7}
               />
             </Group>
-          ) : null}
+          )}
 
-          {/* Existing Zones */}
-          {zones.map((zone) => {
-            const isSelected = zone.id === selectedZoneId;
-            const zoneColor = getZoneColor(zone.type);
+          {/* ── Parsed Room Polygons (backend geometry) ──────────────────── */}
+          {validRooms.map((room, idx) => {
+            const canvasPts = room.boundaries!.map(toCanvas);
+            const flatPoints = canvasPts.flatMap((p) => [p.x, p.y]);
+            const strokeColor =
+              ROOM_STROKE_COLORS[idx % ROOM_STROKE_COLORS.length];
+
+            // Compute centroid for label
+            const cx =
+              canvasPts.reduce((s, p) => s + p.x, 0) / canvasPts.length;
+            const cy =
+              canvasPts.reduce((s, p) => s + p.y, 0) / canvasPts.length;
+
+            const isSelected =
+              zones.find((z) => z.sourceRoomId === room.id)?.id ===
+              selectedZoneId;
 
             return (
               <Group
-                key={zone.id}
-                onClick={() => onZoneClick(zone.id)}
-                onTap={() => onZoneClick(zone.id)}
+                key={room.id}
+                onClick={() => {
+                  const zone = zones.find((z) => z.sourceRoomId === room.id);
+                  if (zone) onZoneClick(zone.id);
+                }}
+                onTap={() => {
+                  const zone = zones.find((z) => z.sourceRoomId === room.id);
+                  if (zone) onZoneClick(zone.id);
+                }}
               >
-                {/* Zone Rectangle */}
-                <Rect
-                  x={zone.x}
-                  y={zone.y}
-                  width={zone.w}
-                  height={zone.h}
-                  fill={zoneColor}
-                  opacity={0.6}
-                  stroke={isSelected ? '#3B82F6' : '#9CA3AF'}
-                  strokeWidth={isSelected ? 3 : 2}
-                  dash={isSelected ? [] : [5, 5]}
-                  cornerRadius={8}
+                <Line
+                  points={flatPoints}
+                  closed
+                  fill={isSelected ? `${strokeColor}55` : `${strokeColor}25`}
+                  stroke={strokeColor}
+                  strokeWidth={isSelected ? 2.5 : 1.5}
+                  dash={isSelected ? [] : []}
                 />
-                {/* Zone Title Overlay */}
+                {/* Room label */}
                 <Rect
-                  x={zone.x + zone.w / 2 - 60}
-                  y={zone.y + zone.h / 2 - 12}
-                  width={120}
-                  height={24}
-                  fill="rgba(255, 255, 255, 0.95)"
-                  cornerRadius={4}
-                  shadowBlur={4}
-                  shadowColor="rgba(0, 0, 0, 0.1)"
+                  x={cx - 50}
+                  y={cy - 10}
+                  width={100}
+                  height={20}
+                  fill="rgba(255,255,255,0.85)"
+                  cornerRadius={3}
                 />
                 <Text
-                  x={zone.x + zone.w / 2}
-                  y={zone.y + zone.h / 2}
-                  text={zone.name}
-                  fontSize={12}
+                  x={cx}
+                  y={cy}
+                  text={room.name || 'Room'}
+                  fontSize={10}
                   fontStyle="bold"
-                  fill="#1F2937"
+                  fill="#374151"
                   align="center"
                   verticalAlign="middle"
-                  offsetX={60}
-                  offsetY={6}
+                  offsetX={50}
+                  offsetY={5}
+                  width={100}
                 />
-                {/* Zone Type (shown when selected) */}
-                {isSelected && (
-                  <>
-                    <Rect
-                      x={zone.x}
-                      y={zone.y + zone.h - 20}
-                      width={zone.w}
-                      height={20}
-                      fill="rgba(0, 0, 0, 0.6)"
-                      cornerRadius={[0, 0, 8, 8]}
-                    />
-                    <Text
-                      x={zone.x + zone.w / 2}
-                      y={zone.y + zone.h - 10}
-                      text={zone.type}
-                      fontSize={10}
-                      fill="#FFFFFF"
-                      align="center"
-                      verticalAlign="middle"
-                      offsetX={zone.w / 2}
-                      offsetY={5}
-                    />
-                  </>
-                )}
               </Group>
             );
           })}
 
-          {/* Selection Preview */}
+          {/* ── Manually Drawn Zones (user-created on top) ───────────────── */}
+          {zones
+            .filter((z) => !z.sourceRoomId) // only manually created zones
+            .map((zone) => {
+              const isSelected = zone.id === selectedZoneId;
+              const zoneColor = getZoneColor(zone.type);
+
+              return (
+                <Group
+                  key={zone.id}
+                  onClick={() => onZoneClick(zone.id)}
+                  onTap={() => onZoneClick(zone.id)}
+                >
+                  <Rect
+                    x={zone.x}
+                    y={zone.y}
+                    width={zone.w}
+                    height={zone.h}
+                    fill={zoneColor}
+                    opacity={0.65}
+                    stroke={isSelected ? '#3B82F6' : '#9CA3AF'}
+                    strokeWidth={isSelected ? 3 : 1.5}
+                    cornerRadius={6}
+                  />
+                  {/* Title pill */}
+                  <Rect
+                    x={zone.x + zone.w / 2 - 55}
+                    y={zone.y + zone.h / 2 - 12}
+                    width={110}
+                    height={24}
+                    fill="rgba(255,255,255,0.95)"
+                    cornerRadius={4}
+                    shadowBlur={4}
+                    shadowColor="rgba(0,0,0,0.1)"
+                  />
+                  <Text
+                    x={zone.x + zone.w / 2}
+                    y={zone.y + zone.h / 2}
+                    text={zone.name}
+                    fontSize={11}
+                    fontStyle="bold"
+                    fill="#1F2937"
+                    align="center"
+                    verticalAlign="middle"
+                    offsetX={55}
+                    offsetY={6}
+                    width={110}
+                  />
+                  {isSelected && (
+                    <>
+                      <Rect
+                        x={zone.x}
+                        y={zone.y + zone.h - 20}
+                        width={zone.w}
+                        height={20}
+                        fill="rgba(0,0,0,0.6)"
+                        cornerRadius={[0, 0, 6, 6]}
+                      />
+                      <Text
+                        x={zone.x + zone.w / 2}
+                        y={zone.y + zone.h - 10}
+                        text={zone.type}
+                        fontSize={9}
+                        fill="#FFFFFF"
+                        align="center"
+                        verticalAlign="middle"
+                        offsetX={zone.w / 2}
+                        offsetY={4}
+                        width={zone.w}
+                      />
+                    </>
+                  )}
+                </Group>
+              );
+            })}
+
+          {/* ── Drawing Selection Preview ─────────────────────────────────── */}
           {isDrawing && selectionPoints.length > 0 && (
             <Group>
-              {/* Draw polygon from selection points */}
               {selectionPoints.length > 1 && (
                 <Line
                   points={selectionPoints.flatMap((p) => [p.x, p.y])}
                   closed={false}
                   stroke="#3B82F6"
                   strokeWidth={2}
-                  dash={[5, 5]}
-                  fill="rgba(59, 130, 246, 0.2)"
+                  dash={[6, 4]}
+                  fill="rgba(59,130,246,0.15)"
                 />
               )}
-              {/* Draw points */}
               {selectionPoints.map((point, idx) => (
                 <Group key={idx}>
                   <Rect
-                    x={point.x - 4}
-                    y={point.y - 4}
-                    width={8}
-                    height={8}
+                    x={point.x - 5}
+                    y={point.y - 5}
+                    width={10}
+                    height={10}
                     fill="#3B82F6"
                     stroke="#FFFFFF"
                     strokeWidth={2}
-                    cornerRadius={4}
+                    cornerRadius={5}
                   />
                 </Group>
               ))}
@@ -379,4 +386,5 @@ const FloorPlanCanvas: React.FC<{
     </div>
   );
 };
+
 export default FloorPlanCanvas;

@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 export interface PaginationProps {
   currentPage: number;
-  totalPages: number;
+  totalPages?: number;
   totalItems?: number;
   itemsPerPage?: number;
   onPageChange: (page: number) => void;
@@ -19,7 +19,7 @@ export interface PaginationProps {
 
 export function Pagination({
   currentPage,
-  totalPages,
+  totalPages = 0,
   totalItems,
   itemsPerPage = 10,
   onPageChange,

@@ -89,28 +89,6 @@ export default function DashboardsPage() {
 
         {/* Tabs */}
         <div className="flex justify-between items-center gap-2">
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleTabChange('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all dark:bg-gray-800 dark:text-white ${
-                selectedTab === 'all'
-                  ? 'bg-secondary text-white shadow-md'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-white'
-              }`}
-            >
-              {t('solutionDashboards.tabs.all')}
-            </button>
-            <button
-              onClick={() => handleTabChange('group')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all dark:bg-gray-800 dark:text-white ${
-                selectedTab === 'group'
-                  ? 'bg-secondary text-white shadow-md'
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-white'
-              }`}
-            >
-              {t('solutionDashboards.tabs.group')}
-            </button>
-          </div>
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -163,17 +141,6 @@ export default function DashboardsPage() {
         {/* Main Content Card */}
         <Card className="shadow-lg rounded-xl border-secondary/50 dark:bg-gray-800 dark:text-white">
           <CardContent className="p-6">
-            {/* Search/Filter Bar */}
-            <div className="flex gap-3 mb-6">
-              <Button
-                onClick={handleShowCustomerDashboards}
-                className="bg-secondary text-white hover:bg-secondary/90 dark:bg-gray-700 dark:text-white"
-              >
-                <Diamond className="h-4 w-4 mr-2" />
-                {t('solutionDashboards.showCustomerDashboards')}
-              </Button>
-            </div>
-
             {/* Table */}
             {isLoading ? (
               <div className="flex items-center justify-center py-12">

@@ -2,27 +2,40 @@ import apiClient from '@/lib/axios.ts';
 
 export interface Asset {
   id: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  deletedBy?: string | null;
+  tenantId?: string | null;
+  customerId?: string | null;
   name: string;
+  label?: string | null;
   type: string;
-  label?: string;
-  assetProfileId?: string;
-  parentId?: string;
-  tenantId?: string;
-  customerId?: string;
+  latitude: number;
+  longitude: number;
+  description?: string | null;
+  imageUrl?: string | null;
+  active?: boolean;
+  assetProfileId?: string | null;
+  parentAssetId?: string | null;
+  parentAsset?: any | null;
+  childrenCount?: number;
+  deviceCount?: number;
   location?: {
     latitude: number;
     longitude: number;
     address?: string;
   };
-  attributes?: Record<string, any>;
-  additionalInfo?: Record<string, any>;
+  attributes?: any[] | Record<string, any>;
+  tags?: any[] | null;
+  additionalInfo?: Record<string, any> | null;
   maintenanceSchedule?: {
     frequency: string;
     lastMaintenance?: string;
     nextMaintenance?: string;
   };
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface AssetQuery {

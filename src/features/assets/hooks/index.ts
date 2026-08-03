@@ -74,6 +74,7 @@ export const useUpdateAsset = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['assets'] });
       queryClient.invalidateQueries({ queryKey: ['assets', variables.id] });
+      toast.success('Asset updated successfully');
     },
   });
 };

@@ -25,7 +25,10 @@ class WebSocketManager {
       console.log('WebSocket connected');
     } catch (error) {
       console.error('WebSocket connection failed:', error);
-      toast.error('Connection Error', 'Failed to establish real-time connection');
+      toast.error(
+        'Connection Error',
+        'Failed to establish real-time connection'
+      );
     }
   }
 

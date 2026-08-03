@@ -1,19 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/common/PageHeader';
-import { ColumnDef, Row } from '@tanstack/react-table';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  CardFooter,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -23,20 +13,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { DataTable } from '@/components/common/DataTable/DataTable';
-import { createActionsColumn } from '@/components/common/DataTable/columns';
 import {
   Map,
-  Building2,
   Layers,
   MapPin,
   Thermometer,
@@ -45,35 +24,44 @@ import {
   Wind,
   CheckCircle2,
   Edit,
-  Copy,
   Trash2,
   Download,
-  Upload,
   Eye,
   Maximize2,
   Grid3x3,
-  Factory,
-  Warehouse,
-  Hospital,
   PlusSquare,
-  FileInput,
   Plug,
   BarChart3,
 } from 'lucide-react';
-import { useFloorPlans } from '@/features/floorPlan/hooks';
+import { useDeleteFloorPlan, useFloorPlans } from '@/features/floorPlan/hooks';
 import type { FloorPlan as ApiFloorPlan } from '@/services/api/floor-plans.api';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { ErrorMessage } from '@/components/common/ErrorMessage';
 import { useTranslation } from 'react-i18next';
+import UploadFlorPLanModel from '../components/UploadFlorPLanModel';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+import { Pagination } from '@/components/common/Pagination/Pagination';
+
+import { DeleteConfirmationDialog } from '@/components/common/DeleteConfirmationDialog';
+import { Device, Zone } from '../types';
+
 interface FloorPlan {
   id: string;
   name: string;
   building: string;
   floor: string;
   imageUrl: string;
-  devices: number;
+  devices: Device[];
   assets: number;
-  zones: number;
+  zones?: Zone[];
   dimensions: {
     width: number;
     height: number;
@@ -82,7 +70,7 @@ interface FloorPlan {
   createdAt: Date;
   lastModified: Date;
   category: string;
-  status: 'active' | 'draft' | 'archived';
+  status: 'active' | 'draft' | 'archived' | 'failed' | 'active' | 'warning';
 }
 // Transform API FloorPlan to local FloorPlan format
 const transformFloorPlan = (apiPlan: ApiFloorPlan): FloorPlan => {
@@ -92,9 +80,30 @@ const transformFloorPlan = (apiPlan: ApiFloorPlan): FloorPlan => {
     building: apiPlan.building || '',
     floor: apiPlan.floor || '',
     imageUrl: apiPlan.imageUrl || '',
-    devices: apiPlan.devices?.length || 0,
+    devices: (apiPlan.devices || []).map((device) => ({
+      id: device.deviceId,
+      name: device.name,
+      type: device.type,
+      status: 'online', // API doesn't provide device status, defaulting to 'online'
+    })),
     assets: 0, // API doesn't provide assets count, defaulting to 0
-    zones: apiPlan.zones?.length || 0,
+    zones: (apiPlan.zones || []).map((zone) => ({
+      id: zone.id,
+      name: zone.name,
+      type: 'zone',
+      area: 0,
+      capacity: 0,
+      status: 'active',
+      floor: apiPlan.floor || '',
+      description: '',
+      color: zone.color,
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+      isDefined: true,
+      boundaries: zone.boundaries,
+    })),
     dimensions: apiPlan.dimensions,
     scale: apiPlan.scale || '1:100',
     createdAt: new Date(apiPlan.createdAt),
@@ -116,8 +125,6 @@ interface DeviceMarker {
   value?: string;
   icon: React.ReactNode;
 }
-
-type FloorPlanRow = Row<FloorPlan>;
 
 const deviceMarkers: DeviceMarker[] = [
   {
@@ -171,20 +178,31 @@ export default function FloorPlans() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchQuery] = useState('');
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<FloorPlan | null>(null);
-  const [activeTab, setActiveTab] = useState('plans');
+  const [selectedPlan] = useState<FloorPlan | null>(null);
+  const [, setActiveTab] = useState('plans');
   const [showDevices, setShowDevices] = useState(true);
   const [showZones, setShowZones] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
-
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [FloorpLanID, setFloorPlanID] = useState<string>();
+  const itemsPerPage = 10;
   const { data: floorPlansData, isLoading, isError } = useFloorPlans();
-  const apiFloorPlans = floorPlansData?.data?.data?.data;
+  const apiFloorPlans = floorPlansData?.data;
+  const total = floorPlansData?.total;
+  const totalPages = floorPlansData?.totalPages || 0;
+  const DeleteFloorPlan = useDeleteFloorPlan();
 
   // Transform API data to local FloorPlan format
   const floorPlans: FloorPlan[] | undefined =
     apiFloorPlans?.map(transformFloorPlan);
+  // Handle delete device
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!FloorpLanID) return;
+    DeleteFloorPlan.mutate(FloorpLanID);
+  }, [FloorpLanID, setFloorPlanID]);
 
   if (isLoading) return <LoadingOverlay />;
   if (isError)
@@ -195,6 +213,7 @@ export default function FloorPlans() {
         onRetry={() => window.location.reload()}
       />
     );
+
   const quickActions = [
     {
       label: t('floorplans.createNew'),
@@ -203,13 +222,7 @@ export default function FloorPlans() {
       icon: <PlusSquare className="h-5 w-5 text-primary" />,
       onClick: () => navigate('/floor-plans/create'),
     },
-    // {
-    //   label: t('floorplans.importDWG'),
-    //   title: 'Files',
-    //   description: t('floorplans.uploadBuildingPlans'),
-    //   icon: <FileInput className="h-5 w-5 text-primary" />,
-    //   onClick: () => setIsCreateOpen(true),
-    // },
+
     {
       label: t('floorplans.device'),
       title: t('floorplans.deviceManagement'),
@@ -226,117 +239,20 @@ export default function FloorPlans() {
     },
   ];
 
-  const columns: ColumnDef<FloorPlan>[] = [
-    {
-      accessorKey: 'name',
-      header: t('floorplans.name'),
-      cell: ({ row }: { row: FloorPlanRow }) => (
-        <div>
-          <div className="font-medium">{row.getValue('name') as string}</div>
-          <div className="text-sm text-muted-foreground">
-            {row.original.building} - {row.original.floor}
-          </div>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'category',
-      header: t('floorplans.category'),
-      cell: ({ row }: { row: FloorPlanRow }) => {
-        const category = row.getValue('category') as string;
-        const icons: Record<string, React.ReactNode> = {
-          Industrial: <Factory className="h-4 w-4" />,
-          Commercial: <Building2 className="h-4 w-4" />,
-          Logistics: <Warehouse className="h-4 w-4" />,
-          Healthcare: <Hospital className="h-4 w-4" />,
-        };
-        return (
-          <div className="flex items-center gap-2">
-            {icons[category]}
-            <span>{category}</span>
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: 'devices',
-      header: t('floorplans.devices'),
-      cell: ({ row }: { row: FloorPlanRow }) => (
-        <Badge variant="outline">
-          {row.getValue('devices') as number} {t('floorplans.devices')}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: 'zones',
-      header: t('floorplans.zones'),
-      cell: ({ row }: { row: FloorPlanRow }) => (
-        <Badge variant="outline">{row.getValue('zones') as number} {t('floorplans.zones')}</Badge>
-      ),
-    },
-    {
-      accessorKey: 'status',
-      header: t('floorplans.status'),
-      cell: ({ row }: { row: FloorPlanRow }) => {
-        const status = row.getValue('status') as string;
-        const colors = {
-          active: 'bg-green-500',
-          draft: 'bg-yellow-500',
-          archived: 'bg-gray-500',
-        };
-        return (
-          <Badge
-            className={`${colors[status as keyof typeof colors]} text-white`}
-          >
-            {status}
-          </Badge>
-        );
-      },
-    },
-
-    createActionsColumn((row: FloorPlanRow) => [
-      {
-        label: t('floorplans.view'),
-        onClick: () => {
-          setSelectedPlan(row.original);
-          setIsViewerOpen(true);
-        },
-        icon: <Eye className="h-4 w-4" />,
-      },
-      { label: t('floorplans.edit'), onClick: () => { }, icon: <Edit className="h-4 w-4" /> },
-      { label: t('floorplans.copy'), onClick: () => { }, icon: <Copy className="h-4 w-4" /> },
-      {
-        label: t('floorplans.export'),
-        onClick: () => { },
-        icon: <Download className="h-4 w-4" />,
-      },
-      {
-        label: t('floorplans.delete'),
-        onClick: () => { },
-        icon: <Trash2 className="h-4 w-4" />,
-        variant: 'destructive' as const,
-      },
-    ]) as ColumnDef<FloorPlan>,
-  ];
-
+  const handleDelete = (id: string) => {
+    setFloorPlanID(id);
+    setIsDeleteDialogOpen(true);
+  };
   const filteredPlans = floorPlans?.filter(
     (plan) =>
       plan?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       plan.building?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
   return (
     <div className="space-y-6">
       <PageHeader
         title={t('floorplans.title')}
         description={t('floorplans.subtitle')}
-        actions={[
-          {
-            label: t('floorplans.uploadFloorPlan'),
-            onClick: () => setIsCreateOpen(true),
-            icon: <Upload className="h-4 w-4 mr-2" />,
-          },
-        ]}
       />
 
       {/* Stats */}
@@ -350,7 +266,9 @@ export default function FloorPlans() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{floorPlans?.length}</div>
-            <p className="text-xs text-muted-foreground">{t('floorplans.facilityLayouts')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('floorplans.facilityLayouts')}
+            </p>
           </CardContent>
         </Card>
 
@@ -365,7 +283,9 @@ export default function FloorPlans() {
             <div className="text-2xl font-bold  ">
               {floorPlans?.filter((p) => p.status === 'active').length}
             </div>
-            <p className="text-xs text-muted-foreground">{t('floorplans.inUse')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('floorplans.inUse')}
+            </p>
           </CardContent>
         </Card>
 
@@ -378,149 +298,159 @@ export default function FloorPlans() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {floorPlans?.reduce((sum, p) => sum + p.devices, 0)}
+              {/* {floorPlans?.reduce((sum, p) => sum + p.devices, 0)} */}
             </div>
-            <p className="text-xs text-muted-foreground">{t('floorplans.mappedDevices')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('floorplans.mappedDevices')}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('floorplans.totalZones')}</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              {t('floorplans.totalZones')}
+            </CardTitle>
             <Layers className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {floorPlans?.reduce((sum, p) => sum + p.zones, 0)}
+              {/* {floorPlans?.reduce((sum, p) => sum + p.zones, 0)} */}
             </div>
-            <p className="text-xs text-muted-foreground">{t('floorplans.definedAreas')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('floorplans.definedAreas')}
+            </p>
           </CardContent>
         </Card>
       </div>
+      {/* table of florplan  */}
+      <Card className="pt-6">
+        <CardContent className="relative min-h-[200px]">
+          <div className="">
+            <Table>
+              <TableHeader className="bg-primary  text-white">
+                <TableRow className="hover:bg-primary ">
+                  <TableHead className="text-white font-semibold">
+                    {t('devices.table.name')}
+                  </TableHead>
+                  <TableHead className="text-white font-semibold">
+                    {t('floorplans.category')}
+                  </TableHead>
+                  <TableHead className="text-white font-semibold">
+                    {t('floorplans.devices')}
+                  </TableHead>
+                  <TableHead className="text-white font-semibold">
+                    {t('floorplans.zones')}
+                  </TableHead>
 
-      {/* Tabs */}
-      <Tabs defaultValue="plans" value={activeTab} onValueChange={setActiveTab}>
-        <TabsContent value="plans" className="space-y-6">
-          {/* Table */}
-          <Card>
-            <CardContent>
-              <DataTable
-                columns={columns}
-                data={filteredPlans || []}
-                searchKey="name"
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="gallery" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {floorPlans?.map((plan) => (
-              <Card
-                key={plan.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <div className="aspect-video bg-muted flex items-center justify-center relative">
-                  <Map className="h-16 w-16 text-muted-foreground" />
-                  <Badge className="absolute top-2 right-2">
-                    {plan?.devices} {t('floorplans.devices')}
-                  </Badge>
-                </div>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{plan.name}</CardTitle>
-                    <Badge variant="outline">{plan.status}</Badge>
-                  </div>
-                  <CardDescription>
-                    {plan.building} - {plan.floor}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">{t('floorplans.zones')}:</span>
-                      <span className="ml-2 font-medium">{plan.zones}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">{t('floorplans.scale')}:</span>
-                      <span className="ml-2 font-medium">{plan.scale}</span>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => {
-                      setSelectedPlan(plan);
-                      setIsViewerOpen(true);
-                    }}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    {t('floorplans.view')}
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Edit className="h-4 w-4 mr-2" />
-                    {t('floorplans.edit')}
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="categories" className="space-y-6">
-          {['Industrial', 'Commercial', 'Logistics', 'Healthcare'].map(
-            (category) => {
-              const plans = floorPlans?.filter((p) => p.category === category);
-              if (!plans || plans.length === 0) return null;
-
-              return (
-                <Card key={category}>
-                  <CardHeader>
-                    <CardTitle>{category}</CardTitle>
-                    <CardDescription>
-                      {plans.length} {t('floorplans.floorPlans')}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {plans?.map((plan) => (
-                        <div
-                          key={plan.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                          onClick={() => {
-                            setSelectedPlan(plan);
-                            setIsViewerOpen(true);
-                          }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-primary/10 rounded-lg">
-                              <Map className="h-5 w-5 text-primary" />
-                            </div>
-                            <div>
-                              <p className="font-medium">{plan.name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {plan.devices} {t('floorplans.devices')} • {plan.zones} {t('floorplans.zones')}
-                              </p>
-                            </div>
-                          </div>
-                          <Eye className="h-5 w-5 text-muted-foreground" />
+                  <TableHead className="text-white font-semibold">
+                    {t('common.status')}
+                  </TableHead>
+                  <TableHead className="text-right text-white font-semibold">
+                    {t('devices.table.actions')}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {total === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="h-24 text-center bg-gray-50 text-muted-foreground"
+                    >
+                      {t('floorplans.nofloorPlan')}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredPlans?.map((plan: FloorPlan) => (
+                    <TableRow
+                      key={plan.id}
+                      onClick={() => navigate(`/plans/${plan.id}`)}
+                      className="cursor-pointer hover:bg-slate-50 transition-colors"
+                    >
+                      <TableCell className="font-medium">
+                        <div className="flex flex-col">
+                          <span className="capitalize">{plan.name}</span>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            }
+                      </TableCell>
+                      <TableCell>
+                        <p className="font-normal capitalize">
+                          {plan.category}
+                        </p>
+                      </TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className=" text">{plan.devices?.length || 0}</div>
+                      </TableCell>
+
+                      <TableCell className="text-slate-500 text-sm">
+                        <p className="font-normal capitalize">
+                          {plan?.zones?.length || 0}
+                        </p>
+                      </TableCell>
+                      <TableCell className="text-slate-500 text-sm">
+                        <Badge
+                          className={`${
+                            plan.status === 'active'
+                              ? 'bg-green-500 hover:bg-green-600'
+                              : plan.status === 'warning'
+                                ? 'bg-amber-500 hover:bg-amber-600'
+                                : 'bg-red-500 hover:bg-red-600'
+                          } text-white`}
+                        >
+                          {plan.status === 'active'
+                            ? t('assets.status.active') || 'Active'
+                            : plan.status === 'warning'
+                              ? t('common.warning') || 'Warning'
+                              : t('assets.status.error') || 'Error'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell
+                        className="text-right flex gap-1 items-end justify-end relative"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="hover:bg-secondary hover:text-white"
+                          onClick={() => navigate(`/plans/${plan.id}`)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="hover:bg-secondary hover:text-white"
+                          onClick={() => handleDelete(plan.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          {totalPages > 1 && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalItems={total}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
+            </div>
           )}
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
 
       {/* Quick Actions */}
       <div className="space-y-3">
-        <h3 className="text-xl font-semibold text-gray-900">{t('floorplans.quickActions')}</h3>
+        <h3 className="text-xl font-semibold text-gray-900">
+          {t('floorplans.quickActions')}
+        </h3>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {quickActions.map((action) => (
             <button
@@ -545,105 +475,10 @@ export default function FloorPlans() {
       </div>
 
       {/* Create/Upload Dialog */}
-      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>{t('floorplans.uploadFloorPlan')}</DialogTitle>
-            <DialogDescription>
-              {t('floorplans.uploadFloorPlanDescription')}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="plan-name">{t('floorplans.floorPlanName')} <span className="text-red-500">*</span></Label>
-              <Input
-                id="plan-name"
-                placeholder={t('floorplans.floorPlanNamePlaceholder')}
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="building">{t('floorplans.building')} <span className="text-red-500">*</span></Label>
-                <Input
-                  id="building"
-                  placeholder={t('floorplans.buildingPlaceholder')}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="floor">{t('floorplans.floor')} <span className="text-red-500">*</span></Label>
-                <Input id="floor" placeholder={t('floorplans.floorPlaceholder')} />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="category">{t('floorplans.category')} <span className="text-red-500">*</span></Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder={t('floorplans.categoryPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="industrial">{t('floorplans.industrial')}</SelectItem>
-                  <SelectItem value="commercial">{t('floorplans.commercial')}</SelectItem>
-                  <SelectItem value="residential">{t('floorplans.residential')}</SelectItem>
-                  <SelectItem value="logistics">{t('floorplans.logistics')}</SelectItem>
-                  <SelectItem value="healthcare">{t('floorplans.healthcare')}</SelectItem>
-                  <SelectItem value="education">{t('floorplans.education')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image">{t('floorplans.floorPlanImage')} <span className="text-red-500">*</span></Label>
-              <div className="border-2 border-dashed rounded-lg p-8 text-center hover:bg-muted/50 cursor-pointer transition-colors">
-                <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-sm font-medium mb-1">
-                  {t('floorplans.clickToUploadOrDragAndDrop')}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {t('floorplans.pngJpgSvgUpTo10Mb')}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="width">{t('floorplans.width')} (meters)</Label>
-                <Input id="width" type="number" placeholder="100" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="height">{t('floorplans.height')} (meters)</Label>
-                <Input id="height" type="number" placeholder="80" />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="scale">{t('floorplans.scale')}</Label>
-                <Input id="scale" placeholder="1:100" />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="description">{t('floorplans.description')}</Label>
-              <Textarea
-                id="description"
-                placeholder={t('floorplans.floorPlanDescriptionPlaceholder')}
-                rows={3}
-              />
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
-              {t('floorplans.cancel')}
-            </Button>
-            <Button>{t('floorplans.uploadFloorPlan')}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
+      <UploadFlorPLanModel
+        open={isCreateOpen}
+        onOpenChange={() => setIsCreateOpen(!isCreateOpen)}
+      />
       {/* Floor Plan Viewer Dialog */}
       <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
@@ -656,7 +491,10 @@ export default function FloorPlans() {
                 </DialogDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline">{selectedPlan?.devices} {t('floorplans.devices')} {t('floorplans.zones')}</Badge>
+                <Badge variant="outline">
+                  {selectedPlan?.devices?.length || 0} {t('floorplans.devices')}{' '}
+                  - {selectedPlan?.zones?.length || 0} {t('floorplans.zones')}
+                </Badge>
               </div>
             </div>
           </DialogHeader>
@@ -831,18 +669,24 @@ export default function FloorPlans() {
             {/* Plan Info */}
             <div className="grid grid-cols-3 gap-4 p-4 border rounded-lg">
               <div>
-                <p className="text-sm text-muted-foreground">{t('floorplans.dimensions')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('floorplans.dimensions')}
+                </p>
                 <p className="font-semibold">
                   {selectedPlan?.dimensions.width}m ×{' '}
                   {selectedPlan?.dimensions.height}m
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">{t('floorplans.scale')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('floorplans.scale')}
+                </p>
                 <p className="font-semibold">{selectedPlan?.scale}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">{t('floorplans.lastModified')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('floorplans.lastModified')}
+                </p>
                 <p className="font-semibold">
                   {selectedPlan?.lastModified.toLocaleDateString()}
                 </p>
@@ -865,6 +709,18 @@ export default function FloorPlans() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Delete flood plan model  */}
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        title={t('devices.tooltips.delete')}
+        itemName={
+          floorPlans?.find((d: FloorPlan) => d.id === FloorpLanID)?.name ||
+          t('common.name')
+        }
+        isLoading={DeleteFloorPlan.isPending}
+      />
     </div>
   );
 }

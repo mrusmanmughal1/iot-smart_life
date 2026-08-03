@@ -1,19 +1,25 @@
 import apiClient from '@/lib/axios';
+import { TemplatePreviewData } from '../hooks/useSolutionTemplatePrevies';
+import {
+  CreateSolutionTemplatePayload,
+  SolutionTemplate as CreatedSolutionTemplate,
+} from '../hooks/useCreateSolutionTemp';
 
 export enum TemplateCategory {
   SMART_HOME = 'smart_home',
-  AGRICULTURE = 'agriculture',
+  SMART_AGRICULTURE = 'smart_agriculture',
   SMART_CITY = 'smart_city',
   HEALTHCARE = 'healthcare',
-  ENERGY = 'energy',
+  ENERGY = 'smart_energy',
   TRANSPORTATION = 'transportation',
-  RETAIL = 'retail',
+  SMART_RETAIL = 'smart_retail',
   SMART_FACTORY = 'smart_factory',
   SMART_BUILDING = 'smart_building',
   LOGISTICS = 'logistics',
-  WATER = 'water',
+  WATER = 'smart_water',
   CLIMATE = 'climate',
   EDUCATION = 'education',
+  SMART_FACILITY = 'smart_facility',
 }
 
 export interface TemplateConfiguration {
@@ -24,6 +30,7 @@ export interface TemplateConfiguration {
 }
 
 export interface SolutionTemplate {
+  imageUrl: any;
   id: string;
   name: string;
   title: string;
@@ -57,6 +64,7 @@ export interface PaginatedResponse<T> {
     page: number;
     limit: number;
     totalPages: number;
+    totalItems: number;
   };
 }
 
@@ -77,8 +85,11 @@ export const solutionTemplatesApi = {
     apiClient.get<ApiResponse<SolutionTemplate>>(`/solution-templates/${id}`),
 
   // Create template
-  create: (data: Partial<SolutionTemplate>) =>
-    apiClient.post<ApiResponse<SolutionTemplate>>('/solution-templates', data),
+  create: (data: Partial<CreateSolutionTemplatePayload>) =>
+    apiClient.post<ApiResponse<CreatedSolutionTemplate>>(
+      '/solution-templates',
+      data
+    ),
 
   // Update template
   update: (id: string, data: Partial<SolutionTemplate>) =>
@@ -98,7 +109,9 @@ export const solutionTemplatesApi = {
 
   // Get installation history
   getInstallations: (id: string) =>
-    apiClient.get<ApiResponse<any[]>>(`/solution-templates/${id}/installations`),
+    apiClient.get<ApiResponse<any[]>>(
+      `/solution-templates/${id}/installations`
+    ),
 
   // Get categories
   getCategories: () =>
@@ -127,5 +140,11 @@ export const solutionTemplatesApi = {
   getByCategory: (category: TemplateCategory) =>
     apiClient.get<ApiResponse<SolutionTemplate[]>>(
       `/solution-templates/category/${category}`
+    ),
+
+  // Get preview
+  getSolutionTemplatePreview: (id: number | string) =>
+    apiClient.get<ApiResponse<TemplatePreviewData>>(
+      `solution-templates/${id}/preview`
     ),
 };

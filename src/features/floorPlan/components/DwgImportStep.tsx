@@ -63,7 +63,7 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
   onPrevious,
   onNext,
 }) => {
-  const { floorPlanId, selectedFloor } = useFloorMapStore();
+  const { floorPlanId, selectedFloor, setParsedGeometry, setZones } = useFloorMapStore();
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
   const isUploading = useMemo(
@@ -101,7 +101,9 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
   const uploadFile = useCallback(
     async (fileItem: UploadedFile) => {
       if (!floorPlanId) {
-        toast.error('Floor plan ID is missing. Please go back and create a floor plan first.');
+        toast.error(
+          'Floor plan ID is missing. Please go back and create a floor plan first.'
+        );
         return;
       }
 
@@ -139,19 +141,27 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
           }
         );
 
-        // Update status to completed
+        // Update status to completed — backend returns { fileUrl, floor?, parsedGeometry? }
+        const responseData = response.data?.data;
         setUploadedFiles((prev) =>
           prev.map((f) =>
             f.id === fileItem.id
               ? {
-                ...f,
-                status: 'completed',
-                progress: 100,
-                fileUrl: response.data?.data?.fileUrl,
-              }
+                  ...f,
+                  status: 'completed' as const,
+                  progress: 100,
+                  fileUrl: responseData?.fileUrl,
+                }
               : f
           )
         );
+
+        // Store parsed geometry in Zustand so ZoneSetupStep can use it immediately
+        if (responseData?.parsedGeometry) {
+          setParsedGeometry(responseData.parsedGeometry);
+          // Reset zones so the new geometry is auto-mapped in ZoneSetupStep
+          setZones([]);
+        }
 
         toast.success(`File "${fileItem.file.name}" uploaded successfully`);
       } catch (error: unknown) {
@@ -163,13 +173,21 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
         );
 
         const errorMessage =
-          (error && typeof error === 'object' && 'response' in error &&
-            error.response && typeof error.response === 'object' && 'data' in error.response &&
-            error.response.data && typeof error.response.data === 'object' && 'message' in error.response.data &&
-            typeof error.response.data.message === 'string')
+          error &&
+          typeof error === 'object' &&
+          'response' in error &&
+          error.response &&
+          typeof error.response === 'object' &&
+          'data' in error.response &&
+          error.response.data &&
+          typeof error.response.data === 'object' &&
+          'message' in error.response.data &&
+          typeof error.response.data.message === 'string'
             ? error.response.data.message
             : 'Failed to upload file';
-        toast.error(`Failed to upload "${fileItem.file.name}": ${errorMessage}`);
+        toast.error(
+          `Failed to upload "${fileItem.file.name}": ${errorMessage}`
+        );
       }
     },
     [floorPlanId]
@@ -181,7 +199,9 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
       if (isUploading) return;
 
       if (!floorPlanId) {
-        toast.error('Floor plan ID is missing. Please go back and create a floor plan first.');
+        toast.error(
+          'Floor plan ID is missing. Please go back and create a floor plan first.'
+        );
         return;
       }
 
@@ -280,7 +300,8 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
         <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm">
           <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" />
           <p className="text-red-800">
-            Floor plan ID is missing. Please go back and create a floor plan first.
+            Floor plan ID is missing. Please go back and create a floor plan
+            first.
           </p>
         </div>
       )}
@@ -292,12 +313,13 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
             <h3 className="mb-3 text-lg font-semibold">Upload DWG Files</h3>
             <div
               {...getRootProps()}
-              className={`rounded-2xl border border-dashed p-8 text-center transition-all cursor-pointer ${isDragActive
-                ? 'border-primary bg-primary/10'
-                : isUploading || !floorPlanId
-                  ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
-                  : 'border-primary/40 bg-primary/5 hover:border-primary/60 hover:bg-primary/10'
-                }`}
+              className={`rounded-2xl border border-dashed p-8 text-center transition-all cursor-pointer ${
+                isDragActive
+                  ? 'border-primary bg-primary/10'
+                  : isUploading || !floorPlanId
+                    ? 'border-gray-300 bg-gray-50 cursor-not-allowed'
+                    : 'border-primary/40 bg-primary/5 hover:border-primary/60 hover:bg-primary/10'
+              }`}
             >
               <input {...getInputProps()} />
               {isUploading ? (
@@ -375,7 +397,11 @@ export const DwgImportStep: React.FC<DwgImportStepProps> = ({
                   control={control}
                   name="drawingUnit"
                   render={({ field }) => (
-                    <Select value={field.value} className='w-32' onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      className="w-32"
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger className="h-8 w-32 border text-xs">
                         <SelectValue placeholder="Meters" />
                       </SelectTrigger>

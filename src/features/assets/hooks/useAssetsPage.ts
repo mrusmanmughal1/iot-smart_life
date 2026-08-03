@@ -5,10 +5,7 @@ import type { Asset as ApiAsset, AssetQuery } from '@/services/api/assets.api';
 import { toast } from 'react-hot-toast';
 import { debounce } from '@/lib/util';
 
-export interface Asset {
-  id: string;
-  name: string;
-  type: string;
+export interface Asset extends ApiAsset {
   customer: string;
   created: string;
   status: 'active' | 'warning' | 'error';
@@ -60,32 +57,15 @@ export const useAssetsPage = (options: UseAssetsPageOptions = {}) => {
   const assets: Asset[] = useMemo(() => {
     const list = assetsResponse?.data?.data.data ?? [];
     return list.map((apiAsset: ApiAsset) => {
-      const statusFromInfo = apiAsset.additionalInfo?.status;
-      let status: 'active' | 'warning' | 'error' = 'active';
-
-      if (statusFromInfo === 'warning' || statusFromInfo === 'error') {
-        status = statusFromInfo;
-      } else if (
-        statusFromInfo === 'inactive' ||
-        statusFromInfo === 'deactivated'
-      ) {
-        status = 'error';
-      }
-
-      const statusIndicator: 'primary' | 'danger' =
-        status === 'active' ? 'primary' : 'danger';
-
-      const customer =
-        apiAsset.additionalInfo?.customer || apiAsset.customerId || 'N/A';
-
+      const status = apiAsset.active === false ? 'error' : 'active';
+      const statusIndicator = status === 'active' ? 'primary' : 'danger';
+      const customer = apiAsset.customerId || 'N/A';
       const created = apiAsset.createdAt
         ? new Date(apiAsset.createdAt).toISOString().split('T')[0]
         : 'N/A';
 
       return {
-        id: apiAsset.id,
-        name: apiAsset.name,
-        type: apiAsset.type,
+        ...apiAsset,
         customer,
         created,
         status,

@@ -32,6 +32,7 @@ import { useAssetProfiles } from '@/features/profiles/hooks';
 import { useAssets } from '@/features/assets/hooks';
 import type { AssetProfile as ApiAssetProfile } from '@/services/api/profiles.api';
 import type { Asset as ApiAsset } from '@/services/api/assets.api';
+import type { Asset } from '@/features/assets/hooks';
 
 export interface AdditionalAttribute {
   key: string;
@@ -64,6 +65,8 @@ export interface AddAssetModalProps {
     building?: BuildingDetails;
   }) => void;
   isLoading?: boolean;
+  mode?: 'add' | 'edit';
+  initialData?: Partial<Asset>;
 }
 
 const optionalNumber = z.preprocess((v) => {
@@ -211,6 +214,8 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
   onOpenChange,
   onSave,
   isLoading = false,
+  mode = 'add',
+  initialData,
 }) => {
   const { t } = useTranslation();
   const schema = useMemo(() => createSchema(t), [t]);
@@ -288,6 +293,57 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
     }
   }, [assetType, setValue]);
 
+  // Populate form with initialData when in edit mode
+  useEffect(() => {
+    if (open && mode === 'edit' && initialData) {
+      reset({
+        name: initialData.name ?? '',
+        type: initialData.type ?? '',
+        description: initialData.description ?? '',
+        assetProfileId: initialData.assetProfileId ?? '',
+        parentAssetId: initialData.parentAssetId ?? '',
+        location: {
+          latitude:
+            initialData.location?.latitude != null
+              ? String(initialData.location.latitude)
+              : '',
+          longitude:
+            initialData.location?.longitude != null
+              ? String(initialData.location.longitude)
+              : '',
+        },
+        building: {
+          name: initialData.additionalInfo?.buildingName ?? '',
+          floors: initialData.additionalInfo?.floors ?? undefined,
+          dimensions: {
+            width: initialData.additionalInfo?.width ?? undefined,
+            height: initialData.additionalInfo?.height ?? undefined,
+          },
+        },
+        attributes:
+          initialData.attributes &&
+          Array.isArray(initialData.attributes) &&
+          initialData.attributes.length > 0
+            ? initialData.attributes.map((attr: any) => ({
+                key: attr.key || '',
+                value: attr.value != null ? String(attr.value) : '',
+              }))
+            : [{ key: '', value: '' }],
+      });
+    } else if (open && mode === 'add') {
+      reset({
+        name: '',
+        type: '',
+        description: '',
+        assetProfileId: '',
+        parentAssetId: '',
+        location: { latitude: '', longitude: '' },
+        building: { name: '', floors: undefined, dimensions: {} },
+        attributes: [{ key: '', value: '' }],
+      });
+    }
+  }, [open, mode, initialData, reset]);
+
   const latitudeStr = watch('location.latitude');
   const longitudeStr = watch('location.longitude');
 
@@ -356,7 +412,9 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
         <DialogHeader className="bg-primary text-white p-4 rounded-t-lg dark:bg-gray-950 dark:border-gray-700 dark:border-b">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-white text-lg font-semibold">
-              {t('addAsset.title') || 'Add New Asset'}
+              {mode === 'edit'
+                ? t('addAsset.editTitle') || 'Edit Asset'
+                : t('addAsset.title') || 'Add New Asset'}
             </DialogTitle>
             <button
               onClick={handleCancel}
@@ -765,7 +823,11 @@ export const AddAssetModal: React.FC<AddAssetModalProps> = ({
             className="bg-black hover:bg-black/90 text-white"
             isLoading={isLoading}
           >
-            {t('addAsset.save') || 'Save'}
+            {isLoading
+              ? t('common.saving') || 'Saving...'
+              : mode === 'edit'
+                ? t('addAsset.update') || 'Update'
+                : t('addAsset.save') || 'Save'}
           </Button>
         </DialogFooter>
       </DialogContent>

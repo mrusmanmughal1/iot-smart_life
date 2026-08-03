@@ -137,10 +137,7 @@ export const floorPlanService = {
   /**
    * Clone floor plan with new name
    */
-  async cloneFloorPlan(
-    id: string,
-    newName: string
-  ): Promise<FloorPlan> {
+  async cloneFloorPlan(id: string, newName: string): Promise<FloorPlan> {
     if (!id || !newName) {
       throw new Error('Floor plan ID and new name are required');
     }
@@ -188,4 +185,3 @@ export const floorPlanService = {
     return response.data.data;
   },
 };
-

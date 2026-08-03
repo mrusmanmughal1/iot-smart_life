@@ -11,25 +11,17 @@ import { TagInput } from '@/components/common/TagInput';
 import { dashboardsApi } from '@/services/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
- 
+import { Checkbox } from '@/components/ui/checkbox';
 
 // Zod validation schema
 const createDashboardSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Dashboard name is required')
-    .trim(),
-  description: z
-    .string()
-    .optional(),
+  name: z.string().min(1, 'Dashboard name is required').trim(),
+  description: z.string().optional(),
   owner: z
     .array(z.string())
     .min(1, 'Owner is required')
     .max(1, 'Only one owner is allowed'),
-  groups: z
-    .array(z.string())
-    .default([])
-    .optional(),
+  visibility: z.boolean().optional(),
 });
 
 type CreateDashboardFormData = z.infer<typeof createDashboardSchema>;
@@ -49,13 +41,11 @@ export default function CreateDashboardPage() {
     defaultValues: {
       name: '',
       description: '',
-      owner: ["admin"],
-      groups: [],
+      owner: ['admin'],
+      visibility: false,
     },
     mode: 'onChange',
   });
-
-  
 
   const onSubmit = async (data: CreateDashboardFormData) => {
     try {
@@ -63,23 +53,24 @@ export default function CreateDashboardPage() {
       const dashboardData = {
         name: data.name,
         description: data.description || undefined,
-        // assignedCustomers: data.owner,
-        // additionalInfo: {
-        //   groups: data.groups || [],
-        // },
+        visibility: data.visibility ? 'private' : 'public',
       };
 
       // Create dashboard
       await dashboardsApi.create(dashboardData);
 
-      toast.success(t('createDashboard.success') || 'Dashboard created successfully');
+      toast.success(
+        t('createDashboard.success') || 'Dashboard created successfully'
+      );
       queryClient.invalidateQueries({ queryKey: ['dashboards'] });
       navigate('/solution-dashboards');
     } catch (error: unknown) {
-      console.error('Failed to create dashboard:', error);
+      toast.error('error');
       const errorMessage =
-        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
-        t('createDashboard.error') || 'Failed to create dashboard';
+        (error as { response?: { data?: { message?: string } } })?.response
+          ?.data?.message ||
+        t('createDashboard.error') ||
+        'Failed to create dashboard';
       toast.error(errorMessage);
     }
   };
@@ -89,15 +80,15 @@ export default function CreateDashboardPage() {
   };
 
   return (
-      <div className="space-y-6">
-        {/* Header */}
-        <h1 className="text-2xl font-semibold dark:text-white text-gray-900">
-          {t('createDashboard.title') || 'Create New Dashboard'}
-        </h1>
-        
-        <div className="grid   gap-6">
-          {/* Form Card */}
-          <Card className="shadow-lg rounded-xl border-gray-200">
+    <div className="space-y-6">
+      {/* Header */}
+      <h1 className="text-2xl font-semibold dark:text-white text-gray-900">
+        {t('createDashboard.title') || 'Create New Dashboard'}
+      </h1>
+
+      <div className="grid   gap-6">
+        {/* Form Card */}
+        <Card className="shadow-lg rounded-xl border-gray-200">
           <CardContent className="p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               {/* Dashboard Title */}
@@ -111,11 +102,16 @@ export default function CreateDashboardPage() {
                 <Input
                   id="name"
                   {...register('name')}
-                  placeholder={t('createDashboard.dashboardTitlePlaceholder') || 'Enter dashboard title'}
+                  placeholder={
+                    t('createDashboard.dashboardTitlePlaceholder') ||
+                    'Enter dashboard title'
+                  }
                   className="w-full border rounded-md"
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 
@@ -130,11 +126,16 @@ export default function CreateDashboardPage() {
                 <Textarea
                   id="description"
                   {...register('description')}
-                  placeholder={t('createDashboard.descriptionPlaceholder') || 'Enter dashboard description'}
+                  placeholder={
+                    t('createDashboard.descriptionPlaceholder') ||
+                    'Enter dashboard description'
+                  }
                   className="min-h-[100px] w-full"
                 />
                 {errors.description && (
-                  <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.description.message}
+                  </p>
                 )}
               </div>
 
@@ -156,34 +157,40 @@ export default function CreateDashboardPage() {
                       <TagInput
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder={t('createDashboard.ownerPlaceholder') || 'Type owner name and press Enter'}
+                        placeholder={
+                          t('createDashboard.ownerPlaceholder') ||
+                          'Type owner name and press Enter'
+                        }
                         maxTags={1}
                       />
                     )}
                   />
                   {errors.owner && (
-                    <p className="mt-1 text-sm text-red-600">{errors.owner.message}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.owner.message}
+                    </p>
                   )}
                 </div>
 
                 {/* Groups Field */}
                 <div>
-                  <label className="block text-sm font-medium dark:text-white text-gray-700 mb-2">
-                    {t('createDashboard.groups') || 'Groups'}
-                  </label>
                   <Controller
-                    name="groups"
+                    name="visibility"
                     control={control}
                     render={({ field }) => (
-                      <TagInput
-                        value={field.value ?? []}
+                      <Checkbox
+                        id="visibility"
+                        name="visibility"
+                        label="Make This Dashbaord Private ?"
+                        value={field?.value}
                         onChange={field.onChange}
-                        placeholder={t('createDashboard.groupsPlaceholder') || 'Type group name and press Enter'}
                       />
                     )}
                   />
-                  {errors.groups && (
-                    <p className="mt-1 text-sm text-red-600">{errors.groups.message}</p>
+                  {errors.visibility && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.visibility.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -211,10 +218,7 @@ export default function CreateDashboardPage() {
             </form>
           </CardContent>
         </Card>
-
-       
-        </div>
       </div>
+    </div>
   );
 }
-
