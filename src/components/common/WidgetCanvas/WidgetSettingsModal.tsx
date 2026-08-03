@@ -15,7 +15,6 @@ import { Badge } from '@/components/ui/badge';
 import {
   Cpu,
   Activity,
-  Plus,
   Search,
   CheckCircle2,
   WifiOff,
@@ -96,7 +95,6 @@ export function WidgetSettingsModal({
   const [selectedTelemetryKeys, setSelectedTelemetryKeys] = useState<string[]>(
     []
   );
-  const [customKeyInput, setCustomKeyInput] = useState('');
   const [timeRange, setTimeRange] = useState('24h');
   const [selectedColor, setSelectedColor] = useState('#3b82f6');
 
@@ -185,19 +183,12 @@ export function WidgetSettingsModal({
     );
   };
 
-  const handleAddCustomKey = () => {
-    if (customKeyInput.trim()) {
-      const newKey = customKeyInput.trim();
-      if (!selectedTelemetryKeys.includes(newKey)) {
-        setSelectedTelemetryKeys((prev) => [...prev, newKey]);
-      }
-      setCustomKeyInput('');
-    }
-  };
+  const selectedDevice = devices.find((d) => d.id === selectedDeviceId);
 
   const handleSave = () => {
     const dataSource: WidgetDataSource = {
       deviceIds: selectedDeviceId ? [selectedDeviceId] : [],
+      deviceName: selectedDevice?.name || selectedDeviceId || undefined,
       telemetryKeys: selectedTelemetryKeys,
       timeRange,
     };
@@ -213,8 +204,6 @@ export function WidgetSettingsModal({
   const handleCancel = () => {
     onOpenChange(false);
   };
-
-  const selectedDevice = devices.find((d) => d.id === selectedDeviceId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -401,37 +390,9 @@ export function WidgetSettingsModal({
               </div>
             ) : (
               <p className="text-xs text-slate-400 italic py-2">
-                No active telemetry payload received for this device yet. You
-                can add a custom key below.
+                No active telemetry payload received for this device yet.
               </p>
             )}
-
-            {/* Custom telemetry key input */}
-            <div className="flex gap-2">
-              <Input
-                type="text"
-                placeholder="Add custom key (e.g. temperature, humidity)..."
-                value={customKeyInput}
-                onChange={(e) => setCustomKeyInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddCustomKey();
-                  }
-                }}
-                className="h-9 text-xs bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleAddCustomKey}
-                className="h-9 shrink-0"
-              >
-                <Plus className="w-3.5 h-3.5 mr-1" />
-                Add Key
-              </Button>
-            </div>
           </div>
 
           {/* ── Section 3: Time Range ── */}

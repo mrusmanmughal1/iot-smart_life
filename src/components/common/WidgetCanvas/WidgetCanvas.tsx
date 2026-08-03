@@ -19,6 +19,7 @@ import 'react-resizable/css/styles.css';
 
 export interface WidgetDataSource {
   deviceIds: string[];
+  deviceName?: string;
   telemetryKeys: string[];
   timeRange: string;
 }
@@ -139,6 +140,105 @@ export function WidgetCanvas({
       console.log(widgetType);
       const alias =
         widgetType.descriptor?.alias || widgetType.category || 'telemetry';
+      // Smartly infer default chartType based on widgetType category, descriptor alias, and name
+      const catUpper = String(widgetType.category || '').toUpperCase();
+      const nameOrAlias = String(
+        widgetType.descriptor?.alias || widgetType.name || ''
+      ).toLowerCase();
+
+      let defaultChartType = 'line-chart';
+      if (
+        catUpper === 'GAUGES' ||
+        catUpper === 'ANALOG_GAUGES' ||
+        nameOrAlias.includes('gauge')
+      ) {
+        defaultChartType = nameOrAlias.includes('progress')
+          ? 'progress-bar'
+          : nameOrAlias.includes('digital')
+            ? 'digital-gauge'
+            : 'radial-gauge';
+      } else if (
+        catUpper === 'CONTROL_WIDGETS' ||
+        catUpper === 'GPIO_WIDGETS' ||
+        catUpper === 'INPUT_WIDGETS' ||
+        nameOrAlias.includes('switch') ||
+        nameOrAlias.includes('control') ||
+        nameOrAlias.includes('relay')
+      ) {
+        if (
+          nameOrAlias.includes('thermostat') ||
+          nameOrAlias.includes('climate') ||
+          nameOrAlias.includes('temp control')
+        ) {
+          defaultChartType = 'thermostat-control';
+        } else if (
+          nameOrAlias.includes('slider') ||
+          nameOrAlias.includes('dimmer') ||
+          nameOrAlias.includes('speed')
+        ) {
+          defaultChartType = 'slider-control';
+        } else if (
+          nameOrAlias.includes('command') ||
+          nameOrAlias.includes('button') ||
+          nameOrAlias.includes('action')
+        ) {
+          defaultChartType = 'command-control';
+        } else {
+          defaultChartType = 'device-switch';
+        }
+      } else if (
+        catUpper === 'CARDS' ||
+        nameOrAlias.includes('card') ||
+        nameOrAlias.includes('metric')
+      ) {
+        if (
+          nameOrAlias.includes('multi') ||
+          nameOrAlias.includes('grid') ||
+          nameOrAlias.includes('overview')
+        ) {
+          defaultChartType = 'multi-metric-card';
+        } else if (
+          nameOrAlias.includes('health') ||
+          nameOrAlias.includes('status')
+        ) {
+          defaultChartType = 'status-card';
+        } else {
+          defaultChartType = 'metric-card';
+        }
+      } else if (
+        catUpper === 'MAPS' ||
+        nameOrAlias.includes('map') ||
+        nameOrAlias.includes('gps')
+      ) {
+        defaultChartType = 'device-map';
+      } else if (
+        catUpper === 'ALARM_WIDGETS' ||
+        nameOrAlias.includes('alarm') ||
+        nameOrAlias.includes('alert')
+      ) {
+        defaultChartType = 'alarms-table';
+      } else if (
+        catUpper === 'TABLES' ||
+        nameOrAlias.includes('table') ||
+        nameOrAlias.includes('grid') ||
+        nameOrAlias.includes('log')
+      ) {
+        defaultChartType = 'data-table';
+      } else if (
+        catUpper === 'CHARTS' ||
+        nameOrAlias.includes('chart') ||
+        nameOrAlias.includes('pie') ||
+        nameOrAlias.includes('donut')
+      ) {
+        if (nameOrAlias.includes('pie') || nameOrAlias.includes('donut')) {
+          defaultChartType = 'pie-chart';
+        } else if (nameOrAlias.includes('bar')) {
+          defaultChartType = 'bar-chart';
+        } else {
+          defaultChartType = 'line-chart';
+        }
+      }
+
       const newWidget: Widget = {
         id: `widget-${Date.now()}`,
         type: alias,
@@ -152,7 +252,7 @@ export function WidgetCanvas({
           timeRange: '24h',
         },
         visualization: {
-          chartType: 'line',
+          chartType: defaultChartType,
           colors: ['#3b82f6'],
           showLegend: true,
         },
@@ -319,6 +419,14 @@ export function WidgetCanvas({
                       <span className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate">
                         {widget.title}
                       </span>
+                      {widget.dataSource?.deviceName && (
+                        <span
+                          className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-medium px-1.5 py-0.5 rounded-full truncate max-w-[140px]"
+                          title={widget.dataSource.deviceName}
+                        >
+                          {widget.dataSource.deviceName}
+                        </span>
+                      )}
                     </div>
                     {!readOnly && (
                       <div
