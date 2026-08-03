@@ -101,7 +101,7 @@ export const dashboardsApi = {
     apiClient.post<ApiResponse<Dashboard>>('/dashboards', data),
 
   // Update dashboard
-  update: (id: string, data: Partial<Dashboard>) =>
+  update: (id: string | number, data: Partial<Dashboard>) =>
     apiClient.patch<ApiResponse<Dashboard>>(`/dashboards/${id}`, data),
 
   // Delete dashboard

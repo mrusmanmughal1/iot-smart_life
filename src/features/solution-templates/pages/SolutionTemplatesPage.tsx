@@ -23,11 +23,12 @@ import {
 import { useSolutionTemplates } from '@/features/solution-templates/hooks';
 import { debounce } from '@/lib/util';
 import { PageHeader } from '@/components/common/PageHeader';
+import { useTempInstallation } from '../hooks/useTempInstallation';
 
 export default function SolutionTemplates() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
+  const installTemp = useTempInstallation();
   const {
     searchQuery,
     selectedCategory,
@@ -45,8 +46,6 @@ export default function SolutionTemplates() {
     itemsPerPage: 10,
     initialCategory: 'smartCity',
   });
-
-  // Local state for input value (for immediate UI update)
   const [inputValue, setInputValue] = useState(searchQuery);
 
   // Create debounced search handler (900ms delay)
@@ -79,6 +78,9 @@ export default function SolutionTemplates() {
     key: cat.key,
     translationKey: cat.translationKey,
   }));
+  const handleTempActivation = (id: string, installationName: string) => {
+    installTemp.mutate({ id, installationName });
+  };
   return (
     <div className="space-y-4">
       {/* Header Section */}
@@ -209,8 +211,12 @@ export default function SolutionTemplates() {
                         className={`flex-1 ${
                           template.isActivated
                             ? 'bg-secondary hover:bg-secondary/90 text-white'
-                            : 'bg-gray-300 hover:bg-gray-400 text-gray-700'
+                            : 'bg-secondary hover:bg-secondary/90 text-white'
                         }`}
+                        disabled={template.isActivated}
+                        onClick={() =>
+                          handleTempActivation(template.id, template.name)
+                        }
                       >
                         {template.isActivated
                           ? t('solutionTemplates.activated')

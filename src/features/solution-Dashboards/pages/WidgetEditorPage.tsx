@@ -8,8 +8,35 @@ import {
   buildDashboardPayload,
 } from '@/components/common/WidgetCanvas/WidgetCanvas';
 import { Card, CardContent } from '@/components/ui/card';
-import { dashboardsApi } from '@/services/api';
+import { dashboardsApi, Dashboard } from '@/services/api';
 import toast from 'react-hot-toast';
+
+interface DashboardPayload {
+  widgets: Array<{
+    type: string;
+    title: string;
+    position: { x: number; y: number; w: number; h: number };
+    dataSource: {
+      deviceIds: string[];
+      telemetryKeys: string[];
+      timeRange: string;
+    };
+    visualization: {
+      chartType: string;
+      colors: string[];
+      showLegend: boolean;
+    };
+    filters: Record<string, unknown>;
+  }>;
+  layout: {
+    cols: number;
+    rowHeight: number;
+  };
+  settings: {
+    autoRefresh: boolean;
+    refreshInterval: number;
+  };
+}
 
 export default function WidgetEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -47,7 +74,7 @@ export default function WidgetEditorPage() {
   const handleSaveLayout = async (
     layout: Layout[],
     widgets: Widget[],
-    payload?: any
+    payload?: DashboardPayload
   ) => {
     // 1. Persist in localStorage
     localStorage.setItem('dashboardLayout', JSON.stringify(layout));
@@ -61,15 +88,24 @@ export default function WidgetEditorPage() {
     console.log('[WidgetEditorPage] Posting to /dashboards:', dashboardPayload);
 
     // 3. POST to /dashboards
+    if (!id) {
+      toast.error('Dashboard ID is missing. Cannot save to /dashboards.');
+      return;
+    }
+
     try {
-      await dashboardsApi.create(dashboardPayload as any);
+      await dashboardsApi.update(id, dashboardPayload as Partial<Dashboard>);
       toast.success('Dashboard saved to /dashboards successfully!');
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.error('Try ');
       // Surface API error but still confirm local save
+      const apiError = err as {
+        response?: { data?: unknown };
+        message?: string;
+      };
       console.error(
         '/dashboards API error:',
-        err?.response?.data || err?.message
+        apiError?.response?.data || apiError?.message
       );
     }
   };

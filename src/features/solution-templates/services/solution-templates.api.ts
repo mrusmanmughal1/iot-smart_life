@@ -23,14 +23,14 @@ export enum TemplateCategory {
 }
 
 export interface TemplateConfiguration {
-  devices?: any[];
-  dashboards?: any[];
-  rules?: any[];
-  assets?: any[];
+  devices?: unknown[];
+  dashboards?: unknown[];
+  rules?: unknown[];
+  assets?: unknown[];
 }
 
 export interface SolutionTemplate {
-  imageUrl: any;
+  imageUrl: string;
   id: string;
   name: string;
   title: string;
@@ -73,6 +73,14 @@ export interface ApiResponse<T> {
   data: T;
 }
 
+export interface TemplateInstallation {
+  id: string;
+  templateId: string;
+  name: string;
+  status: 'in_progress' | 'completed' | 'failed';
+  createdAt: string;
+}
+
 export const solutionTemplatesApi = {
   // Get all templates
   getAll: (params?: TemplateQuery) =>
@@ -102,14 +110,17 @@ export const solutionTemplatesApi = {
   delete: (id: string) => apiClient.delete(`/solution-templates/${id}`),
 
   // Install template
-  install: (id: string, installationName?: string) =>
-    apiClient.post<ApiResponse<any>>(`/solution-templates/${id}/install`, {
-      installationName,
-    }),
+  install: (id: string, installationName: string) =>
+    apiClient.post<ApiResponse<TemplateInstallation>>(
+      `/solution-templates/${id}/install`,
+      {
+        installationName,
+      }
+    ),
 
   // Get installation history
   getInstallations: (id: string) =>
-    apiClient.get<ApiResponse<any[]>>(
+    apiClient.get<ApiResponse<unknown[]>>(
       `/solution-templates/${id}/installations`
     ),
 
@@ -128,11 +139,11 @@ export const solutionTemplatesApi = {
 
   // Get template statistics
   getStatistics: () =>
-    apiClient.get<ApiResponse<any>>('/solution-templates/statistics'),
+    apiClient.get<ApiResponse<unknown>>('/solution-templates/statistics'),
 
   // Rate template
   rate: (id: string, rating: number) =>
-    apiClient.post<ApiResponse<any>>(`/solution-templates/${id}/rate`, {
+    apiClient.post<ApiResponse<unknown>>(`/solution-templates/${id}/rate`, {
       rating,
     }),
 
