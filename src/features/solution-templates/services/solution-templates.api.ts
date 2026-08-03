@@ -30,6 +30,8 @@ export interface TemplateConfiguration {
 }
 
 export interface SolutionTemplate {
+  installs: number;
+  isInstalled: boolean;
   imageUrl: string;
   id: string;
   name: string;
@@ -110,7 +112,7 @@ export const solutionTemplatesApi = {
   delete: (id: string) => apiClient.delete(`/solution-templates/${id}`),
 
   // Install template
-  install: (id: string, installationName: string) =>
+  install: (id: string, installationName?: string) =>
     apiClient.post<ApiResponse<TemplateInstallation>>(
       `/solution-templates/${id}/install`,
       {

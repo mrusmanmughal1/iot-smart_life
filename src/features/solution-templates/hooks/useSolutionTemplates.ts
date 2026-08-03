@@ -14,8 +14,8 @@ interface ApiResponseWrapper<T> {
 
 // Template interface matching component expectations
 export interface Template {
-  isInstalled: any;
-  installs: any;
+  isInstalled: boolean;
+  installs: number;
   imageUrl: string;
   id: string;
   name: string;
@@ -196,7 +196,9 @@ export const useSolutionTemplates = (
         tags: template.tags || [],
         imageUrl,
         image: imageUrl ? [imageUrl] : [],
-        isActivated: template.isInstalled > 0, // Consider activated if installed
+        isInstalled: template.isInstalled,
+        installs: template.installs,
+        isActivated: template.isInstalled,
       };
     });
   }, [templatesResponse]);
