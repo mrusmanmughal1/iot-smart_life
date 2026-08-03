@@ -172,7 +172,7 @@ export default function CreateDashboardPage() {
                   )}
                 </div>
 
-                {/* Groups Field */}
+                {/* Groups Field done  */}
                 <div>
                   <Controller
                     name="visibility"
@@ -182,7 +182,7 @@ export default function CreateDashboardPage() {
                         id="visibility"
                         name="visibility"
                         label="Make This Dashbaord Private ?"
-                        value={field?.value}
+                        checked={field.value}
                         onChange={field.onChange}
                       />
                     )}
