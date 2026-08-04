@@ -59,13 +59,31 @@ export default function WidgetEditorPage() {
 
   const dashboard = dashboardData?.data?.data;
 
-  // Load saved layout from localStorage on mount
+  // Load saved layout/widgets from the fetched dashboard configuration
   useEffect(() => {
-    const storedLayout = localStorage.getItem('dashboardLayout');
-    const storedWidgets = localStorage.getItem('dashboardWidgets');
-    if (storedLayout) setSavedLayout(JSON.parse(storedLayout));
-    if (storedWidgets) setSavedWidgets(JSON.parse(storedWidgets));
-  }, []);
+    if (!dashboard?.configuration?.widgets) return;
+
+    const configWidgets = dashboard.configuration.widgets;
+    const mappedWidgets: Widget[] = configWidgets.map((w) => ({
+      id: w.id,
+      type: w.widgetTypeId,
+      title:
+        (w.config as { title?: string } | undefined)?.title || w.widgetTypeId,
+      position: w.position,
+      config: w.config,
+    }));
+
+    const mappedLayout: Layout[] = configWidgets.map((w) => ({
+      i: w.id,
+      x: w.position.x,
+      y: w.position.y,
+      w: w.position.w,
+      h: w.position.h,
+    }));
+
+    setSavedLayout(mappedLayout);
+    setSavedWidgets(mappedWidgets);
+  }, [dashboard]);
 
   /**
    * Called by WidgetCanvas "Save Layout" button.

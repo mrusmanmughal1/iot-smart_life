@@ -1,4 +1,4 @@
-import { wsClient } from '@/services/websocket/wsClient';
+import wsClient from '@/services/websocket/wsClient';
 import { localStorageService } from '@/services/storage/localStorage';
 import { toast } from '@/stores/useNotificationStore';
 

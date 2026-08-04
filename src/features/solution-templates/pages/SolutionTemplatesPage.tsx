@@ -159,7 +159,7 @@ export default function SolutionTemplates() {
               {paginatedTemplates.map((template) => (
                 <Card
                   key={template.id}
-                  className="hover:shadow-lg transition-shadow"
+                  className="hover:shadow-lg  transition-shadow flex flex-col justify-between"
                 >
                   <CardHeader className="pb-3">
                     {/* Thumbnail Images */}
@@ -184,13 +184,13 @@ export default function SolutionTemplates() {
                     </CardDescription>
                   </CardHeader>
 
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 flex flex-col justify-between">
                     {/* Tags */}
                     <div className="flex flex-wrap gap-2">
                       {template.tags.map((tag) => (
                         <Badge
                           key={tag}
-                          className="bg-blue-100 text-blue-700 border-0 text-xs rounded-md px-2 py-1"
+                          className="bg-secondary text-white capitalize border-0 text-[10px] rounded-md px-2 py-1"
                         >
                           {tag}
                         </Badge>

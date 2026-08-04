@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { solutionTemplatesApi } from '../services/solution-templates.api';
+import toast from 'react-hot-toast';
 
 export const useTempInstallation = () => {
   const queryClient = useQueryClient();
@@ -13,7 +14,13 @@ export const useTempInstallation = () => {
       installationName?: string;
     }) => solutionTemplatesApi.install(id, installationName),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['solution-templates'] });
+      queryClient.invalidateQueries({
+        queryKey: ['solution-templates'],
+      });
+      toast.success('Solution template installed successfully');
+    },
+    onError: () => {
+      toast.error('Failed to install solution template');
     },
   });
 };

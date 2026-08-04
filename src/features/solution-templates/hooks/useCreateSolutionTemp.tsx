@@ -61,6 +61,7 @@ export function useCreateSolutionTemplate(
     onSuccess: () => {
       // refresh any cached template lists/previews so the new template shows up
       queryClient.invalidateQueries({ queryKey: templatePreviewKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['solution-templates'] });
       toast.success('Tempate Created Succesfully');
     },
     ...options,
