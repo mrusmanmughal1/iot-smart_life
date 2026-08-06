@@ -89,7 +89,7 @@ export default function SolutionTemplates() {
       </div>
       <div className="border border-secondary dark:border-gray-700 p-4 rounded-2xl">
         {/* Search Bar */}
-        <div className="flex w flex-col md:flex-row justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B] dark:bg-gray-950">
+        {/* <div className="flex w flex-col md:flex-row justify-between items-center shadow-sm p-4 rounded-lg bg-[#D9D9D92B] dark:bg-gray-950">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black" />
             <Input
@@ -99,18 +99,11 @@ export default function SolutionTemplates() {
               className="pl-10 w-full md:w-96 rounded-md"
             />
           </div>
-          <Button
-            className="bg-secondary hover:bg-secondary/90 text-white dark:bg-gray-800 dark:text-white"
-            onClick={() => navigate('/solution-templates/create')}
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t('solutionTemplates.createNewTemplate')}
-          </Button>
-        </div>
+        </div> */}
 
         {/* Popular Domain Section */}
         <div className="  rounded-lg md:p-4  ">
-          <h2 className="text-sm font-semibold dark:text-white text-gray-600 mb-4">
+          <h2 className="text-sm font-semibold dark:text-white bg-secondary px-4 py-2 w-fit rounded-full text-white   mb-4">
             {t('solutionTemplates.popularDomain')}
           </h2>
           <div className="relative">
@@ -123,7 +116,7 @@ export default function SolutionTemplates() {
                     className={`  flex-shrink-0 p-4  rounded-xl transition-all flex flex-col items-center dark:bg-gray-800 dark:text-white gap-3 ${
                       selectedCategory === category.key
                         ? 'bg-primary text-white shadow-md hover:bg-gray-400 border border-gray-200'
-                        : 'bg-white text-gray-700 '
+                        : 'bg-white text-gray-700 shadow '
                     }`}
                   >
                     {/* <category.icon className="h-10 w-10" /> */}
@@ -210,9 +203,9 @@ export default function SolutionTemplates() {
                       <Button
                         className={`flex-1 ${
                           template.isActivated
-                            ? 'bg-secondary hover:bg-secondary/90 text-white'
+                            ? 'bg-secondary hover:bg-secondary/90 text-white  '
                             : 'bg-secondary hover:bg-secondary/90 text-white'
-                        }`}
+                        } disabled:cursor-not-allowed`}
                         disabled={template.isActivated}
                         onClick={() =>
                           handleTempActivation(template.id, template.name)

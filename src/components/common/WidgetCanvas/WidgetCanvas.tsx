@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import GridLayout, { Layout } from 'react-grid-layout';
 import { Plus, Trash2, Settings, Maximize2, Layers, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,14 +6,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { WidgetSettingsModal } from './WidgetSettingsModal';
 import { WidgetRenderer } from './WidgetRenderer';
 import { WidgetLibraryModal } from './WidgetLibraryModal';
-import { dashboardsApi } from '@/services/api/dashboards.api';
-import toast from 'react-hot-toast';
 import type {
   TelemetryWidgetConfig,
   DeviceTelemetry,
   MetricType,
 } from './TelemetryWidget';
 import type { WidgetType } from '@/services/api/widgets.api';
+import { useDashboardStore } from '@/stores/useDashboardStore';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
@@ -32,6 +31,7 @@ export interface WidgetVisualization {
 
 export interface Widget {
   id: string;
+  widgetTypeId?: string;
   type: string;
   title: string;
   category?: string;
@@ -61,6 +61,7 @@ export function buildDashboardPayload(widgets: Widget[], layout: Layout[]) {
     };
 
     return {
+      id: widget.id,
       type: widget.type,
       title: widget.title,
       position: pos,
@@ -68,6 +69,7 @@ export function buildDashboardPayload(widgets: Widget[], layout: Layout[]) {
         deviceIds:
           widget.dataSource?.deviceIds ||
           (widget.config?.deviceId ? [widget.config.deviceId] : []),
+        deviceName: widget.dataSource?.deviceName,
         telemetryKeys:
           widget.dataSource?.telemetryKeys ||
           widget.config?.enabledMetrics ||
@@ -96,18 +98,113 @@ export function buildDashboardPayload(widgets: Widget[], layout: Layout[]) {
   };
 }
 
+export function getNextWidgetPosition(layout: Layout[], w = 4, h = 4) {
+  if (!layout || layout.length === 0) {
+    return { x: 0, y: 0, w, h };
+  }
+
+  let maxY = 0;
+  for (const item of layout) {
+    const itemY = typeof item.y === 'number' && isFinite(item.y) ? item.y : 0;
+    const itemH = typeof item.h === 'number' && isFinite(item.h) ? item.h : 4;
+    const bottom = itemY + itemH;
+    if (bottom > maxY) {
+      maxY = bottom;
+    }
+  }
+
+  const lastRowItems = layout.filter((item) => {
+    const itemY = typeof item.y === 'number' && isFinite(item.y) ? item.y : 0;
+    const itemH = typeof item.h === 'number' && isFinite(item.h) ? item.h : 4;
+    return itemY + itemH === maxY;
+  });
+
+  let maxXInLastRow = 0;
+  for (const item of lastRowItems) {
+    const itemX = typeof item.x === 'number' && isFinite(item.x) ? item.x : 0;
+    const itemW = typeof item.w === 'number' && isFinite(item.w) ? item.w : 4;
+    const right = itemX + itemW;
+    if (right > maxXInLastRow) {
+      maxXInLastRow = right;
+    }
+  }
+
+  if (maxXInLastRow + w <= 12) {
+    const lastRowY =
+      lastRowItems.length > 0
+        ? typeof lastRowItems[0].y === 'number' && isFinite(lastRowItems[0].y)
+          ? lastRowItems[0].y
+          : 0
+        : 0;
+    return { x: maxXInLastRow, y: lastRowY, w, h };
+  }
+
+  return { x: 0, y: maxY, w, h };
+}
+
+export function buildSingleWidgetPayload(widget: Widget, layoutItem?: Layout) {
+  const posX =
+    typeof layoutItem?.x === 'number' && isFinite(layoutItem.x)
+      ? layoutItem.x
+      : (widget.position?.x ?? 0);
+  const posY =
+    typeof layoutItem?.y === 'number' && isFinite(layoutItem.y)
+      ? layoutItem.y
+      : (widget.position?.y ?? 0);
+  const posW =
+    typeof layoutItem?.w === 'number' && isFinite(layoutItem.w)
+      ? layoutItem.w
+      : (widget.position?.w ?? 4);
+  const posH =
+    typeof layoutItem?.h === 'number' && isFinite(layoutItem.h)
+      ? layoutItem.h
+      : (widget.position?.h ?? 4);
+
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  let targetWidgetTypeId = widget.widgetTypeId;
+
+  if (!targetWidgetTypeId || !uuidRegex.test(targetWidgetTypeId)) {
+    if (widget.descriptor?.id && uuidRegex.test(widget.descriptor.id)) {
+      targetWidgetTypeId = widget.descriptor.id;
+    } else if (widget.type && uuidRegex.test(widget.type)) {
+      targetWidgetTypeId = widget.type;
+    } else {
+      targetWidgetTypeId = '00000000-0000-0000-0000-000000000000';
+    }
+  }
+
+  return {
+    widgetTypeId: targetWidgetTypeId,
+    title: widget.title || 'Widget',
+    row: posY,
+    col: posX,
+    width: posW,
+    height: posH,
+    datasource: {
+      deviceId:
+        widget.dataSource?.deviceIds?.[0] ||
+        (widget.config?.deviceId ? widget.config.deviceId : ''),
+      entityType: 'DEVICE',
+      telemetryKeys:
+        widget.dataSource?.telemetryKeys || widget.config?.enabledMetrics || [],
+      timeWindow: widget.dataSource?.timeRange || '1h',
+      aggregation: 'AVG',
+    },
+    config: {
+      minValue: (widget.config as any)?.minValue ?? 0,
+      maxValue: (widget.config as any)?.maxValue ?? 50,
+      unit: (widget.config as any)?.unit || '°C',
+      ...(widget.config || {}),
+    },
+  };
+}
+
 interface WidgetCanvasProps {
   onSaveLayout?: (layout: Layout[], widgets: Widget[], payload?: any) => void;
   initialLayout?: Layout[];
   initialWidgets?: Widget[];
   readOnly?: boolean;
-  dashboardMetadata?: {
-    name?: string;
-    description?: string;
-    customerId?: string;
-    visibility?: string;
-    tags?: string[];
-  };
 }
 
 export function WidgetCanvas({
@@ -116,31 +213,53 @@ export function WidgetCanvas({
   initialWidgets = [],
   readOnly = false,
 }: WidgetCanvasProps) {
-  const [layout, setLayout] = useState<Layout[]>(initialLayout);
-  const [widgets, setWidgets] = useState<Widget[]>(initialWidgets);
+  const store = useDashboardStore();
+
+  const widgets = readOnly ? initialWidgets : store.widgets;
+  const layout = readOnly ? initialLayout : store.layout;
+  const isSaving = store.isSaving;
+
   const [showWidgetLibraryModal, setShowWidgetLibraryModal] = useState(false);
   const [selectedSettingWidget, setSelectedSettingWidget] =
     useState<Widget | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+
+  const layoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevLayoutRef = useRef<Layout[]>([]);
 
   const handleLayoutChange = useCallback(
     (newLayout: Layout[]) => {
-      setLayout(newLayout);
-      if (onSaveLayout && !readOnly) {
-        const payload = buildDashboardPayload(widgets, newLayout);
-        onSaveLayout(newLayout, widgets, payload);
+      if (!readOnly) {
+        store.setLayout(newLayout);
       }
     },
-    [widgets, onSaveLayout, readOnly]
+    [readOnly, store]
+  );
+
+  const handleDragOrResizeStop = useCallback(
+    (currentLayout: Layout[]) => {
+      if (!readOnly && store.dashboardId) {
+        store.setLayout(currentLayout);
+
+        // Skip API call if any widget has a non-UUID ID (e.g., newly added unsaved widget)
+        const uuidRegex =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const allSaved = currentLayout.every((item) => uuidRegex.test(item.i));
+        if (!allSaved) {
+          console.log('[Layout] Skipping API call — unsaved widgets detected');
+          return;
+        }
+
+        store.updateLayoutToApi(store.dashboardId, currentLayout);
+      }
+    },
+    [readOnly, store]
   );
 
   // Add Widget from API Widget Library Selection
   const handleAddWidgetFromType = useCallback(
     (widgetType: WidgetType) => {
-      console.log(widgetType);
       const alias =
         widgetType.descriptor?.alias || widgetType.category || 'telemetry';
-      // Smartly infer default chartType based on widgetType category, descriptor alias, and name
       const catUpper = String(widgetType.category || '').toUpperCase();
       const nameOrAlias = String(
         widgetType.descriptor?.alias || widgetType.name || ''
@@ -241,6 +360,7 @@ export function WidgetCanvas({
 
       const newWidget: Widget = {
         id: `widget-${Date.now()}`,
+        widgetTypeId: widgetType.id,
         type: alias,
         title: widgetType.name,
         category: widgetType.category as string,
@@ -271,73 +391,69 @@ export function WidgetCanvas({
       const w = widgetType.descriptor?.sizeX || 4;
       const h = widgetType.descriptor?.sizeY || 4;
 
+      const pos = getNextWidgetPosition(layout, w, h);
+      newWidget.position = pos;
+
       const newLayoutItem: Layout = {
         i: newWidget.id,
-        x: (layout.length * 4) % 12,
-        y: Infinity, // puts it at the bottom of the grid
-        w,
-        h,
+        x: pos.x,
+        y: pos.y,
+        w: pos.w,
+        h: pos.h,
         minW: widgetType.descriptor?.minSizeX || 2,
         minH: widgetType.descriptor?.minSizeY || 2,
       };
 
-      setWidgets((prev) => [...prev, newWidget]);
-      setLayout((prev) => [...prev, newLayoutItem]);
+      if (!readOnly) {
+        store.addWidget(newWidget, newLayoutItem);
+      }
+
       setShowWidgetLibraryModal(false);
-      // Automatically open the settings modal so the user can select
-      // the device and telemetry keys right after adding the widget
       setSelectedSettingWidget(newWidget);
     },
-    [layout.length]
+    [layout.length, readOnly, store]
   );
 
-  const handleRemoveWidget = useCallback((widgetId: string) => {
-    setWidgets((prev) => prev.filter((w) => w.id !== widgetId));
-    setLayout((prev) => prev.filter((l) => l.i !== widgetId));
-  }, []);
+  const handleRemoveWidget = useCallback(
+    async (widgetId: string) => {
+      if (!readOnly) {
+        if (store.dashboardId) {
+          await store.deleteWidgetFromApi(store.dashboardId, widgetId);
+        } else {
+          store.removeWidget(widgetId);
+        }
+      }
+    },
+    [readOnly, store]
+  );
 
   const handleSave = useCallback(async () => {
-    setIsSaving(true);
-    const payload = buildDashboardPayload(widgets, layout);
-
     if (onSaveLayout) {
+      const payload = buildDashboardPayload(widgets, layout);
       onSaveLayout(layout, widgets, payload);
-    }
-
-    try {
-      await dashboardsApi.create(payload as any);
-      toast.success('Dashboard saved to /dashboards API successfully!');
-    } catch (err: any) {
-      console.warn('Backend /dashboards API response:', err?.message);
-    } finally {
-      setIsSaving(false);
     }
   }, [layout, widgets, onSaveLayout]);
 
   const handleSaveWidgetSettings = useCallback(
-    (
+    async (
       widgetId: string,
       dataSource: WidgetDataSource,
       visualization: WidgetVisualization
     ) => {
-      setWidgets((prev) =>
-        prev.map((w) =>
-          w.id === widgetId
-            ? {
-                ...w,
-                dataSource,
-                visualization,
-                config: {
-                  ...w.config,
-                  deviceId: dataSource.deviceIds[0],
-                  enabledMetrics: dataSource.telemetryKeys as any,
-                },
-              }
-            : w
-        )
-      );
+      if (!readOnly) {
+        if (store.dashboardId) {
+          await store.saveWidgetToApi(
+            store.dashboardId,
+            widgetId,
+            dataSource,
+            visualization
+          );
+        } else {
+          store.updateWidgetSettings(widgetId, dataSource, visualization);
+        }
+      }
     },
-    []
+    [readOnly, store]
   );
 
   return (
@@ -352,14 +468,14 @@ export function WidgetCanvas({
             <Layers className="h-4 w-4 mr-2 text-primary" />
             Widget Library
           </Button>
-          <Button
+          {/* <Button
             onClick={handleSave}
             disabled={isSaving}
             className="bg-primary text-white hover:bg-primary/90 shadow-md font-medium flex items-center gap-1.5"
           >
             <Save className="h-4 w-4" />
             {isSaving ? 'Saving...' : 'Save Layout'}
-          </Button>
+          </Button> */}
         </div>
       )}
       {/* Widget Library Modal */}
@@ -376,6 +492,7 @@ export function WidgetCanvas({
         widget={selectedSettingWidget}
         onSave={handleSaveWidgetSettings}
       />
+
       {/* Canvas */}
       <div className="h-full overflow-auto bg-gray-100 dark:bg-gray-800  ">
         {widgets.length === 0 ? (
@@ -401,6 +518,8 @@ export function WidgetCanvas({
             className="layout"
             layout={layout}
             onLayoutChange={handleLayoutChange}
+            onDragStop={handleDragOrResizeStop}
+            onResizeStop={handleDragOrResizeStop}
             cols={12}
             rowHeight={30}
             width={1200}
@@ -465,13 +584,24 @@ export function WidgetCanvas({
                     <WidgetRenderer
                       widget={widget}
                       onDeviceChange={(deviceId) => {
-                        setWidgets((prev) =>
-                          prev.map((w) =>
-                            w.id === widget.id
-                              ? { ...w, config: { ...w.config, deviceId } }
-                              : w
-                          )
-                        );
+                        if (!readOnly) {
+                          store.updateWidgetSettings(
+                            widget.id,
+                            {
+                              ...(widget.dataSource || {
+                                deviceIds: [deviceId],
+                                telemetryKeys: [],
+                                timeRange: '24h',
+                              }),
+                              deviceIds: [deviceId],
+                            },
+                            widget.visualization || {
+                              chartType: 'line',
+                              colors: ['#3b82f6'],
+                              showLegend: true,
+                            }
+                          );
+                        }
                       }}
                     />
                   </CardContent>

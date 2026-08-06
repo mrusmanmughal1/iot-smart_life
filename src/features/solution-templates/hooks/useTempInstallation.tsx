@@ -17,6 +17,9 @@ export const useTempInstallation = () => {
       queryClient.invalidateQueries({
         queryKey: ['solution-templates'],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['dashboards'],
+      });
       toast.success('Solution template installed successfully');
     },
     onError: () => {

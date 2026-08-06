@@ -44,7 +44,7 @@ interface WidgetSettingsModalProps {
     widgetId: string,
     dataSource: WidgetDataSource,
     visualization: WidgetVisualization
-  ) => void;
+  ) => Promise<void> | void;
 }
 
 const TIME_RANGES = [
@@ -97,6 +97,7 @@ export function WidgetSettingsModal({
   );
   const [timeRange, setTimeRange] = useState('24h');
   const [selectedColor, setSelectedColor] = useState('#3b82f6');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Chart type is determined by widget library choice
   const chartType =
@@ -126,7 +127,7 @@ export function WidgetSettingsModal({
     queryKey: ['devices-list-modal', deviceSearch],
     queryFn: async () => {
       const res = await devicesApi.getAll({
-        limit: 50,
+        limit: 100,
         search: deviceSearch || undefined,
       });
       const items: Device[] =
@@ -173,7 +174,15 @@ export function WidgetSettingsModal({
   // ── Handlers ──────────────────────────────────────────────────────────
   // Single device selection handler
   const handleSelectDevice = (deviceId: string) => {
-    setSelectedDeviceId((prev) => (prev === deviceId ? null : deviceId));
+    setSelectedDeviceId((prev) => {
+      const nextDeviceId = prev === deviceId ? null : deviceId;
+      // Clear selected telemetry keys whenever the device selection changes
+      // (telemetry keys are device-specific and must be re-selected per device)
+      if (prev !== nextDeviceId) {
+        setSelectedTelemetryKeys([]);
+      }
+      return nextDeviceId;
+    });
   };
 
   // Multiple telemetry keys selection handler
@@ -185,7 +194,7 @@ export function WidgetSettingsModal({
 
   const selectedDevice = devices.find((d) => d.id === selectedDeviceId);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const dataSource: WidgetDataSource = {
       deviceIds: selectedDeviceId ? [selectedDeviceId] : [],
       deviceName: selectedDevice?.name || selectedDeviceId || undefined,
@@ -197,8 +206,16 @@ export function WidgetSettingsModal({
       colors: [selectedColor],
       showLegend: widget.visualization?.showLegend ?? true,
     };
-    onSave(widget.id, dataSource, visualization);
-    onOpenChange(false);
+
+    setIsSubmitting(true);
+    try {
+      await onSave(widget.id, dataSource, visualization);
+      onOpenChange(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -494,9 +511,16 @@ export function WidgetSettingsModal({
             <Button
               onClick={handleSave}
               className="bg-primary text-white min-w-[130px]"
-              disabled={!selectedDeviceId}
+              disabled={!selectedDeviceId || isSubmitting}
             >
-              Apply Settings
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Apply Settings'
+              )}
             </Button>
           </div>
         </DialogFooter>

@@ -1,47 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Layout } from 'react-grid-layout';
 import {
   WidgetCanvas,
   Widget,
-  buildDashboardPayload,
 } from '@/components/common/WidgetCanvas/WidgetCanvas';
 import { Card, CardContent } from '@/components/ui/card';
-import { dashboardsApi, Dashboard } from '@/services/api';
+import { dashboardsApi } from '@/services/api';
+import { useDashboardStore } from '@/stores/useDashboardStore';
 import toast from 'react-hot-toast';
-
-interface DashboardPayload {
-  widgets: Array<{
-    type: string;
-    title: string;
-    position: { x: number; y: number; w: number; h: number };
-    dataSource: {
-      deviceIds: string[];
-      telemetryKeys: string[];
-      timeRange: string;
-    };
-    visualization: {
-      chartType: string;
-      colors: string[];
-      showLegend: boolean;
-    };
-    filters: Record<string, unknown>;
-  }>;
-  layout: {
-    cols: number;
-    rowHeight: number;
-  };
-  settings: {
-    autoRefresh: boolean;
-    refreshInterval: number;
-  };
-}
 
 export default function WidgetEditorPage() {
   const { id } = useParams<{ id: string }>();
-  const [savedLayout, setSavedLayout] = useState<Layout[]>([]);
-  const [savedWidgets, setSavedWidgets] = useState<Widget[]>([]);
+  const queryClient = useQueryClient();
+
+  const {
+    widgets,
+    layout,
+    initFromDashboard,
+    saveDashboard,
+    setWidgets,
+    setLayout,
+  } = useDashboardStore();
 
   // Fetch dashboard data if editing an existing dashboard
   const {
@@ -57,74 +38,36 @@ export default function WidgetEditorPage() {
     enabled: !!id,
   });
 
-  const dashboard = dashboardData?.data?.data;
+  const dashboard = (dashboardData?.data as any)?.data || dashboardData?.data;
 
-  // Load saved layout/widgets from the fetched dashboard configuration
+  const dashboardId = useDashboardStore((s) => s.dashboardId);
+
+  // Load saved layout/widgets from the fetched dashboard configuration into store ONLY once when dashboard ID changes
   useEffect(() => {
-    if (!dashboard?.configuration?.widgets) return;
-
-    const configWidgets = dashboard.configuration.widgets;
-    const mappedWidgets: Widget[] = configWidgets.map((w) => ({
-      id: w.id,
-      type: w.widgetTypeId,
-      title:
-        (w.config as { title?: string } | undefined)?.title || w.widgetTypeId,
-      position: w.position,
-      config: w.config,
-    }));
-
-    const mappedLayout: Layout[] = configWidgets.map((w) => ({
-      i: w.id,
-      x: w.position.x,
-      y: w.position.y,
-      w: w.position.w,
-      h: w.position.h,
-    }));
-
-    setSavedLayout(mappedLayout);
-    setSavedWidgets(mappedWidgets);
-  }, [dashboard]);
+    if (dashboard && dashboard.id && dashboardId !== dashboard.id) {
+      initFromDashboard(dashboard);
+    }
+  }, [dashboard, dashboardId, initFromDashboard]);
 
   /**
    * Called by WidgetCanvas "Save Layout" button.
-   * Saves locally and POSTs to /dashboards with the full expected payload.
+   * Saves widgets and layout into Zustand store and sends API update request.
    */
   const handleSaveLayout = async (
-    layout: Layout[],
-    widgets: Widget[],
-    payload?: DashboardPayload
+    newLayout: Layout[],
+    newWidgets: Widget[]
   ) => {
-    // 1. Persist in localStorage
-    localStorage.setItem('dashboardLayout', JSON.stringify(layout));
-    localStorage.setItem('dashboardWidgets', JSON.stringify(widgets));
-    setSavedLayout(layout);
-    setSavedWidgets(widgets);
-
-    // 2. Build full dashboard payload (format expected by /dashboards)
-    const dashboardPayload = payload || buildDashboardPayload(widgets, layout);
-
-    console.log('[WidgetEditorPage] Posting to /dashboards:', dashboardPayload);
-
-    // 3. POST to /dashboards
     if (!id) {
-      toast.error('Dashboard ID is missing. Cannot save to /dashboards.');
+      toast.error('Dashboard ID is missing. Cannot save dashboard.');
       return;
     }
 
-    try {
-      await dashboardsApi.update(id, dashboardPayload as Partial<Dashboard>);
-      toast.success('Dashboard saved to /dashboards successfully!');
-    } catch (err: unknown) {
-      toast.error('Try ');
-      // Surface API error but still confirm local save
-      const apiError = err as {
-        response?: { data?: unknown };
-        message?: string;
-      };
-      console.error(
-        '/dashboards API error:',
-        apiError?.response?.data || apiError?.message
-      );
+    setWidgets(newWidgets);
+    setLayout(newLayout);
+
+    const success = await saveDashboard(id);
+    if (success) {
+      queryClient.invalidateQueries({ queryKey: ['dashboard', id] });
     }
   };
 
@@ -172,8 +115,8 @@ export default function WidgetEditorPage() {
         >
           <WidgetCanvas
             onSaveLayout={handleSaveLayout}
-            initialLayout={savedLayout}
-            initialWidgets={savedWidgets}
+            initialLayout={layout}
+            initialWidgets={widgets}
           />
         </CardContent>
       </Card>
@@ -200,8 +143,9 @@ export default function WidgetEditorPage() {
             </li>
             <li>Drag and resize widgets to arrange your dashboard layout</li>
             <li>
-              Click <strong>"Save Layout"</strong> to POST the full dashboard
-              payload to the <code className="font-mono">/dashboards</code> API
+              Click <strong>"Save Layout"</strong> to update the dashboard
+              payload via the <code className="font-mono">/dashboards</code> API
+              and update application state
             </li>
           </ul>
         </CardContent>

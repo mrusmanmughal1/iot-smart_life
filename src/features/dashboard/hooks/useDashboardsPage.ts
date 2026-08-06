@@ -192,13 +192,9 @@ export const useDashboardsPage = (options: UseDashboardsPageOptions = {}) => {
           break;
 
         case 'delete':
-          if (
-            window.confirm('Are you sure you want to delete this dashboard?')
-          ) {
-            await dashboardsApi.delete(id);
-            queryClient.invalidateQueries({ queryKey: ['dashboards'] });
-            toast.success('Dashboard deleted successfully');
-          }
+          await dashboardsApi.delete(id);
+          queryClient.invalidateQueries({ queryKey: ['dashboards'] });
+          toast.success('Dashboard deleted successfully');
           break;
 
         case 'download': {

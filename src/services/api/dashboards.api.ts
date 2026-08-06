@@ -3,10 +3,28 @@ import apiClient from '@/lib/axios.ts';
 export interface Dashboard {
   name: string;
   id: string;
-  title: string;
+  title?: string;
   description?: string;
   tenantId?: string;
   customerId?: string;
+  userId?: string;
+  visibility?: string;
+  widgets?: any;
+  layout?: {
+    cols: number;
+    rowHeight: number;
+  };
+  settings?: {
+    autoRefresh: boolean;
+    refreshInterval: number;
+  };
+  filters?: Record<string, any> | null;
+  isDefault?: boolean;
+  isFavorite?: boolean;
+  sharedWith?: any;
+  viewCount?: number;
+  lastViewedAt?: string;
+  tags?: string[] | null;
   configuration?: {
     widgets?: Array<{
       id: string;
@@ -104,6 +122,26 @@ export const dashboardsApi = {
   update: (id: string | number, data: Partial<Dashboard>) =>
     apiClient.patch<ApiResponse<Dashboard>>(`/dashboards/${id}`, data),
 
+  // Add widget to dashboard
+  addWidget: (dashboardId: string | number, data: any) =>
+    apiClient.post<ApiResponse<any>>(
+      `/dashboards/${dashboardId}/widgets`,
+      data
+    ),
+
+  // delete widget
+
+  deleteWidget: (dashboardId: string | number, widgetId: string) =>
+    apiClient.delete<ApiResponse<any>>(
+      `/dashboards/${dashboardId}/widgets/${widgetId}`
+    ),
+
+  // Update dashboard layout (widget positions)
+  updateLayout: (dashboardId: string | number, layoutData: any) =>
+    apiClient.patch<ApiResponse<any>>(
+      `/dashboards/${dashboardId}/layout`,
+      layoutData
+    ),
   // Delete dashboard
   delete: (id: string) => apiClient.delete(`/dashboards/${id}`),
 
