@@ -13,11 +13,28 @@ export interface DeviceTemplate {
   count: number;
   protocol: string;
   telemetryKeys: string[];
+  icon?: string;
+}
+
+export interface WidgetPreviewItem {
+  type: string;
+  title: string;
+  width: number;
+  height: number;
+  row: number;
+  col: number;
+  icon?: string;
+  description?: string;
 }
 
 export interface DashboardTemplate {
   name: string;
   widgetCount: number;
+  widgets?: WidgetPreviewItem[];
+  layout?: {
+    totalColumns: number;
+    estimatedRows: number;
+  };
 }
 
 export interface RuleChainTemplate {
@@ -28,8 +45,10 @@ export interface RuleChainTemplate {
 
 export interface AlarmTemplate {
   name: string;
-  severity: 'critical' | 'warning' | 'info' | string;
+  severity: 'critical' | 'warning' | 'error' | 'info' | string;
   condition: string;
+  deviceSelector?: string;
+  icon?: string;
 }
 
 export interface TemplateSummary {

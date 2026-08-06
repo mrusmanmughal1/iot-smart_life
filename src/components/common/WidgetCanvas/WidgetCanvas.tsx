@@ -47,7 +47,7 @@ export interface Widget {
   visualization?: WidgetVisualization;
   filters?: Record<string, any>;
   content?: DeviceTelemetry[];
-  config?: TelemetryWidgetConfig;
+  config?: any;
 }
 
 export function buildDashboardPayload(widgets: Widget[], layout: Layout[]) {

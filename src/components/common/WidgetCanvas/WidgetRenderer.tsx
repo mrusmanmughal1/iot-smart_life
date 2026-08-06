@@ -265,26 +265,25 @@ function getDynamicPieData(
     selectedKeys && selectedKeys.length > 0
       ? selectedKeys
       : Array.from(flatMap.keys()).length > 0
-      ? Array.from(flatMap.keys())
-      : ['co2', 'voc'];
+        ? Array.from(flatMap.keys())
+        : ['co2', 'voc'];
 
   const items: { name: string; value: number; color: string }[] = [];
 
   let idx = 0;
   for (const key of defaultKeys) {
     const val = flatMap.get(key);
-    const fallbackVal =
-      key.toLowerCase().includes('co2')
-        ? 450
-        : key.toLowerCase().includes('voc')
+    const fallbackVal = key.toLowerCase().includes('co2')
+      ? 450
+      : key.toLowerCase().includes('voc')
         ? 120
         : key.toLowerCase().includes('temp')
-        ? 24.5
-        : key.toLowerCase().includes('hum')
-        ? 55
-        : key.toLowerCase().includes('batt')
-        ? 85
-        : (idx + 1) * 30;
+          ? 24.5
+          : key.toLowerCase().includes('hum')
+            ? 55
+            : key.toLowerCase().includes('batt')
+              ? 85
+              : (idx + 1) * 30;
 
     const finalVal = val !== undefined ? val : fallbackVal;
 
