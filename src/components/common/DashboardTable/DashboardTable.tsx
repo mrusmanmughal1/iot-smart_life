@@ -134,6 +134,10 @@ export function DashboardTable({
     } else if (onAction) {
       onAction(action, id);
     }
+    if (action === 'view') {
+      const path = getNavigationPath?.(id) || '';
+      navigate(path);
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -159,25 +163,6 @@ export function DashboardTable({
     }
   };
 
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setSelectedIds(data.map((item) => item.id));
-    } else {
-      setSelectedIds([]);
-    }
-  };
-
-  const handleSelectOne = (
-    id: string,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (e.target.checked) {
-      setSelectedIds([...selectedIds, id]);
-    } else {
-      setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
-    }
-  };
-
   const handleBulkDelete = () => {
     if (onBulkDelete && selectedIds.length > 0) {
       onBulkDelete(selectedIds);
@@ -185,7 +170,6 @@ export function DashboardTable({
     }
   };
 
-  const isAllSelected = data.length > 0 && selectedIds.length === data.length;
   const isTitleClickable = !!(onTitleClick || getNavigationPath);
   return (
     <div className="space-y-4">
@@ -312,7 +296,7 @@ export function DashboardTable({
                   )}
                   {columns.actions && (
                     <td className="py-4 px-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center ">
                         <button
                           onClick={() => handleAction('view', item.id)}
                           className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors dark:text-white dark:hover:text-secondary dark:hover:bg-gray-800"
@@ -328,14 +312,6 @@ export function DashboardTable({
                           aria-label="Delete"
                         >
                           <Trash2 className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleAction('download', item.id)}
-                          className="p-1.5 text-gray-500 hover:text-secondary hover:bg-gray-100 rounded transition-colors dark:text-white dark:hover:text-secondary dark:hover:bg-gray-800"
-                          title="Download"
-                          aria-label="Download"
-                        >
-                          <Download className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
