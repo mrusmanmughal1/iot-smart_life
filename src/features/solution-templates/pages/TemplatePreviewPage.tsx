@@ -11,21 +11,21 @@ import {
 } from '@/components/common/WidgetCanvas/WidgetCanvas';
 import { useTemplatePreview } from '../hooks/useSolutionTemplatePrevies';
 import WarningMessage from '@/components/ui/WarningMessage';
+import { useTempInstallation } from '../hooks/useTempInstallation';
 
 export default function TemplatePreviewPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id: templateId } = useParams<{ id: string }>();
-
+  const installTemp = useTempInstallation();
   const { data, isLoading, isError } = useTemplatePreview(templateId);
 
   const handleCancel = () => {
     navigate('/solution-templates');
   };
 
-  const handleActivate = () => {
-    // Navigate or trigger activation
-    navigate('/solution-templates');
+  const handleActivate = (id: string, installationName: string) => {
+    installTemp.mutate({ id, installationName });
   };
 
   if (isLoading) {
@@ -206,7 +206,7 @@ export default function TemplatePreviewPage() {
         <Button
           type="button"
           disabled={!canInstall || alreadyInstalled}
-          onClick={handleActivate}
+          onClick={() => handleActivate(templateId!, templateName)}
           className="bg-gray-900 hover:bg-gray-800 text-white rounded-md px-6 dark:bg-primary dark:hover:bg-primary/90"
         >
           {alreadyInstalled
