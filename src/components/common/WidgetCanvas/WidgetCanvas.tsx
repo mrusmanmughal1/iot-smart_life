@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import GridLayout, { Layout } from 'react-grid-layout';
-import { Plus, Trash2, Settings, Maximize2, Layers, Save } from 'lucide-react';
+import { Plus, Trash2, Settings, Maximize2, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { WidgetSettingsModal } from './WidgetSettingsModal';
@@ -26,8 +26,11 @@ import {
 } from './widgetCanvasUtils';
 
 export type { WidgetDataSource, WidgetVisualization, Widget };
-export { buildDashboardPayload, getNextWidgetPosition, buildSingleWidgetPayload };
-
+export {
+  buildDashboardPayload,
+  getNextWidgetPosition,
+  buildSingleWidgetPayload,
+};
 
 interface WidgetCanvasProps {
   onSaveLayout?: (layout: Layout[], widgets: Widget[], payload?: any) => void;
