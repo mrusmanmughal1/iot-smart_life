@@ -201,6 +201,7 @@ export default function TemplatePreviewPage() {
           onClick={handleCancel}
           className="px-6 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-700 dark:bg-gray-800 dark:text-gray-300"
         >
+          {/* working now */}
           {t('solutionTemplates.templatePreview.cancel', 'Cancel')}
         </Button>
         <Button
