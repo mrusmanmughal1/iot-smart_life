@@ -129,8 +129,14 @@ export const dashboardsApi = {
       data
     ),
 
-  // delete widget
+  // Update widget in dashboard
+  updateWidget: (dashboardId: string | number, widgetId: string, data: any) =>
+    apiClient.patch<ApiResponse<any>>(
+      `/dashboards/${dashboardId}/widgets/${widgetId}`,
+      data
+    ),
 
+  // delete widget
   deleteWidget: (dashboardId: string | number, widgetId: string) =>
     apiClient.delete<ApiResponse<any>>(
       `/dashboards/${dashboardId}/widgets/${widgetId}`

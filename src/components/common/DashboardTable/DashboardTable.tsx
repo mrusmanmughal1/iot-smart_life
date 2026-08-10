@@ -212,13 +212,6 @@ export function DashboardTable({
         <table className="w-full">
           <thead className="bg-primary dark:bg-gray-800 dark:text-white">
             <tr className="border-b border-gray-200 dark:border-gray-700">
-              <th className="text-left py-3 px-4 text-sm font-semibold text-white w-12">
-                <Checkbox
-                  checked={isAllSelected}
-                  onChange={handleSelectAll}
-                  aria-label="Select all"
-                />
-              </th>
               {columns.title && (
                 <th className="text-left py-3 px-4 text-sm font-semibold text-white dark:text-white">
                   {t(defaultTranslationKeys.title)}
@@ -264,13 +257,6 @@ export function DashboardTable({
                     selectedIds.includes(item.id) ? 'bg-blue-50' : ''
                   }`}
                 >
-                  <td className="py-4 px-4 w-12">
-                    <Checkbox
-                      checked={selectedIds.includes(item.id)}
-                      onChange={(e) => handleSelectOne(item.id, e)}
-                      aria-label={`Select ${item.title}`}
-                    />
-                  </td>
                   {columns.title && (
                     <td
                       className={`py-4 px-4 ${

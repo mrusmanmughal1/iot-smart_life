@@ -4,11 +4,11 @@ import type {
   Widget,
   WidgetDataSource,
   WidgetVisualization,
-} from '@/components/common/WidgetCanvas/WidgetCanvas';
+} from '@/components/common/WidgetCanvas/widgetCanvasUtils';
 import {
   buildDashboardPayload,
   buildSingleWidgetPayload,
-} from '@/components/common/WidgetCanvas/WidgetCanvas';
+} from '@/components/common/WidgetCanvas/widgetCanvasUtils';
 import { dashboardsApi, Dashboard } from '@/services/api/dashboards.api';
 import toast from 'react-hot-toast';
 
@@ -239,12 +239,122 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       },
     };
 
-    const singlePayload = buildSingleWidgetPayload(updatedWidget, layoutItem);
+    const isTemporaryId =
+      typeof widgetId === 'string' &&
+      widgetId.startsWith('widget-') &&
+      /^\d+/.test(widgetId.replace('widget-', ''));
+    const isExistingWidget = !isTemporaryId;
+
+    const singlePayload = buildSingleWidgetPayload(
+      updatedWidget,
+      layoutItem,
+      isExistingWidget
+    );
 
     try {
-      const res = await dashboardsApi.addWidget(dashboardId, singlePayload);
-      const apiWidgetData = (res?.data as any)?.data || res?.data;
-      const finalId = apiWidgetData?.id || widgetId;
+      let res;
+      if (isExistingWidget) {
+        try {
+          res = await dashboardsApi.updateWidget(
+            dashboardId,
+            widgetId,
+            singlePayload
+          );
+        } catch (updateErr: any) {
+          // Only fallback to POST if the server returned 404 Not Found (meaning widget was not saved on server yet)
+          if (updateErr?.response?.status === 404) {
+            console.warn(
+              `[PATCH /dashboards/${dashboardId}/widgets/${widgetId}] returned 404, attempting POST`,
+              updateErr
+            );
+            const createPayload = buildSingleWidgetPayload(
+              updatedWidget,
+              layoutItem,
+              false
+            );
+            res = await dashboardsApi.addWidget(dashboardId, createPayload);
+          } else {
+            throw updateErr;
+          }
+        }
+      } else {
+        res = await dashboardsApi.addWidget(dashboardId, singlePayload);
+      }
+      const apiResponseData = (res?.data as any)?.data || res?.data;
+
+      // 1. If backend returned the full updated dashboard, re-initialize store directly
+      const extractedWidgets = extractWidgetsFromDashboard(apiResponseData);
+      if (
+        apiResponseData &&
+        extractedWidgets.length > 0 &&
+        (apiResponseData.id === dashboardId ||
+          apiResponseData.configuration ||
+          apiResponseData.widgets)
+      ) {
+        get().initFromDashboard(apiResponseData);
+        toast.success(`Widget "${updatedWidget.title}" saved to dashboard!`);
+        return true;
+      }
+
+      // 2. Fetch fresh dashboard data from API so all newly assigned server UUIDs are synced
+      try {
+        const freshRes = await dashboardsApi.getById(dashboardId);
+        const freshDashboard = (freshRes?.data as any)?.data || freshRes?.data;
+        if (
+          freshDashboard &&
+          extractWidgetsFromDashboard(freshDashboard).length > 0
+        ) {
+          get().initFromDashboard(freshDashboard);
+          toast.success(`Widget "${updatedWidget.title}" saved to dashboard!`);
+          return true;
+        }
+      } catch (freshErr) {
+        console.warn(
+          '[saveWidgetToApi] Could not fetch fresh dashboard, falling back to local update',
+          freshErr
+        );
+      }
+
+      // 3. Fallback: single widget response handling or local state update
+      let finalId = widgetId;
+      const uuidRegex =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+      if (apiResponseData) {
+        const possibleWidgetId =
+          apiResponseData.id || apiResponseData._id || apiResponseData.widgetId;
+
+        // If response is a single widget object and its ID is NOT the dashboard ID
+        if (possibleWidgetId && possibleWidgetId !== dashboardId) {
+          finalId = possibleWidgetId;
+        } else if (extractedWidgets.length > 0) {
+          let matched = extractedWidgets.find(
+            (w: any) =>
+              (w.id && w.id === widgetId) || (w._id && w._id === widgetId)
+          );
+          if (!matched) {
+            matched =
+              extractedWidgets.find(
+                (w: any) =>
+                  (w.row === singlePayload.row &&
+                    w.col === singlePayload.col) ||
+                  w.title === singlePayload.title ||
+                  w.widgetTypeId === singlePayload.widgetTypeId
+              ) || extractedWidgets[extractedWidgets.length - 1];
+          }
+          if (matched) {
+            const matchedId = matched.id || matched._id;
+            if (matchedId && matchedId !== dashboardId) {
+              finalId = matchedId;
+            }
+          }
+        }
+      }
+
+      // Safeguard: Never allow dashboardId to become finalId for a widget
+      if (finalId === dashboardId) {
+        finalId = uuidRegex.test(widgetId) ? widgetId : `widget-${Date.now()}`;
+      }
 
       const finalWidget: Widget = {
         ...updatedWidget,

@@ -3,14 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  ArrowLeft,
-  CheckCircle2,
-  AlertTriangle,
-  Sparkles,
-} from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 import type { Layout } from 'react-grid-layout';
-import { WidgetCanvas, Widget } from '@/components/common/WidgetCanvas/WidgetCanvas';
+import {
+  WidgetCanvas,
+  Widget,
+} from '@/components/common/WidgetCanvas/WidgetCanvas';
 import { useTemplatePreview } from '../hooks/useSolutionTemplatePrevies';
 import WarningMessage from '@/components/ui/WarningMessage';
 
@@ -74,12 +72,12 @@ export default function TemplatePreviewPage() {
       w.type === 'map'
         ? 'device-map'
         : w.type === 'timeseries'
-        ? 'line-chart'
-        : w.type === 'gauge'
-        ? 'analog-gauge'
-        : w.type === 'alarm-widget' || w.type === 'alarm'
-        ? 'alarms-table'
-        : w.type;
+          ? 'line-chart'
+          : w.type === 'gauge'
+            ? 'analog-gauge'
+            : w.type === 'alarm-widget' || w.type === 'alarm'
+              ? 'alarms-table'
+              : w.type;
 
     return {
       id: `preview-widget-${idx}`,
@@ -99,8 +97,8 @@ export default function TemplatePreviewPage() {
           w.type === 'gauge'
             ? ['fill_level']
             : w.type === 'timeseries'
-            ? ['aqi', 'pm25']
-            : ['temperature', 'humidity', 'status'],
+              ? ['aqi', 'pm25']
+              : ['temperature', 'humidity', 'status'],
         timeRange: '24h',
       },
       visualization: {
@@ -162,10 +160,13 @@ export default function TemplatePreviewPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-            {t('solutionTemplates.templatePreview.title', 'Template Preview')} - {templateName}
+            {t('solutionTemplates.templatePreview.title', 'Template Preview')} -{' '}
+            {templateName}
           </h1>
           <p className="text-xs text-gray-500 mt-0.5">
-            {dashboard?.name?.replace('{installName}', templateName) || `${templateName} Dashboard`} • {mappedWidgets.length} Visualizer Widgets
+            {dashboard?.name?.replace('{installName}', templateName) ||
+              `${templateName} Dashboard`}{' '}
+            • {mappedWidgets.length} Visualizer Widgets
           </p>
         </div>
       </div>
@@ -210,7 +211,10 @@ export default function TemplatePreviewPage() {
         >
           {alreadyInstalled
             ? 'Already Installed'
-            : t('solutionTemplates.templatePreview.activateTemplate', 'Activate Template')}
+            : t(
+                'solutionTemplates.templatePreview.activateTemplate',
+                'Activate Template'
+              )}
         </Button>
       </div>
     </div>
