@@ -62,7 +62,7 @@ export const DeviceCredentialsDialog: React.FC<
           {label}
         </span>
         <span className="text-sm font-mono truncate">
-          {value.length > 90 ? value.substring(0, 90) + '...' : value}
+          {value?.length > 90 ? value.substring(0, 90) + '...' : value}
         </span>
       </div>
       {renderCopyButton(value, copyKey)}
