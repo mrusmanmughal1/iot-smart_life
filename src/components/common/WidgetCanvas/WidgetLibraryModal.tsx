@@ -101,7 +101,7 @@ export function WidgetLibraryModal({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500"
+            className="rounded-full hover:bg-slate-300 dark:hover:bg-slate-800 text-white"
           >
             <X className="w-5 h-5" />
           </Button>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import GridLayout, { Layout } from 'react-grid-layout';
 import { Plus, Trash2, Settings, Maximize2, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -57,6 +57,28 @@ export function WidgetCanvas({
 
   const layoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prevLayoutRef = useRef<Layout[]>([]);
+
+  // Dynamic canvas width measured from the container element
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [canvasWidth, setCanvasWidth] = useState(1180);
+
+  useEffect(() => {
+    const el = canvasContainerRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width;
+        if (width > 0) setCanvasWidth(width);
+      }
+    });
+
+    observer.observe(el);
+    // Set initial width immediately
+    setCanvasWidth(el.getBoundingClientRect().width || 1180);
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleLayoutChange = useCallback(
     (newLayout: Layout[]) => {
@@ -326,7 +348,10 @@ export function WidgetCanvas({
       />
 
       {/* Canvas */}
-      <div className="h-full overflow-auto bg-gray-100 dark:bg-gray-800  ">
+      <div
+        ref={canvasContainerRef}
+        className="h-full overflow-auto bg-primary dark:bg-gray-800  "
+      >
         {widgets.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[400px]">
             <button
@@ -353,8 +378,8 @@ export function WidgetCanvas({
             onDragStop={handleDragOrResizeStop}
             onResizeStop={handleDragOrResizeStop}
             cols={12}
-            rowHeight={30}
-            width={1200}
+            rowHeight={20}
+            width={canvasWidth}
             isDraggable={!readOnly}
             isResizable={!readOnly}
             draggableHandle=".drag-handle"
@@ -362,7 +387,7 @@ export function WidgetCanvas({
           >
             {widgets.map((widget) => (
               <div key={widget.id} className="widget-container">
-                <Card className="h-full shadow-lg border border-gray-200 dark:border-gray-700 hover:border-primary transition-colors flex flex-col overflow-hidden">
+                <Card className="h-full rounded-sm shadow-lg border border-gray-200 dark:border-gray-700 hover:border-primary transition-colors flex flex-col overflow-hidden">
                   {/* Widget Header */}
                   <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
                     <div className="drag-handle flex items-center gap-2 truncate cursor-move flex-1">

@@ -141,11 +141,9 @@ export default function WidgetEditorPage() {
               <strong> telemetry keys</strong> (e.g.&nbsp;temperature, humidity)
               to bind the widget to real data
             </li>
-            <li>Drag and resize widgets to arrange your dashboard layout</li>
             <li>
-              Click <strong>"Save Layout"</strong> to update the dashboard
-              payload via the <code className="font-mono">/dashboards</code> API
-              and update application state
+              Drag and resize widgets to arrange your dashboard layout and it
+              will be auto saved
             </li>
           </ul>
         </CardContent>
