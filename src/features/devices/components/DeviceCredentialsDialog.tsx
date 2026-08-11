@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Copy, Check, Terminal, KeyRound, Info } from 'lucide-react';
+import { Copy, Check, KeyRound, Info } from 'lucide-react';
 
 interface DeviceCredentialsDialogProps {
   open: boolean;
