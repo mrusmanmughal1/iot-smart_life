@@ -1339,10 +1339,10 @@ export function WidgetRenderer({
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#0f172a',
+                      backgroundColor: '#f1f1f2ff',
                       borderRadius: '8px',
                       border: 'none',
-                      color: '#ffffff',
+                      color: '#ffffffff',
                       fontSize: '12px',
                     }}
                   />
