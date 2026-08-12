@@ -350,13 +350,13 @@ export function WidgetCanvas({
       {/* Canvas */}
       <div
         ref={canvasContainerRef}
-        className="h-full overflow-auto bg-secondary dark:bg-gray-800  "
+        className="h-full overflow-auto bg-indigo-900 dark:bg-gray-800  "
       >
         {widgets.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[400px]">
             <button
               onClick={() => setShowWidgetLibraryModal(true)}
-              className="flex flex-col items-center justify-center gap-3 px-12 py-10 border-3 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl hover:border-primary hover:bg-white dark:hover:bg-gray-900 transition-all group"
+              className="flex bg-white flex-col items-center justify-center gap-3 px-12 py-10 border-3 border-dashed border-gray-300 dark:border-gray-700 rounded-2xl hover:border-primary hover:bg-white dark:hover:bg-gray-900 transition-all group"
             >
               <div className="p-4 bg-primary/10 rounded-full text-primary group-hover:scale-110 transition-transform">
                 <Plus className="h-8 w-8" />
@@ -391,13 +391,9 @@ export function WidgetCanvas({
                   {/* Widget Header */}
                   <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
                     <div className="drag-handle flex items-center gap-2 truncate cursor-move flex-1">
-                      <Maximize2 className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                      <span className="text-xs font-bold text-gray-800 dark:text-gray-200 truncate">
-                        {widget.title}
-                      </span>
                       {widget.dataSource?.deviceName && (
                         <span
-                          className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-medium px-1.5 py-0.5 rounded-full truncate max-w-[140px]"
+                          className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-medium px-1.5 py-0.5 rounded-md truncate max-w-[140px]"
                           title={widget.dataSource.deviceName}
                         >
                           {widget.dataSource.deviceName}

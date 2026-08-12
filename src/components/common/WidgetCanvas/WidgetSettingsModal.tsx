@@ -227,13 +227,13 @@ export function WidgetSettingsModal({
       <DialogContent className="sm:max-w-[680px] max-h-[92vh] overflow-hidden flex flex-col p-0">
         {/* ── Header ── */}
         <DialogHeader className="px-6 pt-5 pb-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
-          <DialogTitle className="flex items-center gap-2.5 text-base font-bold text-slate-900 dark:text-white">
-            <div className="p-1.5 bg-primary/10 rounded-lg text-primary">
+          <DialogTitle className="flex items-center gap-2.5 text-base font-medium text-white dark:text-white">
+            <div className="p-1.5   rounded-lg  ">
               <Activity className="w-4 h-4" />
             </div>
             <span>Configure Widget: {widget.title}</span>
           </DialogTitle>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 pl-0.5">
+          <p className="text-xs  dark:text-slate-400 mt-0.5 pl-0.5">
             Select one target device and multiple dynamic telemetry keys from
             API
           </p>
@@ -355,7 +355,7 @@ export function WidgetSettingsModal({
             <div className="flex items-center justify-between">
               <Label className="text-sm font-semibold flex items-center gap-2 text-slate-800 dark:text-slate-100">
                 <Activity className="w-4 h-4 text-primary" />
-                Select Telemetry Keys (Flattened from telemetry.data)
+                Select Telemetry Keys
                 {selectedTelemetryKeys.length > 0 && (
                   <Badge className="bg-primary text-white border-primary text-[10px]">
                     {selectedTelemetryKeys.length} selected

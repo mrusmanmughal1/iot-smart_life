@@ -36,6 +36,15 @@ export default function AlarmsPage() {
     };
     return colors[severity] || 'default';
   };
+
+  // const safeFormatDistance = (createdTime: any): string => {
+  //   if (!createdTime) return '—';
+  //   const date = new Date(
+  //     typeof createdTime === 'number' ? createdTime : String(createdTime)
+  //   );
+  //   if (isNaN(date.getTime())) return '—';
+  //   return formatDistanceToNow(date, { addSuffix: true });
+  // };
   const { data: stats } = useGetStatsAlaram();
   const statsDataByStatus = stats?.byStatus;
 
@@ -117,7 +126,7 @@ export default function AlarmsPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  alarms.map((alarm: any) => (
+                  alarms?.map((alarm: any) => (
                     <TableRow key={alarm.id}>
                       <TableCell>
                         <Badge
@@ -136,13 +145,11 @@ export default function AlarmsPage() {
                               : 'secondary'
                           }
                         >
-                          {alarm.status}
+                          {alarm?.status}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {formatDistanceToNow(new Date(alarm.createdTime), {
-                          addSuffix: true,
-                        })}
+                        {/* {safeFormatDistance(alarm.createdTime)} */}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
