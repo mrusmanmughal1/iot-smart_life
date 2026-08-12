@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { devicesApi } from '@/services/api/devices.api';
 import { useLiveTelemetry } from '@/hooks/useLiveTelemetry';
@@ -508,7 +508,8 @@ export function WidgetRenderer({
   onDeviceChange,
 }: WidgetRendererProps) {
   // Interactive control states
-  const [toggleState, setToggleState] = useState(true);
+  const [toggleState, setToggleState] = useState(false);
+  const [isSendingCommand, setIsSendingCommand] = useState(false);
   const [controlMode, setControlMode] = useState<'manual' | 'auto'>('manual');
   const [sliderValue, setSliderValue] = useState(65);
   const [targetTemp, setTargetTemp] = useState(22.5);
@@ -549,6 +550,22 @@ export function WidgetRenderer({
     (telemetryData as any)?.device?.name ||
     (isValidDevice ? primaryDeviceId : undefined);
 
+  // Derive the primary switch key from configured telemetry keys or auto-detect
+  const liveData: Record<string, any> = (telemetryData as any)?.data || {};
+  const switchKey =
+    widget.dataSource?.telemetryKeys?.find((k) => /^switch/i.test(k)) ||
+    Object.keys(liveData).find((k) => /^switch/i.test(k)) ||
+    'switch_1';
+
+  // Sync toggle state with live telemetry whenever it updates
+  useEffect(() => {
+    const val = liveData[switchKey];
+    if (val !== undefined && val !== null) {
+      setToggleState(Boolean(val));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(liveData), switchKey]);
+
   const isPollingFallback = telemetryConnectionState === 'polling';
   const classification = resolveWidgetClassification(widget);
 
@@ -576,7 +593,7 @@ export function WidgetRenderer({
         ) : (
           <div className="flex flex-col items-center justify-center my-auto gap-3 py-2">
             {/* Control mode selector */}
-            <div className="flex items-center bg-slate-200 dark:bg-slate-800 p-0.5 rounded-lg text-[10px] font-semibold">
+            {/* <div className="flex items-center bg-slate-200 dark:bg-slate-800 p-0.5 rounded-lg text-[10px] font-semibold">
               <button
                 type="button"
                 onClick={() => setControlMode('manual')}
@@ -599,35 +616,55 @@ export function WidgetRenderer({
               >
                 Auto Schedule
               </button>
-            </div>
+            </div> */}
 
             {/* Big Interactive Power Toggle */}
             <button
               type="button"
-              onClick={() => {
+              disabled={isSendingCommand}
+              onClick={async () => {
+                if (!primaryDeviceId) return;
                 const nextState = !toggleState;
-                setToggleState(nextState);
-                toast.success(
-                  `RPC Command Sent: Relay Power ${nextState ? 'ACTIVATED (ON)' : 'DEACTIVATED (OFF)'}`
-                );
+                setToggleState(nextState); // optimistic update
+                setIsSendingCommand(true);
+                try {
+                  await devicesApi.sendCommand(primaryDeviceId, 'control', {
+                    [switchKey]: nextState,
+                  });
+                  toast.success(
+                    `${switchKey} turned ${nextState ? 'ON' : 'OFF'}`
+                  );
+                } catch (err: any) {
+                  // Revert optimistic update on failure
+                  setToggleState(!nextState);
+                  toast.error(
+                    err?.response?.data?.message || 'Failed to send command'
+                  );
+                } finally {
+                  setIsSendingCommand(false);
+                }
               }}
               className={`group relative flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg cursor-pointer ${
+                isSendingCommand ? 'opacity-70 cursor-not-allowed' : ''
+              } ${
                 toggleState
                   ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/30 scale-105'
                   : 'bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 shadow-slate-900/10'
               }`}
             >
-              {toggleState ? (
+              {isSendingCommand ? (
+                <Loader2 className="w-7 h-7 animate-spin" />
+              ) : toggleState ? (
                 <ToggleRight className="w-7 h-7 text-white animate-pulse" />
               ) : (
                 <ToggleLeft className="w-7 h-7 text-slate-400" />
               )}
               <div className="flex flex-col items-start leading-tight">
                 <span className="text-[10px] uppercase opacity-80 font-mono tracking-wider">
-                  Relay State
+                  {switchKey}
                 </span>
                 <span className="text-sm font-extrabold tracking-wide">
-                  {toggleState ? 'STATUS: ACTIVE (ON)' : 'STATUS: OFF'}
+                  {isSendingCommand ? 'SENDING…' : toggleState ? 'ON' : 'OFF'}
                 </span>
               </div>
             </button>
@@ -635,20 +672,28 @@ export function WidgetRenderer({
             {/* Load Statistics */}
             <div className="grid grid-cols-3 gap-2 w-full text-center text-[10px]">
               <div className="p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 block">Voltage</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">
-                  220V AC
+                <span className="text-slate-400 block">Relay Mode</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 capitalize">
+                  {String(
+                    liveData['light_mode'] ?? liveData['relay_status'] ?? '—'
+                  )}
                 </span>
               </div>
               <div className="p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 block">Current</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">
-                  {toggleState ? '4.8 A' : '0.0 A'}
+                <span className="text-slate-400 block">R1 Status</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 capitalize">
+                  {String(
+                    liveData['relay_status_1'] ?? liveData['switch_2'] ?? '—'
+                  )}
                 </span>
               </div>
               <div className="p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 block">Latency</span>
-                <span className="font-bold text-emerald-500">12ms</span>
+                <span className="text-slate-400 block">R2 Status</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200 capitalize">
+                  {String(
+                    liveData['relay_status_2'] ?? liveData['switch_3'] ?? '—'
+                  )}
+                </span>
               </div>
             </div>
           </div>
