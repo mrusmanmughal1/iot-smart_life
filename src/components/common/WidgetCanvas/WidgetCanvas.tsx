@@ -310,9 +310,9 @@ export function WidgetCanvas({
         <div className="absolute -top-18 right-4 z-40 flex items-center gap-2">
           <Button
             onClick={() => setShowWidgetLibraryModal(true)}
-            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-md font-medium"
+            className="bg-secondary text-white hover:bg-secondary/95 shadow-md font-medium border border-gray-300"
           >
-            <Layers className="h-4 w-4 mr-2 text-primary" />
+            <Layers className="h-4 w-4 mr-2 text-white" />
             Widget Library
           </Button>
         </div>
