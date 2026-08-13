@@ -101,7 +101,7 @@ function LiveStatusBadge({
   }
   return (
     <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full font-medium shrink-0">
-      Http
+      HTTP
     </span>
   );
 }
@@ -1085,10 +1085,6 @@ export function WidgetRenderer({
     return (
       <div className="w-full h-full flex flex-col justify-between p-3 bg-white dark:bg-slate-900 rounded-lg">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 capitalize">
-            <Activity className="w-4 h-4" style={{ color: primaryColor }} />
-            {widget.title || `${key} Utilization`}
-          </span>
           <LiveStatusBadge
             isLive={isLiveTelemetry}
             isConnecting={isConnectingTelemetry}
@@ -1112,9 +1108,9 @@ export function WidgetRenderer({
               </span>
             </div>
 
-            <div className="w-full bg-slate-200 dark:bg-slate-800 h-4 rounded-full overflow-hidden relative shadow-inner p-0.5">
+            <div className="w-full bg-slate-200 shadow shadow-[rgba(0,0,0,0.3)] dark:bg-slate-800 h-4 rounded-full overflow-hidden relative shadow-inner p-0.5">
               <div
-                className="h-full rounded-full transition-all duration-500 ease-out"
+                className="h-full   rounded-full transition-all duration-500 ease-out"
                 style={{
                   width: `${value}%`,
                   backgroundColor: statusColor,
@@ -1177,9 +1173,9 @@ export function WidgetRenderer({
         {!isValidDevice ? (
           <EmptyDeviceState widget={widget} icon={Zap} />
         ) : (
-          <div className="my-auto">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-3xl font-black text-slate-900 dark:text-white tracking-tight font-mono">
+          <div className="my-auto  ">
+            <div className="flex justify-center items-center gap-1.5 ">
+              <span className="text-4xl font-black text-center text-slate-900 dark:text-white tracking-tight font-mono text-shadow-md  ">
                 {numVal.toFixed(1)}
               </span>
               <span className="text-xs font-bold text-slate-400 uppercase">

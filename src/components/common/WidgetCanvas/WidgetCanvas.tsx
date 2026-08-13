@@ -335,7 +335,7 @@ export function WidgetCanvas({
       {/* Canvas */}
       <div
         ref={canvasContainerRef}
-        className="h-full overflow-auto bg-indigo-900 dark:bg-gray-800  "
+        className="h-full overflow-auto bg-gray-300 dark:bg-gray-800  "
       >
         {widgets.length === 0 ? (
           <div className="flex items-center justify-center h-full min-h-[400px]">
