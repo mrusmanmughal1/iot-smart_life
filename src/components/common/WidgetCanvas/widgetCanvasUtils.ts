@@ -180,10 +180,18 @@ export function buildSingleWidgetPayload(
       aggregation: 'AVG',
     },
     config: {
+      ...(widget.config || {}),
+      // Persist visualization settings so the backend stores them and they
+      // can be restored from config.colors / config.chartType on re-fetch.
+      chartType:
+        widget.visualization?.chartType || widget.config?.chartType || 'line',
+      colors: widget.visualization?.colors ||
+        widget.config?.colors || ['#3b82f6'],
+      showLegend:
+        widget.visualization?.showLegend ?? widget.config?.showLegend ?? true,
       minValue: (widget.config as any)?.minValue ?? 0,
       maxValue: (widget.config as any)?.maxValue ?? 50,
       unit: (widget.config as any)?.unit || '°C',
-      ...(widget.config || {}),
     },
   };
 

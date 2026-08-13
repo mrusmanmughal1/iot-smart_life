@@ -42,7 +42,6 @@ export const ALARM_SEVERITY_COLORS = {
 
 // Chart Colors
 export const CHART_COLORS = [
-  '#3B82F6',
   '#8B5CF6',
   '#10B981',
   '#F59E0B',

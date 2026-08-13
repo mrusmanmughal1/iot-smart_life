@@ -1,9 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Thermometer, Droplets, Battery, Zap, Wifi } from 'lucide-react';
 import type { MetricType, TelemetryWidgetConfig } from './TelemetryWidget';
 import { availableDevices } from './TelemetryWidget';
@@ -15,7 +27,11 @@ interface TelemetryWidgetSettingsProps {
   onSave: (config: TelemetryWidgetConfig) => void;
 }
 
-const metricOptions: { value: MetricType; label: string; icon: React.ReactNode }[] = [
+const metricOptions: {
+  value: MetricType;
+  label: string;
+  icon: React.ReactNode;
+}[] = [
   {
     value: 'temperature',
     label: 'Temperature',
@@ -50,7 +66,13 @@ export function TelemetryWidgetSettings({
   onSave,
 }: TelemetryWidgetSettingsProps) {
   const [selectedMetrics, setSelectedMetrics] = useState<MetricType[]>(
-    config.enabledMetrics || ['temperature', 'humidity', 'battery', 'power', 'signal']
+    config.enabledMetrics || [
+      'temperature',
+      'humidity',
+      'battery',
+      'power',
+      'signal',
+    ]
   );
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>(
     config.deviceId || availableDevices[0].id
@@ -58,7 +80,15 @@ export function TelemetryWidgetSettings({
 
   useEffect(() => {
     if (open) {
-      setSelectedMetrics(config.enabledMetrics || ['temperature', 'humidity', 'battery', 'power', 'signal']);
+      setSelectedMetrics(
+        config.enabledMetrics || [
+          'temperature',
+          'humidity',
+          'battery',
+          'power',
+          'signal',
+        ]
+      );
       setSelectedDeviceId(config.deviceId || availableDevices[0].id);
     }
   }, [open, config.enabledMetrics, config.deviceId]);
@@ -99,7 +129,10 @@ export function TelemetryWidgetSettings({
           {/* Device Selection */}
           <div className="space-y-2">
             <Label className="text-base font-semibold">Select Device</Label>
-            <Select value={selectedDeviceId} onValueChange={setSelectedDeviceId}>
+            <Select
+              value={selectedDeviceId}
+              onValueChange={setSelectedDeviceId}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select a device" />
               </SelectTrigger>
@@ -116,7 +149,9 @@ export function TelemetryWidgetSettings({
           {/* Metrics Selection */}
           <div className="space-y-2">
             <div className="flex items-center justify-between mb-3">
-              <Label className="text-base font-semibold">Select Metrics to Display</Label>
+              <Label className="text-base font-semibold">
+                Select Metrics to Display
+              </Label>
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -170,7 +205,11 @@ export function TelemetryWidgetSettings({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
           <Button

@@ -22,13 +22,22 @@ class WebSocketClient {
           reconnectionDelay: 3000,
         });
 
+        // Guard against the promise hanging forever if the server never
+        // responds with either `connect` or `connect_error`.
+        const timeout = setTimeout(() => {
+          this.socket?.disconnect();
+          reject(new Error('WebSocket connection timed out'));
+        }, 10000);
+
         this.socket.on('connect', () => {
+          clearTimeout(timeout);
           this.connected = true;
           console.log('✅ WebSocket connected! Socket ID:', this.socket?.id);
           resolve();
         });
 
         this.socket.on('connect_error', (err) => {
+          clearTimeout(timeout);
           console.error('❌ WebSocket connection error:', err.message);
           reject(err);
         });

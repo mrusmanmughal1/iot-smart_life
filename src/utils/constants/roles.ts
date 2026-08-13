@@ -9,7 +9,6 @@ export enum UserRole {
 
 // Role Permissions
 export const ROLE_PERMISSIONS = {
-  
   [UserRole.ADMIN]: {
     devices: ['create', 'read', 'update', 'delete', 'command'],
     users: ['create', 'read', 'update', 'delete'],
@@ -82,7 +81,9 @@ export const hasPermission = (
   action: string
 ): boolean => {
   const permissions: any = ROLE_PERMISSIONS[role];
-  return permissions[resource as keyof typeof permissions]?.includes(action) ?? false;
+  return (
+    permissions[resource as keyof typeof permissions]?.includes(action) ?? false
+  );
 };
 
 export const isAdmin = (role: UserRole): boolean => role === UserRole.ADMIN;

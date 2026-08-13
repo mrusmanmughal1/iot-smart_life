@@ -24,7 +24,7 @@ import {
   RefreshCw,
   Clock,
   Palette,
-  Check,
+  Type,
 } from 'lucide-react';
 import { devicesApi } from '@/services/api/devices.api';
 import type { Device, DeviceStatus } from '@/services/api/devices.api';
@@ -43,7 +43,8 @@ interface WidgetSettingsModalProps {
   onSave: (
     widgetId: string,
     dataSource: WidgetDataSource,
-    visualization: WidgetVisualization
+    visualization: WidgetVisualization,
+    title?: string
   ) => Promise<void> | void;
 }
 
@@ -97,6 +98,10 @@ export function WidgetSettingsModal({
   );
   const [timeRange, setTimeRange] = useState('24h');
   const [selectedColor, setSelectedColor] = useState('#3b82f6');
+  const [telemetryKeyColors, setTelemetryKeyColors] = useState<
+    Record<string, string>
+  >({});
+  const [cardTitle, setCardTitle] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Chart type is determined by widget library choice
@@ -106,14 +111,31 @@ export function WidgetSettingsModal({
     widget?.type ||
     'line';
 
+  // Pie/donut charts support a distinct color per telemetry key
+  const isPieChart = ['pie-chart', 'pie', 'donut'].includes(
+    chartType.toLowerCase()
+  );
+
   // Sync state when widget opens or changes
   useEffect(() => {
     if (widget) {
       const devId = widget.dataSource?.deviceIds?.[0] || null;
+      const savedKeys = widget.dataSource?.telemetryKeys || [];
+      const savedColors = widget.visualization?.colors || [];
+
       setSelectedDeviceId(devId);
-      setSelectedTelemetryKeys(widget.dataSource?.telemetryKeys || []);
+      setSelectedTelemetryKeys(savedKeys);
       setTimeRange(widget.dataSource?.timeRange || '24h');
       setSelectedColor(widget.visualization?.colors?.[0] || '#3b82f6');
+      setCardTitle(widget.title || '');
+
+      // Restore per-key colors, aligned to the saved telemetry key order
+      const colorMap: Record<string, string> = {};
+      savedKeys.forEach((key, i) => {
+        colorMap[key] =
+          savedColors[i] || THEME_COLORS[i % THEME_COLORS.length].color;
+      });
+      setTelemetryKeyColors(colorMap);
     }
   }, [widget, open]);
 
@@ -180,6 +202,7 @@ export function WidgetSettingsModal({
       // (telemetry keys are device-specific and must be re-selected per device)
       if (prev !== nextDeviceId) {
         setSelectedTelemetryKeys([]);
+        setTelemetryKeyColors({});
       }
       return nextDeviceId;
     });
@@ -187,9 +210,33 @@ export function WidgetSettingsModal({
 
   // Multiple telemetry keys selection handler
   const toggleTelemetryKey = (key: string) => {
-    setSelectedTelemetryKeys((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    );
+    setSelectedTelemetryKeys((prev) => {
+      if (prev.includes(key)) {
+        // Deselect: remove the key and its assigned color
+        setTelemetryKeyColors((colors) => {
+          const next = { ...colors };
+          delete next[key];
+          return next;
+        });
+        return prev.filter((k) => k !== key);
+      }
+
+      // Select: assign the next theme color to this key
+      const next = [...prev, key];
+      setTelemetryKeyColors((colors) => {
+        if (colors[key]) return colors;
+        const index = next.length - 1;
+        return {
+          ...colors,
+          [key]: THEME_COLORS[index % THEME_COLORS.length].color,
+        };
+      });
+      return next;
+    });
+  };
+
+  const setKeyColor = (key: string, color: string) => {
+    setTelemetryKeyColors((prev) => ({ ...prev, [key]: color }));
   };
 
   const selectedDevice = devices.find((d) => d.id === selectedDeviceId);
@@ -203,13 +250,21 @@ export function WidgetSettingsModal({
     };
     const visualization: WidgetVisualization = {
       chartType,
-      colors: [selectedColor],
+      colors: isPieChart
+        ? selectedTelemetryKeys.map(
+            (key) =>
+              telemetryKeyColors[key] ||
+              THEME_COLORS[
+                selectedTelemetryKeys.indexOf(key) % THEME_COLORS.length
+              ].color
+          )
+        : [selectedColor],
       showLegend: widget.visualization?.showLegend ?? true,
     };
 
     setIsSubmitting(true);
     try {
-      await onSave(widget.id, dataSource, visualization);
+      await onSave(widget.id, dataSource, visualization, cardTitle?.trim());
       onOpenChange(false);
     } catch (err) {
       console.error(err);
@@ -244,7 +299,7 @@ export function WidgetSettingsModal({
           {/* ── Section 1: Single Target Device Selection ── */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
+              <Label className="text-sm font-semibold flex items-center gap-2 text-slate-800 dark:text-slate-100">
                 <Cpu className="w-4 h-4 text-blue-500" />
                 Select Target Device (Single Choice)
               </Label>
@@ -414,8 +469,8 @@ export function WidgetSettingsModal({
 
           {/* ── Section 3: Time Range ── */}
           <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <Label className="text-xs font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
-              <Clock className="w-3.5 h-3.5 text-amber-500" />
+            <Label className="text-xs font-semibold flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
+              <Clock className="w-3.5 h-3.5 text-secondary" />
               Time Range
             </Label>
             <div className="grid grid-cols-6 gap-1.5">
@@ -428,8 +483,8 @@ export function WidgetSettingsModal({
                     onClick={() => setTimeRange(tr.value)}
                     className={`px-2 py-1.5 rounded-md text-xs font-medium border transition-all text-center ${
                       isSelected
-                        ? 'bg-amber-500 text-white border-amber-500 font-bold shadow-sm'
-                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-amber-400'
+                        ? 'bg-secondary text-white border-secondary font-semibold shadow-sm'
+                        : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-secondary'
                     }`}
                   >
                     {tr.label}
@@ -440,35 +495,102 @@ export function WidgetSettingsModal({
           </div>
 
           {/* ── Section 4: Theme Colors ── */}
-          <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <Label className="text-xs font-bold flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
-              <Palette className="w-3.5 h-3.5 text-purple-500" />
-              Theme Color
-            </Label>
-            <div className="flex flex-wrap gap-2.5 items-center">
-              {THEME_COLORS.map((tc) => {
-                const isSelected =
-                  selectedColor.toLowerCase() === tc.color.toLowerCase();
-                return (
-                  <button
-                    key={tc.color}
-                    type="button"
-                    onClick={() => setSelectedColor(tc.color)}
-                    title={tc.label}
-                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                      isSelected
-                        ? 'ring-2 ring-offset-2 ring-primary scale-110'
-                        : 'hover:scale-105 opacity-80 hover:opacity-100'
-                    }`}
-                    style={{ backgroundColor: tc.color }}
-                  >
-                    {isSelected && (
-                      <Check className="w-4 h-4 text-white drop-shadow" />
-                    )}
-                  </button>
-                );
-              })}
+          {!isPieChart && (
+            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <Label className="text-xs font-semibold flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
+                <Palette className="w-3.5 h-3.5 text-purple-500" />
+                Theme Color
+              </Label>
+              <div className="flex items-center gap-2.5">
+                <input
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                  title="Pick theme color"
+                  className="w-10 h-9 rounded cursor-pointer border border-slate-300 dark:border-slate-600 bg-transparent p-0.5"
+                />
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  {selectedColor}
+                </span>
+              </div>
             </div>
+          )}
+
+          {/* ── Section 5: Card Appearance ── */}
+          <div className="space-y-3 py-4 border-t border-slate-100 dark:border-slate-800">
+            <Label className="text-sm font-semibold flex items-center gap-2 text-slate-800 dark:text-slate-100">
+              <Type className="w-4 h-4  " />
+              Card Appearance
+            </Label>
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="card-title"
+                className="text-xs font-semibold text-slate-600 dark:text-slate-300"
+              >
+                Card Title
+              </Label>
+              <Input
+                id="card-title"
+                placeholder="Enter a title for this widget card..."
+                value={cardTitle}
+                onChange={(e) => setCardTitle(e.target.value)}
+                className="h-9 text-xs bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+              />
+              <p className="text-[11px] text-slate-400">
+                This title is displayed on the widget card header.
+              </p>
+            </div>
+            {/* ── Section 2b: Per-Key Colors (Pie/Donut only) ── */}
+            {isPieChart && selectedTelemetryKeys.length > 0 && (
+              <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <Label className="text-xs font-semibold flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
+                  <Palette className="w-3.5 h-3.5 text-purple-500" />
+                  Colors
+                  <span className="text-[10px] font-normal text-slate-400">
+                    (one color per selected telemetry key)
+                  </span>
+                </Label>
+                <div className="space-y-2">
+                  {selectedTelemetryKeys.map((key) => {
+                    const currentColor =
+                      telemetryKeyColors[key] ||
+                      THEME_COLORS[
+                        selectedTelemetryKeys.indexOf(key) % THEME_COLORS.length
+                      ].color;
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-start justify-between gap-3 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className="w-3 h-3 rounded-full shrink-0 mt-0.5"
+                            style={{ backgroundColor: currentColor }}
+                          />
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium text-slate-800 dark:text-slate-200 truncate">
+                              {key}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 justify-end shrink-0">
+                          <span className="text-[10px] text-slate-400">
+                            {currentColor}
+                          </span>
+                          <input
+                            type="color"
+                            value={currentColor}
+                            onChange={(e) => setKeyColor(key, e.target.value)}
+                            title={`Pick color for ${key}`}
+                            className="w-9 h-8 rounded cursor-pointer border border-slate-300 dark:border-slate-600 bg-transparent p-0.5"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ── Summary ── */}
@@ -488,16 +610,34 @@ export function WidgetSettingsModal({
                   ? selectedTelemetryKeys.join(', ')
                   : 'None'}
               </p>
-              <p>
-                <span className="font-medium">Time Range:</span> {timeRange} ·{' '}
-                <span className="font-medium inline-flex items-center gap-1">
-                  Color:{' '}
-                  <span
-                    className="w-2.5 h-2.5 rounded-full inline-block"
-                    style={{ backgroundColor: selectedColor }}
-                  />
-                </span>
-              </p>
+              {isPieChart ? (
+                <p className="font-medium inline-flex items-center gap-1 flex-wrap">
+                  Colors:{' '}
+                  {selectedTelemetryKeys.map((key, i) => {
+                    const color =
+                      telemetryKeyColors[key] ||
+                      THEME_COLORS[i % THEME_COLORS.length].color;
+                    return (
+                      <span
+                        key={key}
+                        className="w-2.5 h-2.5 rounded-full inline-block"
+                        style={{ backgroundColor: color }}
+                      />
+                    );
+                  })}
+                </p>
+              ) : (
+                <p>
+                  <span className="font-medium">Time Range:</span> {timeRange} ·{' '}
+                  <span className="font-medium inline-flex items-center gap-1">
+                    Color:{' '}
+                    <span
+                      className="w-2.5 h-2.5 rounded-full inline-block"
+                      style={{ backgroundColor: selectedColor }}
+                    />
+                  </span>
+                </p>
+              )}
             </div>
           )}
         </div>

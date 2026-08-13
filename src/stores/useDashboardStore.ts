@@ -52,13 +52,15 @@ interface DashboardState {
     dashboardId: string,
     widgetId: string,
     dataSource: WidgetDataSource,
-    visualization: WidgetVisualization
+    visualization: WidgetVisualization,
+    title?: string
   ) => Promise<boolean>;
   deleteWidgetFromApi: (dashboardId: string, widgetId: string) => Promise<void>;
   updateWidgetSettings: (
     widgetId: string,
     dataSource: WidgetDataSource,
-    visualization: WidgetVisualization
+    visualization: WidgetVisualization,
+    title?: string
   ) => void;
   updateLayoutToApi: (dashboardId: string, layout: Layout[]) => Promise<void>;
   addWidget: (widget: Widget, layoutItem: Layout) => void;
@@ -221,7 +223,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     dashboardId: string,
     widgetId: string,
     dataSource: WidgetDataSource,
-    visualization: WidgetVisualization
+    visualization: WidgetVisualization,
+    title?: string
   ) => {
     const { widgets, layout } = get();
     const targetWidget = widgets.find((w) => w.id === widgetId);
@@ -230,6 +233,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     const layoutItem = layout.find((l) => l.i === widgetId);
     const updatedWidget: Widget = {
       ...targetWidget,
+      title: title || targetWidget.title,
       dataSource,
       visualization,
       config: {
@@ -409,12 +413,13 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     }
   },
 
-  updateWidgetSettings: (widgetId, dataSource, visualization) => {
+  updateWidgetSettings: (widgetId, dataSource, visualization, title?) => {
     set((state) => ({
       widgets: state.widgets.map((w) =>
         w.id === widgetId
           ? {
               ...w,
+              title: title || w.title,
               dataSource,
               visualization,
               config: {

@@ -1,16 +1,12 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import GridLayout, { Layout } from 'react-grid-layout';
-import { Plus, Trash2, Settings, Maximize2, Layers } from 'lucide-react';
+import { Plus, Trash2, Settings, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { WidgetSettingsModal } from './WidgetSettingsModal';
 import { WidgetRenderer } from './WidgetRenderer';
 import { WidgetLibraryModal } from './WidgetLibraryModal';
-import type {
-  TelemetryWidgetConfig,
-  DeviceTelemetry,
-  MetricType,
-} from './TelemetryWidget';
+import type { MetricType } from './TelemetryWidget';
 import type { WidgetType } from '@/services/api/widgets.api';
 import { useDashboardStore } from '@/stores/useDashboardStore';
 import 'react-grid-layout/css/styles.css';
@@ -40,7 +36,6 @@ interface WidgetCanvasProps {
 }
 
 export function WidgetCanvas({
-  onSaveLayout,
   initialLayout = [],
   initialWidgets = [],
   readOnly = false,
@@ -49,14 +44,9 @@ export function WidgetCanvas({
 
   const widgets = readOnly ? initialWidgets : store.widgets;
   const layout = readOnly ? initialLayout : store.layout;
-  const isSaving = store.isSaving;
-
   const [showWidgetLibraryModal, setShowWidgetLibraryModal] = useState(false);
   const [selectedSettingWidget, setSelectedSettingWidget] =
     useState<Widget | null>(null);
-
-  const layoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const prevLayoutRef = useRef<Layout[]>([]);
 
   // Dynamic canvas width measured from the container element
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -281,18 +271,12 @@ export function WidgetCanvas({
     [readOnly, store]
   );
 
-  const handleSave = useCallback(async () => {
-    if (onSaveLayout) {
-      const payload = buildDashboardPayload(widgets, layout);
-      onSaveLayout(layout, widgets, payload);
-    }
-  }, [layout, widgets, onSaveLayout]);
-
   const handleSaveWidgetSettings = useCallback(
     async (
       widgetId: string,
       dataSource: WidgetDataSource,
-      visualization: WidgetVisualization
+      visualization: WidgetVisualization,
+      title?: string
     ) => {
       if (!readOnly) {
         if (store.dashboardId) {
@@ -300,10 +284,16 @@ export function WidgetCanvas({
             store.dashboardId,
             widgetId,
             dataSource,
-            visualization
+            visualization,
+            title
           );
         } else {
-          store.updateWidgetSettings(widgetId, dataSource, visualization);
+          store.updateWidgetSettings(
+            widgetId,
+            dataSource,
+            visualization,
+            title
+          );
         }
       }
     },
@@ -322,14 +312,6 @@ export function WidgetCanvas({
             <Layers className="h-4 w-4 mr-2 text-primary" />
             Widget Library
           </Button>
-          {/* <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-primary text-white hover:bg-primary/90 shadow-md font-medium flex items-center gap-1.5"
-          >
-            <Save className="h-4 w-4" />
-            {isSaving ? 'Saving...' : 'Save Layout'}
-          </Button> */}
         </div>
       )}
       {/* Widget Library Modal */}
@@ -391,12 +373,12 @@ export function WidgetCanvas({
                   {/* Widget Header */}
                   <div className="flex items-center justify-between px-3 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
                     <div className="drag-handle flex items-center gap-2 truncate cursor-move flex-1">
-                      {widget.dataSource?.deviceName && (
+                      {widget.title && (
                         <span
                           className="text-[10px] bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-medium px-1.5 py-0.5 rounded-md truncate max-w-[140px]"
-                          title={widget.dataSource.deviceName}
+                          title={widget.title}
                         >
-                          {widget.dataSource.deviceName}
+                          {widget.title}
                         </span>
                       )}
                     </div>

@@ -29,6 +29,9 @@ class WebSocketManager {
         'Connection Error',
         'Failed to establish real-time connection'
       );
+      // Re-throw so callers (e.g. useLiveTelemetry) can run their own
+      // fallback logic instead of wrongly assuming the socket connected.
+      throw error;
     }
   }
 
@@ -38,11 +41,14 @@ class WebSocketManager {
     console.log('WebSocket disconnected');
   }
 
-  subscribe<T = any>(event: string, handler: (data: T) => void): () => void {
+  subscribe<T = unknown>(
+    event: string,
+    handler: (data: T) => void
+  ): () => void {
     return wsClient.subscribe(event, handler);
   }
 
-  send(event: string, data: any): void {
+  send(event: string, data: unknown): void {
     wsClient.send(event, data);
   }
 

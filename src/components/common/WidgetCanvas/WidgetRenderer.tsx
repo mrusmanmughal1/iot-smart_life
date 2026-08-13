@@ -59,6 +59,7 @@ import { TelemetryWidget } from './TelemetryWidget';
 import type { Widget } from './WidgetCanvas';
 import { flattenObject } from '@/utils/helpers/FlattenObject';
 import toast from 'react-hot-toast';
+import { CHART_COLORS } from '@/utils/constants/colors';
 
 interface WidgetRendererProps {
   widget: Widget;
@@ -101,7 +102,7 @@ function LiveStatusBadge({
   }
   return (
     <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded-full font-medium shrink-0">
-      Telemetry
+      Http
     </span>
   );
 }
@@ -220,18 +221,15 @@ function getTelemetryNumericValue(
 function getDynamicPieData(
   telemetry: ReturnType<typeof useLiveTelemetry>['data'],
   selectedKeys?: string[],
-  primaryColor: string = '#3b82f6'
+  primaryColor: string = '#3b82f6',
+  customColors?: string[]
 ) {
-  const COLOR_PALETTE = [
-    primaryColor,
-    '#10b981', // Emerald
-    '#f59e0b', // Amber
-    '#8b5cf6', // Purple
-    '#ef4444', // Red
-    '#06b6d4', // Cyan
-    '#ec4899', // Pink
-    '#f97316', // Orange
-  ];
+  // When per-key colors were configured, use them (aligned to the selected
+  // key order). Otherwise fall back to the default palette.
+  const COLOR_PALETTE =
+    customColors && customColors.length > 0
+      ? customColors
+      : [primaryColor, ...CHART_COLORS];
 
   const flatMap = new Map<string, number>();
 
@@ -507,10 +505,10 @@ export function WidgetRenderer({
   widget,
   onDeviceChange,
 }: WidgetRendererProps) {
+  console.log(widget);
   // Interactive control states
   const [toggleState, setToggleState] = useState(false);
   const [isSendingCommand, setIsSendingCommand] = useState(false);
-  const [controlMode, setControlMode] = useState<'manual' | 'auto'>('manual');
   const [sliderValue, setSliderValue] = useState(65);
   const [targetTemp, setTargetTemp] = useState(22.5);
   const [hvacMode, setHvacMode] = useState<'cool' | 'heat' | 'fan' | 'off'>(
@@ -518,8 +516,13 @@ export function WidgetRenderer({
   );
   const [acknowledgedAlarms, setAcknowledgedAlarms] = useState<string[]>([]);
 
-  const primaryColor = widget.visualization?.colors?.[0] || '#3b82f6';
-  const primaryDeviceId = widget.dataSource?.deviceIds?.[0];
+  const primaryColor = widget.visualization?.colors?.[0] || '#166bf3ff';
+  const primaryDeviceId =
+    widget.dataSource?.deviceIds?.[0] ||
+    (widget.dataSource as any)?.deviceId ||
+    widget.config?.deviceId ||
+    '';
+  console.log(primaryDeviceId);
   const isValidDevice =
     !!primaryDeviceId && !primaryDeviceId.includes('device-uuid');
 
@@ -1338,16 +1341,13 @@ export function WidgetRenderer({
     const pieData = getDynamicPieData(
       telemetryData,
       widget.dataSource?.telemetryKeys,
-      primaryColor
+      primaryColor,
+      widget.visualization?.colors
     );
 
     return (
       <div className="w-full h-full flex flex-col items-center justify-between p-2 bg-white dark:bg-slate-900 rounded-lg">
         <div className="flex items-center justify-between w-full mb-1">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
-            <PieChartIcon className="w-4 h-4" style={{ color: primaryColor }} />
-            <span>{widget.title || 'Telemetry Distribution'}</span>
-          </div>
           <LiveStatusBadge
             isLive={isLiveTelemetry}
             isConnecting={isConnectingTelemetry}
