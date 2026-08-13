@@ -53,14 +53,16 @@ interface DashboardState {
     widgetId: string,
     dataSource: WidgetDataSource,
     visualization: WidgetVisualization,
-    title?: string
+    title?: string,
+    config?: { minValue?: number; maxValue?: number }
   ) => Promise<boolean>;
   deleteWidgetFromApi: (dashboardId: string, widgetId: string) => Promise<void>;
   updateWidgetSettings: (
     widgetId: string,
     dataSource: WidgetDataSource,
     visualization: WidgetVisualization,
-    title?: string
+    title?: string,
+    config?: { minValue?: number; maxValue?: number }
   ) => void;
   updateLayoutToApi: (dashboardId: string, layout: Layout[]) => Promise<void>;
   addWidget: (widget: Widget, layoutItem: Layout) => void;
@@ -224,7 +226,8 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     widgetId: string,
     dataSource: WidgetDataSource,
     visualization: WidgetVisualization,
-    title?: string
+    title?: string,
+    config?: { minValue?: number; maxValue?: number }
   ) => {
     const { widgets, layout } = get();
     const targetWidget = widgets.find((w) => w.id === widgetId);
@@ -240,6 +243,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         ...targetWidget.config,
         deviceId: dataSource.deviceIds[0],
         enabledMetrics: dataSource.telemetryKeys as any,
+        ...(config
+          ? { minValue: config.minValue, maxValue: config.maxValue }
+          : {}),
       },
     };
 
@@ -413,7 +419,13 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     }
   },
 
-  updateWidgetSettings: (widgetId, dataSource, visualization, title?) => {
+  updateWidgetSettings: (
+    widgetId,
+    dataSource,
+    visualization,
+    title?,
+    config?
+  ) => {
     set((state) => ({
       widgets: state.widgets.map((w) =>
         w.id === widgetId
@@ -426,6 +438,9 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
                 ...w.config,
                 deviceId: dataSource.deviceIds[0],
                 enabledMetrics: dataSource.telemetryKeys as any,
+                ...(config
+                  ? { minValue: config.minValue, maxValue: config.maxValue }
+                  : {}),
               },
             }
           : w

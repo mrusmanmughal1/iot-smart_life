@@ -22,7 +22,6 @@ import {
   AlertTriangle,
   Zap,
   MapPin,
-  ToggleLeft,
   ToggleRight,
   ShieldAlert,
   BarChart2,
@@ -126,14 +125,8 @@ function DataSourceBadge({
       ? ds.deviceIds[0]
       : `${ds.deviceIds.length} devices`);
 
-  const keyLabel =
-    ds.telemetryKeys?.slice(0, 2).join(', ') +
-    (ds.telemetryKeys && ds.telemetryKeys.length > 2
-      ? ` +${ds.telemetryKeys.length - 2}`
-      : '');
-
   return (
-    <div className="flex items-center gap-1.5 flex-wrap mt-auto pt-1.5 px-1 border-t border-slate-100 dark:border-slate-800/60 w-full text-[10px]">
+    <div className="flex items-center justify-between gap-1.5 flex-wrap mt-auto pt-1.5 px-1 border-t border-slate-100 dark:border-slate-800/60 w-full text-[10px]">
       <span
         className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 font-medium text-blue-600 dark:text-blue-300 max-w-[220px] truncate"
         title={nameToDisplay}
@@ -141,11 +134,7 @@ function DataSourceBadge({
         <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse shrink-0" />
         <span className="truncate">{nameToDisplay}</span>
       </span>
-      {keyLabel && (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 font-medium text-emerald-600 dark:text-emerald-300">
-          {keyLabel}
-        </span>
-      )}
+
       {ds.timeRange && (
         <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500">
           {ds.timeRange}
@@ -577,13 +566,16 @@ export function WidgetRenderer({
   // --------------------------------------------------------------------------
   if (classification === 'device-switch') {
     return (
-      <div className="w-full h-full flex flex-col justify-between p-3 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 rounded-lg">
+      <div className="relative w-full h-full flex flex-col justify-between p-3   dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 rounded-lg overflow-hidden">
+        {/* Ambient glow when switch is ON */}
+        <div
+          className={`pointer-events-none absolute inset-0 transition-opacity duration-700 ${
+            toggleState && isValidDevice ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+
         {/* Top bar */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-100">
-            <Power className="w-4 h-4" style={{ color: primaryColor }} />
-            <span>{widget.title || 'IoT Power Switch'}</span>
-          </div>
+        <div className="relative z-10    ">
           <LiveStatusBadge
             isLive={isLiveTelemetry}
             isConnecting={isConnectingTelemetry}
@@ -592,39 +584,15 @@ export function WidgetRenderer({
         </div>
 
         {!isValidDevice ? (
-          <EmptyDeviceState widget={widget} icon={ToggleRight} />
+          <div className="relative z-10">
+            <EmptyDeviceState widget={widget} icon={ToggleRight} />
+          </div>
         ) : (
-          <div className="flex flex-col items-center justify-center my-auto gap-3 py-2">
-            {/* Control mode selector */}
-            {/* <div className="flex items-center bg-slate-200 dark:bg-slate-800 p-0.5 rounded-lg text-[10px] font-semibold">
-              <button
-                type="button"
-                onClick={() => setControlMode('manual')}
-                className={`px-2.5 py-1 rounded-md transition-all ${
-                  controlMode === 'manual'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500'
-                }`}
-              >
-                Manual Override
-              </button>
-              <button
-                type="button"
-                onClick={() => setControlMode('auto')}
-                className={`px-2.5 py-1 rounded-md transition-all ${
-                  controlMode === 'auto'
-                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500'
-                }`}
-              >
-                Auto Schedule
-              </button>
-            </div> */}
-
-            {/* Big Interactive Power Toggle */}
+          <div className="relative z-10 flex flex-col items-center justify-center my-auto gap-3.5 py-3">
             <button
               type="button"
               disabled={isSendingCommand}
+              aria-pressed={toggleState}
               onClick={async () => {
                 if (!primaryDeviceId) return;
                 const nextState = !toggleState;
@@ -647,58 +615,76 @@ export function WidgetRenderer({
                   setIsSendingCommand(false);
                 }
               }}
-              className={`group relative flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg cursor-pointer ${
-                isSendingCommand ? 'opacity-70 cursor-not-allowed' : ''
-              } ${
-                toggleState
-                  ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/30 scale-105'
-                  : 'bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 shadow-slate-900/10'
+              className={`group relative flex flex-col items-center gap-3 outline-none cursor-pointer select-none disabled:cursor-wait rounded-2xl focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:focus-visible:ring-offset-slate-900 ${
+                isSendingCommand ? 'opacity-80' : ''
               }`}
             >
-              {isSendingCommand ? (
-                <Loader2 className="w-7 h-7 animate-spin" />
-              ) : toggleState ? (
-                <ToggleRight className="w-7 h-7 text-white animate-pulse" />
-              ) : (
-                <ToggleLeft className="w-7 h-7 text-slate-400" />
-              )}
-              <div className="flex flex-col items-start leading-tight">
-                <span className="text-[10px] uppercase opacity-80 font-mono tracking-wider">
-                  {switchKey}
-                </span>
-                <span className="text-sm font-extrabold tracking-wide">
-                  {isSendingCommand ? 'SENDING…' : toggleState ? 'ON' : 'OFF'}
-                </span>
-              </div>
-            </button>
+              {/* Animated state badge */}
+              <span
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest transition-all duration-300 border ${
+                  toggleState
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shadow shadow-[rgba(0,0,0,0.5)]'
+                    : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400'
+                }`}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                    toggleState
+                      ? 'bg-emerald-500 animate-pulse'
+                      : 'bg-slate-400'
+                  }`}
+                />
+                {isSendingCommand ? 'Sending…' : toggleState ? 'On' : 'Off'}
+              </span>
 
-            {/* Load Statistics */}
-            <div className="grid grid-cols-3 gap-2 w-full text-center text-[10px]">
-              <div className="p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 block">Relay Mode</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 capitalize">
-                  {String(
-                    liveData['light_mode'] ?? liveData['relay_status'] ?? '—'
-                  )}
+              {/* Switch track */}
+              <div
+                className={`relative flex items-center w-24 h-12  shadow shadow-[rgba(0,0,0,0.5)] rounded-full p-1.5 transition-all duration-300 ease-out ${
+                  toggleState
+                    ? 'bg-emerald-500 '
+                    : 'bg-slate-300 dark:bg-slate-700 '
+                } ${isSendingCommand ? 'opacity-60' : ''}`}
+              >
+                {/* ON label */}
+                <span
+                  className={`absolute left-3 text-[9px] font-black text-white/90 tracking-wide transition-opacity duration-200 ${
+                    toggleState ? 'opacity-100' : 'opacity-0'
+                  }`}
+                >
+                  ON
                 </span>
-              </div>
-              <div className="p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 block">R1 Status</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 capitalize">
-                  {String(
-                    liveData['relay_status_1'] ?? liveData['switch_2'] ?? '—'
-                  )}
+                {/* OFF label */}
+                <span
+                  className={`absolute right-3 text-[9px] font-black text-slate-500 dark:text-slate-400 tracking-wide transition-opacity duration-200 ${
+                    toggleState ? 'opacity-0' : 'opacity-100'
+                  }`}
+                >
+                  OFF
                 </span>
-              </div>
-              <div className="p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 block">R2 Status</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200 capitalize">
-                  {String(
-                    liveData['relay_status_2'] ?? liveData['switch_3'] ?? '—'
+
+                {/* Sliding knob */}
+                <div
+                  className={`relative z-10 w-9 h-9 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform duration-300 ease-out ${
+                    toggleState ? 'translate-x-12' : 'translate-x-0'
+                  }`}
+                >
+                  {isSendingCommand ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
+                  ) : (
+                    <Power
+                      className={`w-5 h-5 transition-colors duration-300 ${
+                        toggleState ? 'text-emerald-500' : 'text-slate-400'
+                      }`}
+                    />
                   )}
-                </span>
+                </div>
               </div>
-            </div>
+
+              {/* Hint */}
+              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
+                {isSendingCommand ? 'Sending command…' : 'Tap to toggle'}
+              </span>
+            </button>
           </div>
         )}
         <DataSourceBadge widget={widget} deviceName={resolvedDeviceName} />
@@ -1369,6 +1355,23 @@ export function WidgetRenderer({
             <div className="w-full h-36 relative">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPieChart>
+                  <defs>
+                    <filter
+                      id="pieShadow"
+                      x="-20%"
+                      y="-20%"
+                      width="140%"
+                      height="140%"
+                    >
+                      <feDropShadow
+                        dx="0"
+                        dy="3"
+                        stdDeviation="4"
+                        floodColor="#000000"
+                        floodOpacity="0.25"
+                      />
+                    </filter>
+                  </defs>
                   <Pie
                     data={pieData}
                     cx="50%"
@@ -1377,6 +1380,7 @@ export function WidgetRenderer({
                     innerRadius={30}
                     paddingAngle={4}
                     dataKey="value"
+                    filter="url(#pieShadow)"
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
@@ -1384,10 +1388,10 @@ export function WidgetRenderer({
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: '#f1f1f2ff',
+                      backgroundColor: '#f1f1f2',
                       borderRadius: '8px',
                       border: 'none',
-                      color: '#ffffffff',
+                      color: '#1e1e1e',
                       fontSize: '12px',
                     }}
                   />

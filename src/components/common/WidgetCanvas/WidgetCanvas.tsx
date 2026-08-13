@@ -276,7 +276,8 @@ export function WidgetCanvas({
       widgetId: string,
       dataSource: WidgetDataSource,
       visualization: WidgetVisualization,
-      title?: string
+      title?: string,
+      config?: { minValue?: number; maxValue?: number }
     ) => {
       if (!readOnly) {
         if (store.dashboardId) {
@@ -285,14 +286,16 @@ export function WidgetCanvas({
             widgetId,
             dataSource,
             visualization,
-            title
+            title,
+            config
           );
         } else {
           store.updateWidgetSettings(
             widgetId,
             dataSource,
             visualization,
-            title
+            title,
+            config
           );
         }
       }

@@ -44,7 +44,8 @@ interface WidgetSettingsModalProps {
     widgetId: string,
     dataSource: WidgetDataSource,
     visualization: WidgetVisualization,
-    title?: string
+    title?: string,
+    config?: { minValue?: number; maxValue?: number }
   ) => Promise<void> | void;
 }
 
@@ -102,6 +103,8 @@ export function WidgetSettingsModal({
     Record<string, string>
   >({});
   const [cardTitle, setCardTitle] = useState('');
+  const [minValue, setMinValue] = useState(0);
+  const [maxValue, setMaxValue] = useState(100);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Chart type is determined by widget library choice
@@ -116,6 +119,11 @@ export function WidgetSettingsModal({
     chartType.toLowerCase()
   );
 
+  // Progress bar widgets support a configurable min/max range
+  const isProgressBar =
+    chartType.toLowerCase() === 'progress-bar' ||
+    chartType.toLowerCase().includes('progress');
+
   // Sync state when widget opens or changes
   useEffect(() => {
     if (widget) {
@@ -128,6 +136,8 @@ export function WidgetSettingsModal({
       setTimeRange(widget.dataSource?.timeRange || '24h');
       setSelectedColor(widget.visualization?.colors?.[0] || '#3b82f6');
       setCardTitle(widget.title || '');
+      setMinValue(Number(widget.config?.minValue ?? 0));
+      setMaxValue(Number(widget.config?.maxValue ?? 100));
 
       // Restore per-key colors, aligned to the saved telemetry key order
       const colorMap: Record<string, string> = {};
@@ -264,7 +274,13 @@ export function WidgetSettingsModal({
 
     setIsSubmitting(true);
     try {
-      await onSave(widget.id, dataSource, visualization, cardTitle?.trim());
+      await onSave(
+        widget.id,
+        dataSource,
+        visualization,
+        cardTitle?.trim(),
+        isProgressBar ? { minValue, maxValue } : undefined
+      );
       onOpenChange(false);
     } catch (err) {
       console.error(err);
@@ -540,6 +556,54 @@ export function WidgetSettingsModal({
                 This title is displayed on the widget card header.
               </p>
             </div>
+            {/* ── Range (Progress Bar only) ── */}
+            {isProgressBar && (
+              <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <Label className="text-xs font-semibold flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
+                  <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                  Range
+                  <span className="text-[10px] font-normal text-slate-400">
+                    (min & max scale for the progress bar)
+                  </span>
+                </Label>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="range-min"
+                      className="text-xs font-semibold text-slate-600 dark:text-slate-300"
+                    >
+                      Min Value
+                    </Label>
+                    <Input
+                      id="range-min"
+                      type="number"
+                      value={minValue}
+                      onChange={(e) => setMinValue(Number(e.target.value))}
+                      className="h-9 text-xs bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label
+                      htmlFor="range-max"
+                      className="text-xs font-semibold text-slate-600 dark:text-slate-300"
+                    >
+                      Max Value
+                    </Label>
+                    <Input
+                      id="range-max"
+                      type="number"
+                      value={maxValue}
+                      onChange={(e) => setMaxValue(Number(e.target.value))}
+                      className="h-9 text-xs bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                    />
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  The telemetry value is mapped onto this range to compute the
+                  progress bar fill.
+                </p>
+              </div>
+            )}
             {/* ── Section 2b: Per-Key Colors (Pie/Donut only) ── */}
             {isPieChart && selectedTelemetryKeys.length > 0 && (
               <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
