@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -10,6 +10,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -18,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PageHeader } from '@/components/common/PageHeader';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import {
   AreaChart,
   Area,
@@ -29,77 +32,214 @@ import {
   PieChart,
   Pie,
   Cell,
+  BarChart,
+  Bar,
 } from 'recharts';
-import { Edit2, Trash2 } from 'lucide-react';
+import {
+  Database,
+  HardDrive,
+  Activity,
+  Zap,
+  TrendingUp,
+  Clock,
+  Download,
+  Search,
+  Server,
+  Layers,
+  BarChart3,
+  Calendar,
+} from 'lucide-react';
+import { useDataConsumptionAnalytics } from '@/features/analytics/hooks';
+import { format } from 'date-fns';
 
-const consumptionTrendData = [
-  { time: '20/8', value: 30 },
-  { time: '21/8', value: 45 },
-  { time: '22/8', value: 35 },
-  { time: '23/8', value: 50 },
-  { time: '24/8', value: 55 },
-  { time: '25/8', value: 80 },
-  { time: '26/8', value: 95 },
-];
+const formatBytes = (bytes: number | null | undefined): string => {
+  if (!bytes || bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+};
 
-const statusDistributionData = [
-  { name: 'Device Data', value: 65, color: '#4338ca' },
-  { name: 'Dashboard Queries', value: 20, color: '#c026d3' },
-  { name: 'API Calls', value: 10, color: '#f97316' },
-  { name: 'Storage Overhead', value: 5, color: '#44403c' },
-];
-
-const tableData = [
-  {
-    type: 'Device',
-    name: 'Gateway-002',
-    consumed: '485 GB',
-    percent: '17.3%',
-    trend: '↑ 12%',
-  },
-  {
-    type: 'Dashboard',
-    name: 'Production Overview',
-    consumed: '320 GB',
-    percent: '11.4%',
-    trend: '↑ 8%',
-  },
-  {
-    type: 'Device',
-    name: 'Sensor-001',
-    consumed: '280 GB',
-    percent: '10.0%',
-    trend: '↓ 5%',
-  },
-  {
-    type: 'Dashboard',
-    name: 'Energy Management',
-    consumed: '195 GB',
-    percent: '7.0%',
-    trend: '↑ 15%',
-  },
-];
+const TYPE_COLORS: Record<string, string> = {
+  telemetry: '#6366f1',
+  apiCalls: '#f59e0b',
+  attributes: '#10b981',
+  commands: '#ec4899',
+};
 
 export default function DataConsumptionAnalyticsPage() {
   const { t } = useTranslation();
-  const [timeRange, setTimeRange] = useState('30d');
-console.log()
+  const [timeRange, setTimeRange] = useState<string>('30d');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [trendMetric, setTrendMetric] = useState<'messages' | 'bytes'>(
+    'messages'
+  );
+
+  const { data: analytics, isLoading } = useDataConsumptionAnalytics(timeRange);
+  const summary = analytics?.summary;
+  const trend = analytics?.trend ?? [];
+  const byType = analytics?.byType;
+  const topConsumers = analytics?.topConsumers ?? [];
+  const hourlyDistribution = analytics?.hourlyDistribution ?? [];
+  const period = analytics?.period;
+
+  // Chart data: Data Consumption Analytics
+  const trendChartData = useMemo(() => {
+    return trend.map((item) => ({
+      date: item.bucket ? format(new Date(item.bucket), 'MMM dd') : '',
+      fullDate: item.bucket
+        ? format(new Date(item.bucket), 'MMM dd, yyyy')
+        : '',
+      messages: item.messages ?? 0,
+      estimatedBytes: item.estimatedBytes ?? 0,
+      formattedBytes: formatBytes(item.estimatedBytes),
+    }));
+  }, [trend]);
+
+  // Chart data: Distribution by Type
+  const typeDistributionData = useMemo(() => {
+    if (!byType) return [];
+    const total =
+      (byType.telemetry ?? 0) +
+      (byType.apiCalls ?? 0) +
+      (byType.attributes ?? 0) +
+      (byType.commands ?? 0);
+
+    return [
+      {
+        name: 'Telemetry',
+        key: 'telemetry',
+        value: byType.telemetry ?? 0,
+        percentage:
+          total > 0
+            ? (((byType.telemetry ?? 0) / total) * 100).toFixed(1)
+            : '0',
+        color: TYPE_COLORS.telemetry,
+      },
+      {
+        name: 'API Calls',
+        key: 'apiCalls',
+        value: byType.apiCalls ?? 0,
+        percentage:
+          total > 0 ? (((byType.apiCalls ?? 0) / total) * 100).toFixed(1) : '0',
+        color: TYPE_COLORS.apiCalls,
+      },
+      {
+        name: 'Attributes',
+        key: 'attributes',
+        value: byType.attributes ?? 0,
+        percentage:
+          total > 0
+            ? (((byType.attributes ?? 0) / total) * 100).toFixed(1)
+            : '0',
+        color: TYPE_COLORS.attributes,
+      },
+      {
+        name: 'Commands',
+        key: 'commands',
+        value: byType.commands ?? 0,
+        percentage:
+          total > 0 ? (((byType.commands ?? 0) / total) * 100).toFixed(1) : '0',
+        color: TYPE_COLORS.commands,
+      },
+    ].filter((item) => item.value > 0);
+  }, [byType]);
+
+  // Chart data: Hourly Distribution
+  const hourlyChartData = useMemo(() => {
+    const hoursMap = new Map<number, number>();
+    hourlyDistribution.forEach((item) => {
+      hoursMap.set(item.hour, item.messages);
+    });
+
+    const data = [];
+    for (let h = 0; h < 24; h++) {
+      const messages = hoursMap.get(h) ?? 0;
+      data.push({
+        hour: `${String(h).padStart(2, '0')}:00`,
+        messages,
+        isPeak: summary?.peakHour === `${String(h).padStart(2, '0')}:00`,
+      });
+    }
+    return data;
+  }, [hourlyDistribution, summary?.peakHour]);
+
+  // Filtered Top Consumers
+  const filteredConsumers = useMemo(() => {
+    if (!searchTerm.trim()) return topConsumers;
+    const term = searchTerm.toLowerCase();
+    return topConsumers.filter(
+      (c) =>
+        c.name?.toLowerCase().includes(term) ||
+        c.id?.toLowerCase().includes(term) ||
+        c.type?.toLowerCase().includes(term)
+    );
+  }, [topConsumers, searchTerm]);
+
+  // Export to CSV handler
+  const handleExportCSV = () => {
+    if (!topConsumers.length) return;
+    const headers = [
+      'Rank',
+      'Type',
+      'Name',
+      'Device ID',
+      'Messages',
+      'Estimated Bytes',
+      'Percentage',
+    ];
+    const rows = topConsumers.map((c, idx) => [
+      idx + 1,
+      c.type,
+      `"${c.name}"`,
+      c.id,
+      c.messages,
+      c.estimatedBytes,
+      `${c.percentage}%`,
+    ]);
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute(
+      'download',
+      `data-consumption-${timeRange}-${format(new Date(), 'yyyyMMdd')}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <PageHeader
-          title={t('analytics.dataConsumption.title')}
-          description={t('analytics.dataConsumption.subtitle')}
-        />
-        <div className="flex items-center gap-3">
-          <Select
-            value={timeRange}
-            onValueChange={setTimeRange}
-            className="w-40 border-gray-200"
-          >
-            <SelectTrigger className=" h-10 rounded-md">
-              <SelectValue placeholder="Time Range: Last 30 days" />
+        <div>
+          <PageHeader
+            title={t(
+              'analytics.dataConsumption.title',
+              'Data Consumption Analytics'
+            )}
+          />
+          {period && (
+            <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+              <Calendar className="h-3.5 w-3.5 text-primary" />
+              <span>
+                {format(new Date(period.since), 'MMM dd, yyyy')} —{' '}
+                {format(new Date(period.until), 'MMM dd, yyyy')} ({period.days}{' '}
+                days window)
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Time Range Selector */}
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-40 h-10 rounded-md bg-white border-slate-200 shadow-sm">
+              <SelectValue placeholder="Time Range" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="24h">Last 24 hours</SelectItem>
@@ -108,238 +248,579 @@ console.log()
               <SelectItem value="90d">Last 90 days</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="primary">Export Data</Button>
+
+          <Button
+            variant="outline"
+            className="h-10 gap-2 border-slate-200 shadow-sm bg-white"
+            onClick={handleExportCSV}
+            disabled={!topConsumers.length}
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          {
-            title: t('analytics.dataConsumption.stats.totalData'),
-            value: '2.8 TB',
-            trend: '↑ 15% from last month',
-            color: 'bg-primary text-white',
-          },
-          {
-            title: t('analytics.dataConsumption.stats.avgDaily'),
-            value: '95.2 GB',
-            trend: '↑ 3% from yesterday',
-            color: 'bg-secondary text-white',
-          },
-          {
-            title: t('analytics.dataConsumption.stats.peakHour'),
-            value: '14:00',
-            trend: '127 GB peak',
-            color: 'bg-success text-white',
-          },
-          {
-            title: t('analytics.dataConsumption.stats.storageEfficiency'),
-            value: '87.5%',
-            trend: '↑ 2% efficiency',
-            color: 'bg-white text-black ',
-          },
-        ].map((kpi, idx) => (
-          <Card key={idx} className={`  rounded-lg `}>
-            <CardContent
-              className={`p-6  rounded-lg ${kpi.color} ${idx === 3 ? 'text-black' : 'text-white'
-                }`}
-            >
-              <h3
-                className={`text-sm font-semibold ${kpi.color.split(' ')[1]}`}
-              >
-                {kpi.title}
-              </h3>
-              <p className="text-2xl font-semibold  mt-1">{kpi.value}</p>
-              <p className="text-xs mt-1">{kpi.trend}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-32">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* Total Data Volume */}
+            <Card className="bg-primary text-white shadow-sm rounded-xl overflow-hidden border-0">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium uppercase tracking-wider text-white/80">
+                    Total Ingested Data
+                  </span>
+                  <Database className="h-5 w-5 text-white/80" />
+                </div>
+                <div className="text-3xl font-bold tracking-tight mb-1">
+                  {formatBytes(summary?.estimatedBytes)}
+                </div>
+                <div className="text-xs text-white/90 font-medium">
+                  {summary?.totalMessages?.toLocaleString() ?? 0} messages
+                </div>
+                <div className="text-[11px] text-white/70 mt-2">
+                  {summary?.vsLastPeriodPercent != null
+                    ? `${summary.vsLastPeriodPercent > 0 ? '↑ +' : '↓ '}${summary.vsLastPeriodPercent}% vs last period`
+                    : 'Active telemetry payload'}
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Data Consumption Trend */}
-        <Card className="border border-gray-100 dark:border-gray-800 shadow-sm rounded-lg overflow-hidden">
-          <CardHeader className="p-6 pb-2">
-            <CardTitle className="text-lg font-semibold text-gray-800 dark:text-white">
-              {t('analytics.dataConsumption.charts.consumptionTrend')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 pt-0">
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={consumptionTrendData}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#c026d3" stopOpacity={0.1} />
-                      <stop offset="95%" stopColor="#c026d3" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={true}
-                    horizontal={false}
-                    stroke="#f1f5f9"
-                  />
-                  <XAxis
-                    dataKey="time"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fill: '#94a3b8', fontSize: 12 }}
-                    dy={10}
-                  />
-                  <YAxis hide />
-                  <Tooltip
-                    content={({ active, payload }) => {
-                      if (active && payload && payload.length) {
-                        return (
-                          <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-100 flex flex-col gap-1">
-                            <span className="text-xs text-gray-400">Total</span>
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3 rounded-sm bg-[#c026d3]" />
-                              <span className="text-sm font-medium">
-                                2000 kW/h
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke="#c026d3"
-                    strokeWidth={4}
-                    fillOpacity={1}
-                    fill="url(#colorValue)"
-                    dot={{
-                      r: 4,
-                      fill: '#c026d3',
-                      strokeWidth: 2,
-                      stroke: '#fff',
-                    }}
-                    activeDot={{
-                      r: 6,
-                      fill: '#c026d3',
-                      strokeWidth: 2,
-                      stroke: '#fff',
-                    }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Device Status Distribution */}
-        <Card className="border border-gray-100 dark:border-gray-800 shadow-sm rounded-lg overflow-hidden">
-          <CardHeader className="p-6 pb-2">
-            <CardTitle className="text-lg font-semibold text-gray-800 dark:text-white">
-              {t('analytics.dataConsumption.charts.statusDistribution')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 flex items-center gap-8">
-            <div className="h-[250px] w-1/2">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusDistributionData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {statusDistributionData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex flex-col gap-4">
-              {statusDistributionData.map((item, idx) => (
-                <div key={idx} className="flex items-center gap-3">
-                  <div
-                    className="w-4 h-4 rounded-sm"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {item.name} ({item.value}%)
+            {/* Daily Average */}
+            <Card className="bg-secondary text-white shadow-sm rounded-xl overflow-hidden border-0">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium uppercase tracking-wider text-white/80">
+                    Daily Average
+                  </span>
+                  <Activity className="h-5 w-5 text-white/80" />
+                </div>
+                <div className="text-3xl font-bold tracking-tight mb-1">
+                  {summary?.avgDailyMessages?.toLocaleString() ?? 0}
+                  <span className="text-sm font-normal ml-1 text-white/80">
+                    msgs/day
                   </span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                <div className="text-xs text-white/90 font-medium">
+                  ~
+                  {formatBytes(
+                    (summary?.estimatedBytes ?? 0) /
+                      Math.max(period?.days ?? 1, 1)
+                  )}
+                  /day avg data
+                </div>
+                <div className="text-[11px] text-white/70 mt-2">
+                  Over {period?.days ?? 30} days sampled
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Table Section */}
-      <Card className="rounded-lg overflow-hidden">
-        <CardContent className="p-6">
-          <Table>
-            <TableHeader className=" text-white">
-              <TableRow className="hover:bg-transparent border-none">
-                <TableHead className="text-white font-medium h-14">
-                  {t('analytics.dataConsumption.table.type')}
-                </TableHead>
-                <TableHead className="text-white font-medium h-14">
-                  {t('analytics.dataConsumption.table.name')}
-                </TableHead>
-                <TableHead className="text-white font-medium h-14">
-                  {t('analytics.dataConsumption.table.dataConsumed')}
-                </TableHead>
-                <TableHead className="text-white font-medium h-14">
-                  {t('analytics.dataConsumption.table.percentOfTotal')}
-                </TableHead>
-                <TableHead className="text-white font-medium h-14">
-                  {t('analytics.dataConsumption.table.trend')}
-                </TableHead>
-                <TableHead className="text-white font-medium h-14 text-right">
-                  {t('analytics.dataConsumption.table.actions')}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tableData.map((row, index) => (
-                <TableRow
-                  key={index}
-                  className="border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-900/50 h-16"
-                >
-                  <TableCell className="text-sm text-gray-700 dark:text-gray-300">
-                    {row.type}
-                  </TableCell>
-                  <TableCell className="text-sm font-medium text-gray-900 dark:text-white">
-                    {row.name}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-700 dark:text-gray-300">
-                    {row.consumed}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-700 dark:text-gray-300">
-                    {row.percent}
-                  </TableCell>
-                  <TableCell className="text-sm text-gray-700 dark:text-gray-300">
-                    {row.trend}
-                  </TableCell>
-                  <TableCell className="text-right flex items-center justify-end gap-2 h-16">
-                    <Button variant="outline" className='rounded-full' size="sm">
-                      <Edit2 className="h-3 w-3" />
-                    </Button>
-                    <Button variant="destructive" className='rounded-full' size="sm">
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            {/* Peak Activity Window */}
+            <Card className="bg-success text-white shadow-sm rounded-xl overflow-hidden border-0">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-medium uppercase tracking-wider text-white/80">
+                    Peak Hour
+                  </span>
+                  <Zap className="h-5 w-5 text-white/80" />
+                </div>
+                <div className="text-3xl font-bold tracking-tight mb-1">
+                  {summary?.peakHour ?? 'N/A'}
+                </div>
+                <div className="text-xs text-white/90 font-medium">
+                  {summary?.bytesPerRow
+                    ? `${summary.bytesPerRow} B/row avg`
+                    : 'Peak traffic time'}
+                </div>
+                <div className="text-[11px] text-white/70 mt-2">
+                  Highest hourly throughput window
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Storage Efficiency */}
+            <Card className="bg-white text-slate-800 shadow-sm rounded-xl border border-slate-200">
+              <CardContent className="p-5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    Storage Efficiency
+                  </span>
+                  <HardDrive className="h-5 w-5 text-success" />
+                </div>
+                <div className="text-3xl font-bold tracking-tight text-slate-800 mb-1">
+                  {summary?.storageEfficiencyPercent ?? 0}%
+                </div>
+                <div className="text-xs text-slate-600 font-medium">
+                  {summary?.bytesPerRowMeasured
+                    ? 'Measured compression'
+                    : 'Estimated compression'}
+                </div>
+                <div className="text-[11px] text-slate-400 mt-2">
+                  Optimized database storage footprint
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts Row 1: Trend + Type Distribution */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Data Consumption Trend (2 cols on lg) */}
+            <Card className="lg:col-span-2 border border-slate-200 shadow-sm rounded-xl overflow-hidden bg-white">
+              <CardHeader className="p-5 pb-2 flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    {t(
+                      'analytics.dataConsumption.charts.consumptionTrend',
+                      'Data Consumption Trend'
+                    )}
+                  </CardTitle>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Historical volume breakdown over the selected period
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg">
+                  <button
+                    onClick={() => setTrendMetric('messages')}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                      trendMetric === 'messages'
+                        ? 'bg-white text-slate-800 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Messages
+                  </button>
+                  <button
+                    onClick={() => setTrendMetric('bytes')}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                      trendMetric === 'bytes'
+                        ? 'bg-white text-slate-800 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    Data Volume
+                  </button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-5 pt-3">
+                {trendChartData.length > 0 ? (
+                  <div className="h-[280px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={trendChartData}>
+                        <defs>
+                          <linearGradient
+                            id="consumptionGradient"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor="#6366f1"
+                              stopOpacity={0.25}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor="#6366f1"
+                              stopOpacity={0.0}
+                            />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          vertical={false}
+                          stroke="#f1f5f9"
+                        />
+                        <XAxis
+                          dataKey="date"
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#94a3b8', fontSize: 12 }}
+                          dy={6}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#94a3b8', fontSize: 12 }}
+                          tickFormatter={(val) =>
+                            trendMetric === 'bytes'
+                              ? formatBytes(val)
+                              : val.toLocaleString()
+                          }
+                          dx={-4}
+                        />
+                        <Tooltip
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-100 text-xs flex flex-col gap-1.5 min-w-[160px]">
+                                  <span className="font-semibold text-slate-700">
+                                    {data.fullDate}
+                                  </span>
+                                  <div className="flex items-center justify-between gap-4 text-slate-600">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-2 h-2 rounded-full bg-primary" />
+                                      Messages:
+                                    </span>
+                                    <strong className="text-slate-900">
+                                      {data.messages.toLocaleString()}
+                                    </strong>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-4 text-slate-600">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-2 h-2 rounded-full bg-secondary" />
+                                      Data Size:
+                                    </span>
+                                    <strong className="text-slate-900">
+                                      {data.formattedBytes}
+                                    </strong>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey={
+                            trendMetric === 'bytes'
+                              ? 'estimatedBytes'
+                              : 'messages'
+                          }
+                          stroke="#6366f1"
+                          strokeWidth={2.5}
+                          fillOpacity={1}
+                          fill="url(#consumptionGradient)"
+                          dot={{
+                            r: 4,
+                            fill: '#6366f1',
+                            strokeWidth: 2,
+                            stroke: '#fff',
+                          }}
+                          activeDot={{
+                            r: 6,
+                            fill: '#6366f1',
+                            strokeWidth: 2,
+                            stroke: '#fff',
+                          }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-[280px] text-slate-400 gap-2">
+                    <TrendingUp className="h-8 w-8 opacity-30" />
+                    <p className="text-sm">
+                      No trend data available for this range
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Traffic by Message Type */}
+            <Card className="border border-slate-200 shadow-sm rounded-xl overflow-hidden bg-white">
+              <CardHeader className="p-5 pb-2">
+                <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-primary" />
+                  {t(
+                    'analytics.dataConsumption.charts.statusDistribution',
+                    'Traffic by Message Type'
+                  )}
+                </CardTitle>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Breakdown by ingestion channel
+                </p>
+              </CardHeader>
+              <CardContent className="p-5 pt-0">
+                {typeDistributionData.length > 0 ? (
+                  <div className="flex flex-col gap-4">
+                    <div className="h-[180px] w-full flex items-center justify-center">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={typeDistributionData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={50}
+                            outerRadius={75}
+                            paddingAngle={4}
+                            dataKey="value"
+                          >
+                            {typeDistributionData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            formatter={(value: any) => [
+                              value.toLocaleString(),
+                              'Messages',
+                            ]}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-100">
+                      {typeDistributionData.map((item) => (
+                        <div
+                          key={item.key}
+                          className="flex items-center gap-2 text-xs"
+                        >
+                          <div
+                            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-slate-600 truncate font-medium">
+                              {item.name}
+                            </span>
+                            <span className="text-slate-400 font-semibold">
+                              {item.value.toLocaleString()} ({item.percentage}%)
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-[240px] text-slate-400 gap-2">
+                    <Layers className="h-8 w-8 opacity-30" />
+                    <p className="text-xs">
+                      No message type breakdown available
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Charts Row 2: Hourly Traffic Distribution */}
+          <Card className="border border-slate-200 shadow-sm rounded-xl overflow-hidden bg-white">
+            <CardHeader className="p-5 pb-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    24-Hour Traffic Profile
+                  </CardTitle>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Hourly message volume across the day (Peak:{' '}
+                    <strong className="text-slate-700">
+                      {summary?.peakHour ?? 'N/A'}
+                    </strong>
+                    )
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-500">
+                  <span className="w-2.5 h-2.5 rounded-sm bg-primary" /> Normal
+                  <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" />{' '}
+                  Peak
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-5 pt-3">
+              <div className="h-[200px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={hourlyChartData}
+                    margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#f1f5f9"
+                    />
+                    <XAxis
+                      dataKey="hour"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                      interval={2}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#94a3b8', fontSize: 11 }}
+                    />
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-white p-2.5 rounded-lg shadow-md border border-slate-100 text-xs">
+                              <p className="font-semibold text-slate-800">
+                                {data.hour}
+                              </p>
+                              <p className="text-primary font-medium">
+                                {data.messages.toLocaleString()} messages
+                              </p>
+                              {data.isPeak && (
+                                <Badge
+                                  variant="default"
+                                  className="mt-1 text-[10px] bg-emerald-500"
+                                >
+                                  Peak Window
+                                </Badge>
+                              )}
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar dataKey="messages" radius={[4, 4, 0, 0]}>
+                      {hourlyChartData.map((entry, index) => (
+                        <Cell
+                          key={`hourly-${index}`}
+                          fill={entry.isPeak ? '#10b981' : '#6366f1'}
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Top Consumers Table */}
+          <Card className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+            <CardHeader className="p-5 pb-3 border-b border-slate-100  flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <CardTitle className="text-base font-semibold  flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                  Top Data Consumers
+                </CardTitle>
+                <p className="text-xs   mt-0.5">
+                  Devices and entities generating highest volume and storage
+                  overhead
+                </p>
+              </div>
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Search consumer by name or ID..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9 h-9 text-xs bg-slate-50 border-slate-200 rounded-lg"
+                />
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader className=" text-white">
+                  <TableRow className="border-b border-slate-200">
+                    <TableHead className="font-semibold   text-xs h-11 w-16 text-center">
+                      #
+                    </TableHead>
+                    <TableHead className="font-semibold   text-xs h-11">
+                      {t('analytics.dataConsumption.table.type', 'TYPE')}
+                    </TableHead>
+                    <TableHead className="font-semibold   text-xs h-11">
+                      {t(
+                        'analytics.dataConsumption.table.name',
+                        'CONSUMER / DEVICE'
+                      )}
+                    </TableHead>
+                    <TableHead className="font-semibold   text-xs h-11">
+                      {t(
+                        'analytics.dataConsumption.table.messages',
+                        'MESSAGES'
+                      )}
+                    </TableHead>
+                    <TableHead className="font-semibold   text-xs h-11">
+                      {t(
+                        'analytics.dataConsumption.table.dataConsumed',
+                        'ESTIMATED DATA'
+                      )}
+                    </TableHead>
+                    <TableHead className="font-semibold   text-xs h-11 w-52">
+                      {t(
+                        'analytics.dataConsumption.table.percentOfTotal',
+                        '% OF TOTAL'
+                      )}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredConsumers.length > 0 ? (
+                    filteredConsumers.map((row, index) => (
+                      <TableRow
+                        key={row.id || index}
+                        className="border-b border-slate-100 last:border-0 hover:bg-slate-50/75 transition-colors h-14"
+                      >
+                        <TableCell className="text-xs font-semibold text-slate-400 text-center">
+                          {index + 1}
+                        </TableCell>
+                        <TableCell className="text-xs">
+                          <Badge
+                            variant="outline"
+                            className="capitalize text-[11px] font-medium border-slate-200 bg-slate-50"
+                          >
+                            {row.type}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                              <Server className="h-3.5 w-3.5 text-slate-400" />
+                              {row.name || 'Unnamed Entity'}
+                            </span>
+                            <span className="text-[11px] text-slate-400 font-mono">
+                              {row.id}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs font-medium text-slate-700">
+                          {row.messages?.toLocaleString()} msgs
+                        </TableCell>
+                        <TableCell className="text-xs font-semibold text-slate-800">
+                          {formatBytes(row.estimatedBytes)}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                              <div
+                                className="bg-primary h-2 rounded-full transition-all duration-500"
+                                style={{
+                                  width: `${Math.min(row.percentage, 100)}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs font-bold text-slate-700 w-12 text-right">
+                              {row.percentage}%
+                            </span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={6}
+                        className="text-center py-12 text-slate-400 text-sm"
+                      >
+                        {searchTerm
+                          ? 'No consumers match your search'
+                          : 'No data consumers found'}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }

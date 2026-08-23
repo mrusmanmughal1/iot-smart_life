@@ -510,28 +510,6 @@ export function WidgetSettingsModal({
             </div>
           </div>
 
-          {/* ── Section 4: Theme Colors ── */}
-          {!isPieChart && (
-            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <Label className="text-xs font-semibold flex items-center gap-1.5 text-slate-800 dark:text-slate-100">
-                <Palette className="w-3.5 h-3.5 text-purple-500" />
-                Theme Color
-              </Label>
-              <div className="flex items-center gap-2.5">
-                <input
-                  type="color"
-                  value={selectedColor}
-                  onChange={(e) => setSelectedColor(e.target.value)}
-                  title="Pick theme color"
-                  className="w-10 h-9 rounded cursor-pointer border border-slate-300 dark:border-slate-600 bg-transparent p-0.5"
-                />
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                  {selectedColor}
-                </span>
-              </div>
-            </div>
-          )}
-
           {/* ── Section 5: Card Appearance ── */}
           <div className="space-y-3 py-4 border-t border-slate-100 dark:border-slate-800">
             <Label className="text-sm font-semibold flex items-center gap-2 text-slate-800 dark:text-slate-100">

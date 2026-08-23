@@ -17,8 +17,6 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Search,
-  Plus,
 } from 'lucide-react';
 import { useSolutionTemplates } from '@/features/solution-templates/hooks';
 import { debounce } from '@/lib/util';
@@ -46,6 +44,7 @@ export default function SolutionTemplates() {
     itemsPerPage: 10,
     initialCategory: 'smartCity',
   });
+
   const [inputValue, setInputValue] = useState(searchQuery);
 
   // Create debounced search handler (900ms delay)

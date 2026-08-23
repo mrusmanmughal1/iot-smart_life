@@ -11,7 +11,6 @@ export const handleApiError = (error: unknown): ApiError => {
     const statusCode = error.response?.status;
     const message = error.response?.data?.message || error.message;
     const errors = error.response?.data?.errors;
-    
 
     return {
       message,
@@ -36,7 +35,9 @@ export const getErrorMessage = (error: unknown): string => {
   return apiError.message;
 };
 
-export const getValidationErrors = (error: unknown): Record<string, string[]> | undefined => {
+export const getValidationErrors = (
+  error: unknown
+): Record<string, string[]> | undefined => {
   const apiError = handleApiError(error);
   return apiError.errors;
 };

@@ -37,31 +37,66 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { TimeRangeType } from '@/services/api/analytics.api';
 import DashboardNavigation from '@/components/ui/DashboardNavigation';
+import { Pagination } from '@/components/common/Pagination';
+import { format } from 'date-fns';
+
+import { exportDeviceAnalyticsPdf } from '@/features/analytics/utils/exportDeviceAnalyticsPdf';
 
 export default function DeviceAnalyticsMainPage() {
   const { t } = useTranslation();
   const [deviceType, setDeviceType] = useState('');
   const [status, setStatus] = useState('');
-  const [timeRange, setTimeRange] = useState<TimeRangeType>('daily');
-  const { data: devicesAnalytics } = useDevicesAnalytics({
-    period: timeRange,
-    deviceType,
-    status,
-  });
 
-  const rawData: any = (devicesAnalytics as any)?.data || {};
-  const tableData = (rawData.devices || []).map((device: any) => ({
-    id: device.deviceId,
-    name: device.deviceName || 'Unknown',
-    type: device.deviceType || 'Unknown',
+  const [timeRange, setTimeRange] = useState<TimeRangeType>(
+    TimeRangeType.last24h
+  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const { data: devicesAnalytics, isLoading: isLoadingData } =
+    useDevicesAnalytics({
+      timeRange,
+      type: deviceType || undefined,
+      status: status || undefined,
+      page: currentPage,
+      limit: itemsPerPage,
+    });
+  const rawData = devicesAnalytics || {};
+  const meta = rawData.meta || {
+    totalPages: 1,
+    totalItems: 0,
+    page: 1,
+    limit: itemsPerPage,
+  };
+
+  const handleExportPdf = () => {
+    exportDeviceAnalyticsPdf({
+      timeRange,
+      deviceType,
+      status,
+      devices: rawData.devices || [],
+      topGenerators: rawData.topGenerators || [],
+      statusDistribution: rawData.statusDistribution || {
+        online: 0,
+        offline: 0,
+        maintenance: 0,
+      },
+      totalDevices: rawData.meta?.totalItems || (rawData.devices || []).length,
+    });
+  };
+
+  const tableData = (rawData.devices || []).map((device) => ({
+    id: device.id,
+    name: device.name || 'Unknown',
+    type: device.type || 'Unknown',
     status:
       device.status === 'active' || device.status === 'online'
         ? 'Online'
         : 'Offline',
-    dataGenerated: `${device.dataGeneratedMB || 0} MB`,
-    lastActive: device.lastActive || 'N/A',
-    uptime: `${device.uptimePercent || 0}%`,
-    alerts: device.alarmCount || 0,
+    dataGenerated: `${device.dataGeneratedBytes || 0} MB`,
+    lastActive: device.lastSeenAt || 'N/A',
+    uptime: `${device.uptimePercentage || 0}%`,
+    alerts: device.activeAlarms || 0,
     statusColor:
       device.status === 'active' || device.status === 'online'
         ? 'text-green-500'
@@ -75,24 +110,24 @@ export default function DeviceAnalyticsMainPage() {
   }));
 
   const topGeneratorsData = (rawData.topGenerators || []).map(
-    (gen: any, index: number) => ({
-      name: gen.deviceName || 'Unknown',
-      value: gen.dataGeneratedMB || 0,
+    (gen, index: number) => ({
+      name: gen.name || 'Unknown',
+      value: gen.dataGeneratedBytes || 0,
       color: ['#312e81', '#c026d3', '#4a4a4a'][index % 3] || '#4a4a4a',
     })
   );
 
   const dist = rawData.statusDistribution || {
-    online: 0,
-    offline: 0,
-    maintenance: 0,
+    online: 10,
+    offline: 10,
+    maintenance: 10,
   };
   const statusDistributionData = [
     { name: 'Online', value: dist.online || 0, color: '#4338ca' },
     { name: 'Offline', value: dist.offline || 0, color: '#c026d3' },
     { name: 'Maintenance', value: dist.maintenance || 0, color: '#fca5a1' },
   ];
-  const totalDevices = rawData.total || 0;
+  const totalDevices = rawData.meta?.totalItems || 0;
   const navigate = useNavigate();
   return (
     <div className="flex flex-col space-y-6 animate-in fade-in duration-500">
@@ -102,7 +137,9 @@ export default function DeviceAnalyticsMainPage() {
           title={t('analytics.deviceMain.title')}
           description={t('analytics.deviceMain.subtitle')}
         />
-        <Button variant="primary">Export Data</Button>
+        <Button variant="primary" onClick={handleExportPdf}>
+          Export Data
+        </Button>
       </div>
 
       {/* Filters Section */}
@@ -111,23 +148,35 @@ export default function DeviceAnalyticsMainPage() {
           <span>Device Type :</span>{' '}
           <Select
             value={deviceType}
-            onValueChange={setDeviceType}
+            onValueChange={(val) => {
+              setDeviceType(val);
+              setCurrentPage(1);
+            }}
             className="w-[180px]"
           >
             <SelectTrigger className="w-[180px] h-10 bg-gray-100 border-none rounded-md">
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="temperature">Temperature</SelectItem>
+              <SelectItem value="">All</SelectItem>
+              <SelectItem value="sensor">Sensor</SelectItem>
               <SelectItem value="gateway">Gateway</SelectItem>
               <SelectItem value="actuator">Actuator</SelectItem>
+              <SelectItem value="controller">Controller</SelectItem>
+              <SelectItem value="camera">Camera</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="flex items-center gap-2">
           <span>Status :</span>{' '}
-          <Select value={status} onValueChange={setStatus} className="w-32">
+          <Select
+            value={status}
+            onValueChange={(val) => {
+              setStatus(val);
+              setCurrentPage(1);
+            }}
+            className="w-32"
+          >
             <SelectTrigger className="w-[280px] h-10 bg-gray-100 border-none rounded-md">
               <SelectValue placeholder="All" />
             </SelectTrigger>
@@ -142,9 +191,10 @@ export default function DeviceAnalyticsMainPage() {
           <span>Time Range :</span>{' '}
           <Select
             value={timeRange}
-            onValueChange={(value) =>
-              setTimeRange(value as 'daily' | 'weekly' | 'monthly')
-            }
+            onValueChange={(value) => {
+              setTimeRange(value as TimeRangeType);
+              setCurrentPage(1);
+            }}
             className="w-[180px]"
           >
             <SelectTrigger className="  h-10 bg-gray-100 border-none rounded-md">
@@ -153,10 +203,17 @@ export default function DeviceAnalyticsMainPage() {
               />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="daily">Last 24 hours</SelectItem>
-              <SelectItem value="weekly">Last week</SelectItem>
-              <SelectItem value="monthly">Last 30 days</SelectItem>
-              <SelectItem value="yearly">Last year</SelectItem>
+              <SelectItem value={TimeRangeType.lastHour}>Last hour</SelectItem>
+              <SelectItem value={TimeRangeType.last24h}>
+                Last 24 hours
+              </SelectItem>
+              <SelectItem value={TimeRangeType.lastWeek}>Last week</SelectItem>
+              <SelectItem value={TimeRangeType.last30d}>
+                Last 30 days
+              </SelectItem>
+              <SelectItem value={TimeRangeType.last90d}>
+                Last 90 days
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -204,8 +261,17 @@ export default function DeviceAnalyticsMainPage() {
                     {t('analytics.deviceMain.table.noData')}
                   </TableCell>
                 </TableRow>
+              ) : isLoadingData ? (
+                <TableRow className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16">
+                  <TableCell
+                    colSpan={8}
+                    className="text-center text-gray-500 text-sm"
+                  >
+                    Loading...
+                  </TableCell>
+                </TableRow>
               ) : (
-                tableData.map((row: any, index: number) => (
+                tableData.map((row, index: number) => (
                   <TableRow
                     key={index}
                     className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 h-16"
@@ -213,7 +279,7 @@ export default function DeviceAnalyticsMainPage() {
                     <TableCell className="text-sm font-semibold capitalize text-gray-700">
                       {row.name}
                     </TableCell>
-                    <TableCell className="text-sm text-gray-600">
+                    <TableCell className="text-sm capitalize text-gray-600">
                       {row.type}
                     </TableCell>
                     <TableCell>
@@ -237,7 +303,7 @@ export default function DeviceAnalyticsMainPage() {
                       {row.dataGenerated}
                     </TableCell>
                     <TableCell className="text-sm text-gray-600">
-                      {row.lastActive}
+                      {format(row.lastActive, 'yyyy-MM-dd HH:mm:ss')}
                     </TableCell>
                     <TableCell className="text-sm text-gray-600">
                       {row.uptime}
@@ -261,6 +327,17 @@ export default function DeviceAnalyticsMainPage() {
               )}
             </TableBody>
           </Table>
+          {(meta?.totalPages ?? 0) > 1 && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={meta.totalPages}
+                totalItems={meta.totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -318,7 +395,7 @@ export default function DeviceAnalyticsMainPage() {
                       offset: 10,
                     }}
                   >
-                    {topGeneratorsData.map((entry: any, index: number) => (
+                    {topGeneratorsData.map((entry, index: number) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Bar>
@@ -353,7 +430,11 @@ export default function DeviceAnalyticsMainPage() {
                     ))}
                     <Label
                       content={({ viewBox }) => {
-                        const { cx, cy } = viewBox as any;
+                        const box = viewBox as
+                          | { cx?: number; cy?: number }
+                          | undefined;
+                        const cx = box?.cx ?? 0;
+                        const cy = box?.cy ?? 0;
                         return (
                           <text
                             x={cx}
@@ -404,8 +485,10 @@ export default function DeviceAnalyticsMainPage() {
 
       {/* Bottom navigation */}
       <div className="flex justify-center gap-3 pt-4">
-        <DashboardNavigation previousRoute="/analytics/devices"
-          nextRoute="/analytics/devices-2" />
+        <DashboardNavigation
+          previousRoute="/analytics/devices"
+          nextRoute="/analytics/devices-2"
+        />
       </div>
     </div>
   );

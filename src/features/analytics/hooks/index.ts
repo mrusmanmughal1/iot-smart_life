@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { analyticsApi, DeviesAnaltyisParams } from '@/services/api';
 
-export const useSystemAnalytics = () => {
+export const useSystemAnalytics = (timeRange?: string) => {
   return useQuery({
-    queryKey: ['analytics', 'system'],
-    queryFn: () => analyticsApi.getSystemAnalytics(),
+    queryKey: ['analytics', 'system', timeRange],
+    queryFn: async () => {
+      const response = await analyticsApi.getSystemAnalytics(timeRange);
+      return response.data.data;
+    },
   });
 };
 
@@ -25,10 +28,16 @@ export const useDevicesAnalytics = (params?: DeviesAnaltyisParams) => {
   });
 };
 // get device details by id
-export const useDeviceDetails = (deviceId: string) => {
+export const useDeviceDetails = (deviceId: string, timeRange?: string) => {
   return useQuery({
-    queryKey: ['analytics', 'device', deviceId],
-    queryFn: () => analyticsApi.getDeviceAnalytics(deviceId),
+    queryKey: ['analytics', 'device', deviceId, timeRange],
+    queryFn: async () => {
+      const ApiResponse = await analyticsApi.getDeviceAnalytics(
+        deviceId,
+        timeRange
+      );
+      return ApiResponse.data.data;
+    },
     enabled: !!deviceId,
   });
 };
@@ -56,10 +65,33 @@ export const useAnalyticsOverview = () => {
 
 export const useGeoAnalytics = (region?: string) => {
   return useQuery({
-    queryKey: ['analytics', 'geo', region],
+    queryKey: ['analytics', 'geo-analyics', region],
     queryFn: async () => {
       const response = await analyticsApi.getgeoDetails(region);
-      return response.data.data.data;
+      return response.data.data;
+    },
+  });
+};
+
+export const useDataConsumptionAnalytics = (timeRange?: string) => {
+  return useQuery({
+    queryKey: ['analytics', 'data-consumption', timeRange],
+    queryFn: async () => {
+      const response = await analyticsApi.getDataConsumption(timeRange);
+      return response.data.data;
+    },
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+// get daashboard analytics
+export const useDashboardAnalytics = (timeRange?: string) => {
+  return useQuery({
+    queryKey: ['analytics', 'dashboards', timeRange],
+    queryFn: async () => {
+      const response = await analyticsApi.getDashboardAnalytics(timeRange);
+      return response.data.data;
     },
   });
 };

@@ -1,5 +1,5 @@
 import { PageHeader } from '@/components/common/PageHeader';
-import { Badge } from '@/components/ui/badge';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,42 +8,86 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { AlertTriangle, Clock1, CheckCircle2 } from 'lucide-react';
+import { Clock1, Clock } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import {
+  useAcknowledgeAlarm,
+  useAlarm,
+  useAlarmEscalationHistory,
+  useResolveAlarm,
+} from '../hooks';
+import { format } from 'date-fns';
+import { AlarmRuleBadge } from '@/components/ui/AlarmRuleBadge';
+import { LoadingOverlay } from '@/components/common/LoadingSpinner';
+import { AlarmSeverity } from '@/services/api/alarms.api';
+
+const getSeverityVariant = (severity?: AlarmSeverity): BadgeVariant => {
+  switch (severity) {
+    case AlarmSeverity.CRITICAL:
+      return 'destructive';
+    case AlarmSeverity.MAJOR:
+      return 'warning';
+    case AlarmSeverity.MINOR:
+      return 'info';
+    case AlarmSeverity.WARNING:
+      return 'secondary';
+    default:
+      return 'default';
+  }
+};
 
 export const AlertDetailsPage = () => {
+  const { id } = useParams();
+  const { data: alarm, isLoading } = useAlarm(id || '');
+  const { data: escalationHistory, isLoading: escalationHistoryLoading } =
+    useAlarmEscalationHistory(id || '');
+  const acknowledge = useAcknowledgeAlarm();
+  const resolve = useResolveAlarm();
+  if (isLoading || escalationHistoryLoading) return <LoadingOverlay />;
   return (
     <div className="mx-auto max-w-[1260px]  ">
-      <PageHeader title="Temperature Alert - Sensor-001" />
-      <div className="mb-6 space-y-2 pt-2 text-sm text-slate-500">
-        <p>
-          Status: <Badge variant="default">Active</Badge>
-        </p>
-        <p>Severity: Warning · Created: 2024-05-22 14:30:25</p>
-      </div>
+      <PageHeader title={alarm?.name || ''} className="mb-4" />
 
       <div className="space-y-4">
         <Card className="overflow-hidden space-y-4">
           <div className="flex bg-white flex-col gap-4 border-b border-slate-200 bg-slate-50 px-6 py-6 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-emerald-800">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Active
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-900">
-                  <AlertTriangle className="h-4 w-4" />
-                  Warning
-                </span>
+                <Badge variant="default" className="uppercase text-sm">
+                  {alarm?.status ?? '—'}
+                </Badge>
+                <Badge
+                  className="uppercase text-sm"
+                  variant={getSeverityVariant(alarm?.severity)}
+                >
+                  {alarm?.severity ?? '—'}
+                </Badge>
               </div>
-              <p className="text-sm text-slate-600">
-                Alert generated for a temperature sensor that exceeded the safe
-                threshold. Review the current values and take action.
-              </p>
+              <div className="mb-  text-sm text-slate-500">
+                {alarm?.createdAt && (
+                  <p className="  ">
+                    <Clock className=" inline h-4 w-4 text-primary" /> Created:{' '}
+                    {format(new Date(alarm.createdAt), 'yyyy-MM-dd HH:mm:ss')}
+                  </p>
+                )}
+              </div>
+              <p className="text-sm text-slate-600">{alarm?.description}</p>
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-3">
-              <Button variant="secondary">Acknowledge</Button>
-              <Button variant="success">Resolve</Button>
+              <Button
+                variant="secondary"
+                onClick={() => acknowledge.mutate({ alarmId: id || '' })}
+              >
+                Acknowledge
+              </Button>
+              <Button
+                variant="success"
+                onClick={() => resolve.mutate({ alarmId: id || '', note: '' })}
+                disabled={resolve.isPending}
+              >
+                Resolve
+              </Button>
             </div>
           </div>
 
@@ -64,13 +108,17 @@ export const AlertDetailsPage = () => {
                     <div className="grid  grid-cols-2 gap-4 border-b border-slate-100 pb-4">
                       <span className="font-medium text-slate-800">Device</span>
                       <span className="  text-slate-500">
-                        Sensor-001 (Temperature Sensor)
+                        {alarm?.device?.name}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4">
                       <span className="font-medium text-slate-800">Rule</span>
                       <span className="  text-slate-500">
-                        Temperature &gt; 75°C
+                        {alarm?.rule ? (
+                          <AlarmRuleBadge rule={alarm.rule} />
+                        ) : (
+                          '—'
+                        )}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4">
@@ -78,7 +126,7 @@ export const AlertDetailsPage = () => {
                         Current Value
                       </span>
                       <span className="  text-rose-600 font-semibold">
-                        78.5°C
+                        {alarm?.currentValue}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4 border-b border-slate-100 pb-4">
@@ -86,8 +134,7 @@ export const AlertDetailsPage = () => {
                         Description
                       </span>
                       <span className="  text-slate-500">
-                        Temperature sensor reading exceeded safe threshold for
-                        manufacturing equipment. Immediate attention required.
+                        {alarm?.description}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -95,7 +142,12 @@ export const AlertDetailsPage = () => {
                         Last Updated
                       </span>
                       <span className="  text-slate-500">
-                        2024-05-22 14:32:10
+                        {alarm?.updatedAt
+                          ? format(
+                              new Date(alarm.updatedAt),
+                              'yyyy-MM-dd HH:mm:ss'
+                            )
+                          : '—'}
                       </span>
                     </div>
                   </div>

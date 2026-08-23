@@ -46,7 +46,71 @@ export interface AlertItem {
   triggeredAt: string;
   deviceId?: string;
 }
+export interface AlarmRuleCreateCondition {
+  key: string;
+  operation:
+    | 'GREATER'
+    | 'LESS'
+    | 'GREATER_OR_EQUAL'
+    | 'LESS_OR_EQUAL'
+    | 'EQUAL'
+    | 'NOT_EQUAL'
+    | string;
+  value: number | string;
+}
+
+export interface AlarmRuleConfig {
+  alarmType: string;
+  severity: string;
+  createCondition: AlarmRuleCreateCondition;
+  propagateToParent?: boolean;
+}
+
+export interface CreateAlarmRulePayload {
+  name: string;
+  description?: string;
+  severity: string;
+  deviceId?: string;
+  assetId?: string;
+  rule: AlarmRuleConfig;
+  isEnabled: boolean;
+  autoClear: boolean;
+  email: boolean;
+  sms: boolean;
+  push: boolean;
+  webhook?: string;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    webhook?: string;
+  };
+  userIds: string[];
+  emails: string[];
+  phones: string[];
+  recipients: {
+    userIds: string[];
+    emails: string[];
+  };
+  tags: string[];
+  details?: string;
+  status: 'active' | 'inactive' | string;
+}
+
+export interface AlarmRule {
+  value: number;
+  duration: number; // seconds
+  condition:
+    | 'GREATER_THAN'
+    | 'LESS_THAN'
+    | 'GREATER_THAN_OR_EQUAL'
+    | 'LESS_THAN_OR_EQUAL'
+    | 'EQUAL'
+    | 'NOT_EQUAL';
+  telemetryKey: string;
+}
+
 export interface Alarm {
+  note: string;
   id: string;
   type: string;
   originatorId: string;
@@ -63,6 +127,15 @@ export interface Alarm {
   customerId?: string;
   createdAt: string;
   updatedAt: string;
+  // UI / enriched fields returned by the backend
+  name?: string;
+  description?: string;
+  currentValue?: string | number;
+  rule?: AlarmRule;
+  device?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface AlarmQuery {
@@ -114,6 +187,11 @@ export const alarmsApi = {
 
   // Delete alarm
   delete: (id: string) => apiClient.delete(`/alarms/${id}`),
+  // Alarm analytics
+  analytics: (timeRange?: string) =>
+    apiClient.get<ApiResponse<any>>(
+      `/analytics/alarms${timeRange ? `?timeRange=${timeRange}` : ''}`
+    ),
 
   // Acknowledge alarm
   acknowledge: (id: string) =>
@@ -130,6 +208,9 @@ export const alarmsApi = {
   // Bulk clear
   bulkClear: (alarmIds: string[]) =>
     apiClient.post<ApiResponse<any>>('/alarms/bulk/clear', { alarmIds }),
+  // resolve
+  resolve: ({ id, note }: { id: string; note: string }) =>
+    apiClient.post<ApiResponse<Alarm>>(`/alarms/${id}/resolve`, { note }),
 
   // Get statistics
   getStatistics: () =>
@@ -154,4 +235,28 @@ export const alarmsApi = {
   // Get alarms by severity
   getBySeverity: (severity: AlarmSeverity) =>
     apiClient.get<ApiResponse<Alarm[]>>(`/alarms/severity/${severity}`),
+
+  // Get critical alarms
+  getCritical: () =>
+    apiClient.get<ApiResponse<Alarm[] | PaginatedResponse<Alarm>>>(
+      '/alarms/critical'
+    ),
+
+  // Get active alarms
+  getActive: () =>
+    apiClient.get<ApiResponse<Alarm[] | PaginatedResponse<Alarm>>>(
+      '/alarms/active'
+    ),
+
+  // Delete alarm
+  deleteAlarm: (id: string) =>
+    apiClient.delete<ApiResponse<void>>(`/alarms/${id}`),
+
+  // Create alarm rule
+  createRule: (data: CreateAlarmRulePayload) =>
+    apiClient.post<ApiResponse<any>>('/alarms', data),
+
+  // Get alarm escalation history
+  getEscalationHistory: (alarmId: string) =>
+    apiClient.get<ApiResponse<any[]>>(`/alarms/${alarmId}/escalation-history`),
 };

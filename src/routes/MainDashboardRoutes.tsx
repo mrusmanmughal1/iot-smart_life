@@ -12,18 +12,23 @@ const DashboardPage = Loadable(
     }))
   )
 );
-const AlarmsPage = Loadable(lazy(() => import('@/pages/AlarmsPage.tsx')));
+const AlarmsPage = Loadable(
+  lazy(() => import('@/features/alarms/page/AlarmsPage'))
+);
 const AlertAnalyticsPage = Loadable(
-  lazy(() => import('@/pages/AlertAnalyticsPage.tsx'))
+  lazy(() => import('@/features/alarms/page/AlertAnalyticsPage'))
 );
 const AlertRulesPage = Loadable(
   lazy(() => import('@/features/alarms/page/AlertRulesPage'))
+);
+const CreateAlarmRulePage = Loadable(
+  lazy(() => import('@/features/alarms/page/createAlarmRule'))
 );
 const AlertsNotificationPage = Loadable(
   lazy(() => import('@/features/alarms/page/AlertsNotificationPage'))
 );
 const AlertDetailsPage = Loadable(
-  lazy(() => import('@/pages/AlertDetailsPage.tsx'))
+  lazy(() => import('@/features/alarms/page/AlertDetailsPage'))
 );
 const NotificationsPage = Loadable(
   lazy(() => import('@/features/notifications/page/NotificationsPage'))
@@ -43,9 +48,7 @@ const SystemPerformanceAnalyticsPage = Loadable(
 const DataConsumptionAnalyticsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/DataConsumptionAnalyticsPage'))
 );
-const DashboardsAnalyticsPage = Loadable(
-  lazy(() => import('@/features/analytics/pages/DashboardsAnalyticsPage'))
-);
+
 const GeoAnalyticsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/GeoAnalyticsPage'))
 );
@@ -126,11 +129,15 @@ export const mainDashboardRoutes = [
         element: <AlertRulesPage />,
       },
       {
+        path: 'rules/create',
+        element: <CreateAlarmRulePage />,
+      },
+      {
         path: 'notifications',
         element: <AlertsNotificationPage />,
       },
       {
-        path: 'details',
+        path: 'details/:id',
         element: <AlertDetailsPage />,
       },
       {

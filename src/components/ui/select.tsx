@@ -28,6 +28,15 @@ interface SelectProps {
   disabled?: boolean;
 }
 
+function extractTextFromChildren(node: React.ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(extractTextFromChildren).join('');
+  if (React.isValidElement(node) && (node.props as any)?.children) {
+    return extractTextFromChildren((node.props as any).children);
+  }
+  return '';
+}
+
 export function Select({
   value: controlledValue,
   onValueChange,
@@ -58,7 +67,16 @@ export function Select({
   }, []);
 
   const getItemLabel = useCallback(
-    (itemValue: string) => itemLabels[itemValue],
+    (itemValue: string) => {
+      if (!itemValue && itemValue !== '') return undefined;
+      if (itemLabels[itemValue]) return itemLabels[itemValue];
+      // Case-insensitive lookup
+      const matchedKey = Object.keys(itemLabels).find(
+        (key) => key.toLowerCase() === itemValue.toLowerCase()
+      );
+      if (matchedKey && itemLabels[matchedKey]) return itemLabels[matchedKey];
+      return undefined;
+    },
     [itemLabels]
   );
 
@@ -82,7 +100,6 @@ interface SelectTriggerProps {
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
-
   id?: string;
 }
 
@@ -204,14 +221,15 @@ export function SelectItem({
     throw new Error('SelectItem must be used within Select');
   }
 
-  const isSelected = context.value === value;
+  const isSelected =
+    context.value === value ||
+    (typeof context.value === 'string' &&
+      typeof value === 'string' &&
+      context.value.toLowerCase() === value.toLowerCase());
 
   useEffect(() => {
-    const inferred =
-      typeof children === 'string' || typeof children === 'number'
-        ? String(children)
-        : '';
-    context.registerItem(value, textValue ?? inferred);
+    const inferred = extractTextFromChildren(children);
+    context.registerItem(value, textValue ?? (inferred || value));
   }, [children, context, textValue, value]);
 
   return (

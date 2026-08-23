@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { devicesApi } from '@/services/api/devices.api';
+import { alarmsApi } from '@/services/api/alarms.api';
 import { useLiveTelemetry } from '@/hooks/useLiveTelemetry';
 import {
   PieChart as RechartsPieChart,
@@ -19,14 +20,10 @@ import {
 import {
   TrendingUp,
   Activity,
-  AlertTriangle,
   Zap,
-  MapPin,
   ToggleRight,
-  ShieldAlert,
   BarChart2,
   PieChartIcon,
-  Compass,
   Loader2,
   Thermometer,
   Droplets,
@@ -49,7 +46,6 @@ import {
   Gauge,
   Sparkles,
   Layers,
-  Check,
   Table,
   Search,
   Download,
@@ -59,6 +55,9 @@ import type { Widget } from './WidgetCanvas';
 import { flattenObject } from '@/utils/helpers/FlattenObject';
 import toast from 'react-hot-toast';
 import { CHART_COLORS } from '@/utils/constants/colors';
+import DeviceMapWidget from '../widgets/Maps/DeviceMapWidget';
+import AlaramsList from '../widgets/alarms/AlaramsList';
+import ToggleSwitch from '../widgets/switches/ToggleSwitch';
 
 interface WidgetRendererProps {
   widget: Widget;
@@ -66,7 +65,7 @@ interface WidgetRendererProps {
 }
 
 /** Badge showing whether telemetry is pushed live over WebSocket or via polling */
-function LiveStatusBadge({
+export function LiveStatusBadge({
   isLive,
   isConnecting,
   isPolling,
@@ -107,7 +106,7 @@ function LiveStatusBadge({
 }
 
 /** Small badge shown inside every widget displaying bound device/telemetry info */
-function DataSourceBadge({
+export function DataSourceBadge({
   widget,
   deviceName,
 }: {
@@ -145,7 +144,7 @@ function DataSourceBadge({
 }
 
 /** Standard Empty State Card rendered when no device is selected yet */
-function EmptyDeviceState({
+export function EmptyDeviceState({
   widget,
   icon: Icon = Settings,
 }: {
@@ -490,6 +489,8 @@ function resolveWidgetClassification(widget: Widget): string {
   return 'telemetry-default';
 }
 
+/** Helper to extract latitude & longitude from telemetry, device details, or widget config */
+
 export function WidgetRenderer({
   widget,
   onDeviceChange,
@@ -534,6 +535,17 @@ export function WidgetRenderer({
     staleTime: 60_000,
   });
 
+  // Fetch real device alarms from API
+  const { data: alarmsResponse } = useQuery({
+    queryKey: ['device-alarms-widget', primaryDeviceId],
+    queryFn: () =>
+      primaryDeviceId
+        ? alarmsApi.getByDevice(primaryDeviceId)
+        : Promise.resolve(null),
+    enabled: isValidDevice,
+    staleTime: 15_000,
+  });
+
   const resolvedDeviceName =
     widget.dataSource?.deviceName ||
     (deviceDetailResponse?.data as any)?.data?.name ||
@@ -566,129 +578,22 @@ export function WidgetRenderer({
   // --------------------------------------------------------------------------
   if (classification === 'device-switch') {
     return (
-      <div className="relative w-full h-full flex flex-col justify-between p-3   dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 rounded-lg overflow-hidden">
-        {/* Ambient glow when switch is ON */}
-        <div
-          className={`pointer-events-none absolute inset-0 transition-opacity duration-700 ${
-            toggleState && isValidDevice ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-
-        {/* Top bar */}
-        <div className="relative z-10    ">
-          <LiveStatusBadge
-            isLive={isLiveTelemetry}
-            isConnecting={isConnectingTelemetry}
-            isPolling={isPollingFallback}
-          />
-        </div>
-
-        {!isValidDevice ? (
-          <div className="relative z-10">
-            <EmptyDeviceState widget={widget} icon={ToggleRight} />
-          </div>
-        ) : (
-          <div className="relative z-10 flex flex-col items-center justify-center my-auto gap-3.5 py-3">
-            <button
-              type="button"
-              disabled={isSendingCommand}
-              aria-pressed={toggleState}
-              onClick={async () => {
-                if (!primaryDeviceId) return;
-                const nextState = !toggleState;
-                setToggleState(nextState); // optimistic update
-                setIsSendingCommand(true);
-                try {
-                  await devicesApi.sendCommand(primaryDeviceId, 'control', {
-                    [switchKey]: nextState,
-                  });
-                  toast.success(
-                    `${switchKey} turned ${nextState ? 'ON' : 'OFF'}`
-                  );
-                } catch (err: any) {
-                  // Revert optimistic update on failure
-                  setToggleState(!nextState);
-                  toast.error(
-                    err?.response?.data?.message || 'Failed to send command'
-                  );
-                } finally {
-                  setIsSendingCommand(false);
-                }
-              }}
-              className={`group relative flex flex-col items-center gap-3 outline-none cursor-pointer select-none disabled:cursor-wait rounded-2xl focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 dark:focus-visible:ring-offset-slate-900 ${
-                isSendingCommand ? 'opacity-80' : ''
-              }`}
-            >
-              {/* Animated state badge */}
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-widest transition-all duration-300 border ${
-                  toggleState
-                    ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 shadow shadow-[rgba(0,0,0,0.5)]'
-                    : 'bg-slate-100 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400'
-                }`}
-              >
-                <span
-                  className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                    toggleState
-                      ? 'bg-emerald-500 animate-pulse'
-                      : 'bg-slate-400'
-                  }`}
-                />
-                {isSendingCommand ? 'Sending…' : toggleState ? 'On' : 'Off'}
-              </span>
-
-              {/* Switch track */}
-              <div
-                className={`relative flex items-center w-24 h-12  shadow shadow-[rgba(0,0,0,0.5)] rounded-full p-1.5 transition-all duration-300 ease-out ${
-                  toggleState
-                    ? 'bg-emerald-500 '
-                    : 'bg-slate-300 dark:bg-slate-700 '
-                } ${isSendingCommand ? 'opacity-60' : ''}`}
-              >
-                {/* ON label */}
-                <span
-                  className={`absolute left-3 text-[9px] font-black text-white/90 tracking-wide transition-opacity duration-200 ${
-                    toggleState ? 'opacity-100' : 'opacity-0'
-                  }`}
-                >
-                  ON
-                </span>
-                {/* OFF label */}
-                <span
-                  className={`absolute right-3 text-[9px] font-black text-slate-500 dark:text-slate-400 tracking-wide transition-opacity duration-200 ${
-                    toggleState ? 'opacity-0' : 'opacity-100'
-                  }`}
-                >
-                  OFF
-                </span>
-
-                {/* Sliding knob */}
-                <div
-                  className={`relative z-10 w-9 h-9 rounded-full bg-white shadow-lg flex items-center justify-center transition-transform duration-300 ease-out ${
-                    toggleState ? 'translate-x-12' : 'translate-x-0'
-                  }`}
-                >
-                  {isSendingCommand ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-amber-500" />
-                  ) : (
-                    <Power
-                      className={`w-5 h-5 transition-colors duration-300 ${
-                        toggleState ? 'text-emerald-500' : 'text-slate-400'
-                      }`}
-                    />
-                  )}
-                </div>
-              </div>
-
-              {/* Hint */}
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
-                {isSendingCommand ? 'Sending command…' : 'Tap to toggle'}
-              </span>
-            </button>
-          </div>
-        )}
-        <DataSourceBadge widget={widget} deviceName={resolvedDeviceName} />
-      </div>
+      <ToggleSwitch
+        toggleState={toggleState}
+        setToggleState={setToggleState}
+        primaryColor={primaryColor}
+        widget={widget}
+        primaryDeviceId={primaryDeviceId}
+        isValidDevice={isValidDevice}
+        isLiveTelemetry={isLiveTelemetry}
+        isConnectingTelemetry={isConnectingTelemetry}
+        isPollingFallback={isPollingFallback}
+        classification={classification}
+        resolvedDeviceName={resolvedDeviceName}
+        switchKey={switchKey}
+        setIsSendingCommand={setIsSendingCommand}
+        isSendingCommand={isSendingCommand}
+      />
     );
   }
 
@@ -1586,42 +1491,17 @@ export function WidgetRenderer({
   // 14. GEOSPATIAL MAP & GPS TRACKER WIDGET
   // --------------------------------------------------------------------------
   if (classification === 'device-map') {
-    const lat = telemetryData?.latitude ?? 24.7136;
-    const lon = telemetryData?.longitude ?? 46.6753;
-
     return (
-      <div className="w-full h-full relative rounded-lg overflow-hidden bg-slate-950 text-white p-3 flex flex-col justify-between border border-slate-800">
-        <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:12px_12px] opacity-40 pointer-events-none" />
-        <div className="flex items-center justify-between z-10">
-          <span className="text-xs font-bold flex items-center gap-1 text-cyan-400">
-            <MapPin className="w-4 h-4" /> {widget.title || 'Live GPS Radar'}
-          </span>
-          <LiveStatusBadge
-            isLive={isLiveTelemetry}
-            isConnecting={isConnectingTelemetry}
-            isPolling={isPollingFallback}
-          />
-        </div>
-
-        {!isValidDevice ? (
-          <EmptyDeviceState widget={widget} icon={MapPin} />
-        ) : (
-          <div className="relative my-auto flex items-center justify-center z-10">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-cyan-500/20 animate-ping absolute inset-0" />
-              <div className="w-10 h-10 rounded-full bg-cyan-500 flex items-center justify-center shadow-lg border border-white">
-                <Compass className="w-6 h-6 text-white animate-spin-slow" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="flex justify-between items-center text-[10px] text-slate-400 z-10 pt-2 border-t border-slate-800 font-mono">
-          <span>Lat: {Number(lat).toFixed(4)}° N</span>
-          <span>Lon: {Number(lon).toFixed(4)}° E</span>
-          <span className="text-emerald-400 font-bold">GPS Locked</span>
-        </div>
-      </div>
+      <DeviceMapWidget
+        widget={widget}
+        telemetryData={telemetryData}
+        deviceDetailResponse={deviceDetailResponse}
+        resolvedDeviceName={resolvedDeviceName}
+        isLiveTelemetry={isLiveTelemetry}
+        isConnectingTelemetry={isConnectingTelemetry}
+        isPollingFallback={isPollingFallback}
+        isValidDevice={isValidDevice}
+      />
     );
   }
 
@@ -1629,6 +1509,13 @@ export function WidgetRenderer({
   // 15. ALARMS & ALERTS MONITOR WIDGET
   // --------------------------------------------------------------------------
   if (classification === 'alarms-table') {
+    const rawApiAlarms =
+      (alarmsResponse?.data as any)?.data?.data ||
+      (alarmsResponse?.data as any)?.data ||
+      (alarmsResponse?.data as any) ||
+      [];
+    const fetchedAlarms = Array.isArray(rawApiAlarms) ? rawApiAlarms : [];
+
     const defaultAlarms = [
       {
         id: '1',
@@ -1644,73 +1531,30 @@ export function WidgetRenderer({
       },
     ];
 
-    return (
-      <div className="w-full h-full flex flex-col justify-between p-3 bg-white dark:bg-slate-900 rounded-lg">
-        <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-bold text-red-600 dark:text-red-400 flex items-center gap-1">
-            <ShieldAlert className="w-4 h-4" />{' '}
-            {widget.title || 'System Alarms'}
-          </span>
-          <span className="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold">
-            {defaultAlarms.length - acknowledgedAlarms.length} Active
-          </span>
-        </div>
+    const activeAlarmsList =
+      fetchedAlarms.length > 0
+        ? fetchedAlarms.map((a: any) => ({
+            id: a.id || String(a.type),
+            title: a.type || a.name || 'Device Alarm',
+            target:
+              a.details?.message ||
+              a.details?.description ||
+              a.originatorName ||
+              resolvedDeviceName ||
+              'Device',
+            level: (a.severity || 'warning').toLowerCase(),
+          }))
+        : defaultAlarms;
 
-        {!isValidDevice ? (
-          <EmptyDeviceState widget={widget} icon={ShieldAlert} />
-        ) : (
-          <div className="space-y-1 text-[11px] overflow-auto my-auto py-1">
-            {defaultAlarms.map((alarm) => {
-              const isAck = acknowledgedAlarms.includes(alarm.id);
-              if (isAck) return null;
-              return (
-                <div
-                  key={alarm.id}
-                  className={`flex items-center justify-between p-2 rounded-lg border ${
-                    alarm.level === 'critical'
-                      ? 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900'
-                      : 'bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5">
-                    <AlertTriangle
-                      className={`w-4 h-4 shrink-0 ${
-                        alarm.level === 'critical'
-                          ? 'text-red-500'
-                          : 'text-amber-500'
-                      }`}
-                    />
-                    <div>
-                      <p className="font-bold text-slate-800 dark:text-slate-200 leading-none">
-                        {alarm.title}
-                      </p>
-                      <span className="text-[9px] text-slate-400 font-mono">
-                        {alarm.target}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAcknowledgedAlarms((prev) => [...prev, alarm.id]);
-                      toast.success(`Acknowledged alarm: ${alarm.title}`);
-                    }}
-                    className="px-2 py-0.5 text-[9px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded hover:bg-slate-100"
-                  >
-                    Ack
-                  </button>
-                </div>
-              );
-            })}
-            {acknowledgedAlarms.length === defaultAlarms.length && (
-              <div className="text-center py-4 text-emerald-500 text-xs font-semibold flex items-center justify-center gap-1">
-                <Check className="w-4 h-4" /> All alarms acknowledged
-              </div>
-            )}
-          </div>
-        )}
-        <DataSourceBadge widget={widget} deviceName={resolvedDeviceName} />
-      </div>
+    return (
+      <AlaramsList
+        widget={widget}
+        activeAlarmsList={activeAlarmsList}
+        acknowledgedAlarms={acknowledgedAlarms}
+        setAcknowledgedAlarms={setAcknowledgedAlarms}
+        isValidDevice={isValidDevice}
+        resolvedDeviceName={resolvedDeviceName}
+      />
     );
   }
 

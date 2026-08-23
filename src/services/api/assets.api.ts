@@ -27,6 +27,8 @@ export interface Asset {
     latitude: number;
     longitude: number;
     address?: string;
+    city?: string;
+    country?: string;
   };
   attributes?: any[] | Record<string, any>;
   tags?: any[] | null;

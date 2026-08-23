@@ -66,7 +66,7 @@ export const TelemetryDetails: React.FC<TelemetryDetailsProps> = ({
           className="h-8 shadow-sm"
         >
           <RefreshCw
-            className={`h-3.5 w-3.5 mr-2 ${isLoading ? 'animate-spin' : ''}`}
+            className={`h-3.5 w-3.5 mr-2 ${isLoading ? 'animate-spin text-success' : ''}`}
           />
           {t('devices.details.telemetry.details.refresh')}
         </Button>

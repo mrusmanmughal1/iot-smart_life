@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/table';
 
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Eye, Download } from 'lucide-react';
+import { Trash2, Download } from 'lucide-react';
 import { AddAssetModal } from '@/features/assets/components/AddAssetModal';
 import { LoadingOverlay } from '@/components/common/LoadingSpinner';
 import { Pagination } from '@/components/common/Pagination/Pagination';
@@ -204,7 +204,7 @@ export default function AssetsPage() {
                       {t('common.status')}
                     </TableHead>
                     <TableHead className="text-white font-semibold">
-                      {t('assets.table.customer')}
+                      {t('assets.table.location')}
                     </TableHead>
                     <TableHead className="text-white font-semibold">
                       {t('assets.table.created')}
@@ -257,7 +257,8 @@ export default function AssetsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-slate-600">
-                          {asset.customer || 'N/A'}
+                          {asset.location?.city || 'N/A'} ,{' '}
+                          {asset.location?.country || 'N/A'}
                         </TableCell>
                         <TableCell className="text-slate-500 text-sm">
                           {asset.created

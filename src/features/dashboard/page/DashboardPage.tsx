@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Building2, Sprout, Building, Car, Home, Factory } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Progress } from '@/components/ui/progress';
@@ -165,37 +164,6 @@ export const DashboardPage = () => {
             <div className="col-span-">
               <AssetLocationsMapCard />
             </div>
-            {/* API Usage Card */}
-            {/* <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold text-gray-600">
-                    {t('dashboard.apiUsage', 'API Usage')}
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4 py-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-gray-900">
-                    {SubscriptionUsage?.current?.apiCalls || 0}
-                  </span>
-                  <Badge variant="outline" className="text-xs">
-                    {t('dashboard.monthlyLimit', 'Monthly Limit')}:{' '}
-                    {SubscriptionUsage?.limits?.apiCallsPerMonth || 0}
-                  </Badge>
-                </div>
-                <div className="space-y-1 pb-6">
-                  <div className="flex justify-between text-xs text-gray-500">
-                    <span>{t('dashboard.usage', 'Usage')}</span>
-                    <span>{SubscriptionUsage?.percentage?.apiCalls || 0}%</span>
-                  </div>
-                  <Progress
-                    value={SubscriptionUsage?.percentage?.apiCalls || 0}
-                    className="h-2"
-                  />
-                </div>
-              </CardContent>
-            </Card> */}
           </div>
 
           {/* Column 2 - Middle */}

@@ -179,12 +179,6 @@ const getNavItems = (): NavItem[] => [
       },
 
       {
-        titleKey: 'nav.alertDetails',
-        href: '/alarms/details',
-        icon: <AlertTriangle className="h-4 w-4" />,
-      },
-
-      {
         titleKey: 'nav.alertNotifications',
         href: '/alarms/notifications',
         icon: <BellRing className="h-4 w-4" />,
@@ -201,15 +195,16 @@ const getNavItems = (): NavItem[] => [
         href: '/analytics/devices',
         icon: <Smartphone className="h-4 w-4" />,
       },
-      {
-        titleKey: 'nav.dashboardAnalytics',
-        href: '/analytics/dashboard-analytics',
-        icon: <BarChart3 className="h-4 w-4" />,
-      },
+
       {
         titleKey: 'nav.dataConsumption',
         href: '/analytics/data-consumption',
         icon: <Zap className="h-4 w-4" />,
+      },
+      {
+        titleKey: 'nav.dashboardAnalytics',
+        href: '/analytics/dashboard-analytics',
+        icon: <BarChart3 className="h-4 w-4" />,
       },
       {
         titleKey: 'nav.systemPerformanceAnalytics',

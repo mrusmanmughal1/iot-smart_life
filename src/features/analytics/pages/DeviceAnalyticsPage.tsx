@@ -39,13 +39,6 @@ const activityData = [
   { date: '24/8', value: 2800 },
   { date: '25/8', value: 1100 },
   { date: '26/8', value: 2200 },
-  { date: '20/8', value: 2000 },
-  { date: '21/8', value: 1800 },
-  { date: '22/8', value: 2900 },
-  { date: '23/8', value: 400 },
-  { date: '24/8', value: 1800 },
-  { date: '25/8', value: 100 },
-  { date: '26/8', value: 2200 },
 ];
 
 // Helper function to get localized recent activity
@@ -57,21 +50,6 @@ const getRecentActivity = (t: TFunction) => [
       size: '2.3MB',
     }),
     time: t('analytics.timeAgo.minutes', { count: 2 }),
-  },
-  {
-    id: '2',
-    message: t('deviceAnalytics.activityMessages.dashboardConsumed', {
-      dashboardName: 'Production Overview',
-      size: '450MB',
-    }),
-    time: t('analytics.timeAgo.minutes', { count: 5 }),
-  },
-  {
-    id: '3',
-    message: t('deviceAnalytics.activityMessages.alertTriggered', {
-      message: 'Temperature threshold exceeded',
-    }),
-    time: t('analytics.timeAgo.minutes', { count: 8 }),
   },
 ];
 
@@ -89,9 +67,16 @@ export default function DeviceAnalyticsPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <PageHeader title={t('deviceAnalytics.title')} description={t('deviceAnalytics.description')} />
+            <PageHeader
+              title={t('deviceAnalytics.title')}
+              description={t('deviceAnalytics.description')}
+            />
           </div>
-          <Select value={timeRange} onValueChange={setTimeRange} className="w-40">
+          <Select
+            value={timeRange}
+            onValueChange={setTimeRange}
+            className="w-40"
+          >
             <SelectTrigger className="w-[180px] dark:bg-gray-800 dark:border-gray-700">
               <SelectValue placeholder={t('deviceAnalytics.selectTimeRange')} />
             </SelectTrigger>
@@ -99,7 +84,9 @@ export default function DeviceAnalyticsPage() {
               <SelectItem value="24h">
                 {t('deviceAnalytics.last24Hours')}
               </SelectItem>
-              <SelectItem value="7d">{t('deviceAnalytics.last7Days')}</SelectItem>
+              <SelectItem value="7d">
+                {t('deviceAnalytics.last7Days')}
+              </SelectItem>
               <SelectItem value="30d">
                 {t('deviceAnalytics.last30Days')}
               </SelectItem>
@@ -146,7 +133,9 @@ export default function DeviceAnalyticsPage() {
                 const start = startOfDay(parseISO(startDate));
                 const end = endOfDay(parseISO(endDate));
                 if (isAfter(start, end)) {
-                  console.warn('Start date must be before or equal to end date');
+                  console.warn(
+                    'Start date must be before or equal to end date'
+                  );
                   return;
                 }
                 // Format to ISO date strings (UTC) or any backend-expected format
@@ -243,9 +232,7 @@ export default function DeviceAnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold   dark:text-white">
-              99.8%
-            </div>
+            <div className="text-3xl font-bold   dark:text-white">99.8%</div>
             <div className="flex items-center gap-1 text-sm   dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
               <span>
@@ -401,8 +388,10 @@ export default function DeviceAnalyticsPage() {
         </CardContent>
       </Card>
       <div className="flex justify-center gap-3 pt-4">
-        <DashboardNavigation previousRoute="/analytics/devices"
-          nextRoute="/analytics/devices-2" />
+        <DashboardNavigation
+          previousRoute="/analytics/devices"
+          nextRoute="/analytics/devices-2"
+        />
       </div>
     </div>
   );

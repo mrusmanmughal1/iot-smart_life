@@ -201,7 +201,7 @@ export const analyticsService = {
    */
   async getTopPerformers(metric: string, limit: number = 10) {
     const system = await analyticsApi.getSystemAnalytics();
-    const topDevices = system.data.data.topDevicesByActivity;
+    const topDevices = system.data.data.topDevicesByActivity || [];
 
     return topDevices.slice(0, limit);
   },
@@ -217,7 +217,7 @@ export const analyticsService = {
 
     const data = analytics.data.data;
     const totalTime = endTime - startTime;
-    const activeTime = data.activeTime;
+    const activeTime = data.activeTime || 0;
 
     return {
       deviceId,

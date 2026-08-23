@@ -22,14 +22,12 @@ import { dashboardsApi } from '@/services/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { PageHeader } from '@/components/common/PageHeader';
-import { useNavigate } from 'react-router-dom';
 
 export default function DashboardsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const navigate = useNavigate();
   const {
     selectedTab,
     dashboards,
@@ -77,7 +75,6 @@ export default function DashboardsPage() {
       setIsImporting(false);
     }
   };
-
   const getNavigationPath = (id: any) => {
     return `/solution-dashboards/${id}`;
   };

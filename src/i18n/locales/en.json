@@ -826,7 +826,10 @@
           "actions": "ACTIONS",
           "noData": "No alarms found",
           "yes": "YES",
-          "no": "NO"
+          "no": "NO",
+          "triggeredTime": "TRIGGERED TIME",
+          "clearedTime": "CLEARED TIME",
+          "acknowledgedTime": "ACKNOWLEDGED TIME"
         },
         "messages": {
           "editComingSoon": "Edit alarm functionality coming soon",
@@ -1034,7 +1037,8 @@
       "customer": "CUSTOMER",
       "created": "CREATED",
       "status": "STATUS",
-      "actions": "ACTIONS"
+      "actions": "ACTIONS",
+      "location": "LOCATION"
     },
     "status": {
       "active": "Active",
@@ -1137,6 +1141,10 @@
     "acknowledgedAlarms": "Acknowledged",
     "clearedAlarms": "Cleared",
     "resolvedAlarms": "Resolved",
+    "selected": "Selected",
+    "view": "View Alarm",
+    "edit": "Edit Alarm",
+    "deleted": "Delete Alarm",
     "table": {
       "severity": "Severity",
       "type": "Type",
@@ -1144,7 +1152,18 @@
       "status": "Status",
       "created": "Created",
       "actions": "Actions",
-      "noData": "No data available"
+      "noData": "No data available",
+      "triggeredTime": "Trigger Time"
+    },
+    "filter": {
+      "all": "All",
+      "severity": "Severity",
+      "status": "Status",
+      "clearSelection": "Clear selection"
+    },
+    "delete": {
+      "title": "Delete Alarm",
+      "description": "Are you sure you want to delete this alarm?"
     }
   },
   "users": {
@@ -2768,7 +2787,7 @@
     "infoAlerts": "Info Alerts",
     "resolvedToday": "Resolved Today",
     "fromYesterday": "{{amount}} from yesterday",
-    "trendsTitle": "Alert Trends (Last 7 Days)",
+    "trendsTitle": "Alert Trends ",
     "legend": {
       "critical": "Critical Warning",
       "warning": "Warning",

@@ -20,7 +20,6 @@ export const alarmService = {
     if (comment) {
       await alarmsApi.update(alarmId, {
         details: {
-          acknowledgedComment: comment,
           acknowledgedAt: new Date().toISOString(),
         },
       });
