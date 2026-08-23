@@ -68,6 +68,9 @@ const DashboardAnalyticsPage = Loadable(
 const ProductionOverviewPage = Loadable(
   lazy(() => import('@/features/analytics/pages/ProductionOverviewPage'))
 );
+const AnalyticsOverviewPage = Loadable(
+  lazy(() => import('@/features/analytics/pages/AnalyticsOverviewPage'))
+);
 const Overview2Page = Loadable(lazy(() => import('@/pages/Overview2Page.tsx')));
 const SettingsPage = Loadable(
   lazy(() => import('@/features/settings/pages/SettingsPage'))
@@ -163,6 +166,10 @@ export const mainDashboardRoutes = [
       {
         path: 'devices',
         element: <DeviceAnalyticsMainPage />,
+      },
+      {
+        path: 'overview',
+        element: <AnalyticsOverviewPage />,
       },
       {
         path: 'devices-2',

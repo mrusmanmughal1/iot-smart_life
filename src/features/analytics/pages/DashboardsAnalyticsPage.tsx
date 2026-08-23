@@ -22,6 +22,8 @@ import { PageHeader } from '@/components/common/PageHeader';
 import {
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -39,7 +41,7 @@ import {
   AlertCircle,
   BarChart3,
 } from 'lucide-react';
-import { useDashboardAnalytics } from '../hooks';
+import { useDashboardAnalytics, useEnergyDetails } from '../hooks';
 import { DashboardAnalyticsItem } from '@/services/api/analytics.api';
 
 export default function DashboardsAnalyticsPage() {
@@ -55,7 +57,8 @@ export default function DashboardsAnalyticsPage() {
     isError,
     refetch,
   } = useDashboardAnalytics(timeRange);
-
+  const { data: energyData } = useEnergyDetails(timeRange);
+  console.log('energyData', energyData);
   if (isLoading) {
     return (
       <div className="flex flex-col space-y-6 animate-pulse p-4">
@@ -604,6 +607,362 @@ export default function DashboardsAnalyticsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Environmental Metrics & Impact Summary Section */}
+      {(() => {
+        // ── Derive chart data from energyData ──────────────────────────
+        const latest = energyData?.latest ?? {};
+        const trend: any[] = energyData?.trend ?? [];
+        const thresholds = energyData?.thresholds ?? {};
+        const recentAlerts: any[] = energyData?.recentAlerts ?? [];
+        const optimizationSuggestions: any[] =
+          energyData?.optimizationSuggestions ?? [];
+
+        const co2Latest = latest?.co2?.value ?? null;
+        const tempLatest = latest?.temperature?.value ?? null;
+        const humidityLatest = latest?.humidity?.value ?? null;
+
+        const co2Threshold = thresholds?.co2 ?? 1000;
+        const tempThreshold = thresholds?.temperature ?? 28;
+
+        // Build chart data: use trend array if available, otherwise use a single "Now" point
+        const chartData: {
+          label: string;
+          co2: number | null;
+          temp: number | null;
+          humidity: number | null;
+        }[] =
+          trend.length > 0
+            ? trend.map((d: any) => ({
+                label: d.bucket
+                  ? new Date(d.bucket).toLocaleDateString('en', {
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : (d.label ?? ''),
+                co2: d.co2 ?? d.co2Avg ?? null,
+                temp: d.temperature ?? d.temperatureAvg ?? null,
+                humidity: d.humidity ?? d.humidityAvg ?? null,
+              }))
+            : co2Latest !== null
+              ? [
+                  {
+                    label: 'Now',
+                    co2: co2Latest,
+                    temp: tempLatest,
+                    humidity: humidityLatest,
+                  },
+                ]
+              : [];
+
+        // Threshold percentage helpers
+        const co2Pct =
+          co2Latest != null
+            ? Math.min(Math.round((co2Latest / co2Threshold) * 100), 100)
+            : null;
+        const tempPct =
+          tempLatest != null
+            ? Math.min(Math.round((tempLatest / tempThreshold) * 100), 100)
+            : null;
+
+        const severityColor = (s: string) =>
+          s === 'critical'
+            ? 'text-red-600'
+            : s === 'error'
+              ? 'text-orange-500'
+              : s === 'warning'
+                ? 'text-yellow-500'
+                : 'text-blue-500';
+        const severityBg = (s: string) =>
+          s === 'critical'
+            ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+            : s === 'error'
+              ? 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'
+              : s === 'warning'
+                ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800'
+                : 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800';
+        const priorityColor = (p: string) =>
+          p === 'high'
+            ? 'text-red-600'
+            : p === 'medium'
+              ? 'text-orange-500'
+              : 'text-blue-500';
+
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* ── Environmental Metrics Trends ── */}
+            <Card className="border-gray-200 dark:border-gray-800 shadow-sm rounded-xl overflow-hidden">
+              <CardHeader className="p-6 pb-2">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Environmental Metrics Trends
+                </CardTitle>
+                {energyData?.period && (
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {new Date(energyData.period.since).toLocaleDateString()} –{' '}
+                    {new Date(energyData.period.until).toLocaleDateString()}
+                  </p>
+                )}
+              </CardHeader>
+              <CardContent className="p-6 pt-2">
+                {/* Latest snapshot pills */}
+                {co2Latest !== null && (
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200 dark:bg-fuchsia-900/20 dark:border-fuchsia-800 dark:text-fuchsia-300">
+                      <span className="w-2 h-2 rounded-full bg-fuchsia-500 inline-block" />
+                      CO₂: {co2Latest} ppm
+                      {co2Latest > co2Threshold && (
+                        <span className="ml-1 text-red-500 font-bold">
+                          ⚠ above {co2Threshold}
+                        </span>
+                      )}
+                    </span>
+                    {tempLatest !== null && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 dark:text-indigo-300">
+                        <span className="w-2 h-2 rounded-full bg-indigo-700 inline-block" />
+                        Temp: {tempLatest}°C
+                        {tempLatest > tempThreshold && (
+                          <span className="ml-1 text-red-500 font-bold">
+                            ⚠ above {tempThreshold}°C
+                          </span>
+                        )}
+                      </span>
+                    )}
+                    {humidityLatest !== null && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+                        Humidity: {humidityLatest}%
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Chart */}
+                {chartData.length > 0 ? (
+                  <div className="h-[220px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={chartData}
+                        margin={{ top: 5, right: 15, left: -20, bottom: 0 }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="0"
+                          vertical={false}
+                          stroke="#f1f5f9"
+                        />
+                        <XAxis
+                          dataKey="label"
+                          axisLine={{ stroke: '#e2e8f0' }}
+                          tickLine={false}
+                          tick={{ fill: '#94a3b8', fontSize: 10 }}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{ fill: '#94a3b8', fontSize: 10 }}
+                        />
+                        <Tooltip
+                          content={({ active, payload, label }) => {
+                            if (active && payload && payload.length) {
+                              return (
+                                <div className="bg-white dark:bg-gray-900 p-3 rounded-lg shadow-xl border border-gray-100 dark:border-gray-800 text-xs space-y-1">
+                                  <span className="font-semibold text-gray-800 dark:text-gray-200 block mb-1">
+                                    {label}
+                                  </span>
+                                  {payload.map((entry, idx) => (
+                                    <div
+                                      key={idx}
+                                      className="flex items-center justify-between gap-4"
+                                    >
+                                      <span style={{ color: entry.color }}>
+                                        {entry.name}:
+                                      </span>
+                                      <span className="font-bold text-gray-700 dark:text-gray-300">
+                                        {entry.value}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="co2"
+                          name="CO₂ (ppm)"
+                          stroke="#c026d3"
+                          strokeWidth={2.5}
+                          dot={
+                            chartData.length === 1
+                              ? { r: 5, fill: '#c026d3' }
+                              : false
+                          }
+                          connectNulls
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="temp"
+                          name="Temperature (°C)"
+                          stroke="#312e81"
+                          strokeWidth={2.5}
+                          dot={
+                            chartData.length === 1
+                              ? { r: 5, fill: '#312e81' }
+                              : false
+                          }
+                          connectNulls
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey="humidity"
+                          name="Humidity (%)"
+                          stroke="#d97706"
+                          strokeWidth={2.5}
+                          dot={
+                            chartData.length === 1
+                              ? { r: 5, fill: '#d97706' }
+                              : false
+                          }
+                          connectNulls
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="h-[220px] flex items-center justify-center text-gray-400 text-sm">
+                    No trend data available for this period
+                  </div>
+                )}
+
+                {/* Legend */}
+                <div className="flex flex-wrap items-center gap-6 mt-4 pt-2 border-t border-gray-100 dark:border-gray-800">
+                  {[
+                    { color: '#c026d3', label: 'CO₂ Emissions' },
+                    { color: '#312e81', label: 'Temperature' },
+                    { color: '#d97706', label: 'Humidity' },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center gap-2">
+                      <span
+                        className="w-3 h-3 rounded-[2px]"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span
+                        className="text-xs font-semibold"
+                        style={{ color: item.color }}
+                      >
+                        {item.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* ── Environmental Impact Summary ── */}
+            <Card className="border-gray-200 dark:border-gray-800 shadow-sm rounded-xl overflow-hidden flex flex-col">
+              <CardHeader className="p-6 pb-2">
+                <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Environmental Impact Summary
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 pt-2 flex-1 flex flex-col gap-5">
+                {/* Metric cards row */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* CO2 */}
+                  <div className="rounded-xl   p-4">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      CO₂ Level
+                    </p>
+                    <p
+                      className={`text-2xl font-bold mt-1 ${co2Latest != null && co2Latest > co2Threshold ? 'text-red-600' : 'text-primary'}`}
+                    >
+                      {co2Latest != null ? `${co2Latest} ppm` : '—'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Threshold: {co2Threshold} ppm
+                    </p>
+                    {co2Pct !== null && (
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden mt-2">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ${co2Pct >= 100 ? 'bg-red-500' : co2Pct >= 80 ? 'bg-orange-400' : 'bg-primary'}`}
+                          style={{ width: `${co2Pct}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Temperature */}
+                  <div className="rounded-xl   p-4">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      Temperature
+                    </p>
+                    <p
+                      className={`text-2xl font-bold mt-1 ${tempLatest != null && tempLatest > tempThreshold ? 'text-red-600' : 'text-primary'}`}
+                    >
+                      {tempLatest != null ? `${tempLatest}°C` : '—'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      Threshold: {tempThreshold}°C
+                    </p>
+                    {tempPct !== null && (
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden mt-2">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ${tempPct >= 100 ? 'bg-red-500' : tempPct >= 90 ? 'bg-orange-400' : 'bg-primary'}`}
+                          style={{ width: `${tempPct}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Humidity */}
+                  <div className="rounded-xl  p-4">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                      Humidity
+                    </p>
+                    <p className="text-2xl font-bold mt-1 text-amber-700 dark:text-amber-300">
+                      {humidityLatest != null ? `${humidityLatest}%` : '—'}
+                    </p>
+
+                    {humidityLatest !== null && (
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 h-2 rounded-full overflow-hidden mt-2">
+                        <div
+                          className="h-full rounded-full bg-amber-400 transition-all duration-700"
+                          style={{ width: `${Math.min(humidityLatest, 100)}%` }}
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Optimization suggestions (first one) */}
+                  {optimizationSuggestions.length > 0 ? (
+                    <div className="rounded-xl   p-4 flex flex-col justify-between">
+                      <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        Optimization
+                      </p>
+                      <p
+                        className={`text-xs font-bold mt-1 uppercase ${priorityColor(optimizationSuggestions[0].priority)}`}
+                      >
+                        {optimizationSuggestions[0].priority} priority
+                      </p>
+                      <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-300 mt-1 leading-snug">
+                        {optimizationSuggestions[0].suggestion}
+                      </p>
+                      <p className="text-[10px] text-gray-400 mt-1 leading-snug">
+                        {optimizationSuggestions[0].basis}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 p-4 flex items-center justify-center">
+                      <p className="text-xs text-gray-400">No suggestions</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      })()}
     </div>
   );
 }

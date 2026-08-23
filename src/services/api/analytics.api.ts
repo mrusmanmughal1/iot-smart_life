@@ -345,6 +345,60 @@ export interface AnalyticsAlarmStats {
 export interface TelemetryStats {
   today: number;
 }
+
+// Analytics Overview types - matching actual /analytics/overview endpoint
+export interface AnalyticsOverviewDevices {
+  total: number;
+  online: number;
+  offline: number;
+  onlinePercentage: number;
+}
+
+export interface AnalyticsOverviewTelemetry {
+  totalMessagesToday: number;
+  totalMessagesThisWeek: number;
+  totalMessagesThisMonth: number;
+  avgMessagesPerHour: number;
+  peakHour: string;
+  peakHourMessages: number;
+}
+
+export interface AnalyticsOverviewAlarms {
+  totalActive: number;
+  critical: number;
+  error: number;
+  warning: number;
+  info: number;
+  resolvedToday: number;
+}
+
+export interface AnalyticsOverviewAssets {
+  total: number;
+  withDevices: number;
+}
+
+export interface AnalyticsOverviewSubscription {
+  plan: string;
+  devicesUsed: number;
+  devicesLimit: number;
+  messagesUsed: number;
+  messagesLimit: number;
+  usagePercentage: number;
+}
+
+export interface AnalyticsOverviewData {
+  devices: AnalyticsOverviewDevices;
+  telemetry: AnalyticsOverviewTelemetry;
+  alarms: AnalyticsOverviewAlarms;
+  assets: AnalyticsOverviewAssets;
+  subscription: AnalyticsOverviewSubscription;
+}
+
+export interface AnalyticsOverviewResponse {
+  success: boolean;
+  data: AnalyticsOverviewData;
+  timestamp: string;
+}
 export const TimeRangeType = {
   lastHour: '1h',
   last24h: '24h',
@@ -465,7 +519,7 @@ export interface DevicesAnalyticsOverview {
 export const analyticsApi = {
   //get analytics overview
   getAnalyticsOverview: () =>
-    apiClient.get<ApiResponse<SystemOverviewResponse>>('/analytics/overview'),
+    apiClient.get<AnalyticsOverviewResponse>('/analytics/overview'),
   // Get time series data
   getTimeSeries: (query: AnalyticsQuery) =>
     apiClient.post<ApiResponse<Record<string, TimeSeriesData[]>>>(
@@ -578,5 +632,11 @@ export const analyticsApi = {
   getDataConsumption: (timeRange?: string) =>
     apiClient.get<ApiResponse<DataConsumptionAnalytics>>(
       `/analytics/data-consumption${timeRange ? `?timeRange=${timeRange}` : ''}`
+    ),
+
+  // get energy details
+  getEnergyDetails: (timeRange?: string) =>
+    apiClient.get<ApiResponse<any>>(
+      `/analytics/energy${timeRange ? `?timeRange=${timeRange}` : ''}`
     ),
 };

@@ -59,7 +59,7 @@ export default function DeviceAnalyticsPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const { data: analyticsOverview, isLoading } = useAnalyticsOverview();
-  const { alarms, devices, telemetry, users } = analyticsOverview?.data || {};
+  const { alarms, devices, telemetry } = analyticsOverview || {};
   if (isLoading) return <LoadingOverlay />;
   return (
     <div className="space-y-6">
@@ -197,7 +197,7 @@ export default function DeviceAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold   dark:text-white">
-              {telemetry?.today}
+              {telemetry?.totalMessagesToday}
             </div>
             <div className="flex items-center gap-1 text-sm   dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />
@@ -215,7 +215,7 @@ export default function DeviceAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold   dark:text-white">
-              {alarms?.active}
+              {alarms?.totalActive}
             </div>
             <div className="flex items-center gap-1 text-sm   dark:text-green-400 mt-1">
               <TrendingUp className="h-4 w-4" />

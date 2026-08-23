@@ -57,9 +57,12 @@ export const useAnalyticsOverview = () => {
   return useQuery({
     queryKey: ['analytics', 'overview'],
     queryFn: async () => {
-      const ApiResponse = await analyticsApi.getAnalyticsOverview();
-      return ApiResponse.data.data;
+      const response = await analyticsApi.getAnalyticsOverview();
+      // The endpoint returns { success, data: { devices, telemetry, alarms, assets, subscription }, timestamp }
+      return response.data.data;
     },
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
   });
 };
 
@@ -91,6 +94,17 @@ export const useDashboardAnalytics = (timeRange?: string) => {
     queryKey: ['analytics', 'dashboards', timeRange],
     queryFn: async () => {
       const response = await analyticsApi.getDashboardAnalytics(timeRange);
+      return response.data.data;
+    },
+  });
+};
+// get energy details
+
+export const useEnergyDetails = (timeRange?: string) => {
+  return useQuery({
+    queryKey: ['analytics', 'energy', timeRange],
+    queryFn: async () => {
+      const response = await analyticsApi.getEnergyDetails(timeRange);
       return response.data.data;
     },
   });
