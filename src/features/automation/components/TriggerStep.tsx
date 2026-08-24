@@ -54,7 +54,7 @@ export const TriggerStep: React.FC = () => {
     triggerData?.deviceId
   );
   const telemetry = telemetryData?.data?.data?.data || {};
-
+  console.log(telemetryData, 'Telemetry Data');
   const availableTelemetryKeys = useMemo(() => {
     return capabilities?.telemetryKeys || [];
   }, [capabilities]);
@@ -150,6 +150,7 @@ export const TriggerStep: React.FC = () => {
                         });
                         setValue('trigger.telemetryKey', '');
                         setValue('trigger.value', '');
+                        console.log(device.id, 'Device ID');
                       }
                     }}
                   >

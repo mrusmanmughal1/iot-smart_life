@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useFormContext, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
@@ -6,23 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { cn } from '@/lib/util';
-
-const templates = [
-  { id: 'security', name: 'Security Alert', icon: 'Shield' },
-  { id: 'lighting', name: 'Smart Lighting', icon: 'Lightbulb' },
-  { id: 'water', name: 'Water Management', icon: 'Droplets' },
-];
+import { X } from 'lucide-react';
 
 export const BasicInfoStep: React.FC = () => {
   const { t } = useTranslation();
+  const [tagInput, setTagInput] = useState('');
   const {
     register,
     control,
@@ -61,25 +49,6 @@ export const BasicInfoStep: React.FC = () => {
               placeholder={t('automation.dialog.fields.descriptionPlaceholder')}
               error={errors.description?.message as string}
               rows={4}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label htmlFor="status" className="font-medium">
-                {t('automation.dialog.fields.status', 'Status')}
-              </Label>
-            </div>
-            <Controller
-              name="enabled"
-              control={control}
-              render={({ field }) => (
-                <Switch
-                  id="status"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              )}
             />
           </div>
 
@@ -175,44 +144,112 @@ export const BasicInfoStep: React.FC = () => {
             <Controller
               name="tags"
               control={control}
-              render={({ field }) => (
-                <Input
-                  placeholder={t(
-                    'automation.dialog.fields.tagsPlaceholder',
-                    'Add tags (comma separated)'
-                  )}
-                  className="border rounded-md"
-                  value={field.value?.join(', ') || ''}
-                  onChange={(e) =>
-                    field.onChange(
-                      e.target.value.split(',').map((s) => s.trim())
-                    )
+              defaultValue={[]}
+              render={({ field }) => {
+                const tags: string[] = Array.isArray(field.value)
+                  ? field.value
+                  : [];
+
+                const addTag = (tagToAdd: string) => {
+                  const trimmed = tagToAdd.trim();
+                  if (trimmed && !tags.includes(trimmed)) {
+                    field.onChange([...tags, trimmed]);
                   }
+                };
+
+                const removeTag = (indexToRemove: number) => {
+                  field.onChange(
+                    tags.filter((_, idx) => idx !== indexToRemove)
+                  );
+                };
+
+                return (
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-1.5 p-2 min-h-[42px] border border-gray-200 rounded-md bg-white focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
+                      {tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 animate-in fade-in zoom-in-95 duration-150"
+                        >
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              removeTag(idx);
+                            }}
+                            className="hover:bg-primary/20 rounded-full p-0.5 transition-colors focus:outline-none"
+                          >
+                            <X className="w-3 h-3 text-primary" />
+                          </button>
+                        </span>
+                      ))}
+                      <input
+                        type="text"
+                        placeholder={
+                          tags.length === 0
+                            ? t(
+                                'automation.dialog.fields.tagsPlaceholder',
+                                'Type tag and press Enter...'
+                              )
+                            : 'Add tag...'
+                        }
+                        className="flex-1 min-w-[120px] bg-transparent border-none outline-none text-sm text-slate-800 placeholder:text-gray-400 focus:ring-0 p-0"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ',') {
+                            e.preventDefault();
+                            if (tagInput.trim()) {
+                              addTag(tagInput);
+                              setTagInput('');
+                            }
+                          } else if (
+                            e.key === 'Backspace' &&
+                            !tagInput &&
+                            tags.length > 0
+                          ) {
+                            e.preventDefault();
+                            removeTag(tags.length - 1);
+                          }
+                        }}
+                        onBlur={() => {
+                          if (tagInput.trim()) {
+                            addTag(tagInput);
+                            setTagInput('');
+                          }
+                        }}
+                      />
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      Press{' '}
+                      <kbd className="px-1.5 py-0.5 bg-gray-100 border rounded text-[10px]">
+                        Enter
+                      </kbd>{' '}
+                      or comma to add a tag badge
+                    </p>
+                  </div>
+                );
+              }}
+            />
+          </div>
+          <div className="flex items-center border p-4 rounded-md border-gray-300 justify-between">
+            <div>
+              <Label htmlFor="status" className="font-medium">
+                {t('automation.dialog.fields.status', 'Status')}
+              </Label>
+            </div>
+            <Controller
+              name="enabled"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  id="status"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
                 />
               )}
             />
-          </div>
-
-          <div className="space-y-4 p-4 border rounded-lg border-gray-200">
-            <h4 className="text-md font-medium">
-              {t(
-                'automation.dialog.sections.templates',
-                'Quick Start Templates'
-              )}
-            </h4>
-            <div className="space-y-2">
-              {templates.map((template) => (
-                <div
-                  key={template.id}
-                  className="flex items-center text-sm p-4 border border-gray-200 rounded-lg hover:bg-accent cursor-pointer transition-colors"
-                  onClick={() =>
-                    setValue('name', template.name, { shouldValidate: true })
-                  }
-                >
-                  <span className="">{template.name}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

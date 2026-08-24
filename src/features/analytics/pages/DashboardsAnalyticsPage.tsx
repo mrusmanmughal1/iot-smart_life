@@ -172,7 +172,7 @@ export default function DashboardsAnalyticsPage() {
   };
 
   return (
-    <div className="flex flex-col space-y-6 animate-in fade-in duration-500 pb-10">
+    <div className="flex flex-col space-y-6 pb-10">
       <PageHeader
         title={t('analytics.dashboard.title', {
           defaultValue: 'Dashboard Analytics',
@@ -614,7 +614,6 @@ export default function DashboardsAnalyticsPage() {
         const latest = energyData?.latest ?? {};
         const trend: any[] = energyData?.trend ?? [];
         const thresholds = energyData?.thresholds ?? {};
-        const recentAlerts: any[] = energyData?.recentAlerts ?? [];
         const optimizationSuggestions: any[] =
           energyData?.optimizationSuggestions ?? [];
 
@@ -707,8 +706,8 @@ export default function DashboardsAnalyticsPage() {
                 {/* Latest snapshot pills */}
                 {co2Latest !== null && (
                   <div className="flex flex-wrap gap-3 mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-200 dark:bg-fuchsia-900/20 dark:border-fuchsia-800 dark:text-fuchsia-300">
-                      <span className="w-2 h-2 rounded-full bg-fuchsia-500 inline-block" />
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-fuchsia-200 dark:bg-fuchsia-900/20 dark:border-fuchsia-800 dark:text-fuchsia-300">
+                      <span className="w-2 h-2 rounded-full bg-primary inline-block" />
                       CO₂: {co2Latest} ppm
                       {co2Latest > co2Threshold && (
                         <span className="ml-1 text-red-500 font-bold">

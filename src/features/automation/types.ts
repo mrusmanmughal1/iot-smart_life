@@ -35,7 +35,7 @@ export interface Automation {
     channel?: string;
   };
   actions?: Array<{
-    id: string;
+    id?: string;
     type: string;
     deviceId?: string;
     command?: string;
@@ -45,7 +45,11 @@ export interface Automation {
     delay?: number;
     priority?: 'low' | 'medium' | 'high';
     channel?: string;
-    params?: string;
+    params?: any;
+    webhookUrl?: string;
+    webhookMethod?: string;
+    webhookHeaders?: any;
+    webhookBody?: any;
   }>;
   execution?: {
     sequence: boolean;

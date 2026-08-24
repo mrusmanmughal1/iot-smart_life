@@ -30,19 +30,23 @@ const customers = ['Acme Corporation', 'Globex', 'Initech'];
 const roles = ['Customer User', 'Customer Admin', 'System Administrator'];
 
 export default function ProfileSettingsPage() {
-  const { register, handleSubmit, control, formState: { errors } } =
-    useForm<ProfileFormValues>({
-      resolver: zodResolver(profileSchema),
-      defaultValues: {
-        email: 'john.doe@company.com',
-        firstName: 'John',
-        lastName: 'Doe',
-        customer: 'Acme Corporation',
-        role: 'Customer User',
-        status: true,
-      },
-      mode: 'onChange',
-    });
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      email: 'john.doe@company.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      customer: 'Acme Corporation',
+      role: 'Customer User',
+      status: true,
+    },
+    mode: 'onChange',
+  });
 
   const onSubmit = (data: ProfileFormValues) => {
     // Placeholder submit handler
@@ -52,7 +56,9 @@ export default function ProfileSettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Profile Settings</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">
+          Profile Settings
+        </h1>
       </div>
 
       <Tabs defaultValue="general">
@@ -65,7 +71,9 @@ export default function ProfileSettingsPage() {
 
         <TabsContent value="general">
           <div className="mt-4 space-y-4">
-            <h2 className="text-lg font-semibold text-slate-900">Profile Information</h2>
+            <h2 className="text-lg font-semibold text-slate-900">
+              Profile Information
+            </h2>
 
             <div className="flex items-center gap-4">
               <div className="h-10 w-10 rounded-full bg-pink-500 text-white flex items-center justify-center text-sm font-semibold">
@@ -99,7 +107,9 @@ export default function ProfileSettingsPage() {
                       </label>
                       <Input {...register('email')} />
                       {errors.email && (
-                        <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
+                        <p className="mt-1 text-xs text-red-600">
+                          {errors.email.message}
+                        </p>
                       )}
                     </div>
 
@@ -135,13 +145,20 @@ export default function ProfileSettingsPage() {
                         name="customer"
                         control={control}
                         render={({ field }) => (
-                          <Select value={field.value || ''} onValueChange={field.onChange}>
+                          <Select
+                            value={field.value || ''}
+                            onValueChange={field.onChange}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Select customer" />
                             </SelectTrigger>
                             <SelectContent>
                               {customers.map((customer) => (
-                                <SelectItem key={customer} value={customer} textValue={customer}>
+                                <SelectItem
+                                  key={customer}
+                                  value={customer}
+                                  textValue={customer}
+                                >
                                   {customer}
                                 </SelectItem>
                               ))}
@@ -159,13 +176,20 @@ export default function ProfileSettingsPage() {
                         name="role"
                         control={control}
                         render={({ field }) => (
-                          <Select value={field.value || ''} onValueChange={field.onChange}>
+                          <Select
+                            value={field.value || ''}
+                            onValueChange={field.onChange}
+                          >
                             <SelectTrigger>
                               <SelectValue placeholder="Select role" />
                             </SelectTrigger>
                             <SelectContent>
                               {roles.map((role) => (
-                                <SelectItem key={role} value={role} textValue={role}>
+                                <SelectItem
+                                  key={role}
+                                  value={role}
+                                  textValue={role}
+                                >
                                   {role}
                                 </SelectItem>
                               ))}
@@ -176,13 +200,18 @@ export default function ProfileSettingsPage() {
                     </div>
 
                     <div className="flex items-center  gap-2">
-                      <span className="text-sm font-medium text-gray-700">Status</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Status
+                      </span>
                       <Controller
                         name="status"
                         control={control}
                         render={({ field }) => (
                           <div className="flex items-center gap-2">
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
                             <span className="text-sm text-gray-600">
                               {field.value ? 'Active' : 'Inactive'}
                             </span>
@@ -206,7 +235,9 @@ export default function ProfileSettingsPage() {
               <div className="space-y-6">
                 <Card>
                   <CardContent className="p-6 space-y-2">
-                    <h3 className="font-semibold text-slate-900">Account Information</h3>
+                    <h3 className="font-semibold text-slate-900">
+                      Account Information
+                    </h3>
                     <div className="text-sm text-slate-600">
                       <p className="font-medium text-slate-500">USER ID</p>
                       <p>1234567890abcdef</p>
@@ -228,7 +259,9 @@ export default function ProfileSettingsPage() {
 
                 <Card>
                   <CardContent className="p-6 space-y-2">
-                    <h3 className="font-semibold text-slate-900">Activity Summary</h3>
+                    <h3 className="font-semibold text-slate-900">
+                      Activity Summary
+                    </h3>
                     <div className="text-sm text-slate-600 space-y-1">
                       <p>Total Sessions: 143</p>
                       <p>28 Dashboards Created</p>
@@ -248,13 +281,19 @@ export default function ProfileSettingsPage() {
         </TabsContent>
 
         <TabsContent value="security">
-          <div className="p-4 text-sm text-slate-600">Security settings coming soon.</div>
+          <div className="p-4 text-sm text-slate-600">
+            Security settings coming soon.
+          </div>
         </TabsContent>
         <TabsContent value="preferences">
-          <div className="p-4 text-sm text-slate-600">Preferences coming soon.</div>
+          <div className="p-4 text-sm text-slate-600">
+            Preferences coming soon.
+          </div>
         </TabsContent>
         <TabsContent value="notifications">
-          <div className="p-4 text-sm text-slate-600">Notifications coming soon.</div>
+          <div className="p-4 text-sm text-slate-600">
+            Notifications coming soon.
+          </div>
         </TabsContent>
       </Tabs>
     </div>

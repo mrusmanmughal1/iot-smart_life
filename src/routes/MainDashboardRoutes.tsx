@@ -60,7 +60,7 @@ const DeviceanalyticsDetailsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/DeviceanalyticsDetailsPage'))
 );
 const AnalyticsDashboardDetailsPage = Loadable(
-  lazy(() => import('@/pages/AnalyticsDashboardDetailsPage.tsx'))
+  lazy(() => import('@/features/analytics/pages/AnalyticsDashboardDetailsPage'))
 );
 const DashboardAnalyticsPage = Loadable(
   lazy(() => import('@/features/analytics/pages/DashboardsAnalyticsPage'))
@@ -171,6 +171,7 @@ export const mainDashboardRoutes = [
         path: 'overview',
         element: <AnalyticsOverviewPage />,
       },
+      //ab
       {
         path: 'devices-2',
         element: <DeviceAnalyticsPage />,
@@ -179,13 +180,13 @@ export const mainDashboardRoutes = [
         path: 'devices/:id',
         element: <DeviceanalyticsDetailsPage />,
       },
-
+      //
       {
         path: 'dashboard-analytics',
         element: <DashboardAnalyticsPage />,
       },
       {
-        path: 'dashboard-analytics-/:id',
+        path: 'dashboard-analytics/:id',
         element: <AnalyticsDashboardDetailsPage />,
       },
       {

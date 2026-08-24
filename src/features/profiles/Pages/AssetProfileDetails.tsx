@@ -39,16 +39,16 @@ export default function AssetProfileDetails() {
   // API response structure: response.data.data.data
   const apiResponse = assetData?.data as
     | {
-      data?: {
         data?: {
-          name?: string;
-          description?: string;
-          defaultQueueName?: string;
-          defaultRuleChain?: string;
-          defaultEdgeRuleChain?: string;
+          data?: {
+            name?: string;
+            description?: string;
+            defaultQueueName?: string;
+            defaultRuleChain?: string;
+            defaultEdgeRuleChain?: string;
+          };
         };
-      };
-    }
+      }
     | undefined;
   const asset = apiResponse?.data?.data;
 
@@ -67,7 +67,6 @@ export default function AssetProfileDetails() {
         activeTab={activeTab}
         onTabChange={(tabId) => setActiveTab(tabId as TabType)}
       />
-
 
       {/* Details/General Tab */}
       {activeTab === 'details' && id && (

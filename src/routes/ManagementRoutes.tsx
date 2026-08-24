@@ -40,7 +40,7 @@ const CreateUserPage = Loadable(
   lazy(() => import('@/pages/CreateUserPage.tsx'))
 );
 const ProfileSettingsPage = Loadable(
-  lazy(() => import('@/pages/ProfileSettingsPage.tsx'))
+  lazy(() => import('@/features/settings/pages/ProfileSettingsPage'))
 );
 const CompanyProfilePage = Loadable(
   lazy(() => import('@/pages/CompanyProfilePage.tsx'))

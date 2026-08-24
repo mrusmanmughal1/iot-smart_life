@@ -16,7 +16,7 @@ const AssetProfiles = Loadable(
   lazy(() => import('@/pages/AssetProfilesPage.tsx'))
 );
 const AssetProfileDetails = Loadable(
-  lazy(() => import('@/pages/AssetProfileDetails.tsx'))
+  lazy(() => import('@/features/profiles/Pages/AssetProfileDetails'))
 );
 const DeviceProfiles = Loadable(
   lazy(() => import('@/pages/DeviceProfilesPage.tsx'))

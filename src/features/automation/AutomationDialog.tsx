@@ -17,6 +17,7 @@ import { TriggerStep } from './components/TriggerStep';
 import { ActionStep } from './components/ActionStep';
 import { ReviewStep } from './components/ReviewStep';
 import { automationSchema } from './Schema';
+import toast from 'react-hot-toast';
 
 interface AutomationDialogProps {
   open: boolean;
@@ -55,27 +56,32 @@ export const AutomationDialog: React.FC<AutomationDialogProps> = ({
       status: 'active',
       trigger: {
         type: 'threshold',
+        deviceId: '',
+        telemetryKey: '',
+        operator: 'gte',
+        value: '',
+        debounce: 60,
         enableDebounce: false,
         activeHoursEnabled: false,
         activeDays: [1, 2, 3, 4, 5],
-      },
-      actions: [
-        {
-          id: '1',
-          type: 'control',
-          deviceId: '',
-          command: 'Turn On',
-          params: 'Temp=22',
-          delay: 0,
-          priority: 'high',
+        activeHours: {
+          start: '08:00',
+          end: '18:00',
         },
-      ],
-      execution: {
-        sequence: true,
-        parallel: false,
-        stopOnError: false,
-        retryCount: 3,
       },
+      actions: [],
+      settings: {
+        cooldown: 300,
+        maxExecutionsPerDay: 10,
+        activeHours: {
+          start: '08:00',
+          end: '18:00',
+        },
+        activeDays: [1, 2, 3, 4, 5],
+        retryOnFailure: true,
+        maxRetries: 3,
+      },
+      tags: [],
     },
   });
 
@@ -85,31 +91,132 @@ export const AutomationDialog: React.FC<AutomationDialogProps> = ({
   useEffect(() => {
     if (open) {
       if (initialData) {
-        reset(initialData as any);
+        const actionItem: AutomationFormValues['actions'] =
+          initialData.actions && initialData.actions.length > 0
+            ? initialData.actions
+            : initialData.action
+              ? [
+                  {
+                    id: '1',
+                    type: initialData.action.type || 'control',
+                    deviceId: initialData.action.deviceId || '',
+                    command: initialData.action.command || 'setPower',
+                    value: initialData.action.value ?? true,
+                    message: initialData.action.message || '',
+                    recipients: initialData.action.recipients || [],
+                    webhookUrl: initialData.action.webhookUrl || '',
+                    webhookMethod: initialData.action.webhookMethod || 'POST',
+                    webhookHeaders: initialData.action.webhookHeaders,
+                    webhookBody: initialData.action.webhookBody,
+                    priority: initialData.action.priority || 'high',
+                    delay: initialData.action.delay || 0,
+                  },
+                ]
+              : [
+                  {
+                    id: '1',
+                    type: 'control',
+                    deviceId: '',
+                    command: 'setPower',
+                    value: true,
+                    priority: 'high',
+                    delay: 0,
+                  },
+                ];
+
+        reset({
+          name: initialData.name || '',
+          description: initialData.description || '',
+          enabled: initialData.enabled ?? true,
+          status: initialData.status || 'active',
+          trigger: {
+            type: initialData.trigger?.type || '',
+            deviceId:
+              initialData.trigger?.deviceId ||
+              initialData.trigger?.device ||
+              '',
+            telemetryKey: initialData.trigger?.telemetryKey || '',
+            attributeKey: initialData.trigger?.attributeKey || '',
+            operator: initialData.trigger?.operator || 'gte',
+            value: initialData.trigger?.value ?? '',
+            value2: initialData.trigger?.value2 ?? '',
+            schedule: initialData.trigger?.schedule || '',
+            debounce: initialData.trigger?.debounce ?? 60,
+            enableDebounce: !!initialData.trigger?.debounce,
+            activeHoursEnabled: !!(
+              initialData.settings?.activeHours ||
+              (initialData.trigger as any)?.activeHours
+            ),
+            activeHours: initialData.settings?.activeHours ||
+              (initialData.trigger as any)?.activeHours || {
+                start: '08:00',
+                end: '18:00',
+              },
+            activeDays: initialData.settings?.activeDays ||
+              (initialData.trigger as any)?.activeDays || [1, 2, 3, 4, 5],
+          },
+          actions: actionItem,
+          settings: {
+            cooldown: initialData.settings?.cooldown ?? 300,
+            maxExecutionsPerDay:
+              initialData.settings?.maxExecutionsPerDay ?? 10,
+            activeHours: initialData.settings?.activeHours || {
+              start: '08:00',
+              end: '18:00',
+            },
+            activeDays: initialData.settings?.activeDays || [1, 2, 3, 4, 5],
+            retryOnFailure: initialData.settings?.retryOnFailure ?? true,
+            maxRetries: initialData.settings?.maxRetries ?? 3,
+            notifyEmail: false,
+            notifyPush: false,
+            logHistory: true,
+          },
+          tags: initialData.tags,
+        });
       } else {
         reset({
           name: '',
           description: '',
           enabled: true,
           status: 'active',
-          trigger: { type: 'threshold' },
+          trigger: {
+            type: 'threshold',
+            deviceId: '',
+            telemetryKey: '',
+            operator: 'gte',
+            value: '',
+            debounce: 60,
+            enableDebounce: false,
+            activeHoursEnabled: false,
+            activeDays: [1, 2, 3, 4, 5],
+            activeHours: {
+              start: '08:00',
+              end: '18:00',
+            },
+          },
           actions: [
             {
               id: '1',
               type: 'control',
               deviceId: '',
-              command: 'Turn On',
-              params: 'Temp=22',
-              delay: 0,
+              command: 'setPower',
+              value: true,
               priority: 'high',
+              delay: 0,
             },
           ],
-          execution: {
-            sequence: true,
-            parallel: false,
-            stopOnError: false,
-            retryCount: 3,
+          settings: {
+            cooldown: 300,
+            maxExecutionsPerDay: 10,
+            activeHours: {
+              start: '08:00',
+              end: '18:00',
+            },
+            activeDays: [1, 2, 3, 4, 5],
+            retryOnFailure: true,
+            maxRetries: 3,
           },
+          tags: [],
         });
       }
       setCurrentStep(1);
@@ -118,7 +225,7 @@ export const AutomationDialog: React.FC<AutomationDialogProps> = ({
 
   const handleNext = async () => {
     let fieldsToValidate: any[] = [];
-    if (currentStep === 1) fieldsToValidate = ['name', 'description'];
+    if (currentStep === 1) fieldsToValidate = ['name'];
     if (currentStep === 2)
       fieldsToValidate = ['trigger.deviceId', 'trigger.telemetryKey'];
     if (currentStep === 3) fieldsToValidate = ['actions'];
@@ -129,47 +236,154 @@ export const AutomationDialog: React.FC<AutomationDialogProps> = ({
         setCurrentStep((prev) => prev + 1);
       } else {
         // Final Step: Submit
-        console.log('Final Step: Calling handleSubmit');
         handleSubmit(
           (data) => {
-            console.log('Form data before transformation:', data);
-            // Transform plural actions to singular action as requested
             const firstAction = data.actions?.[0] || {};
 
-            // Map the specific structure the user wants
-            const payload = {
+            // Action payload
+            let actionValue = firstAction.value;
+            if (firstAction.type === 'control') {
+              if (
+                firstAction.params &&
+                typeof firstAction.params === 'object' &&
+                Object.keys(firstAction.params).length > 0
+              ) {
+                actionValue = firstAction.params;
+              } else if (firstAction.value !== undefined) {
+                actionValue = firstAction.value;
+              } else {
+                actionValue = true;
+              }
+            }
+
+            const actionPayload: any = {
+              type: firstAction.type || 'control',
+            };
+
+            if (firstAction.type === 'control') {
+              if (firstAction.deviceId)
+                actionPayload.deviceId = firstAction.deviceId;
+              actionPayload.command = firstAction.command || 'setPower';
+              actionPayload.value = actionValue;
+            } else if (firstAction.type === 'notification') {
+              actionPayload.message = firstAction.message || '';
+              actionPayload.recipients = Array.isArray(firstAction.recipients)
+                ? firstAction.recipients.filter(Boolean)
+                : firstAction.recipients
+                  ? [firstAction.recipients]
+                  : [];
+            } else if (firstAction.type === 'webhook') {
+              actionPayload.webhookUrl =
+                firstAction.webhookUrl || 'https://api.example.com/webhook';
+              actionPayload.webhookMethod = firstAction.webhookMethod || 'POST';
+              actionPayload.webhookHeaders = firstAction.webhookHeaders || {
+                'Content-Type': 'application/json',
+              };
+              actionPayload.webhookBody = firstAction.webhookBody || {
+                alert: 'high_temperature',
+                value: '{{temperature}}',
+              };
+            } else {
+              if (firstAction.deviceId)
+                actionPayload.deviceId = firstAction.deviceId;
+              if (firstAction.command)
+                actionPayload.command = firstAction.command;
+              if (actionValue !== undefined) actionPayload.value = actionValue;
+              if (firstAction.message)
+                actionPayload.message = firstAction.message;
+              if (firstAction.recipients)
+                actionPayload.recipients = firstAction.recipients;
+              if (firstAction.webhookUrl)
+                actionPayload.webhookUrl = firstAction.webhookUrl;
+            }
+
+            // Trigger payload
+            const triggerPayload: any = {
+              type: data.trigger?.type || 'threshold',
+            };
+
+            if (data.trigger?.deviceId) {
+              triggerPayload.deviceId = data.trigger.deviceId;
+            }
+            if (data.trigger?.telemetryKey) {
+              triggerPayload.telemetryKey = data.trigger.telemetryKey;
+            }
+            if (data.trigger?.attributeKey) {
+              triggerPayload.attributeKey = data.trigger.attributeKey;
+            }
+            if (data.trigger?.operator) {
+              triggerPayload.operator = data.trigger.operator;
+            }
+            if (
+              data.trigger?.value !== undefined &&
+              data.trigger?.value !== ''
+            ) {
+              const num = Number(data.trigger.value);
+              triggerPayload.value = isNaN(num) ? data.trigger.value : num;
+            }
+            if (
+              data.trigger?.value2 !== undefined &&
+              data.trigger?.value2 !== ''
+            ) {
+              const num2 = Number(data.trigger.value2);
+              triggerPayload.value2 = isNaN(num2) ? data.trigger.value2 : num2;
+            }
+            if (data.trigger?.schedule) {
+              triggerPayload.schedule = data.trigger.schedule;
+            }
+            if (data.trigger?.enableDebounce && data.trigger?.debounce) {
+              triggerPayload.debounce = Number(data.trigger.debounce);
+            } else if (data.trigger?.debounce) {
+              triggerPayload.debounce = Number(data.trigger.debounce);
+            }
+
+            // Settings payload
+            const activeHours =
+              data.trigger?.activeHoursEnabled && data.trigger?.activeHours
+                ? data.trigger.activeHours
+                : data.settings?.activeHours || {
+                    start: '08:00',
+                    end: '18:00',
+                  };
+
+            const activeDays =
+              data.trigger?.activeHoursEnabled && data.trigger?.activeDays
+                ? data.trigger.activeDays
+                : data.settings?.activeDays || [1, 2, 3, 4, 5];
+
+            const settingsPayload = {
+              cooldown: Number(data.settings?.cooldown ?? 300),
+              maxExecutionsPerDay: Number(
+                data.settings?.maxExecutionsPerDay ?? 10
+              ),
+              activeHours,
+              activeDays,
+              retryOnFailure: data.settings?.retryOnFailure ?? true,
+              maxRetries: Number(data.settings?.maxRetries ?? 3),
+            };
+
+            const payload: Partial<Automation> = {
               name: data.name,
               description:
                 data.description ||
-                `When ${data.trigger?.telemetryKey} ${data.trigger?.operator} ${data.trigger?.value}, ${firstAction.type}`,
+                `Turn ON ${firstAction.command || 'action'} when ${data.trigger?.telemetryKey || 'metric'} ${data.trigger?.operator || '>='} ${data.trigger?.value || 'threshold'}`,
               enabled: data.enabled ?? true,
-              trigger: {
-                type: 'state',
-                deviceId: data.trigger?.deviceId,
-                telemetryKey: data.trigger?.telemetryKey,
-                operator: data.trigger?.operator || 'eq',
-                value: data.trigger?.value,
-                debounce: data.trigger?.debounce || 0,
-              },
-              action: {
-                type: firstAction.type || 'control',
-                deviceId: firstAction.deviceId,
-                command: firstAction.command || 'control_switch',
-                value: firstAction.params || {},
-              },
-              settings: {
-                cooldown: data.settings?.cooldown || 60,
-              },
+              trigger: triggerPayload,
+              action: actionPayload,
+              settings: settingsPayload,
+              tags:
+                data.tags && data.tags.length > 0
+                  ? data.tags
+                  : ['hvac', 'cooling', 'critical'],
             };
 
             console.log('Submitting Automation Payload:', payload);
-            onSubmit(payload as any);
+            onSubmit(payload);
             onOpenChange(false);
           },
           (errors) => {
             console.error('Form Validation Errors:', errors);
-            // Alert user of errors if they are hidden
-            alert('Form validation failed. Please check your inputs.');
+            toast.error('Form validation failed. Please check your inputs.');
           }
         )();
       }
@@ -198,6 +412,7 @@ export const AutomationDialog: React.FC<AutomationDialogProps> = ({
         return null;
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">

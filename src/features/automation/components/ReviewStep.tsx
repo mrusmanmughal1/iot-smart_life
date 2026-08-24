@@ -101,6 +101,24 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({ formData }) => {
                       )}
                     </div>
                   </div>
+
+                  {formData.tags && formData.tags.length > 0 && (
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 mb-1">
+                        Tags:
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        {formData.tags.map((tag, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </section>
 

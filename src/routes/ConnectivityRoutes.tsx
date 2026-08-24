@@ -3,7 +3,9 @@ import { FeatureRoute } from '@/routes/FeatureRoute.tsx';
 import { Loadable } from '@/components/common/Loadable';
 
 // Import connectivity page components lazily
-const Automation = Loadable(lazy(() => import('@/pages/AutomationPage.tsx')));
+const Automation = Loadable(
+  lazy(() => import('@/features/automation/page/AutomationPage'))
+);
 const Integrations = Loadable(
   lazy(() => import('@/pages/IntegrationsPage.tsx'))
 );
@@ -11,7 +13,7 @@ const IntegrationDetailsPage = Loadable(
   lazy(() => import('@/pages/IntegrationDetailsPage.tsx'))
 );
 const AddIntegrationPage = Loadable(
-  lazy(() => import('@/pages/AddIntegrationPage.tsx'))
+  lazy(() => import('@/features/integrations/page/AddIntegrationPage'))
 );
 const EdgeManagement = Loadable(
   lazy(() => import('@/features/Edge-managment/page/EdgeManagementPage'))

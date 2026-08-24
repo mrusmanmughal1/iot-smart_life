@@ -344,7 +344,7 @@ export const ActionFormItem: React.FC<ActionFormItemProps> = ({
                   </Label>
                   <Input
                     className="bg-slate-50 border-slate-200"
-                    placeholder="email@example.com"
+                    placeholder="email@example.com or user-uuid"
                     {...register(`actions.${index}.recipients.0`)}
                   />
                 </div>
@@ -375,6 +375,60 @@ export const ActionFormItem: React.FC<ActionFormItemProps> = ({
                   />
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {actionType === 'webhook' && (
+          <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-sm font-medium text-gray-500">
+                  Webhook URL
+                </Label>
+                <Input
+                  className="bg-slate-50 border-slate-200"
+                  placeholder="https://api.example.com/webhook"
+                  {...register(`actions.${index}.webhookUrl`)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-500">
+                  HTTP Method
+                </Label>
+                <Controller
+                  name={`actions.${index}.webhookMethod`}
+                  control={control}
+                  defaultValue="POST"
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || 'POST'}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="bg-slate-50 border-slate-200">
+                        <SelectValue placeholder="Select Method" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="GET">GET</SelectItem>
+                        <SelectItem value="POST">POST</SelectItem>
+                        <SelectItem value="PUT">PUT</SelectItem>
+                        <SelectItem value="PATCH">PATCH</SelectItem>
+                        <SelectItem value="DELETE">DELETE</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-500">
+                Webhook Payload / Message
+              </Label>
+              <Input
+                className="bg-slate-50 border-slate-200 font-mono text-xs"
+                placeholder='{"alert": "high_temperature", "value": "{{temperature}}"}'
+                {...register(`actions.${index}.message`)}
+              />
             </div>
           </div>
         )}

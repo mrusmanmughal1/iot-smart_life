@@ -438,8 +438,10 @@ export default function AnalyticsDashboardDetailsPage() {
         </Card>
       </div>
       <div className="flex justify-center gap-3 pt-4">
-        <DashboardNavigation previousRoute="/analytics/dashboard-analytics/:id"
-          nextRoute="/analytics/dashboard-analytics-/:id" />
+        <DashboardNavigation
+          previousRoute="/analytics/dashboard-analytics/:id"
+          nextRoute="/analytics/dashboard-analytics-/:id"
+        />
       </div>
     </div>
   );

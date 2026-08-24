@@ -69,22 +69,6 @@ export default function DeviceAnalyticsMainPage() {
     limit: itemsPerPage,
   };
 
-  const handleExportPdf = () => {
-    exportDeviceAnalyticsPdf({
-      timeRange,
-      deviceType,
-      status,
-      devices: rawData.devices || [],
-      topGenerators: rawData.topGenerators || [],
-      statusDistribution: rawData.statusDistribution || {
-        online: 0,
-        offline: 0,
-        maintenance: 0,
-      },
-      totalDevices: rawData.meta?.totalItems || (rawData.devices || []).length,
-    });
-  };
-
   const tableData = (rawData.devices || []).map((device) => ({
     id: device.id,
     name: device.name || 'Unknown',
@@ -137,9 +121,6 @@ export default function DeviceAnalyticsMainPage() {
           title={t('analytics.deviceMain.title')}
           description={t('analytics.deviceMain.subtitle')}
         />
-        <Button variant="primary" onClick={handleExportPdf}>
-          Export Data
-        </Button>
       </div>
 
       {/* Filters Section */}

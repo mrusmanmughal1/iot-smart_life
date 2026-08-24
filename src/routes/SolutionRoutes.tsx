@@ -54,7 +54,7 @@ const BuildingHierarchyChartPage = Loadable(
   lazy(() => import('@/pages/BuildingHierarchyChartPage.tsx'))
 );
 const AlertConfigurationPage = Loadable(
-  lazy(() => import('@/pages/AlertConfigurationPage.tsx'))
+  lazy(() => import('@/features/alarms/page/AlertConfigurationPage'))
 );
 const FloorMapHistoryPage = Loadable(
   lazy(() => import('@/features/floorPlan/page/FloorMapHistoryPage'))

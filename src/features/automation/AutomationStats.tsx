@@ -2,26 +2,14 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Zap, Play, AlertTriangle } from 'lucide-react';
-import { useAutomationStats } from './hooks/useAutomation';
-import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { AutomationStatistics } from '@/services/api/automation.api';
 
-export const AutomationStats: React.FC = () => {
+export interface AutomationStatsProps {
+  stats?: AutomationStatistics['data'];
+}
+
+export const AutomationStats: React.FC<AutomationStatsProps> = ({ stats }) => {
   const { t } = useTranslation();
-  const { data: stats, isLoading, isError } = useAutomationStats();
-  if (isError) {
-    return (
-      <div className="p-4 bg-red-50 text-red-500 rounded-md border border-red-200">
-        Failed to load automation statistics.
-      </div>
-    );
-  }
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
 
   return (
     <div className="grid gap-6 md:grid-cols-4">

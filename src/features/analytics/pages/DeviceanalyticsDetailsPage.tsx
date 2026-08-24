@@ -26,6 +26,7 @@ import {
 import { CheckCircle2, AlertCircle, RefreshCw, Activity } from 'lucide-react';
 import { cn } from '@/lib/util';
 import { useDeviceDetails } from '@/features/analytics/hooks';
+import { exportDeviceDetailsPdf } from '../utils/exportDeviceDetailsPdf';
 export default function DeviceanalyticsDetailsPage() {
   const { t } = useTranslation();
   const { id } = useParams();
@@ -160,9 +161,19 @@ export default function DeviceanalyticsDetailsPage() {
   ];
 
   const isOnline = device?.status?.toLowerCase() === 'online';
-
+  const handleExportPdf = () => {
+    exportDeviceDetailsPdf({
+      device,
+      stats,
+      telemetrySummary: deviceAnalytics.telemetrySummary || [],
+      telemetryTrend: deviceAnalytics.telemetryTrend || [],
+      alarmHistory: deviceAnalytics.alarmHistory || [],
+      hourlyActivity: deviceAnalytics.hourlyActivity || [],
+      period,
+    });
+  };
   return (
-    <div className="flex flex-col space-y-6 animate-in fade-in duration-500 pb-10">
+    <div className="flex flex-col space-y-6   pb-10">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <PageHeader
@@ -200,7 +211,9 @@ export default function DeviceanalyticsDetailsPage() {
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
-          <Button variant="primary">Export Data</Button>
+          <Button variant="primary" onClick={handleExportPdf}>
+            Export Data
+          </Button>
         </div>
       </div>
 
